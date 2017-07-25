@@ -3,5 +3,6 @@ cc_binary(
     srcs = ["visualizer.cc"],
     deps = [
         "@ignition_gui",
+        "@ignition_rendering",
     ],
 )

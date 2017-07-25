@@ -30,6 +30,16 @@ pkg_config_package(
     modname = "Qt5Core",
 )
 
+pkg_config_package(
+    name = "OGRE",
+    modname = "OGRE",
+)
+
+pkg_config_package(
+    name = "OGRE-Paging",
+    modname = "OGRE-Paging",
+)
+
 github_archive(
     name = "lcm",
     repository = "lcm-proj/lcm",
@@ -45,4 +55,13 @@ bitbucket_archive(
     sha256 = "7454bf848b5df3d758bc6aace1deb53886cda224248bd97f8bff4ffeef09352d",
     strip_prefix = "ignitionrobotics-ign-gui-039f8877d173",
     build_file = "tools/ignition_gui.BUILD",
+)
+
+bitbucket_archive(
+    name = "ignition_rendering",
+    repository = "ignitionrobotics/ign-rendering",
+    commit = "1a63ce5e15e9",
+    sha256 = "7ace37f74623e9d49291719de62c92b2ac6670b8647c516a5ddf041393b5bda6",
+    strip_prefix = "ignitionrobotics-ign-rendering-1a63ce5e15e9",
+    build_file = "tools/ignition_rendering.BUILD",
 )

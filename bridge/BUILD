@@ -3,5 +3,6 @@ cc_binary(
     srcs = ["lcm-to-ign-trans-bridge.cc"],
     deps = [
         "@ignition-transport3",
+        "@lcm",
     ],
 )

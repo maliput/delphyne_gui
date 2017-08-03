@@ -55,3 +55,12 @@ To run the visualizer, run:
 ```
 $ bazel run //visualizer:visualizer
 ```
+
+# Instructions for the clang-format tool
+In order to get all the C++ code in the project compliant with a single style, we strongly recommend you using the auto-formatting tool called clang-format.
+
+You can execute it against your source code by doing:
+```
+/usr/bin/clang-format-3.9 -i -style=file path/to/file.cpp
+```
+This will automatically apply the code conventions specified in the .clang-format file, found on the root of the repository.

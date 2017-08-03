@@ -61,6 +61,6 @@ In order to get all the C++ code in the project compliant with a single style, w
 
 You can execute it against your source code by doing:
 ```
-/usr/bin/clang-format-3.9 -i -style=file path/to/file.cpp
+/usr/bin/clang-format-3.9 -i -style=file <path/to/file.cpp>
 ```
 This will automatically apply the code conventions specified in the .clang-format file, found on the root of the repository.

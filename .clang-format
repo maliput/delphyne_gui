@@ -19,7 +19,6 @@ PointerAlignment: Left
 # To obtain updated lists of system headers used in the below expressions, see:
 # http://stackoverflow.com/questions/2027991/list-of-standard-header-files-in-c-and-c/2029106#2029106.
 IncludeCategories:
-  # Spacers used by drake/tools/formatter.py.
   - Regex:    '^<clang-format-priority-15>$'
     Priority: 15
   - Regex:    '^<clang-format-priority-25>$'
@@ -37,9 +36,6 @@ IncludeCategories:
   # Other libraries' h files (with angles).
   - Regex:    '^<'
     Priority: 40
-  # Your project's h files.
-  - Regex:    '^"drake'
-    Priority: 50
   # Other libraries' h files (with quotes).
   - Regex:    '^"'
     Priority: 41

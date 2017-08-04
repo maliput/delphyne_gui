@@ -64,3 +64,11 @@ You can execute it against your source code by doing:
 /usr/bin/clang-format-3.9 -i -style=file <path/to/file.cpp>
 ```
 This will automatically apply the code conventions specified in the .clang-format file, found on the root of the repository.
+
+There is also an automated script that looks for all the C++ src/header files and then calls clang-format accordingly. You can invoque it by doing:
+
+```
+./tools/reformat_code.sh
+```
+
+This script must be run from the top-level of the repository in order to find all of the files. It is recommended to run this before opening any pull request.

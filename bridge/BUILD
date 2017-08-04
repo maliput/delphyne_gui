@@ -16,7 +16,6 @@ cc_binary(
         "lcmtypes/lcmt_viewer_load_robot.hpp",
         ],
     deps = [
-        "@ignition-transport3",
         "@lcm",
     ],
 )

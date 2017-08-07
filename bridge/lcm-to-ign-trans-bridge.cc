@@ -34,20 +34,22 @@
 
 #include "drake/lcmt_viewer_geometry_data.hpp"
 #include "drake/lcmt_viewer_load_robot.hpp"
-#include "lcm_to_ign_translator.h"
 #include "lcm_channel_repeater.h"
+#include "lcm_to_ign_translator.h"
 
 #include "lcm/lcm-cpp.hpp"
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char* argv[]) {
   lcm::LCM lcm;
 
-  delphyne::bridge::LcmChannelRepeater<drake::lcmt_viewer_load_robot, ignition::msgs::Model> viewerLoadRobotRepeater(&lcm, "DRAKE_VIEWER_LOAD_ROBOT");
+  delphyne::bridge::LcmChannelRepeater<drake::lcmt_viewer_load_robot,
+                                       ignition::msgs::Model>
+      viewerLoadRobotRepeater(&lcm, "DRAKE_VIEWER_LOAD_ROBOT");
 
   viewerLoadRobotRepeater.Start();
 
-  while(0 == lcm.handle());
+  while (0 == lcm.handle())
+    ;
 
   return 0;
 }

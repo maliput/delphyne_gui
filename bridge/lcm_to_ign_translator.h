@@ -7,10 +7,12 @@
 namespace delphyne {
 namespace bridge {
 
-/// LcmToIgnTranslator implements the methods required to convert LCM messages
-/// into ign-message ones. As the bridge implementation grows and we need to
-/// accommodate more channels, new translation methods will be added.
-///
+/// LcmToIgnTranslator implements the methods required to convert
+/// LCM messages into ign-message ones. As the bridge implementation
+/// grows and we need to accommodate more channels, new translation
+/// methods will be added.
+/// Note that we rely on having overloaded Translate methods so they
+/// can be easily used in the LcmChannelRepeater class.
 class LcmToIgnTranslator {
  public:
   ignition::msgs::Model* Translate(drake::lcmt_viewer_load_robot robot_data);

@@ -11,6 +11,10 @@
 namespace delphyne {
 namespace bridge {
 
+// LcmChannelRepeater listens to all the messages that arrive to
+// an LCM channel, translates them into their ign-msgs counterpart
+// and re-publishes them into an ign-transport topic of the same
+// name.
 template <class LCM_TYPE, class IGN_TYPE>
 class LcmChannelRepeater {
  public:

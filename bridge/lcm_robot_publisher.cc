@@ -27,6 +27,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <iostream>
+#include <string>
 #include <thread>
 #include <lcm/lcm-cpp.hpp>
 
@@ -35,44 +36,146 @@
 #include "drake/lcmt_viewer_link_data.hpp"
 #include "drake/lcmt_viewer_load_robot.hpp"
 
-// Publishes a defined lcmt_viewer_load_robot
-// message into the DRAKE_VIEWER_LOAD_ROBOT
-// channel every one second
+// Publishes a defined lcmt_viewer_load_robot message into
+// the DRAKE_VIEWER_LOAD_ROBOT channel.
+// It consists on:
+// - A box
+// - A cylinder
+// - A sphere
+// - A mesh loaded from a URL path
+// - A mesh loaded from a "package" styled path
+
 int main(int argc, char* argv[]) {
   lcm::LCM lcm;
-
   if (!lcm.good()) {
     ignerr << "Failed to initialize LCM" << std::endl;
     return 1;
   }
+  // fixed values used to override the non-initialized variables from the
+  // geometry messages
+  std::vector<float> position = {0.0, 0.0, 0.0};
+  std::vector<float> quaternion = {1.0, 0.0, 0.0, 0.0};
+  std::vector<float> color = {1.0, 1.0, 1.0, 1.0};
 
-  // Generate geometry message
-  drake::lcmt_viewer_geometry_data geometryMsg;
-  geometryMsg.type = geometryMsg.BOX;
-  geometryMsg.num_float_data = 3;
-  geometryMsg.float_data.resize(geometryMsg.num_float_data);
-  geometryMsg.float_data[0] = 3.8808;
-  geometryMsg.float_data[1] = 0.75;
-  geometryMsg.float_data[2] = 0.030921;
+  // Define box geometry message
+  drake::lcmt_viewer_geometry_data boxMsg;
+  boxMsg.type = boxMsg.BOX;
+  boxMsg.num_float_data = 3;
+  boxMsg.float_data.resize(boxMsg.num_float_data);
+  boxMsg.float_data[0] = 3.8808;
+  boxMsg.float_data[1] = 0.75;
+  boxMsg.float_data[2] = 0.030921;
+  std::copy(position.begin(), position.end(), boxMsg.position);
+  std::copy(quaternion.begin(), quaternion.end(), boxMsg.quaternion);
+  std::copy(color.begin(), color.end(), boxMsg.color);
+  // Generate box link message
+  drake::lcmt_viewer_link_data boxLinkMsg;
+  boxLinkMsg.name = "box";
+  boxLinkMsg.robot_num = 0;
+  boxLinkMsg.num_geom = 1;
+  boxLinkMsg.geom.resize(boxLinkMsg.num_geom);
+  boxLinkMsg.geom[0] = boxMsg;
 
-  // Generate link message
-  drake::lcmt_viewer_link_data linkMsg;
-  linkMsg.name = "chassis";
-  linkMsg.robot_num = 0;
-  linkMsg.num_geom = 1;
-  linkMsg.geom.resize(linkMsg.num_geom);
-  linkMsg.geom[0] = geometryMsg;
+  // Define sphere geometry message
+  drake::lcmt_viewer_geometry_data sphereMsg;
+  sphereMsg.type = sphereMsg.SPHERE;
+  sphereMsg.num_float_data = 1;
+  sphereMsg.float_data.resize(sphereMsg.num_float_data);
+  sphereMsg.float_data[0] = 1;
+  std::copy(position.begin(), position.end(), sphereMsg.position);
+  sphereMsg.position[0] = 4;  // offset for models
+  std::copy(quaternion.begin(), quaternion.end(), sphereMsg.quaternion);
+  std::copy(color.begin(), color.end(), sphereMsg.color);
+  // Generate sphere link message
+  drake::lcmt_viewer_link_data sphereLinkMsg;
+  sphereLinkMsg.name = "sphere";
+  sphereLinkMsg.robot_num = 0;
+  sphereLinkMsg.num_geom = 1;
+  sphereLinkMsg.geom.resize(sphereLinkMsg.num_geom);
+  sphereLinkMsg.geom[0] = sphereMsg;
+
+  // Define cylinder geometry message
+  drake::lcmt_viewer_geometry_data cylinderMsg;
+  cylinderMsg.type = cylinderMsg.CYLINDER;
+  cylinderMsg.num_float_data = 2;
+  cylinderMsg.float_data.resize(cylinderMsg.num_float_data);
+  cylinderMsg.float_data[0] = 1;
+  cylinderMsg.float_data[1] = 4;
+  std::copy(position.begin(), position.end(), cylinderMsg.position);
+  cylinderMsg.position[0] = 8;  // offset for models
+  std::copy(quaternion.begin(), quaternion.end(), cylinderMsg.quaternion);
+  std::copy(color.begin(), color.end(), cylinderMsg.color);
+  // Generate cylinder link message
+  drake::lcmt_viewer_link_data cylinderLinkMsg;
+  cylinderLinkMsg.name = "cylinder";
+  cylinderLinkMsg.robot_num = 0;
+  cylinderLinkMsg.num_geom = 1;
+  cylinderLinkMsg.geom.resize(cylinderLinkMsg.num_geom);
+  cylinderLinkMsg.geom[0] = cylinderMsg;
+
+  // Define mesh-from-url geometry message
+  drake::lcmt_viewer_geometry_data meshURLMsg;
+  meshURLMsg.type = meshURLMsg.MESH;
+  meshURLMsg.string_data =
+      "drake/automotive/models/prius/prius.dae";  // Relative to drake's package
+                                                  // path or absolute.
+  meshURLMsg.num_float_data = 0;
+  meshURLMsg.float_data.resize(meshURLMsg.num_float_data);
+  std::copy(position.begin(), position.end(), meshURLMsg.position);
+  meshURLMsg.position[0] = 10;  // offset for models
+  std::copy(quaternion.begin(), quaternion.end(), meshURLMsg.quaternion);
+  std::copy(color.begin(), color.end(), meshURLMsg.color);
+  // Generate mesh-from-url link message
+  drake::lcmt_viewer_link_data meshURLLinkMsg;
+  meshURLLinkMsg.name = "mesh-from-url";
+  meshURLLinkMsg.robot_num = 0;
+  meshURLLinkMsg.num_geom = 1;
+  meshURLLinkMsg.geom.resize(meshURLLinkMsg.num_geom);
+  meshURLLinkMsg.geom[0] = meshURLMsg;
+
+  // Define mesh-from-package geometry message
+  drake::lcmt_viewer_geometry_data meshPackageMsg;
+  meshPackageMsg.type = meshPackageMsg.MESH;
+  // The following path gets solved by drake's resolvePackageFilename. Requires
+  // a package.xml file on each named directory and to append the root dir to
+  // DRAKE_PACKAGE_PATH
+  meshPackageMsg.string_data = "package://drake/car/car.vtp";
+  meshPackageMsg.num_float_data = 3;
+  meshPackageMsg.float_data.resize(meshPackageMsg.num_float_data);
+  meshPackageMsg.float_data[0] = 1;  // float_data needs to be populated
+  meshPackageMsg.float_data[1] = 1;
+  meshPackageMsg.float_data[2] = 1;
+  std::copy(position.begin(), position.end(), meshPackageMsg.position);
+  meshPackageMsg.position[0] = 16;  // offset for models
+  std::copy(quaternion.begin(), quaternion.end(), meshURLMsg.quaternion);
+  std::copy(quaternion.begin(), quaternion.end(), meshPackageMsg.quaternion);
+  std::copy(color.begin(), color.end(), meshPackageMsg.color);
+  // Generate mesh-from-package link message
+  drake::lcmt_viewer_link_data meshPackageLinkMsg;
+  meshPackageLinkMsg.name = "mesh-from-package";
+  meshPackageLinkMsg.robot_num = 0;
+  meshPackageLinkMsg.num_geom = 1;
+  meshPackageLinkMsg.geom.resize(meshPackageLinkMsg.num_geom);
+  meshPackageLinkMsg.geom[0] = meshPackageMsg;
 
   // Generate robot message
   drake::lcmt_viewer_load_robot robotMsg;
-  robotMsg.num_links = 1;
+  robotMsg.num_links = 5;
   robotMsg.link.resize(robotMsg.num_links);
-  robotMsg.link[0] = linkMsg;
+  robotMsg.link[0] = boxLinkMsg;
+  robotMsg.link[1] = sphereLinkMsg;
+  robotMsg.link[2] = cylinderLinkMsg;
+  robotMsg.link[3] = meshURLLinkMsg;
+  robotMsg.link[4] = meshPackageLinkMsg;
 
-  // Publish robot messages at 1Hz.
+  // Publish a single robot message into the lcm_channel
   while (1) {
-    lcm.publish("DRAKE_VIEWER_LOAD_ROBOT", &robotMsg);
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    std::string lcm_channel = "DRAKE_VIEWER_LOAD_ROBOT";
+    std::cout << "Publishing message into " << lcm_channel << std::endl;
+    if (lcm.publish(lcm_channel, &robotMsg) == -1) {
+      ignerr << "Failed to publish message into" << lcm_channel << std::endl;
+      return 1;
+    }
+    return 0;
   }
-  return 0;
 }

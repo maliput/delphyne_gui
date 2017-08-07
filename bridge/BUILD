@@ -17,5 +17,6 @@ cc_binary(
         ],
     deps = [
         "@lcm",
+        "@ignition_common",
     ],
 )

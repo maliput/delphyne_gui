@@ -1,7 +1,8 @@
 #include <iostream>
-#include <lcm/lcm-cpp.hpp>
 #include <thread>
+#include <lcm/lcm-cpp.hpp>
 
+#include <ignition/common/Console.hh>
 #include "lcmtypes/lcmt_viewer_geometry_data.hpp"
 #include "lcmtypes/lcmt_viewer_link_data.hpp"
 #include "lcmtypes/lcmt_viewer_load_robot.hpp"
@@ -9,10 +10,13 @@
 // Publishes a defined lcmt_viewer_load_robot
 // message into the DRAKE_VIEWER_LOAD_ROBOT
 // channel every one second
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[]) {
   lcm::LCM lcm;
-  if (!lcm.good())
+
+  if (!lcm.good()) {
+    ignerr << "Failed to initialize LCM" << std::endl;
     return 1;
+  }
 
   // Generate geometry message
   drake::lcmt_viewer_geometry_data geometryMsg;

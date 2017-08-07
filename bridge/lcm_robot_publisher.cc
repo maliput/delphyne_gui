@@ -31,9 +31,9 @@
 #include <lcm/lcm-cpp.hpp>
 
 #include <ignition/common/Console.hh>
-#include "lcmtypes/lcmt_viewer_geometry_data.hpp"
-#include "lcmtypes/lcmt_viewer_link_data.hpp"
-#include "lcmtypes/lcmt_viewer_load_robot.hpp"
+#include "drake/lcmt_viewer_geometry_data.hpp"
+#include "drake/lcmt_viewer_link_data.hpp"
+#include "drake/lcmt_viewer_load_robot.hpp"
 
 // Publishes a defined lcmt_viewer_load_robot
 // message into the DRAKE_VIEWER_LOAD_ROBOT

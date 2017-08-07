@@ -21,9 +21,9 @@ cc_binary(
     name = "lcm-robot-publisher",
     srcs = [
         "lcm_robot_publisher.cc",
-        "lcmtypes/lcmt_viewer_geometry_data.hpp",
-        "lcmtypes/lcmt_viewer_link_data.hpp",
-        "lcmtypes/lcmt_viewer_load_robot.hpp",
+        "drake/lcmt_viewer_geometry_data.hpp",
+        "drake/lcmt_viewer_link_data.hpp",
+        "drake/lcmt_viewer_load_robot.hpp",
         ],
     deps = [
         "@lcm",

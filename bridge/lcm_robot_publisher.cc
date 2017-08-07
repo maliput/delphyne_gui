@@ -46,4 +46,5 @@ int main(int argc, char* argv[]) {
     lcm.publish("DRAKE_VIEWER_LOAD_ROBOT", &robotMsg);
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
   }
+  return 0;
 }

@@ -43,9 +43,10 @@ class LcmChannelRepeater {
   ignition::transport::Node::Publisher publisher_;
 
   void handleMessage(const lcm::ReceiveBuffer* rbuf, const std::string& chan,
-                     const LCM_TYPE* lcmMsg) {
-    IGN_TYPE* ignMsg = Translate(*lcmMsg);
-    publisher_.Publish(*ignMsg);
+                     const LCM_TYPE* lcm_msg) {
+    IGN_TYPE ign_msg;
+    Translate(*lcm_msg, &ign_msg);
+    publisher_.Publish(ign_msg);
   }
 };
 

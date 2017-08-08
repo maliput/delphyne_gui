@@ -1,4 +1,5 @@
-#pragma once
+#ifndef DELPHYNE_BRIDGE_LCMCHANNELREPEATER_HH_
+#define DELPHYNE_BRIDGE_LCMCHANNELREPEATER_HH_
 
 #include <ignition/msgs.hh>
 #include <ignition/transport.hh>
@@ -6,7 +7,7 @@
 #include "drake/lcmt_viewer_load_robot.hpp"
 #include "lcm/lcm-cpp.hpp"
 
-#include "lcm_to_ign_translator.h"
+#include "lcm_to_ign_translation.hh"
 
 namespace delphyne {
 namespace bridge {
@@ -40,13 +41,15 @@ class LcmChannelRepeater {
   const std::string topic_name_;
   ignition::transport::Node node_;
   ignition::transport::Node::Publisher publisher_;
-  delphyne::bridge::LcmToIgnTranslator translator_;
 
   void handleMessage(const lcm::ReceiveBuffer* rbuf, const std::string& chan,
                      const LCM_TYPE* msg) {
-    ignition::msgs::Model* modelMsg = translator_.Translate(*msg);
+    ignition::msgs::Model* modelMsg = Translate(*msg);
     publisher_.Publish(*modelMsg);
   }
 };
-}
-}
+
+} // namespace bridge
+} // namespace delphyne
+
+#endif

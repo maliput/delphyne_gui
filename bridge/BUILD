@@ -2,9 +2,9 @@ cc_binary(
     name = "lcm-to-ign-trans-bridge",
     srcs = [
         "lcm-to-ign-trans-bridge.cc",
-        "lcm_to_ign_translator.cc",
-        "lcm_to_ign_translator.h",
-        "lcm_channel_repeater.h",
+        "lcm_to_ign_translation.cc",
+        "lcm_to_ign_translation.hh",
+        "lcm_channel_repeater.hh",
         "drake/lcmt_viewer_command.hpp",
         "drake/lcmt_viewer_draw.hpp",
         "drake/lcmt_viewer_geometry_data.hpp",

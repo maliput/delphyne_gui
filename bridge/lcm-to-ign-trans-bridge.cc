@@ -34,8 +34,7 @@
 
 #include "drake/lcmt_viewer_geometry_data.hpp"
 #include "drake/lcmt_viewer_load_robot.hpp"
-#include "lcm_channel_repeater.h"
-#include "lcm_to_ign_translator.h"
+#include "lcm_channel_repeater.hh"
 
 #include "lcm/lcm-cpp.hpp"
 

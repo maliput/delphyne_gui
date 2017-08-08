@@ -29,9 +29,9 @@ cc_binary(
 )
 
 cc_binary(
-    name = "lcm-robot-publisher",
+    name = "lcm-mock-robot-publisher",
     srcs = [
-        "lcm_robot_publisher.cc",
+        "lcm_mock_robot_publisher.cc",
         "drake/lcmt_viewer_geometry_data.hpp",
         "drake/lcmt_viewer_link_data.hpp",
         "drake/lcmt_viewer_load_robot.hpp",
@@ -42,7 +42,16 @@ cc_binary(
     ],
 )
 
+py_binary(
+    name = "mocked_robot_demo",
+    srcs = ["mocked_robot_demo.py"],
+    data = [
+        ":lcm-mock-robot-publisher",
+        ":lcm-to-ign-trans-bridge"
+    ],
+    main = "mocked_robot_demo.py"
+)
+
 drake_cc_googletest(
     name = "dummy_test",
 )
-

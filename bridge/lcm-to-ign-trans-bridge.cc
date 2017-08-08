@@ -52,7 +52,8 @@ int main(int argc, char* argv[]) {
 
   viewerLoadRobotRepeater.Start();
 
-  while (0 == lcm.handle());
+  while (0 == lcm.handle())
+    ;
 
   return 0;
 }

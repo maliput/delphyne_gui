@@ -51,8 +51,7 @@ void Translate(float quaternion_data[4],
   quaternion_model->set_w(quaternion_data[3]);
 }
 
-void Translate(float color_data[4],
-               ignition::msgs::Color* color_model) {
+void Translate(float color_data[4], ignition::msgs::Color* color_model) {
   color_model->set_r(color_data[0]);
   color_model->set_g(color_data[1]);
   color_model->set_b(color_data[2]);
@@ -60,7 +59,7 @@ void Translate(float color_data[4],
 }
 
 void Translate(drake::lcmt_viewer_geometry_data geometry_data,
-                            ignition::msgs::Geometry* geometry_model) {
+               ignition::msgs::Geometry* geometry_model) {
   if (geometry_data.type == geometry_data.BOX) {
     TranslateBoxGeometry(geometry_data, geometry_model);
   }
@@ -80,5 +79,5 @@ void TranslateBoxGeometry(drake::lcmt_viewer_geometry_data geometry_data,
   size_msg->set_z(geometry_data.float_data[2]);
 }
 
-} // namespace bridge
-} // namespace delphyne
+}  // namespace bridge
+}  // namespace delphyne

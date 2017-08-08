@@ -50,7 +50,7 @@ class LcmChannelRepeater {
   }
 };
 
-} // namespace bridge
-} // namespace delphyne
+}  // namespace bridge
+}  // namespace delphyne
 
 #endif

@@ -1,6 +1,7 @@
 #ifndef DELPHYNE_BRIDGE_LCMCHANNELREPEATER_HH_
 #define DELPHYNE_BRIDGE_LCMCHANNELREPEATER_HH_
 
+#include <string>
 #include <ignition/msgs.hh>
 #include <ignition/transport.hh>
 #include "drake/lcmt_viewer_geometry_data.hpp"

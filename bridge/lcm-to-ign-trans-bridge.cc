@@ -42,6 +42,7 @@
 // of Drake LCM channels and converts them to ign-messages
 // to be consumed by the front end.
 int main(int argc, char* argv[]) {
+
   lcm::LCM lcm;
 
   // Create a repeater on DRAKE_VIEWER_LOAD_ROBOT channel, translating
@@ -52,8 +53,9 @@ int main(int argc, char* argv[]) {
 
   viewerLoadRobotRepeater.Start();
 
-  while (0 == lcm.handle())
-    ;
+  while(true) {
+    lcm.handle();
+  }
 
   return 0;
 }

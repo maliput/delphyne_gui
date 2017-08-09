@@ -102,3 +102,5 @@ with this in mind, we can apply the following one-way mapping between LCM messag
 |:-------------------------------------------------------|-------------------------------:|
 | viewer_load_robot_t.link[n].geom[k].type.CAPSULE = 5   |                                |
 | viewer_load_robot_t.link[n].geom[k].type.ELLIPSOID = 6 |                                |
+
+**Important:** Note that the `float_data` array holds different values depending on the geometry type (e.g. it has 3 elements when describing a box -x, y and z- while two elements when describing a cylinder -radius and length-).

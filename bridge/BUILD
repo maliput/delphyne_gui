@@ -16,6 +16,11 @@ cc_binary(
         "@lcm",
         "@ignition_common//:ignition_common_shared_library",
     ],
+    data = [
+        "drake/car/car.vtp",
+        "drake/package.xml",
+        "drake/car/package.xml"
+    ],
 )
 
 cc_binary(

@@ -168,14 +168,15 @@ int main(int argc, char* argv[]) {
   robotMsg.link[3] = meshURLLinkMsg;
   robotMsg.link[4] = meshPackageLinkMsg;
 
-  // Publish a single robot message into the lcm_channel
+  // Publish a robot message into the lcm_channel every 1 second
   while (1) {
     std::string lcm_channel = "DRAKE_VIEWER_LOAD_ROBOT";
     std::cout << "Publishing message into " << lcm_channel << std::endl;
     if (lcm.publish(lcm_channel, &robotMsg) == -1) {
-      ignerr << "Failed to publish message into" << lcm_channel << std::endl;
+      ignerr << "Failed to publish message into " << lcm_channel << std::endl;
       return 1;
     }
-    return 0;
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
   }
+  return 0;
 }

@@ -26,11 +26,14 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+#include <algorithm>
+#include <chrono>
 #include <iostream>
 #include <string>
 #include <thread>
-#include <lcm/lcm-cpp.hpp>
+#include <vector>
 
+#include <lcm/lcm-cpp.hpp>
 #include <ignition/common/Console.hh>
 #include "drake/lcmt_viewer_geometry_data.hpp"
 #include "drake/lcmt_viewer_link_data.hpp"

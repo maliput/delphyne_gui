@@ -33,36 +33,12 @@ class lcmt_viewer_geometry_data
         std::vector< float > float_data;
 
     public:
-        // If you're using C++11 and are getting compiler errors saying things like
-        // ‘constexpr’ needed for in-class initialization of static data member
-        // then re-run lcm-gen with '--cpp-std=c++11' to generate code that is
-        // compliant with C++11
-        static const int8_t   BOX = 1;
-        // If you're using C++11 and are getting compiler errors saying things like
-        // ‘constexpr’ needed for in-class initialization of static data member
-        // then re-run lcm-gen with '--cpp-std=c++11' to generate code that is
-        // compliant with C++11
-        static const int8_t   SPHERE = 2;
-        // If you're using C++11 and are getting compiler errors saying things like
-        // ‘constexpr’ needed for in-class initialization of static data member
-        // then re-run lcm-gen with '--cpp-std=c++11' to generate code that is
-        // compliant with C++11
-        static const int8_t   CYLINDER = 3;
-        // If you're using C++11 and are getting compiler errors saying things like
-        // ‘constexpr’ needed for in-class initialization of static data member
-        // then re-run lcm-gen with '--cpp-std=c++11' to generate code that is
-        // compliant with C++11
-        static const int8_t   MESH = 4;
-        // If you're using C++11 and are getting compiler errors saying things like
-        // ‘constexpr’ needed for in-class initialization of static data member
-        // then re-run lcm-gen with '--cpp-std=c++11' to generate code that is
-        // compliant with C++11
-        static const int8_t   CAPSULE = 5;
-        // If you're using C++11 and are getting compiler errors saying things like
-        // ‘constexpr’ needed for in-class initialization of static data member
-        // then re-run lcm-gen with '--cpp-std=c++11' to generate code that is
-        // compliant with C++11
-        static const int8_t   ELLIPSOID = 6;
+        static constexpr int8_t   BOX = 1;
+        static constexpr int8_t   SPHERE = 2;
+        static constexpr int8_t   CYLINDER = 3;
+        static constexpr int8_t   MESH = 4;
+        static constexpr int8_t   CAPSULE = 5;
+        static constexpr int8_t   ELLIPSOID = 6;
 
     public:
         /**

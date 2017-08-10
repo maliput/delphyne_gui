@@ -26,12 +26,37 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <iostream>
+#include <ignition/common/Console.hh>
 
-#include <ignition/math.hh>
+#include "drake/lcmt_viewer_geometry_data.hpp"
+#include "drake/lcmt_viewer_load_robot.hpp"
+#include "lcm_channel_repeater.hh"
 
-int main(int argc, char *argv[])
-{
-  std::cout << "LCM to ignition-transport bridge 0.1.0" << std::endl;
+#include "lcm/lcm-cpp.hpp"
+
+// Runs a program that listens for new messages in a set
+// of Drake LCM channels and converts them to ign-messages
+// to be consumed by the front end.
+int main(int argc, char* argv[]) {
+  lcm::LCM lcm;
+
+  try {
+    // Create a repeater on DRAKE_VIEWER_LOAD_ROBOT channel, translating
+    // from drake::lcmt_viewer_load_robot to ignition::msgs::Model
+    delphyne::bridge::LcmChannelRepeater<drake::lcmt_viewer_load_robot,
+                                         ignition::msgs::Model>
+        viewerLoadRobotRepeater(lcm, "DRAKE_VIEWER_LOAD_ROBOT");
+
+    viewerLoadRobotRepeater.Start();
+  } catch(const std::runtime_error &error) {
+    ignerr << "Failed to start LCM channel repeater for initialize DRAKE_VIEWER_LOAD_ROBOT" << std::endl;
+    ignerr << "Details: " << error.what() << std::endl;
+    exit(1);
+  }
+
+  while (true) {
+    lcm.handle();
+  }
+
   return 0;
 }

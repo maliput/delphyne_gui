@@ -14,6 +14,7 @@ cc_binary(
     deps = [
         "@ignition-transport3",
         "@lcm",
+        "@ignition_common//:ignition_common_shared_library",
     ],
 )
 
@@ -27,6 +28,6 @@ cc_binary(
         ],
     deps = [
         "@lcm",
-        "@ignition_common",
+        "@ignition_common//:ignition_common_shared_library",
     ],
 )

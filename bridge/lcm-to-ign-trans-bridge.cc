@@ -26,6 +26,8 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+#include <ignition/common/Console.hh>
+
 #include "drake/lcmt_viewer_geometry_data.hpp"
 #include "drake/lcmt_viewer_load_robot.hpp"
 #include "lcm_channel_repeater.hh"
@@ -38,13 +40,19 @@
 int main(int argc, char* argv[]) {
   lcm::LCM lcm;
 
-  // Create a repeater on DRAKE_VIEWER_LOAD_ROBOT channel, translating
-  // from drake::lcmt_viewer_load_robot to ignition::msgs::Model
-  delphyne::bridge::LcmChannelRepeater<drake::lcmt_viewer_load_robot,
-                                       ignition::msgs::Model>
-      viewerLoadRobotRepeater(lcm, "DRAKE_VIEWER_LOAD_ROBOT");
+  try {
+    // Create a repeater on DRAKE_VIEWER_LOAD_ROBOT channel, translating
+    // from drake::lcmt_viewer_load_robot to ignition::msgs::Model
+    delphyne::bridge::LcmChannelRepeater<drake::lcmt_viewer_load_robot,
+                                         ignition::msgs::Model>
+        viewerLoadRobotRepeater(lcm, "DRAKE_VIEWER_LOAD_ROBOT");
 
-  viewerLoadRobotRepeater.Start();
+    viewerLoadRobotRepeater.Start();
+  } catch(const std::runtime_error &error) {
+    ignerr << "Failed to start LCM channel repeater for initialize DRAKE_VIEWER_LOAD_ROBOT" << std::endl;
+    ignerr << "Details: " << error.what() << std::endl;
+    exit(1);
+  }
 
   while (true) {
     lcm.handle();

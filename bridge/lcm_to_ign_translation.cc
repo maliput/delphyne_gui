@@ -26,7 +26,11 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+#include <string>
+#include <iostream>
+#include <typeinfo>
 #include <ignition/msgs.hh>
+#include <ignition/common/Console.hh>
 
 #include "lcm_to_ign_translation.hh"
 
@@ -35,6 +39,18 @@ namespace bridge {
 
 void translateBoxGeometry(drake::lcmt_viewer_geometry_data geometry_data,
                           ignition::msgs::Geometry* geometry_model);
+
+void translateBoxGeometry(drake::lcmt_viewer_geometry_data geometry_data,
+                          ignition::msgs::Geometry* geometry_model);
+
+void translateSphereGeometry(drake::lcmt_viewer_geometry_data geometry_data,
+                             ignition::msgs::Geometry* geometry_model);
+
+void translateCylinderGeometry(drake::lcmt_viewer_geometry_data geometry_data,
+                               ignition::msgs::Geometry* geometry_model);
+
+void translateMeshGeometry(drake::lcmt_viewer_geometry_data geometry_data,
+                           ignition::msgs::Geometry* geometry_model);
 
 //////////////////////////////////////////////////
 void translate(drake::lcmt_viewer_load_robot robot_data,
@@ -95,11 +111,30 @@ void translate(float color_data[4], ignition::msgs::Color* color_model) {
 //////////////////////////////////////////////////
 void translate(drake::lcmt_viewer_geometry_data geometry_data,
                ignition::msgs::Geometry* geometry_model) {
-  if (geometry_data.type == geometry_data.BOX) {
-    translateBoxGeometry(geometry_data, geometry_model);
+  switch (geometry_data.type) {
+    case geometry_data.BOX:
+      translateBoxGeometry(geometry_data, geometry_model);
+      break;
+    case geometry_data.SPHERE:
+      translateSphereGeometry(geometry_data, geometry_model);
+      break;
+    case geometry_data.CYLINDER:
+      translateCylinderGeometry(geometry_data, geometry_model);
+      break;
+    case geometry_data.MESH:
+      translateMeshGeometry(geometry_data, geometry_model);
+      break;
+    default:
+      std::map<int, std::string> unsupported_geometries;
+      unsupported_geometries[geometry_data.CAPSULE] = "CAPSULE";
+      unsupported_geometries[geometry_data.ELLIPSOID] = "ELLIPSOID";
+      std::string type = std::to_string(geometry_data.type);
+      if ( unsupported_geometries.find(geometry_data.type) != unsupported_geometries.end() ) {
+        type = unsupported_geometries[geometry_data.type];
+      }
+      ignerr << "Geometry of type: " + type + " is currently unsupported" << std::endl;
+      break;
   }
-  // TODO(basicNew): Once we have written all the shape translations we will
-  // throw an exception here if there is no match in the switch statement
 }
 
 //////////////////////////////////////////////////
@@ -109,10 +144,48 @@ void translateBoxGeometry(drake::lcmt_viewer_geometry_data geometry_data,
   auto* size_msg = box_msg->mutable_size();
 
   geometry_model->set_type(ignition::msgs::Geometry::BOX);
-
   size_msg->set_x(geometry_data.float_data[0]);
   size_msg->set_y(geometry_data.float_data[1]);
   size_msg->set_z(geometry_data.float_data[2]);
+}
+
+//////////////////////////////////////////////////
+void translateSphereGeometry(drake::lcmt_viewer_geometry_data geometry_data,
+                             ignition::msgs::Geometry* geometry_model) {
+  auto* sphere_msg = geometry_model->mutable_sphere();
+
+  geometry_model->set_type(ignition::msgs::Geometry::SPHERE);
+  sphere_msg->set_radius(geometry_data.float_data[0]);
+}
+
+//////////////////////////////////////////////////
+void translateCylinderGeometry(drake::lcmt_viewer_geometry_data geometry_data,
+                               ignition::msgs::Geometry* geometry_model) {
+  auto* cylinder_msg = geometry_model->mutable_cylinder();
+
+  geometry_model->set_type(ignition::msgs::Geometry::CYLINDER);
+  cylinder_msg->set_radius(geometry_data.float_data[0]);
+  cylinder_msg->set_length(geometry_data.float_data[1]);
+}
+
+//////////////////////////////////////////////////
+void translateMeshGeometry(drake::lcmt_viewer_geometry_data geometry_data,
+                           ignition::msgs::Geometry* geometry_model) {
+  // If no string_data, we assume MeshMessage, which is unsupported
+  if (geometry_data.string_data.empty()) {
+      ignerr << "Meshes generated from array are currently unsupported" << std::endl;
+  }
+  else {
+    auto* mesh_msg = geometry_model->mutable_mesh();
+    auto* scale_msg = mesh_msg->mutable_scale();
+
+    geometry_model->set_type(ignition::msgs::Geometry::MESH);
+    mesh_msg->set_filename(geometry_data.string_data);
+
+    scale_msg->set_x(1.0);
+    scale_msg->set_y(1.0);
+    scale_msg->set_z(1.0);
+  }
 }
 
 }  // namespace bridge

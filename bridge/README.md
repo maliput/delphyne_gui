@@ -80,9 +80,12 @@ with this in mind, we can apply the following one-way mapping between LCM messag
 
 ## Mesh from file
 
-| LCM                                             | ign-msgs                                       |
-|:------------------------------------------------|-----------------------------------------------:|
-| viewer_load_robot_t.link[n].geom[k].string_data | Model.link[n].visual[k].geometry.mesh.filename |
+| LCM                                              | ign-msgs                                       |
+|:-------------------------------------------------|-----------------------------------------------:|
+| viewer_load_robot_t.link[n].geom[k].string_data  | Model.link[n].visual[k].geometry.mesh.filename |
+| viewer_load_robot_t.link[n].geom[k].float_data[0]| Model.link[n].visual[k].geometry.mesh.scale.x  |
+| viewer_load_robot_t.link[n].geom[k].float_data[1]| Model.link[n].visual[k].geometry.mesh.scale.y  |
+| viewer_load_robot_t.link[n].geom[k].float_data[2]| Model.link[n].visual[k].geometry.mesh.scale.z  |
 
 ## Mesh from mesh-array
 

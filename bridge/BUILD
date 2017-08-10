@@ -1,8 +1,6 @@
 load(
     "//tools:drake.bzl",
     "drake_cc_googletest",
-    "drake_cc_library",
-    "drake_cc_binary",
 )
 
 cc_binary(

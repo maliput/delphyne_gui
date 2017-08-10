@@ -26,12 +26,6 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <iostream>
-
-#include <ignition/math.hh>
-#include <ignition/msgs.hh>
-#include <ignition/transport.hh>
-
 #include "drake/lcmt_viewer_geometry_data.hpp"
 #include "drake/lcmt_viewer_load_robot.hpp"
 #include "lcm_channel_repeater.hh"

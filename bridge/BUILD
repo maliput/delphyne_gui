@@ -4,9 +4,9 @@ load(
 )
 
 cc_binary(
-    name = "lcm-to-ign-trans-bridge",
+    name = "lcm-to-ign-transport-bridge",
     srcs = [
-        "lcm-to-ign-trans-bridge.cc",
+        "lcm_to_ign_transport_bridge.cc",
         "lcm_to_ign_translation.cc",
         "lcm_to_ign_translation.hh",
         "lcm_channel_repeater.hh",
@@ -43,11 +43,11 @@ cc_binary(
 )
 
 py_binary(
-    name = "mocked_robot_demo",
+    name = "mocked-robot-demo",
     srcs = ["mocked_robot_demo.py"],
     data = [
         ":lcm-mock-robot-publisher",
-        ":lcm-to-ign-trans-bridge"
+        ":lcm-to-ign-transport-bridge"
     ],
     main = "mocked_robot_demo.py"
 )

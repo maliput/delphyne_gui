@@ -28,7 +28,7 @@ def launch(command, stdin):
         stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
 def main():
-    bridge_path = "bridge/lcm-to-ign-trans-bridge"
+    bridge_path = "bridge/lcm-to-ign-transport-bridge"
     mock_publisher_path = "bridge/lcm-mock-robot-publisher"
     devnull = open('/dev/null')
     p1 = launch(bridge_path, devnull)

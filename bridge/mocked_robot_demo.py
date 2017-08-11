@@ -1,7 +1,7 @@
 import os
+import subprocess
 import sys
 import time
-import subprocess
 
 """
 Bazel doesn't allow us to run two different "bazel run ...." commands

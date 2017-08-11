@@ -1,3 +1,8 @@
+load(
+    "//tools:drake.bzl",
+    "drake_cc_googletest",
+)
+
 cc_binary(
     name = "lcm-to-ign-trans-bridge",
     srcs = [
@@ -36,3 +41,8 @@ cc_binary(
         "@ignition_common//:ignition_common_shared_library",
     ],
 )
+
+drake_cc_googletest(
+    name = "dummy_test",
+)
+

@@ -15,17 +15,17 @@ cc_binary(
         "drake/lcmt_viewer_geometry_data.hpp",
         "drake/lcmt_viewer_link_data.hpp",
         "drake/lcmt_viewer_load_robot.hpp"
-        ],
+    ],
     deps = [
         "@ignition-transport3",
         "@lcm",
         "@ignition_common//:ignition_common_shared_library",
-        ],
+    ],
     data = [
         "drake/car/car.vtp",
         "drake/package.xml",
         "drake/car/package.xml"
-        ],
+    ],
 )
 
 cc_binary(
@@ -35,7 +35,7 @@ cc_binary(
         "drake/lcmt_viewer_geometry_data.hpp",
         "drake/lcmt_viewer_link_data.hpp",
         "drake/lcmt_viewer_load_robot.hpp",
-        ],
+    ],
     deps = [
         "@lcm",
         "@ignition_common//:ignition_common_shared_library",
@@ -48,12 +48,12 @@ py_binary(
     data = [
         ":lcm-mock-robot-publisher",
         ":lcm-to-ign-transport-bridge"
-        ],
+    ],
     main = "mocked_robot_demo.py",
     args = [
         "$(location :lcm-mock-robot-publisher)",
         "$(location :lcm-to-ign-transport-bridge)"
-        ],
+    ],
 )
 
 drake_cc_googletest(

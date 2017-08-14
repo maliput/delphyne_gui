@@ -38,18 +38,19 @@
 // of Drake LCM channels and converts them to ign-messages
 // to be consumed by the front end.
 int main(int argc, char* argv[]) {
-  lcm::LCM lcm;
 
   ignition::common::Console::SetVerbosity(3);
   ignmsg << "LCM to ignition-transport bridge 0.1.0" << std::endl;
 
-  try {
-    // Create a repeater on DRAKE_VIEWER_LOAD_ROBOT channel, translating
-    // from drake::lcmt_viewer_load_robot to ignition::msgs::Model
-    delphyne::bridge::LcmChannelRepeater<drake::lcmt_viewer_load_robot,
-                                         ignition::msgs::Model>
-        viewerLoadRobotRepeater(lcm, "DRAKE_VIEWER_LOAD_ROBOT");
+  lcm::LCM lcm;
 
+  // Create a repeater on DRAKE_VIEWER_LOAD_ROBOT channel, translating
+  // from drake::lcmt_viewer_load_robot to ignition::msgs::Model
+  delphyne::bridge::LcmChannelRepeater<drake::lcmt_viewer_load_robot,
+                                       ignition::msgs::Model>
+      viewerLoadRobotRepeater(lcm, "DRAKE_VIEWER_LOAD_ROBOT");
+
+  try {
     viewerLoadRobotRepeater.Start();
   } catch(const std::runtime_error &error) {
     ignerr << "Failed to start LCM channel repeater for initialize DRAKE_VIEWER_LOAD_ROBOT" << std::endl;

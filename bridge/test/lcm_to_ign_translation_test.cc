@@ -1,8 +1,7 @@
+#include "bridge/lcm_to_ign_translation.hh"
 #include <iostream>
 #include <gtest/gtest.h>
 #include <ignition/msgs.hh>
-#include "bridge/lcm_to_ign_translation.hh"
-
 
 namespace delphyne {
 namespace bridge {
@@ -40,8 +39,8 @@ GTEST_TEST(CylinderTest, TestCylinderTranslation) {
   cylinderMsg.type = cylinderMsg.CYLINDER;
   cylinderMsg.num_float_data = 2;
   cylinderMsg.float_data.resize(cylinderMsg.num_float_data);
-  cylinderMsg.float_data[0] = 1.368; // radius
-  cylinderMsg.float_data[1] = 4.246; // length
+  cylinderMsg.float_data[0] = 1.368;  // radius
+  cylinderMsg.float_data[1] = 4.246;  // length
 
   // Translate from LCM to ignition
   translate(cylinderMsg, &ign_cylinder_geometry);
@@ -49,8 +48,10 @@ GTEST_TEST(CylinderTest, TestCylinderTranslation) {
   // Verify generated ignition geometry
   ASSERT_EQ(true, ign_cylinder_geometry.has_cylinder());
   ASSERT_EQ(ignition::msgs::Geometry::CYLINDER, ign_cylinder_geometry.type());
-  ASSERT_EQ(cylinderMsg.float_data[0], ign_cylinder_geometry.cylinder().radius());
-  ASSERT_EQ(cylinderMsg.float_data[1], ign_cylinder_geometry.cylinder().length());
+  ASSERT_EQ(cylinderMsg.float_data[0],
+            ign_cylinder_geometry.cylinder().radius());
+  ASSERT_EQ(cylinderMsg.float_data[1],
+            ign_cylinder_geometry.cylinder().length());
 }
 
 GTEST_TEST(SphereTest, TestSphereTranslation) {
@@ -62,7 +63,7 @@ GTEST_TEST(SphereTest, TestSphereTranslation) {
   sphereMsg.type = sphereMsg.SPHERE;
   sphereMsg.num_float_data = 1;
   sphereMsg.float_data.resize(sphereMsg.num_float_data);
-  sphereMsg.float_data[0] = 2.534; // radius
+  sphereMsg.float_data[0] = 2.534;  // radius
 
   // Translate from LCM to ignition
   translate(sphereMsg, &ign_sphere_geometry);
@@ -83,7 +84,7 @@ GTEST_TEST(MeshTest, TestMeshTranslation) {
   meshMsg.string_data = "/path/to/mesh.obj";
   meshMsg.num_float_data = 3;
   meshMsg.float_data.resize(meshMsg.num_float_data);
-  meshMsg.float_data[0] = 3.4; // scale
+  meshMsg.float_data[0] = 3.4;  // scale
   meshMsg.float_data[1] = 4.2;
   meshMsg.float_data[2] = 6.7;
 
@@ -101,3 +102,4 @@ GTEST_TEST(MeshTest, TestMeshTranslation) {
 
 }  // namespace bridge
 }  // namespace delphyne
+

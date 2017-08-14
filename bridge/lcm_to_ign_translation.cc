@@ -26,8 +26,8 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <string>
 #include <iostream>
+#include <string>
 #include <typeinfo>
 #include <ignition/msgs.hh>
 
@@ -128,10 +128,12 @@ void translate(drake::lcmt_viewer_geometry_data geometry_data,
       unsupported_geometries[geometry_data.CAPSULE] = "CAPSULE";
       unsupported_geometries[geometry_data.ELLIPSOID] = "ELLIPSOID";
       std::string type = std::to_string(geometry_data.type);
-      if ( unsupported_geometries.find(geometry_data.type) != unsupported_geometries.end() ) {
+      if (unsupported_geometries.find(geometry_data.type) !=
+          unsupported_geometries.end()) {
         type = unsupported_geometries[geometry_data.type];
       }
-      std::cout << "Geometry of type: " + type + " is currently unsupported" << std::endl;
+      std::cout << "Geometry of type: " + type + " is currently unsupported"
+                << std::endl;
       break;
   }
 }
@@ -172,9 +174,9 @@ void translateMeshGeometry(drake::lcmt_viewer_geometry_data geometry_data,
                            ignition::msgs::Geometry* geometry_model) {
   // If no string_data, we assume MeshMessage, which is unsupported
   if (geometry_data.string_data.empty()) {
-      std::cout << "Meshes generated from array are currently unsupported" << std::endl;
-  }
-  else {
+    std::cout << "Meshes generated from array are currently unsupported"
+              << std::endl;
+  } else {
     auto* mesh_msg = geometry_model->mutable_mesh();
     auto* scale_msg = mesh_msg->mutable_scale();
 

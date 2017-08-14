@@ -27,6 +27,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <cmath>
+#include <functional>
 #include <iostream>
 #include <string>
 
@@ -43,61 +44,23 @@
 #include <ignition/rendering/RenderingIface.hh>
 #include <ignition/rendering/Scene.hh>
 
+#include "RenderWidget.hh"
+
+Q_DECLARE_METATYPE(ignition::msgs::Model)
+
 namespace delphyne {
 namespace gui {
 
-/// \class RenderWidget
-/// \brief This is a class that implements a simple ign-gui widget for
-/// rendering a scene, using the ign-rendering functionality.
-class RenderWidget : public ignition::gui::Plugin {
- public:
-  /// \brief Constructor
-  RenderWidget();
+void RenderWidget::cb(const ignition::msgs::Model &_msg)
+{
+  ignmsg << "Saw new model msg on subscription" << std::endl;
+  emit newGraphic(_msg);
+}
 
-  /// \brief Destructor
-  virtual ~RenderWidget();
+RenderWidget::RenderWidget(QWidget *parent) : Plugin(), initialized_scene(false)
+{
+  qRegisterMetaType<ignition::msgs::Model>();
 
- protected:
-  /// \brief Overridden method to receive Qt paint event.
-  /// \param[in] _e  The event that happened
-  virtual void paintEvent(QPaintEvent* _e);
-
-  /// \brief Overridden method to receive Qt show event.
-  /// \param[in] _e  The event that happened
-  virtual void showEvent(QShowEvent* _e);
-
-  /// \brief Overridden method to receive Qt resize event.
-  /// \param[in] _e  The event that happened.
-  virtual void resizeEvent(QResizeEvent* _e);
-
-  /// \brief Overridden method to receive Qt move event.
-  /// \param[in] _e  The event that happened.
-  virtual void moveEvent(QMoveEvent* _e);
-
-  /// \brief Override paintEngine to stop Qt From trying to draw on top of
-  /// render window.
-  /// \return NULL.
-  virtual QPaintEngine* paintEngine() const;
-
- private:
-  /// \brief Internal method to create the render window the first time
-  /// RenderWidget::showEvent is called.
-  void CreateRenderWindow();
-
-  /// \brief Pointer to timer to call update on a periodic basis.
-  QTimer* updateTimer = nullptr;
-
-  /// \brief The frequency at which we'll do an update on the widget.
-  const int kUpdateTimeFrequency = static_cast<int>(std::round(1000.0 / 60.0));
-
-  /// \brief Pointer to the renderWindow created by this class.
-  ignition::rendering::RenderWindowPtr renderWindow;
-
-  /// \brief Pointer to the camera created by this class.
-  ignition::rendering::CameraPtr camera;
-};
-
-RenderWidget::RenderWidget() : Plugin() {
   this->setAttribute(Qt::WA_OpaquePaintEvent, true);
   this->setAttribute(Qt::WA_PaintOnScreen, true);
   this->setAttribute(Qt::WA_NoSystemBackground, true);
@@ -112,13 +75,183 @@ RenderWidget::RenderWidget() : Plugin() {
   // first time that showEvent() is called.
   this->updateTimer = new QTimer(this);
   QObject::connect(this->updateTimer, SIGNAL(timeout()), this, SLOT(update()));
+  QObject::connect(this, SIGNAL(newGraphic(const ignition::msgs::Model &)), this, SLOT(setNewGraphic(const ignition::msgs::Model &)));
+
+  this->node.Subscribe("/DRAKE_VIEWER_LOAD_ROBOT", &RenderWidget::cb, this);
 
   this->setMinimumHeight(100);
 }
 
 RenderWidget::~RenderWidget() {}
 
-void RenderWidget::CreateRenderWindow() {
+bool RenderWidget::renderBox(ignition::msgs::Link &_link)
+{
+  ignmsg << "Has a box!" << std::endl;
+  ignition::rendering::VisualPtr root = this->scene->RootVisual();
+
+  ignition::rendering::VisualPtr box = this->scene->CreateVisual();
+  if (box == nullptr) {
+    ignerr << "Failed to create visual" << std::endl;
+    return false;
+  }
+
+  ignition::rendering::MaterialPtr green = this->scene->CreateMaterial();
+  if (green == nullptr) {
+    ignerr << "Failed to create green material" << std::endl;
+    return false;
+  }
+
+  double x = 2.0;
+  double y = 0.0;
+  double z = 0.0;
+
+  if (_link.visual(0).has_pose()) {
+    // The default Ogre coordinate system is X left/right,
+    // Y up/down, and Z in/out (of the screen).  However,
+    // ignition-rendering switches that to be consistent with
+    // Gazebo.  Thus, the coordinate system is X in/out, Y
+    // left/right, and Z up/down.
+    x += _link.visual(0).pose().position().z();
+    y += -_link.visual(0).pose().position().x();
+    z += _link.visual(0).pose().position().y();
+  }
+
+  double x_scale = 1.0;
+  double y_scale = 1.0;
+  double z_scale = 1.0;
+
+  if (_link.visual(0).has_geometry()) {
+    auto geom = _link.visual(0).geometry();
+    if (geom.has_box()) {
+      auto box = geom.box();
+      if (box.has_size()) {
+        x_scale = _link.visual(0).geometry().box().size().z();
+        y_scale = _link.visual(0).geometry().box().size().x();
+        z_scale = _link.visual(0).geometry().box().size().y();
+      }
+    }
+  }
+
+  green->SetAmbient(0.0, 0.5, 0.0);
+  green->SetDiffuse(0.0, 0.7, 0.0);
+  green->SetSpecular(0.5, 0.5, 0.5);
+  green->SetShininess(50);
+  green->SetReflectivity(0);
+  box->AddGeometry(scene->CreateBox());
+  box->SetLocalPosition(x, y, z);
+  box->SetLocalScale(x_scale, y_scale, z_scale);
+  box->SetMaterial(green);
+  root->AddChild(box);
+
+  return true;
+}
+
+bool RenderWidget::renderSphere(ignition::msgs::Link &_link)
+{
+  ignmsg << "Has a sphere!" << std::endl;
+  ignition::rendering::VisualPtr root = this->scene->RootVisual();
+
+  ignition::rendering::VisualPtr sphere = this->scene->CreateVisual();
+  if (sphere == nullptr) {
+    ignerr << "Failed to create visual" << std::endl;
+    return false;
+  }
+  ignition::rendering::MaterialPtr red = scene->CreateMaterial();
+  if (red == nullptr) {
+    ignerr << "Failed to create red material" << std::endl;
+    return false;
+  }
+
+  double x = 2.0;
+  double y = 0.0;
+  double z = 0.0;
+
+  if (_link.visual(0).has_pose()) {
+    // The default Ogre coordinate system is X left/right,
+    // Y up/down, and Z in/out (of the screen).  However,
+    // ignition-rendering switches that to be consistent with
+    // Gazebo.  Thus, the coordinate system is X in/out, Y
+    // left/right, and Z up/down.
+    x += _link.visual(0).pose().position().z();
+    y += -_link.visual(0).pose().position().x();
+    z += _link.visual(0).pose().position().y();
+  }
+
+  double x_scale = 1.0;
+  double y_scale = 1.0;
+  double z_scale = 2.0;
+
+  if (_link.visual(0).has_geometry()) {
+    auto geom = _link.visual(0).geometry();
+    if (geom.has_sphere()) {
+      auto sphere = geom.sphere();
+      if (sphere.has_radius()) {
+        ignmsg << "Setting radius to " << sphere.radius() << std::endl;
+        x_scale *= sphere.radius();
+        y_scale *= sphere.radius();
+        z_scale *= sphere.radius();
+      }
+    }
+  }
+
+  red->SetAmbient(0.5, 0.0, 0.0);
+  red->SetDiffuse(1.0, 0.0, 0.0);
+  red->SetSpecular(0.5, 0.5, 0.5);
+  red->SetShininess(50);
+  red->SetReflectivity(0);
+  sphere->AddGeometry(scene->CreateSphere());
+  sphere->SetLocalPosition(x, y, z);
+  sphere->SetLocalScale(x_scale, y_scale, z_scale);
+  sphere->SetMaterial(red);
+  root->AddChild(sphere);
+
+  return true;
+}
+
+void RenderWidget::setNewGraphic(const ignition::msgs::Model &_msg)
+{
+  ignmsg << "Saw new graphic!" << std::endl;
+
+  if (this->initialized_scene) {
+    return;
+  }
+  // ignmsg << _msg.name() << std::endl;
+  // ignmsg << _msg.id() << std::endl;
+  // ignmsg << _msg.is_static() << std::endl;
+  // ignmsg << _msg.link_size() << std::endl;
+  // ignmsg << _msg.link(0).name() << std::endl;
+  // ignmsg << _msg.link(0).visual_size() << std::endl;
+  // ignmsg << _msg.link(0).visual(0).geometry().has_box() << std::endl;
+  // ignmsg << _msg.link(0).visual(0).geometry().box().size().x() << std::endl;
+  // ignmsg << _msg.link(0).visual(0).geometry().box().size().y() << std::endl;
+  // ignmsg << _msg.link(0).visual(0).geometry().box().size().z() << std::endl;
+
+  // ignmsg << _msg.link(0).visual(0).pose().position().x() << std::endl;
+  // ignmsg << _msg.link(0).visual(0).pose().position().y() << std::endl;
+  // ignmsg << _msg.link(0).visual(0).pose().position().z() << std::endl;
+
+  // ignmsg << _msg.link(0).visual(0).pose().orientation().x() << std::endl;
+  // ignmsg << _msg.link(0).visual(0).pose().orientation().y() << std::endl;
+  // ignmsg << _msg.link(0).visual(0).pose().orientation().z() << std::endl;
+  // ignmsg << _msg.link(0).visual(0).pose().orientation().w() << std::endl;
+
+  for (int i = 0; i < _msg.link_size(); i++) {
+    auto link = _msg.link(i);
+    ignmsg << "Rendering: " << link.name() << std::endl;
+
+    if (link.visual(0).geometry().has_box()) {
+      renderBox(link);
+    }
+    else if (link.visual(0).geometry().has_sphere()) {
+      renderSphere(link);
+    }
+  }
+
+  this->initialized_scene = true;
+}
+
+void RenderWidget::CreateRenderWindow()
+{
   std::string engineName = "ogre";
   ignition::rendering::RenderEngine* engine =
       ignition::rendering::get_engine(engineName);
@@ -128,20 +261,20 @@ void RenderWidget::CreateRenderWindow() {
   }
 
   // Create sample scene
-  ignition::rendering::ScenePtr scene = engine->CreateScene("scene");
-  if (scene == nullptr) {
+  this->scene = engine->CreateScene("scene");
+  if (this->scene == nullptr) {
     ignerr << "Failed to create scene" << std::endl;
     return;
   }
 
-  scene->SetAmbientLight(0.3, 0.3, 0.3);
-  ignition::rendering::VisualPtr root = scene->RootVisual();
+  this->scene->SetAmbientLight(0.3, 0.3, 0.3);
+  ignition::rendering::VisualPtr root = this->scene->RootVisual();
   if (root == nullptr) {
     ignerr << "Failed to find the root visual" << std::endl;
     return;
   }
   ignition::rendering::DirectionalLightPtr light0 =
-      scene->CreateDirectionalLight();
+      this->scene->CreateDirectionalLight();
   if (light0 == nullptr) {
     ignerr << "Failed to create a directional light" << std::endl;
     return;
@@ -151,30 +284,8 @@ void RenderWidget::CreateRenderWindow() {
   light0->SetSpecularColor(0.5, 0.5, 0.5);
   root->AddChild(light0);
 
-  ignition::rendering::MaterialPtr green = scene->CreateMaterial();
-  if (green == nullptr) {
-    ignerr << "Failed to create green material" << std::endl;
-    return;
-  }
-  green->SetAmbient(0.0, 0.5, 0.0);
-  green->SetDiffuse(0.0, 0.7, 0.0);
-  green->SetSpecular(0.5, 0.5, 0.5);
-  green->SetShininess(50);
-  green->SetReflectivity(0);
-
-  ignition::rendering::VisualPtr vis = scene->CreateVisual();
-  if (vis == nullptr) {
-    ignerr << "Failed to create visual" << std::endl;
-    return;
-  }
-  vis->AddGeometry(scene->CreateBox());
-  vis->SetLocalPosition(3, 0, 0);
-  vis->SetLocalScale(1, 1, 1);
-  vis->SetMaterial(green);
-  root->AddChild(vis);
-
   // create user camera
-  this->camera = scene->CreateCamera("user_camera");
+  this->camera = this->scene->CreateCamera("user_camera");
   if (this->camera == nullptr) {
     ignerr << "Failed to create camera" << std::endl;
     return;

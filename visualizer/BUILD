@@ -1,14 +1,26 @@
 load("@//tools:ign-gui.bzl", "ign_gui_plugin_dep_name", "IGN_GUI_PLUGIN_PATH")
+load("@//tools:qt.bzl", "qt_moc_gen")
+
+qt_moc_gen(
+    name = "renderwidget_moc",
+    hdr = "RenderWidget.hh",
+    out = "moc_renderwidget.cc",
+)
 
 cc_library(
     name = "_libRenderWidget.so",
     srcs = [
         "RenderWidget.cc",
+        "moc_renderwidget.cc", # from qt_moc_get above
+    ],
+    hdrs = [
+        "RenderWidget.hh",
     ],
     deps = [
         "@ignition_common//:ignition_common_shared_library",
         "@ignition_gui//:ignition_gui_shared_library",
         "@ignition_rendering//:ignition_rendering_shared_library",
+        "@ignition-transport3",
     ],
     linkstatic = 0,
 )
@@ -25,6 +37,7 @@ cc_binary(
 
 cc_binary(
     name = "visualizer",
+    visibility = ["//visibility:public"],
     srcs = [
         "visualizer.cc",
     ],

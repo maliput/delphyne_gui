@@ -181,9 +181,9 @@ void translateMeshGeometry(drake::lcmt_viewer_geometry_data geometry_data,
     geometry_model->set_type(ignition::msgs::Geometry::MESH);
     mesh_msg->set_filename(geometry_data.string_data);
 
-    scale_msg->set_x(1.0);
-    scale_msg->set_y(1.0);
-    scale_msg->set_z(1.0);
+    scale_msg->set_x(geometry_data.float_data[0]);
+    scale_msg->set_y(geometry_data.float_data[1]);
+    scale_msg->set_z(geometry_data.float_data[2]);
   }
 }
 

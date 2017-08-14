@@ -34,6 +34,7 @@ cc_binary(
     deps = [
         "@ignition-transport3",
         "@lcm",
+        "@ignition_common//:ignition_common_shared_library",
         "//bridge:lcm-to-ign-translation",
         "//bridge:drake-lcmt-headers"
     ],
@@ -82,5 +83,7 @@ drake_cc_googletest(
     name = "lcm_to_ign_translation_test",
     deps = [
         "@lcm",
+        "//bridge:lcm-to-ign-translation",
+        "//bridge:drake-lcmt-headers"
     ],
 )

@@ -30,7 +30,6 @@
 #include <iostream>
 #include <typeinfo>
 #include <ignition/msgs.hh>
-#include <ignition/common/Console.hh>
 
 #include "lcm_to_ign_translation.hh"
 
@@ -132,7 +131,7 @@ void translate(drake::lcmt_viewer_geometry_data geometry_data,
       if ( unsupported_geometries.find(geometry_data.type) != unsupported_geometries.end() ) {
         type = unsupported_geometries[geometry_data.type];
       }
-      ignerr << "Geometry of type: " + type + " is currently unsupported" << std::endl;
+      std::cout << "Geometry of type: " + type + " is currently unsupported" << std::endl;
       break;
   }
 }
@@ -173,7 +172,7 @@ void translateMeshGeometry(drake::lcmt_viewer_geometry_data geometry_data,
                            ignition::msgs::Geometry* geometry_model) {
   // If no string_data, we assume MeshMessage, which is unsupported
   if (geometry_data.string_data.empty()) {
-      ignerr << "Meshes generated from array are currently unsupported" << std::endl;
+      std::cout << "Meshes generated from array are currently unsupported" << std::endl;
   }
   else {
     auto* mesh_msg = geometry_model->mutable_mesh();

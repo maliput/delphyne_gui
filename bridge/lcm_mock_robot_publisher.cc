@@ -34,7 +34,6 @@
 #include <vector>
 
 #include <lcm/lcm-cpp.hpp>
-#include <ignition/common/Console.hh>
 #include "drake/lcmt_viewer_geometry_data.hpp"
 #include "drake/lcmt_viewer_link_data.hpp"
 #include "drake/lcmt_viewer_load_robot.hpp"
@@ -51,7 +50,7 @@
 int main(int argc, char* argv[]) {
   lcm::LCM lcm;
   if (!lcm.good()) {
-    ignerr << "Failed to initialize LCM" << std::endl;
+    std::cout << "Failed to initialize LCM" << std::endl;
     return 1;
   }
   // fixed values used to override the non-initialized variables from the
@@ -176,7 +175,7 @@ int main(int argc, char* argv[]) {
     std::string lcm_channel = "DRAKE_VIEWER_LOAD_ROBOT";
     std::cout << "Publishing message into " << lcm_channel << std::endl;
     if (lcm.publish(lcm_channel, &robotMsg) == -1) {
-      ignerr << "Failed to publish message into " << lcm_channel << std::endl;
+      std::cout << "Failed to publish message into " << lcm_channel << std::endl;
       return 1;
     }
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));

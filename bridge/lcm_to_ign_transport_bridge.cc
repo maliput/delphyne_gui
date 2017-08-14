@@ -53,8 +53,8 @@ int main(int argc, char* argv[]) {
   try {
     viewerLoadRobotRepeater.Start();
   } catch(const std::runtime_error &error) {
-    ignerr << "Failed to start LCM channel repeater for initialize DRAKE_VIEWER_LOAD_ROBOT" << std::endl;
-    ignerr << "Details: " << error.what() << std::endl;
+    std::cout << "Failed to start LCM channel repeater for initialize DRAKE_VIEWER_LOAD_ROBOT" << std::endl;
+    std::cout << "Details: " << error.what() << std::endl;
     exit(1);
   }
 

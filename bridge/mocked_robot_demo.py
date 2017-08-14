@@ -55,16 +55,15 @@ def launch(command, stdin):
         stdin=stdin,
         stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
-def main():
-    bridge_path = "bridge/lcm-to-ign-transport-bridge"
-    mock_publisher_path = "bridge/lcm-mock-robot-publisher"
+def main(binaries):
     devnull = open('/dev/null')
-    p1 = launch(bridge_path, devnull)
-    time.sleep(0.5)
-    P2 = launch(mock_publisher_path, devnull)
+    process_list = []
+    for binary in binaries:
+        process_list.append(launch(binary, devnull))
+        time.sleep(0.5)
 
-    p1.wait()
-    p2.wait()
+    for process in process_list:
+        process.wait()
 
 if __name__ == '__main__':
-    main()
+    main(sys.argv[1:])

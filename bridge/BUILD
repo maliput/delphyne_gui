@@ -20,12 +20,12 @@ cc_binary(
         "@ignition-transport3",
         "@lcm",
         "@ignition_common//:ignition_common_shared_library",
-    ],
+        ],
     data = [
         "drake/car/car.vtp",
         "drake/package.xml",
         "drake/car/package.xml"
-    ],
+        ],
 )
 
 cc_binary(
@@ -48,8 +48,12 @@ py_binary(
     data = [
         ":lcm-mock-robot-publisher",
         ":lcm-to-ign-transport-bridge"
-    ],
-    main = "mocked_robot_demo.py"
+        ],
+    main = "mocked_robot_demo.py",
+    args = [
+        "$(location :lcm-mock-robot-publisher)",
+        "$(location :lcm-to-ign-transport-bridge)"
+        ],
 )
 
 drake_cc_googletest(

@@ -173,14 +173,17 @@ void translateMeshGeometry(drake::lcmt_viewer_geometry_data geometry_data,
               << std::endl;
   } else {
     auto* mesh_msg = geometry_model->mutable_mesh();
-    auto* scale_msg = mesh_msg->mutable_scale();
 
     geometry_model->set_type(ignition::msgs::Geometry::MESH);
     mesh_msg->set_filename(geometry_data.string_data);
 
-    scale_msg->set_x(geometry_data.float_data[0]);
-    scale_msg->set_y(geometry_data.float_data[1]);
-    scale_msg->set_z(geometry_data.float_data[2]);
+    if (geometry_data.num_float_data == 3) {
+      auto* scale_msg = mesh_msg->mutable_scale();
+      scale_msg->set_x(geometry_data.float_data[0]);
+      scale_msg->set_y(geometry_data.float_data[1]);
+      scale_msg->set_z(geometry_data.float_data[2]);
+    }
+
   }
 }
 

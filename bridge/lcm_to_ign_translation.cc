@@ -39,9 +39,6 @@ namespace bridge {
 void translateBoxGeometry(drake::lcmt_viewer_geometry_data geometry_data,
                           ignition::msgs::Geometry* geometry_model);
 
-void translateBoxGeometry(drake::lcmt_viewer_geometry_data geometry_data,
-                          ignition::msgs::Geometry* geometry_model);
-
 void translateSphereGeometry(drake::lcmt_viewer_geometry_data geometry_data,
                              ignition::msgs::Geometry* geometry_model);
 

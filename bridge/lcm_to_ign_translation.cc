@@ -72,10 +72,8 @@ void translate(drake::lcmt_viewer_geometry_data geometry_data,
   auto* material_msg = visual_model->mutable_material();
 
   translate(geometry_data.position, pose_msg->mutable_position());
-  translate(geometry_data.position, pose_msg->mutable_orientation());
-
+  translate(geometry_data.quaternion, pose_msg->mutable_orientation());
   translate(geometry_data.color, material_msg->mutable_diffuse());
-
   translate(geometry_data, visual_model->mutable_geometry());
 }
 

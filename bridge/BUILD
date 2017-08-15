@@ -73,13 +73,6 @@ py_binary(
 )
 
 drake_cc_googletest(
-    name = "dummy_test",
-    deps = [
-        "@lcm",
-    ],
-)
-
-drake_cc_googletest(
     name = "lcm_to_ign_translation_test",
     deps = [
         "@lcm",

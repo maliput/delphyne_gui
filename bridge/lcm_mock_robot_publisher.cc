@@ -192,7 +192,7 @@ int main(int argc, char* argv[]) {
   robotMsg.link[0] = boxLinkMsg;
   robotMsg.link[1] = sphereLinkMsg;
   robotMsg.link[2] = cylinderLinkMsg;
-  robotMsg.link[3] = meshPackageLinkMsg;
+  robotMsg.link[3] = meshURLLinkMsg;
   robotMsg.link[4] = meshPackageLinkMsg;
 
   // Publish a robot message into the lcm_channel every 1 second

@@ -59,6 +59,10 @@ int main(int argc, char* argv[]) {
   std::vector<float> quaternion = {1.0, 0.0, 0.0, 0.0};
   std::vector<float> color = {1.0, 1.0, 1.0, 1.0};
 
+  ////////////////
+  /// BOX
+  ////////////////
+
   // Define box geometry message
   drake::lcmt_viewer_geometry_data boxMsg;
   boxMsg.type = boxMsg.BOX;
@@ -70,6 +74,7 @@ int main(int argc, char* argv[]) {
   std::copy(position.begin(), position.end(), boxMsg.position);
   std::copy(quaternion.begin(), quaternion.end(), boxMsg.quaternion);
   std::copy(color.begin(), color.end(), boxMsg.color);
+
   // Generate box link message
   drake::lcmt_viewer_link_data boxLinkMsg;
   boxLinkMsg.name = "box";
@@ -78,16 +83,22 @@ int main(int argc, char* argv[]) {
   boxLinkMsg.geom.resize(boxLinkMsg.num_geom);
   boxLinkMsg.geom[0] = boxMsg;
 
+  ////////////////
+  /// SPHERE
+  ////////////////
+
   // Define sphere geometry message
   drake::lcmt_viewer_geometry_data sphereMsg;
   sphereMsg.type = sphereMsg.SPHERE;
   sphereMsg.num_float_data = 1;
   sphereMsg.float_data.resize(sphereMsg.num_float_data);
   sphereMsg.float_data[0] = 1;
-  std::copy(position.begin(), position.end(), sphereMsg.position);
-  sphereMsg.position[0] = 4;  // offset for models
+  sphereMsg.position[0] = 1;
+  sphereMsg.position[1] = 3;
+  sphereMsg.position[2] = 2.5;
   std::copy(quaternion.begin(), quaternion.end(), sphereMsg.quaternion);
   std::copy(color.begin(), color.end(), sphereMsg.color);
+
   // Generate sphere link message
   drake::lcmt_viewer_link_data sphereLinkMsg;
   sphereLinkMsg.name = "sphere";
@@ -96,6 +107,10 @@ int main(int argc, char* argv[]) {
   sphereLinkMsg.geom.resize(sphereLinkMsg.num_geom);
   sphereLinkMsg.geom[0] = sphereMsg;
 
+  ////////////////
+  /// CYLINDER
+  ////////////////
+
   // Define cylinder geometry message
   drake::lcmt_viewer_geometry_data cylinderMsg;
   cylinderMsg.type = cylinderMsg.CYLINDER;
@@ -103,10 +118,12 @@ int main(int argc, char* argv[]) {
   cylinderMsg.float_data.resize(cylinderMsg.num_float_data);
   cylinderMsg.float_data[0] = 1;
   cylinderMsg.float_data[1] = 4;
-  std::copy(position.begin(), position.end(), cylinderMsg.position);
-  cylinderMsg.position[0] = 8;  // offset for models
+  cylinderMsg.position[0] = 1.1;
+  cylinderMsg.position[1] = 1.2;
+  cylinderMsg.position[2] = 1.3;
   std::copy(quaternion.begin(), quaternion.end(), cylinderMsg.quaternion);
   std::copy(color.begin(), color.end(), cylinderMsg.color);
+
   // Generate cylinder link message
   drake::lcmt_viewer_link_data cylinderLinkMsg;
   cylinderLinkMsg.name = "cylinder";
@@ -114,6 +131,10 @@ int main(int argc, char* argv[]) {
   cylinderLinkMsg.num_geom = 1;
   cylinderLinkMsg.geom.resize(cylinderLinkMsg.num_geom);
   cylinderLinkMsg.geom[0] = cylinderMsg;
+
+  ////////////////
+  /// MESHES
+  ////////////////
 
   // Define mesh-from-url geometry message
   drake::lcmt_viewer_geometry_data meshURLMsg;
@@ -123,10 +144,12 @@ int main(int argc, char* argv[]) {
                                                   // path or absolute.
   meshURLMsg.num_float_data = 0;
   meshURLMsg.float_data.resize(meshURLMsg.num_float_data);
-  std::copy(position.begin(), position.end(), meshURLMsg.position);
-  meshURLMsg.position[0] = 10;  // offset for models
+  meshURLMsg.position[0] = 0;
+  meshURLMsg.position[1] = 0;
+  meshURLMsg.position[2] = 3;
   std::copy(quaternion.begin(), quaternion.end(), meshURLMsg.quaternion);
   std::copy(color.begin(), color.end(), meshURLMsg.color);
+
   // Generate mesh-from-url link message
   drake::lcmt_viewer_link_data meshURLLinkMsg;
   meshURLLinkMsg.name = "mesh-from-url";
@@ -134,6 +157,7 @@ int main(int argc, char* argv[]) {
   meshURLLinkMsg.num_geom = 1;
   meshURLLinkMsg.geom.resize(meshURLLinkMsg.num_geom);
   meshURLLinkMsg.geom[0] = meshURLMsg;
+
 
   // Define mesh-from-package geometry message
   drake::lcmt_viewer_geometry_data meshPackageMsg;
@@ -144,14 +168,15 @@ int main(int argc, char* argv[]) {
   meshPackageMsg.string_data = "package://drake/car/car.vtp";
   meshPackageMsg.num_float_data = 3;
   meshPackageMsg.float_data.resize(meshPackageMsg.num_float_data);
-  meshPackageMsg.float_data[0] = 1;  // float_data needs to be populated
-  meshPackageMsg.float_data[1] = 1;
-  meshPackageMsg.float_data[2] = 1;
-  std::copy(position.begin(), position.end(), meshPackageMsg.position);
-  meshPackageMsg.position[0] = 16;  // offset for models
-  std::copy(quaternion.begin(), quaternion.end(), meshURLMsg.quaternion);
+  meshPackageMsg.float_data[0] = 1.0;  // float_data needs to be populated
+  meshPackageMsg.float_data[1] = 1.0;
+  meshPackageMsg.float_data[2] = 0.5;
+  meshPackageMsg.position[0] = 0.0;
+  meshPackageMsg.position[1] = 0.0;
+  meshPackageMsg.position[2] = 0.0;
   std::copy(quaternion.begin(), quaternion.end(), meshPackageMsg.quaternion);
   std::copy(color.begin(), color.end(), meshPackageMsg.color);
+
   // Generate mesh-from-package link message
   drake::lcmt_viewer_link_data meshPackageLinkMsg;
   meshPackageLinkMsg.name = "mesh-from-package";
@@ -167,7 +192,7 @@ int main(int argc, char* argv[]) {
   robotMsg.link[0] = boxLinkMsg;
   robotMsg.link[1] = sphereLinkMsg;
   robotMsg.link[2] = cylinderLinkMsg;
-  robotMsg.link[3] = meshURLLinkMsg;
+  robotMsg.link[3] = meshPackageLinkMsg;
   robotMsg.link[4] = meshPackageLinkMsg;
 
   // Publish a robot message into the lcm_channel every 1 second

@@ -96,8 +96,14 @@ class LcmChannelRepeater {
   void handleMessage(const lcm::ReceiveBuffer* rbuf, const std::string& chan,
                      const LCM_TYPE* lcm_msg) {
     IGN_TYPE ign_msg;
-    translate(*lcm_msg, &ign_msg);
-    publisher_.Publish(ign_msg);
+    try {
+      translate(*lcm_msg, &ign_msg);
+      publisher_.Publish(ign_msg);
+    } catch(const delphyne::bridge::TranslateException &e) {
+      std::cout << "An error occurred while trying to translate a message in channel " << chan <<
+      ": " << std::endl;
+      std::cout << e.what() << std::endl;
+    }
   }
 };
 

@@ -3,23 +3,40 @@ load(
     "drake_cc_googletest",
 )
 
+cc_library(
+    name = "lcm-to-ign-translation",
+    srcs = ["lcm_to_ign_translation.cc",],
+    hdrs = ["lcm_to_ign_translation.hh",
+    ],
+    deps = [
+        "@ignition-transport3",
+        "@lcm",
+        "//bridge:drake-lcmt-headers"
+    ],
+)
+
+cc_library(
+    name = "drake-lcmt-headers",
+    hdrs = ["drake/lcmt_viewer_command.hpp",
+            "drake/lcmt_viewer_draw.hpp",
+            "drake/lcmt_viewer_geometry_data.hpp",
+            "drake/lcmt_viewer_link_data.hpp",
+            "drake/lcmt_viewer_load_robot.hpp"
+    ],
+)
+
 cc_binary(
     name = "lcm-to-ign-transport-bridge",
     srcs = [
         "lcm_to_ign_transport_bridge.cc",
-        "lcm_to_ign_translation.cc",
-        "lcm_to_ign_translation.hh",
         "lcm_channel_repeater.hh",
-        "drake/lcmt_viewer_command.hpp",
-        "drake/lcmt_viewer_draw.hpp",
-        "drake/lcmt_viewer_geometry_data.hpp",
-        "drake/lcmt_viewer_link_data.hpp",
-        "drake/lcmt_viewer_load_robot.hpp"
     ],
     deps = [
         "@ignition-transport3",
         "@lcm",
         "@ignition_common//:ignition_common_shared_library",
+        "//bridge:lcm-to-ign-translation",
+        "//bridge:drake-lcmt-headers"
     ],
     data = [
         "drake/car/car.vtp",
@@ -38,7 +55,6 @@ cc_binary(
     ],
     deps = [
         "@lcm",
-        "@ignition_common//:ignition_common_shared_library",
     ],
 )
 
@@ -57,5 +73,10 @@ py_binary(
 )
 
 drake_cc_googletest(
-    name = "dummy_test",
+    name = "lcm_to_ign_translation_test",
+    deps = [
+        "@lcm",
+        "//bridge:lcm-to-ign-translation",
+        "//bridge:drake-lcmt-headers"
+    ],
 )

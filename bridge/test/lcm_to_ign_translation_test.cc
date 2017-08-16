@@ -6,9 +6,151 @@
 namespace delphyne {
 namespace bridge {
 
-//////////////////////////////////////////////////
-/// \brief Test that an LCM geometry message describing a box is properly
-/// translated to an ignition Geometry message.
+// Test that an LCM draw message is properly
+// translated to an ignition Geometry message.
+class ViewerDrawTest : public ::testing::Test {
+ protected:
+  drake::lcmt_viewer_draw draw_msg;
+  ignition::msgs::PosesStamped ign_poses_stamped;
+  int last_index;
+
+  virtual void SetUp() override {
+    draw_msg.timestamp = 123456;
+    draw_msg.num_links = 2;
+    draw_msg.link_name.resize(draw_msg.num_links);
+    draw_msg.robot_num.resize(draw_msg.num_links);
+    draw_msg.position.resize(draw_msg.num_links);
+    draw_msg.quaternion.resize(draw_msg.num_links);
+
+    draw_msg.link_name[0] = "robot_one_link_one";
+    draw_msg.robot_num[0] = 1;
+    draw_msg.position[0] = {1.0, 2.0, 3.0};
+    draw_msg.quaternion[0] = {4.0, 3.0, 2.0, 1.0};
+
+    draw_msg.link_name[1] = "robot_two_link_one";
+    draw_msg.robot_num[1] = 2;
+    draw_msg.position[1] = {4.0, 5.0, 6.0};
+    draw_msg.quaternion[1] = {8.0, 7.0, 6.0, 5.0};
+    last_index = draw_msg.num_links - 1;
+  }
+
+  // Checks that all the array-iterable values from
+  // lcmt_viewer_draw are matching their ignition counterpart
+  void checkMsgTranslation(drake::lcmt_viewer_draw* lcm_msg,
+                           ignition::msgs::PosesStamped* ign_poses) {
+    for (int i = 0; i < lcm_msg->num_links; i++) {
+      ASSERT_EQ(ign_poses->pose(i).name(), lcm_msg->link_name[i]);
+      ASSERT_EQ(ign_poses->pose(i).id(), lcm_msg->robot_num[i]);
+      ASSERT_EQ(ign_poses->pose(i).position().x(), lcm_msg->position[i][0]);
+      ASSERT_EQ(ign_poses->pose(i).position().y(), lcm_msg->position[i][1]);
+      ASSERT_EQ(ign_poses->pose(i).position().z(), lcm_msg->position[i][2]);
+      ASSERT_EQ(ign_poses->pose(i).orientation().x(),
+                lcm_msg->quaternion[i][0]);
+      ASSERT_EQ(ign_poses->pose(i).orientation().y(),
+                lcm_msg->quaternion[i][1]);
+      ASSERT_EQ(ign_poses->pose(i).orientation().z(),
+                lcm_msg->quaternion[i][2]);
+      ASSERT_EQ(ign_poses->pose(i).orientation().w(),
+                lcm_msg->quaternion[i][3]);
+    }
+  }
+};
+
+///////////////////////////////////////////////////
+TEST_F(ViewerDrawTest, TestZeroPosesInPosesStamp) {
+  // Resize draw_msg defined in SetUp to zero poses
+  draw_msg.num_links = 0;
+  draw_msg.link_name.resize(0);
+  draw_msg.robot_num.resize(0);
+  draw_msg.position.resize(0);
+  draw_msg.quaternion.resize(0);
+  ignition::msgs::PosesStamped ign_msg;
+  translate(draw_msg, &ign_msg);
+  checkMsgTranslation(&draw_msg, &ign_msg);
+}
+
+TEST_F(ViewerDrawTest, TestOnePoseInPosesStamp) {
+  // Resize draw_msg defined in SetUp to single pose
+  draw_msg.num_links = 1;
+  draw_msg.link_name.resize(1);
+  draw_msg.robot_num.resize(1);
+  draw_msg.position.resize(1);
+  draw_msg.quaternion.resize(1);
+  ignition::msgs::PosesStamped ign_msg;
+  translate(draw_msg, &ign_msg);
+  checkMsgTranslation(&draw_msg, &ign_msg);
+}
+
+TEST_F(ViewerDrawTest, TestThreePosesInPosesStamp) {
+  // Resize draw_msg defined in SetUp to three poses
+  draw_msg.num_links = 3;
+  draw_msg.link_name.resize(3);
+  draw_msg.robot_num.resize(3);
+  draw_msg.position.resize(3);
+  draw_msg.quaternion.resize(3);
+  // Fill third link values
+  draw_msg.link_name[2] = "robot_three_link_one";
+  draw_msg.robot_num[2] = 3;
+  draw_msg.position[2] = {7.0, 8.0, 9.0};
+  draw_msg.quaternion[2] = {12.0, 11.0, 10.0, 9.0};
+  ignition::msgs::PosesStamped ign_msg;
+  translate(draw_msg, &ign_msg);
+  checkMsgTranslation(&draw_msg, &ign_msg);
+}
+
+// Test that a header's sec and nsec were correctly calculated
+TEST_F(ViewerDrawTest, TestTimeStamp) {
+  translate(draw_msg, &ign_poses_stamped);
+  int secs = 123;
+  int nsecs = 456000000;
+  ASSERT_EQ(secs, ign_poses_stamped.time().sec());
+  ASSERT_EQ(nsecs, ign_poses_stamped.time().nsec());
+}
+
+// Test that translation fails if at least one of the defined
+// position vectors doesn't have the correct size
+TEST_F(ViewerDrawTest, TestExceptionInPosition) {
+  draw_msg.position[1] = {1.0, 2.0, 3.0, 4.0};
+  EXPECT_THROW(translate(draw_msg, &ign_poses_stamped), TranslateException);
+}
+
+// Test that translation fails if at least one of the defined
+// orientation vectors doesn't have the correct size
+TEST_F(ViewerDrawTest, TestExceptionInOrientation) {
+  draw_msg.quaternion[1] = {4.0, 2.0, 1.0};
+  EXPECT_THROW(translate(draw_msg, &ign_poses_stamped), TranslateException);
+}
+
+// Test that translation fails if the link_name
+// vector doesn't have the correct size
+TEST_F(ViewerDrawTest, TestExceptionNumberOfLinkNames) {
+  draw_msg.link_name.resize(draw_msg.num_links + 1);
+  EXPECT_THROW(translate(draw_msg, &ign_poses_stamped), TranslateException);
+}
+
+// Test that translation fails if the robot_num
+// vector doesn't have the correct size
+TEST_F(ViewerDrawTest, TestExceptionNumberOfRobotNum) {
+  draw_msg.robot_num.resize(draw_msg.num_links - 1);
+  EXPECT_THROW(translate(draw_msg, &ign_poses_stamped), TranslateException);
+}
+
+// Test that translation fails if the position
+// vector doesn't have the correct size
+TEST_F(ViewerDrawTest, TestExceptionNumberOfPositions) {
+  draw_msg.position.resize(draw_msg.num_links - 1);
+  EXPECT_THROW(translate(draw_msg, &ign_poses_stamped), TranslateException);
+}
+
+// Test that translation fails if the quaternion
+// vector doesn't have the correct size
+TEST_F(ViewerDrawTest, TestExceptionNumberOfQuaternions) {
+  draw_msg.position.resize(draw_msg.num_links + 1);
+  EXPECT_THROW(translate(draw_msg, &ign_poses_stamped), TranslateException);
+}
+
+// Test that an LCM geometry message describing a box is properly
+// translated to an ignition Geometry message.
 GTEST_TEST(BoxTest, TestBoxTranslation) {
   // Define LCM box geometry message
   drake::lcmt_viewer_geometry_data boxMsg;
@@ -49,7 +191,7 @@ GTEST_TEST(BoxTest, TestExceptionInBoxTranslation) {
   boxMsg.float_data[0] = 1;
   boxMsg.float_data[1] = 2;
 
-  EXPECT_THROW(translate(boxMsg, &ign_box_geometry);, TranslateException);
+  EXPECT_THROW(translate(boxMsg, &ign_box_geometry), TranslateException);
 }
 
 //////////////////////////////////////////////////

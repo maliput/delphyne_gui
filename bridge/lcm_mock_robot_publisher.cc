@@ -55,7 +55,6 @@ int main(int argc, char* argv[]) {
   }
   // fixed values used to override the non-initialized variables from the
   // geometry messages
-  std::vector<float> position = {0.0, 0.0, 0.0};
   std::vector<float> quaternion = {1.0, 0.0, 0.0, 0.0};
   std::vector<float> color = {1.0, 1.0, 1.0, 1.0};
 
@@ -71,7 +70,9 @@ int main(int argc, char* argv[]) {
   boxMsg.float_data[0] = 3.8808;
   boxMsg.float_data[1] = 0.75;
   boxMsg.float_data[2] = 0.030921;
-  std::copy(position.begin(), position.end(), boxMsg.position);
+  boxMsg.position[0] = 0.0;
+  boxMsg.position[1] = 0.0;
+  boxMsg.position[2] = 0.0;
   std::copy(quaternion.begin(), quaternion.end(), boxMsg.quaternion);
   std::copy(color.begin(), color.end(), boxMsg.color);
 
@@ -171,9 +172,9 @@ int main(int argc, char* argv[]) {
   meshPackageMsg.float_data[0] = 1.0;  // float_data needs to be populated
   meshPackageMsg.float_data[1] = 1.0;
   meshPackageMsg.float_data[2] = 0.5;
-  meshPackageMsg.position[0] = 0.0;
-  meshPackageMsg.position[1] = 0.0;
-  meshPackageMsg.position[2] = 0.0;
+  meshPackageMsg.position[0] = 0.5;
+  meshPackageMsg.position[1] = 0.5;
+  meshPackageMsg.position[2] = 0.5;
   std::copy(quaternion.begin(), quaternion.end(), meshPackageMsg.quaternion);
   std::copy(color.begin(), color.end(), meshPackageMsg.color);
 

@@ -180,7 +180,7 @@ void translateCylinderGeometry(drake::lcmt_viewer_geometry_data geometry_data,
     std::stringstream message;
     message << "Wrong float_data information for cylinder: "
             << "expecting 2 elements but "
-            << std::to_string(geometry_data.num_float_data)
+            << geometry_data.num_float_data
             << " given.";
     throw TranslateException(message.str());
   }

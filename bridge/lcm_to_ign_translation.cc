@@ -28,6 +28,7 @@
 
 #include <iostream>
 #include <string>
+#include <sstream>
 #include <typeinfo>
 #include <ignition/msgs.hh>
 
@@ -127,8 +128,7 @@ void translate(drake::lcmt_viewer_geometry_data geometry_data,
           unsupported_geometries.end()) {
         type = unsupported_geometries[geometry_data.type];
       }
-      std::cout << "Geometry of type: " + type + " is currently unsupported"
-                << std::endl;
+      throw TranslateException("Geometry of type: " + type + " is currently unsupported");
       break;
   }
 }
@@ -136,6 +136,15 @@ void translate(drake::lcmt_viewer_geometry_data geometry_data,
 //////////////////////////////////////////////////
 void translateBoxGeometry(drake::lcmt_viewer_geometry_data geometry_data,
                           ignition::msgs::Geometry* geometry_model) {
+
+  if (geometry_data.num_float_data != 3) {
+    std::stringstream message;
+    message << "Wrong float_data information for box: expecting 3 elements but "
+            << geometry_data.num_float_data
+            << " given.";
+    throw TranslateException(message.str());
+  }
+
   auto* box_msg = geometry_model->mutable_box();
   auto* size_msg = box_msg->mutable_size();
 
@@ -148,6 +157,16 @@ void translateBoxGeometry(drake::lcmt_viewer_geometry_data geometry_data,
 //////////////////////////////////////////////////
 void translateSphereGeometry(drake::lcmt_viewer_geometry_data geometry_data,
                              ignition::msgs::Geometry* geometry_model) {
+
+  if (geometry_data.num_float_data != 1) {
+    std::stringstream message;
+    message << "Wrong float_data information for sphere: "
+            << "expecting 1 element but "
+            << geometry_data.num_float_data
+            << " given.";
+    throw TranslateException(message.str());
+  }
+
   auto* sphere_msg = geometry_model->mutable_sphere();
 
   geometry_model->set_type(ignition::msgs::Geometry::SPHERE);
@@ -157,6 +176,14 @@ void translateSphereGeometry(drake::lcmt_viewer_geometry_data geometry_data,
 //////////////////////////////////////////////////
 void translateCylinderGeometry(drake::lcmt_viewer_geometry_data geometry_data,
                                ignition::msgs::Geometry* geometry_model) {
+  if (geometry_data.num_float_data != 2) {
+    std::stringstream message;
+    message << "Wrong float_data information for cylinder: "
+            << "expecting 2 elements but "
+            << std::to_string(geometry_data.num_float_data)
+            << " given.";
+    throw TranslateException(message.str());
+  }
   auto* cylinder_msg = geometry_model->mutable_cylinder();
 
   geometry_model->set_type(ignition::msgs::Geometry::CYLINDER);
@@ -169,8 +196,7 @@ void translateMeshGeometry(drake::lcmt_viewer_geometry_data geometry_data,
                            ignition::msgs::Geometry* geometry_model) {
   // If no string_data, we assume MeshMessage, which is unsupported
   if (geometry_data.string_data.empty()) {
-    std::cout << "Meshes generated from array are currently unsupported"
-              << std::endl;
+    throw TranslateException("Meshes generated from array are currently unsupported");
   } else {
     auto* mesh_msg = geometry_model->mutable_mesh();
 
@@ -183,7 +209,6 @@ void translateMeshGeometry(drake::lcmt_viewer_geometry_data geometry_data,
       scale_msg->set_y(geometry_data.float_data[1]);
       scale_msg->set_z(geometry_data.float_data[2]);
     }
-
   }
 }
 

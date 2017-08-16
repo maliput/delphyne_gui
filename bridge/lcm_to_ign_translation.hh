@@ -36,6 +36,10 @@
 namespace delphyne {
 namespace bridge {
 
+class TranslateException : public std::runtime_error {
+  public: TranslateException(std::string message) :std::runtime_error(message) {}
+};
+
 /// \brief Translate a whole robot model definition from LCM to ignition
 /// \param[in]  robot_data  An LCM message containing the robot data
 /// \param[out] robot_model The resulting ignition message with the robot model

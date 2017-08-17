@@ -179,7 +179,7 @@ bool RenderWidget::renderSphere(ignition::msgs::Link &_link)
 
   double x_scale = 1.0;
   double y_scale = 1.0;
-  double z_scale = 2.0;
+  double z_scale = 1.0;
 
   if (_link.visual(0).has_geometry()) {
     auto geom = _link.visual(0).geometry();
@@ -208,6 +208,69 @@ bool RenderWidget::renderSphere(ignition::msgs::Link &_link)
   return true;
 }
 
+bool RenderWidget::renderCylinder(ignition::msgs::Link &_link)
+{
+  ignmsg << "Has a cylinder!" << std::endl;
+
+  ignition::rendering::VisualPtr root = this->scene->RootVisual();
+
+  ignition::rendering::VisualPtr cylinder = this->scene->CreateVisual();
+  if (cylinder == nullptr) {
+    ignerr << "Failed to create visual" << std::endl;
+    return false;
+  }
+  ignition::rendering::MaterialPtr blue = scene->CreateMaterial();
+  if (blue == nullptr) {
+    ignerr << "Failed to create blue material" << std::endl;
+    return false;
+  }
+
+  double x = 2.0;
+  double y = 0.0;
+  double z = 0.0;
+
+  if (_link.visual(0).has_pose()) {
+    // The default Ogre coordinate system is X left/right,
+    // Y up/down, and Z in/out (of the screen).  However,
+    // ignition-rendering switches that to be consistent with
+    // Gazebo.  Thus, the coordinate system is X in/out, Y
+    // left/right, and Z up/down.
+    x += _link.visual(0).pose().position().z();
+    y += -_link.visual(0).pose().position().x();
+    z += _link.visual(0).pose().position().y();
+  }
+
+  double x_scale = 1.0;
+  double y_scale = 1.0;
+  double z_scale = 1.0;
+
+  if (_link.visual(0).has_geometry()) {
+    auto geom = _link.visual(0).geometry();
+    if (geom.has_cylinder()) {
+      auto cylinder = geom.cylinder();
+      if (cylinder.has_radius()) {
+        ignmsg << "Setting radius to " << cylinder.radius() << std::endl;
+        x_scale *= cylinder.radius();
+        y_scale *= cylinder.radius();
+        z_scale = cylinder.length();
+      }
+    }
+  }
+
+  blue->SetAmbient(0.0, 0.0, 0.3);
+  blue->SetDiffuse(0.0, 0.0, 0.8);
+  blue->SetSpecular(0.8, 0.8, 0.8);
+  blue->SetShininess(50);
+  blue->SetReflectivity(0);
+  cylinder->AddGeometry(scene->CreateCylinder());
+  cylinder->SetLocalPosition(x, y, z);
+  cylinder->SetLocalScale(x_scale, y_scale, z_scale);
+  cylinder->SetMaterial(blue);
+  root->AddChild(cylinder);
+
+  return true;
+}
+
 void RenderWidget::setNewGraphic(const ignition::msgs::Model &_msg)
 {
   ignmsg << "Saw new graphic!" << std::endl;
@@ -215,25 +278,6 @@ void RenderWidget::setNewGraphic(const ignition::msgs::Model &_msg)
   if (this->initialized_scene) {
     return;
   }
-  // ignmsg << _msg.name() << std::endl;
-  // ignmsg << _msg.id() << std::endl;
-  // ignmsg << _msg.is_static() << std::endl;
-  // ignmsg << _msg.link_size() << std::endl;
-  // ignmsg << _msg.link(0).name() << std::endl;
-  // ignmsg << _msg.link(0).visual_size() << std::endl;
-  // ignmsg << _msg.link(0).visual(0).geometry().has_box() << std::endl;
-  // ignmsg << _msg.link(0).visual(0).geometry().box().size().x() << std::endl;
-  // ignmsg << _msg.link(0).visual(0).geometry().box().size().y() << std::endl;
-  // ignmsg << _msg.link(0).visual(0).geometry().box().size().z() << std::endl;
-
-  // ignmsg << _msg.link(0).visual(0).pose().position().x() << std::endl;
-  // ignmsg << _msg.link(0).visual(0).pose().position().y() << std::endl;
-  // ignmsg << _msg.link(0).visual(0).pose().position().z() << std::endl;
-
-  // ignmsg << _msg.link(0).visual(0).pose().orientation().x() << std::endl;
-  // ignmsg << _msg.link(0).visual(0).pose().orientation().y() << std::endl;
-  // ignmsg << _msg.link(0).visual(0).pose().orientation().z() << std::endl;
-  // ignmsg << _msg.link(0).visual(0).pose().orientation().w() << std::endl;
 
   for (int i = 0; i < _msg.link_size(); i++) {
     auto link = _msg.link(i);
@@ -244,6 +288,9 @@ void RenderWidget::setNewGraphic(const ignition::msgs::Model &_msg)
     }
     else if (link.visual(0).geometry().has_sphere()) {
       renderSphere(link);
+    }
+    else if (link.visual(0).geometry().has_cylinder()) {
+      renderCylinder(link);
     }
   }
 

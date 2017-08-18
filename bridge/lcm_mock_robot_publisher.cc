@@ -205,8 +205,7 @@ int main(int argc, char* argv[]) {
     std::string lcm_channel = "DRAKE_VIEWER_LOAD_ROBOT";
     ignmsg << "Publishing message into " << lcm_channel << std::endl;
     if (lcm.publish(lcm_channel, &robotMsg) == -1) {
-      ignerr << "Failed to publish message into " << lcm_channel
-                << std::endl;
+      ignerr << "Failed to publish message into " << lcm_channel << std::endl;
       return 1;
     }
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));

@@ -51,7 +51,8 @@ namespace bridge {
 template <class LCM_TYPE, class IGN_TYPE>
 class LcmChannelRepeater {
  public:
-  LcmChannelRepeater(std::shared_ptr<lcm::LCM> lcm, const std::string& topic_name)
+  LcmChannelRepeater(std::shared_ptr<lcm::LCM> lcm,
+                     const std::string& topic_name)
       : lcm_(lcm), topic_name_(topic_name) {}
 
   /// \brief Subscribe to the LCM channel and echo into the

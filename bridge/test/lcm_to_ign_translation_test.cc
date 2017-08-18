@@ -34,7 +34,8 @@ GTEST_TEST(BoxTest, TestBoxTranslation) {
 }
 
 //////////////////////////////////////////////////
-/// \brief Test that translation fails if an LCM geometry message describing a box is
+/// \brief Test that translation fails if an LCM geometry message describing a
+/// box is
 /// not properly filled.
 GTEST_TEST(BoxTest, TestExceptionInBoxTranslation) {
   // Define LCM box geometry message
@@ -48,9 +49,7 @@ GTEST_TEST(BoxTest, TestExceptionInBoxTranslation) {
   boxMsg.float_data[0] = 1;
   boxMsg.float_data[1] = 2;
 
-  EXPECT_THROW(
-      translate(boxMsg, &ign_box_geometry);,
-      TranslateException);
+  EXPECT_THROW(translate(boxMsg, &ign_box_geometry);, TranslateException);
 }
 
 //////////////////////////////////////////////////
@@ -94,9 +93,8 @@ GTEST_TEST(CylinderTest, TestExceptionInCylinderTranslation) {
   cylinderMsg.float_data.resize(cylinderMsg.num_float_data);
   cylinderMsg.float_data[0] = 1.368;  // radius
 
-  EXPECT_THROW(
-      translate(cylinderMsg, &ign_cylinder_geometry),
-      TranslateException);
+  EXPECT_THROW(translate(cylinderMsg, &ign_cylinder_geometry),
+               TranslateException);
 }
 
 //////////////////////////////////////////////////
@@ -135,9 +133,7 @@ GTEST_TEST(SphereTest, TestExceptionInCylinderTranslation) {
   sphereMsg.num_float_data = 0;
   sphereMsg.float_data.resize(sphereMsg.num_float_data);
 
-  EXPECT_THROW(
-      translate(sphereMsg, &ign_sphere_geometry),
-      TranslateException);
+  EXPECT_THROW(translate(sphereMsg, &ign_sphere_geometry), TranslateException);
 }
 
 //////////////////////////////////////////////////
@@ -196,4 +192,3 @@ GTEST_TEST(MeshTest, TestMeshTranslationWithoutScale) {
 
 }  // namespace bridge
 }  // namespace delphyne
-

@@ -164,7 +164,6 @@ int main(int argc, char* argv[]) {
   meshURLLinkMsg.geom.resize(meshURLLinkMsg.num_geom);
   meshURLLinkMsg.geom[0] = meshURLMsg;
 
-
   // Define mesh-from-package geometry message
   drake::lcmt_viewer_geometry_data meshPackageMsg;
   meshPackageMsg.type = meshPackageMsg.MESH;

@@ -6,14 +6,14 @@
 namespace delphyne {
 namespace bridge {
 
-  static bool handler1Called;
-  static bool handler2Called;
+static bool handler1Called;
+static bool handler2Called;
 
 //////////////////////////////////////////////////
 /// \brief Assert that a given ign Geometry is a box and has
 /// the specified size
-void assert_is_box_with_size(const ignition::msgs::Geometry &message,
-                             float x, float y, float z) {
+void assert_is_box_with_size(const ignition::msgs::Geometry& message, float x,
+                             float y, float z) {
   ASSERT_EQ(message.type(), ignition::msgs::Geometry::BOX);
   ASSERT_EQ(message.box().size().x(), x);
   ASSERT_EQ(message.box().size().y(), y);
@@ -23,8 +23,8 @@ void assert_is_box_with_size(const ignition::msgs::Geometry &message,
 //////////////////////////////////////////////////
 /// \brief Fill an LCM viewer_geometry_data message with a box
 /// geometry with the specified size
-void fill_box_with(drake::lcmt_viewer_geometry_data& boxMsg,
-                   float x, float y, float z) {
+void fill_box_with(drake::lcmt_viewer_geometry_data& boxMsg, float x, float y,
+                   float z) {
   boxMsg.type = boxMsg.BOX;
   boxMsg.num_float_data = 3;
   boxMsg.float_data.resize(boxMsg.num_float_data);
@@ -37,8 +37,7 @@ void fill_box_with(drake::lcmt_viewer_geometry_data& boxMsg,
 /// \brief Handler called in TEST_CHANNEL_1. Checks that the
 /// box message has the expected size and flags the handler as
 /// called
-void test_1_handler(const ignition::msgs::Geometry &message)
-{
+void test_1_handler(const ignition::msgs::Geometry& message) {
   assert_is_box_with_size(message, 1, 2, 3);
   handler1Called = true;
 }
@@ -47,8 +46,7 @@ void test_1_handler(const ignition::msgs::Geometry &message)
 /// \brief Handler called in TEST_CHANNEL_2. Checks that the
 /// box message has the expected size and flags the handler as
 /// called
-void test_2_handler(const ignition::msgs::Geometry &message)
-{
+void test_2_handler(const ignition::msgs::Geometry& message) {
   assert_is_box_with_size(message, 5, 5, 5);
   handler2Called = true;
 }
@@ -65,7 +63,6 @@ void reset() {
 /// \brief Test how a message is processed end-to-end by using
 /// a repeater.
 GTEST_TEST(LCMChannelRepeaterTest, TestEndToEndEcho) {
-
   reset();
 
   ASSERT_FALSE(handler1Called);
@@ -100,7 +97,6 @@ GTEST_TEST(LCMChannelRepeaterTest, TestEndToEndEcho) {
 /// \brief Test that if the Start() method is not called on the
 /// repeater no handler will be setup to listen to the LCM channel.
 GTEST_TEST(LCMChannelRepeaterTest, TestHandlerNotCalled) {
-
   reset();
 
   ASSERT_FALSE(handler1Called);
@@ -133,7 +129,6 @@ GTEST_TEST(LCMChannelRepeaterTest, TestHandlerNotCalled) {
 /// \brief Test that two repeaters can be safely setup on different
 /// channels using the same LCM instance to dispatch all the messages.
 GTEST_TEST(LCMChannelRepeaterTest, TestMultipleChannels) {
-
   reset();
 
   ASSERT_FALSE(handler1Called);
@@ -183,7 +178,5 @@ GTEST_TEST(LCMChannelRepeaterTest, TestMultipleChannels) {
   ASSERT_TRUE(handler2Called);
 }
 
-
 }  // namespace bridge
 }  // namespace delphyne
-

@@ -51,7 +51,7 @@ namespace bridge {
 template <class LCM_TYPE, class IGN_TYPE>
 class LcmChannelRepeater {
  public:
-  LcmChannelRepeater(const lcm::LCM& lcm, const std::string& topic_name)
+  LcmChannelRepeater(std::shared_ptr<lcm::LCM> lcm, const std::string& topic_name)
       : lcm_(lcm), topic_name_(topic_name) {}
 
   /// \brief Subscribe to the LCM channel and echo into the
@@ -59,7 +59,7 @@ class LcmChannelRepeater {
   void Start() {
     publisher_ = node_.Advertise<IGN_TYPE>("/" + topic_name_);
 
-    if (!lcm_.good()) {
+    if (!lcm_->good()) {
       throw std::runtime_error("LCM is not ready");
     }
 
@@ -67,13 +67,13 @@ class LcmChannelRepeater {
       throw std::runtime_error("Error advertising topic: " + topic_name_);
     }
 
-    lcm_.subscribe(topic_name_, &LcmChannelRepeater::handleMessage, this);
+    lcm_->subscribe(topic_name_, &LcmChannelRepeater::handleMessage, this);
   }
 
  private:
   /// \internal
   /// \brief The LCM manager
-  lcm::LCM lcm_;
+  std::shared_ptr<lcm::LCM> lcm_;
 
   /// \internal
   /// \brief The topic this repeater subscribes to LCM and

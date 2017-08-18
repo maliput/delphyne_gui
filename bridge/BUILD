@@ -5,13 +5,26 @@ load(
 
 cc_library(
     name = "lcm-to-ign-translation",
-    srcs = ["lcm_to_ign_translation.cc",],
+    srcs = ["lcm_to_ign_translation.cc",
+    ],
     hdrs = ["lcm_to_ign_translation.hh",
     ],
     deps = [
         "@ignition-transport3",
         "@lcm",
-        "//bridge:drake-lcmt-headers"
+        "//bridge:drake-lcmt-headers",
+    ],
+)
+
+cc_library(
+    name = "lcm-channel-repeater",
+    hdrs = ["lcm_channel_repeater.hh",
+    ],
+    deps = [
+        "@ignition-transport3",
+        "@lcm",
+        "//bridge:drake-lcmt-headers",
+        "@ignition_common//:ignition_common_shared_library",
     ],
 )
 
@@ -21,27 +34,26 @@ cc_library(
             "drake/lcmt_viewer_draw.hpp",
             "drake/lcmt_viewer_geometry_data.hpp",
             "drake/lcmt_viewer_link_data.hpp",
-            "drake/lcmt_viewer_load_robot.hpp"
+            "drake/lcmt_viewer_load_robot.hpp",
     ],
 )
 
 cc_binary(
     name = "lcm-to-ign-transport-bridge",
-    srcs = [
-        "lcm_to_ign_transport_bridge.cc",
-        "lcm_channel_repeater.hh",
+    srcs = ["lcm_to_ign_transport_bridge.cc",
     ],
     deps = [
         "@ignition-transport3",
         "@lcm",
         "@ignition_common//:ignition_common_shared_library",
         "//bridge:lcm-to-ign-translation",
-        "//bridge:drake-lcmt-headers"
+        "//bridge:drake-lcmt-headers",
+        "//bridge:lcm-channel-repeater",
     ],
     data = [
         "drake/car/car.vtp",
         "drake/package.xml",
-        "drake/car/package.xml"
+        "drake/car/package.xml",
     ],
 )
 
@@ -64,12 +76,12 @@ py_binary(
     srcs = ["mocked_robot_demo.py"],
     data = [
         ":lcm-mock-robot-publisher",
-        ":lcm-to-ign-transport-bridge"
+        ":lcm-to-ign-transport-bridge",
     ],
     main = "mocked_robot_demo.py",
     args = [
         "$(location :lcm-mock-robot-publisher)",
-        "$(location :lcm-to-ign-transport-bridge)"
+        "$(location :lcm-to-ign-transport-bridge)",
     ],
 )
 
@@ -78,6 +90,16 @@ drake_cc_googletest(
     deps = [
         "@lcm",
         "//bridge:lcm-to-ign-translation",
-        "//bridge:drake-lcmt-headers"
+        "//bridge:drake-lcmt-headers",
+    ],
+)
+
+drake_cc_googletest(
+    name = "lcm_channel_repeater_test",
+    deps = [
+        "@lcm",
+        "//bridge:lcm-to-ign-translation",
+        "//bridge:lcm-channel-repeater",
+        "//bridge:drake-lcmt-headers",
     ],
 )

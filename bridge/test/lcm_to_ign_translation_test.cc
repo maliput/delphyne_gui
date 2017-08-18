@@ -6,8 +6,9 @@
 namespace delphyne {
 namespace bridge {
 
-// Test that an LCM geometry message describing a box is properly
-// translated to an ignition Geometry message.
+//////////////////////////////////////////////////
+/// \brief Test that an LCM geometry message describing a box is properly
+/// translated to an ignition Geometry message.
 GTEST_TEST(BoxTest, TestBoxTranslation) {
   // Define LCM box geometry message
   drake::lcmt_viewer_geometry_data boxMsg;
@@ -32,8 +33,10 @@ GTEST_TEST(BoxTest, TestBoxTranslation) {
   ASSERT_EQ(boxMsg.float_data[2], ign_box_geometry.box().size().z());
 }
 
-// Test that translation fails if an LCM geometry message describing a box is
-// not properly filled.
+//////////////////////////////////////////////////
+/// \brief Test that translation fails if an LCM geometry message describing a
+/// box is
+/// not properly filled.
 GTEST_TEST(BoxTest, TestExceptionInBoxTranslation) {
   // Define LCM box geometry message
   drake::lcmt_viewer_geometry_data boxMsg;
@@ -46,13 +49,12 @@ GTEST_TEST(BoxTest, TestExceptionInBoxTranslation) {
   boxMsg.float_data[0] = 1;
   boxMsg.float_data[1] = 2;
 
-  EXPECT_THROW(
-      translate(boxMsg, &ign_box_geometry);,
-      TranslateException);
+  EXPECT_THROW(translate(boxMsg, &ign_box_geometry);, TranslateException);
 }
 
-// Test that an LCM geometry message describing a cylinder is properly
-// translated to an ignition Geometry message.
+//////////////////////////////////////////////////
+/// \brief Test that an LCM geometry message describing a cylinder is properly
+/// translated to an ignition Geometry message.
 GTEST_TEST(CylinderTest, TestCylinderTranslation) {
   // Define LCM cylinder geometry message
   drake::lcmt_viewer_geometry_data cylinderMsg;
@@ -77,8 +79,9 @@ GTEST_TEST(CylinderTest, TestCylinderTranslation) {
             ign_cylinder_geometry.cylinder().length());
 }
 
-// Test that translation fails if an LCM geometry message describing a
-// cylinder is not properly filled.
+//////////////////////////////////////////////////
+/// \brief Test that translation fails if an LCM geometry message describing a
+/// cylinder is not properly filled.
 GTEST_TEST(CylinderTest, TestExceptionInCylinderTranslation) {
   // Define LCM cylinder geometry message
   drake::lcmt_viewer_geometry_data cylinderMsg;
@@ -90,13 +93,13 @@ GTEST_TEST(CylinderTest, TestExceptionInCylinderTranslation) {
   cylinderMsg.float_data.resize(cylinderMsg.num_float_data);
   cylinderMsg.float_data[0] = 1.368;  // radius
 
-  EXPECT_THROW(
-      translate(cylinderMsg, &ign_cylinder_geometry),
-      TranslateException);
+  EXPECT_THROW(translate(cylinderMsg, &ign_cylinder_geometry),
+               TranslateException);
 }
 
-// Test that an LCM geometry message describing a sphere is properly
-// translated to an ignition Geometry message.
+//////////////////////////////////////////////////
+/// \brief Test that an LCM geometry message describing a sphere is properly
+/// translated to an ignition Geometry message.
 GTEST_TEST(SphereTest, TestSphereTranslation) {
   // Define LCM sphere geometry message
   drake::lcmt_viewer_geometry_data sphereMsg;
@@ -117,8 +120,9 @@ GTEST_TEST(SphereTest, TestSphereTranslation) {
   ASSERT_EQ(sphereMsg.float_data[0], ign_sphere_geometry.sphere().radius());
 }
 
-// Test that translation fails if an LCM geometry message describing a
-// sphere is not properly filled.
+//////////////////////////////////////////////////
+/// \brief Test that translation fails if an LCM geometry message describing a
+/// sphere is not properly filled.
 GTEST_TEST(SphereTest, TestExceptionInCylinderTranslation) {
   // Define LCM sphere geometry message
   drake::lcmt_viewer_geometry_data sphereMsg;
@@ -129,13 +133,12 @@ GTEST_TEST(SphereTest, TestExceptionInCylinderTranslation) {
   sphereMsg.num_float_data = 0;
   sphereMsg.float_data.resize(sphereMsg.num_float_data);
 
-  EXPECT_THROW(
-      translate(sphereMsg, &ign_sphere_geometry),
-      TranslateException);
+  EXPECT_THROW(translate(sphereMsg, &ign_sphere_geometry), TranslateException);
 }
 
-// Test that an LCM geometry message describing a mesh with scaling
-// data is properly translated to an ignition Geometry message.
+//////////////////////////////////////////////////
+/// \brief Test that an LCM geometry message describing a mesh with scaling
+/// data is properly translated to an ignition Geometry message.
 GTEST_TEST(MeshTest, TestMeshTranslationWithScale) {
   // Define LCM mesh geometry message
   drake::lcmt_viewer_geometry_data meshMsg;
@@ -163,8 +166,9 @@ GTEST_TEST(MeshTest, TestMeshTranslationWithScale) {
   ASSERT_EQ(meshMsg.float_data[2], ign_mesh_geometry.mesh().scale().z());
 }
 
-// Test that an LCM geometry message describing a mesh without scaling
-// data is properly translated to an ignition Geometry message.
+//////////////////////////////////////////////////
+/// \brief Test that an LCM geometry message describing a mesh without scaling
+/// data is properly translated to an ignition Geometry message.
 GTEST_TEST(MeshTest, TestMeshTranslationWithoutScale) {
   // Define LCM mesh geometry message
   drake::lcmt_viewer_geometry_data meshMsg;
@@ -188,4 +192,3 @@ GTEST_TEST(MeshTest, TestMeshTranslationWithoutScale) {
 
 }  // namespace bridge
 }  // namespace delphyne
-

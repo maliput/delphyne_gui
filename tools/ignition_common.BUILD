@@ -161,11 +161,16 @@ cc_library(
         "@avformat",
         "@avutil",
         "@glib",
+        "@gts",
         "@ignition-transport3",
+        "@tinyxml2",
         "@uuid",
     ],
     linkopts = [
         "-ldl",
+        # clalancette: Unfortunately, libfreeimage-dev doesn't have a pkg-config
+        # file on Ubuntu, so we hand-link this here.
+        "-lfreeimage",
     ],
     linkstatic = 0,
 )

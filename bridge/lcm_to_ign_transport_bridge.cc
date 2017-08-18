@@ -41,7 +41,7 @@ int main(int argc, char* argv[]) {
   ignition::common::Console::SetVerbosity(3);
   ignmsg << "LCM to ignition-transport bridge 0.1.0" << std::endl;
 
-  lcm::LCM lcm;
+  std::shared_ptr<lcm::LCM> lcm = std::make_shared<lcm::LCM>();
 
   // Create a repeater on DRAKE_VIEWER_LOAD_ROBOT channel, translating
   // from drake::lcmt_viewer_load_robot to ignition::msgs::Model
@@ -53,14 +53,14 @@ int main(int argc, char* argv[]) {
     viewerLoadRobotRepeater.Start();
   } catch (const std::runtime_error& error) {
     ignerr << "Failed to start LCM channel repeater for initialize "
-                 "DRAKE_VIEWER_LOAD_ROBOT"
-              << std::endl;
+              "DRAKE_VIEWER_LOAD_ROBOT"
+           << std::endl;
     ignerr << "Details: " << error.what() << std::endl;
     exit(1);
   }
 
   while (true) {
-    lcm.handle();
+    lcm->handle();
   }
 
   return 0;

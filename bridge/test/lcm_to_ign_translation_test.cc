@@ -7,8 +7,8 @@ namespace delphyne {
 namespace bridge {
 
 //////////////////////////////////////////////////
-// brief\ Test that an LCM draw message is properly
-// translated to an ignition Geometry message.
+/// brief\ Test that an LCM draw message is properly
+/// translated to an ignition Geometry message.
 class ViewerDrawTest : public ::testing::Test {
  protected:
   drake::lcmt_viewer_draw draw_msg;
@@ -36,8 +36,8 @@ class ViewerDrawTest : public ::testing::Test {
   }
 
   //////////////////////////////////////////////////
-  // brief\ Checks that all the array-iterable values from
-  // lcmt_viewer_draw are matching their ignition counterpart
+  /// brief\ Checks that all the array-iterable values from
+  /// lcmt_viewer_draw are matching their ignition counterpart
   void checkMsgTranslation(drake::lcmt_viewer_draw* lcm_msg,
                            ignition::msgs::PosesStamped* ign_poses) {
     for (int i = 0; i < lcm_msg->num_links; i++) {
@@ -59,8 +59,8 @@ class ViewerDrawTest : public ::testing::Test {
 };
 
 //////////////////////////////////////////////////
-// brief\ Check that the translation of a PosesStamp
-// message with zero poses behaves as expected
+/// brief\ Check that the translation of a PosesStamp
+/// message with zero poses behaves as expected
 TEST_F(ViewerDrawTest, TestZeroPosesInPosesStamp) {
   // Resize draw_msg defined in SetUp to zero poses
   draw_msg.num_links = 0;
@@ -75,8 +75,8 @@ TEST_F(ViewerDrawTest, TestZeroPosesInPosesStamp) {
 }
 
 //////////////////////////////////////////////////
-// brief\ Check that the translation of a PosesStamp
-// message with only one pose behaves as expected 
+/// brief\ Check that the translation of a PosesStamp
+/// message with only one pose behaves as expected
 TEST_F(ViewerDrawTest, TestOnePoseInPosesStamp) {
   // Resize draw_msg defined in SetUp to single pose
   draw_msg.num_links = 1;

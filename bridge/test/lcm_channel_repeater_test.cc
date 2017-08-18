@@ -163,7 +163,7 @@ GTEST_TEST(LCMChannelRepeaterTest, TestMultipleChannels) {
 
   lcm->publish("TEST_CHANNEL_1", &box1Msg);
 
-  // Create and publish geometry message to channel 1
+  // Create and publish geometry message to channel 2
   drake::lcmt_viewer_geometry_data box2Msg;
   fill_box_with(box2Msg, 5, 5, 5);
 

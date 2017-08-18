@@ -56,7 +56,8 @@ class ViewerDrawTest : public ::testing::Test {
   }
 };
 
-///////////////////////////////////////////////////
+// Check that the translation of a PosesStamp message
+// with zero poses behaves as expected 
 TEST_F(ViewerDrawTest, TestZeroPosesInPosesStamp) {
   // Resize draw_msg defined in SetUp to zero poses
   draw_msg.num_links = 0;
@@ -69,6 +70,8 @@ TEST_F(ViewerDrawTest, TestZeroPosesInPosesStamp) {
   checkMsgTranslation(&draw_msg, &ign_msg);
 }
 
+// Check that the translation of a PosesStamp message
+// with only one pose behaves as expected 
 TEST_F(ViewerDrawTest, TestOnePoseInPosesStamp) {
   // Resize draw_msg defined in SetUp to single pose
   draw_msg.num_links = 1;
@@ -81,6 +84,8 @@ TEST_F(ViewerDrawTest, TestOnePoseInPosesStamp) {
   checkMsgTranslation(&draw_msg, &ign_msg);
 }
 
+// Check that the translation of a PosesStamp message
+// with more than one pose behaves as expected 
 TEST_F(ViewerDrawTest, TestThreePosesInPosesStamp) {
   // Resize draw_msg defined in SetUp to three poses
   draw_msg.num_links = 3;

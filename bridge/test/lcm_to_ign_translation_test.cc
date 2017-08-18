@@ -6,7 +6,8 @@
 namespace delphyne {
 namespace bridge {
 
-// Test that an LCM draw message is properly
+//////////////////////////////////////////////////
+// brief\ Test that an LCM draw message is properly
 // translated to an ignition Geometry message.
 class ViewerDrawTest : public ::testing::Test {
  protected:
@@ -34,7 +35,8 @@ class ViewerDrawTest : public ::testing::Test {
     last_index = draw_msg.num_links - 1;
   }
 
-  // Checks that all the array-iterable values from
+  //////////////////////////////////////////////////
+  // brief\ Checks that all the array-iterable values from
   // lcmt_viewer_draw are matching their ignition counterpart
   void checkMsgTranslation(drake::lcmt_viewer_draw* lcm_msg,
                            ignition::msgs::PosesStamped* ign_poses) {
@@ -56,8 +58,9 @@ class ViewerDrawTest : public ::testing::Test {
   }
 };
 
-// Check that the translation of a PosesStamp message
-// with zero poses behaves as expected
+//////////////////////////////////////////////////
+// brief\ Check that the translation of a PosesStamp
+// message with zero poses behaves as expected
 TEST_F(ViewerDrawTest, TestZeroPosesInPosesStamp) {
   // Resize draw_msg defined in SetUp to zero poses
   draw_msg.num_links = 0;
@@ -71,8 +74,9 @@ TEST_F(ViewerDrawTest, TestZeroPosesInPosesStamp) {
 
 }
 
-// Check that the translation of a PosesStamp message
-// with only one pose behaves as expected 
+//////////////////////////////////////////////////
+// brief\ Check that the translation of a PosesStamp
+// message with only one pose behaves as expected 
 TEST_F(ViewerDrawTest, TestOnePoseInPosesStamp) {
   // Resize draw_msg defined in SetUp to single pose
   draw_msg.num_links = 1;
@@ -192,6 +196,7 @@ GTEST_TEST(BoxTest, TestBoxTranslation) {
   ASSERT_EQ(boxMsg.float_data[2], ign_box_geometry.box().size().z());
 }
 
+//////////////////////////////////////////////////
 /// brief\ Test that translation fails if an LCM geometry 
 /// message describing a box was not properly filled.
 GTEST_TEST(BoxTest, TestExceptionInBoxTranslation) {

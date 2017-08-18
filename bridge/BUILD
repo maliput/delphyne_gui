@@ -24,6 +24,7 @@ cc_library(
         "@ignition-transport3",
         "@lcm",
         "//bridge:drake-lcmt-headers",
+        "@ignition_common//:ignition_common_shared_library",
     ],
 )
 

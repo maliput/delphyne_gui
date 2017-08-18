@@ -34,6 +34,8 @@
 #include <ignition/transport.hh>
 #include <lcm/lcm-cpp.hpp>
 
+#include <ignition/common/Console.hh>
+
 #include "drake/lcmt_viewer_geometry_data.hpp"
 #include "drake/lcmt_viewer_load_robot.hpp"
 

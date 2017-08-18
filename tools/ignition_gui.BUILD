@@ -102,7 +102,6 @@ cc_library(
         "moc_plugin.cc",  # from qt_moc_gen above
     ],
     deps = [
-        "@gts",
         "@ignition_common//:ignition_common_shared_library",
         "@ignition-transport3",
         "@Qt5Core",
@@ -112,11 +111,6 @@ cc_library(
     ],
     hdrs = public_headers,
     includes = ["include"],
-    linkopts = [
-        # clalancette: Unfortunately, libfreeimage-dev doesn't have a pkg-config
-        # file on Ubuntu, so we hand-link this here.
-        "-lfreeimage",
-    ],
     linkstatic = 0,
 )
 

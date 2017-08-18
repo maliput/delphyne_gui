@@ -5,9 +5,18 @@ load(
 
 cc_library(
     name = "lcm-to-ign-translation",
-    srcs = ["lcm_to_ign_translation.cc",],
-    hdrs = ["lcm_to_ign_translation.hh",
+    srcs = ["lcm_to_ign_translation.cc"],
+    hdrs = ["lcm_to_ign_translation.hh"],
+    deps = [
+        "@ignition-transport3",
+        "@lcm",
+        "//bridge:drake-lcmt-headers"
     ],
+)
+
+cc_library(
+    name = "lcm-channel-repeater",
+    hdrs = ["lcm_channel_repeater.hh"],
     deps = [
         "@ignition-transport3",
         "@lcm",
@@ -27,16 +36,14 @@ cc_library(
 
 cc_binary(
     name = "lcm-to-ign-transport-bridge",
-    srcs = [
-        "lcm_to_ign_transport_bridge.cc",
-        "lcm_channel_repeater.hh",
-    ],
+    srcs = ["lcm_to_ign_transport_bridge.cc"],
     deps = [
         "@ignition-transport3",
         "@lcm",
         "@ignition_common//:ignition_common_shared_library",
         "//bridge:lcm-to-ign-translation",
-        "//bridge:drake-lcmt-headers"
+        "//bridge:drake-lcmt-headers",
+        "//bridge:lcm-channel-repeater"
     ],
     data = [
         "drake/car/car.vtp",
@@ -78,6 +85,16 @@ drake_cc_googletest(
     deps = [
         "@lcm",
         "//bridge:lcm-to-ign-translation",
+        "//bridge:drake-lcmt-headers"
+    ],
+)
+
+drake_cc_googletest(
+    name = "lcm_channel_repeater_test",
+    deps = [
+        "@lcm",
+        "//bridge:lcm-to-ign-translation",
+        "//bridge:lcm-channel-repeater",
         "//bridge:drake-lcmt-headers"
     ],
 )

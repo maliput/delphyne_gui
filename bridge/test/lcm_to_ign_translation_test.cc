@@ -57,7 +57,7 @@ class ViewerDrawTest : public ::testing::Test {
 };
 
 // Check that the translation of a PosesStamp message
-// with zero poses behaves as expected 
+// with zero poses behaves as expected
 TEST_F(ViewerDrawTest, TestZeroPosesInPosesStamp) {
   // Resize draw_msg defined in SetUp to zero poses
   draw_msg.num_links = 0;
@@ -67,7 +67,8 @@ TEST_F(ViewerDrawTest, TestZeroPosesInPosesStamp) {
   draw_msg.quaternion.resize(0);
   ignition::msgs::PosesStamped ign_msg;
   translate(draw_msg, &ign_msg);
-  checkMsgTranslation(&draw_msg, &ign_msg);
+  ASSERT_EQ(ign_msg.pose_size(), 0);
+
 }
 
 // Check that the translation of a PosesStamp message
@@ -84,8 +85,9 @@ TEST_F(ViewerDrawTest, TestOnePoseInPosesStamp) {
   checkMsgTranslation(&draw_msg, &ign_msg);
 }
 
-// Check that the translation of a PosesStamp message
-// with more than one pose behaves as expected 
+//////////////////////////////////////////////////
+/// \brief Check that the translation of a PosesStamp message
+/// with more than one pose behaves as expected 
 TEST_F(ViewerDrawTest, TestThreePosesInPosesStamp) {
   // Resize draw_msg defined in SetUp to three poses
   draw_msg.num_links = 3;
@@ -103,7 +105,9 @@ TEST_F(ViewerDrawTest, TestThreePosesInPosesStamp) {
   checkMsgTranslation(&draw_msg, &ign_msg);
 }
 
-// Test that a header's sec and nsec were correctly calculated
+//////////////////////////////////////////////////
+/// \brief Test that a header's sec and nsec were
+/// correctly calculated
 TEST_F(ViewerDrawTest, TestTimeStamp) {
   translate(draw_msg, &ign_poses_stamped);
   int secs = 123;
@@ -112,50 +116,58 @@ TEST_F(ViewerDrawTest, TestTimeStamp) {
   ASSERT_EQ(nsecs, ign_poses_stamped.time().nsec());
 }
 
-// Test that translation fails if at least one of the defined
-// position vectors doesn't have the correct size
+//////////////////////////////////////////////////
+/// \brief Test that translation fails if at least one of the 
+///  defined position vectors doesn't have the correct size
 TEST_F(ViewerDrawTest, TestExceptionInPosition) {
   draw_msg.position[1] = {1.0, 2.0, 3.0, 4.0};
   EXPECT_THROW(translate(draw_msg, &ign_poses_stamped), TranslateException);
 }
 
-// Test that translation fails if at least one of the defined
-// orientation vectors doesn't have the correct size
+//////////////////////////////////////////////////
+/// \brief Test that translation fails if at least
+/// one of the defined orientation vectors doesn't
+/// have the correct size
 TEST_F(ViewerDrawTest, TestExceptionInOrientation) {
   draw_msg.quaternion[1] = {4.0, 2.0, 1.0};
   EXPECT_THROW(translate(draw_msg, &ign_poses_stamped), TranslateException);
 }
 
-// Test that translation fails if the link_name
-// vector doesn't have the correct size
+//////////////////////////////////////////////////
+/// brief\ Test that translation fails if the 
+/// link_name vector doesn't have the correct size
 TEST_F(ViewerDrawTest, TestExceptionNumberOfLinkNames) {
   draw_msg.link_name.resize(draw_msg.num_links + 1);
   EXPECT_THROW(translate(draw_msg, &ign_poses_stamped), TranslateException);
 }
 
-// Test that translation fails if the robot_num
-// vector doesn't have the correct size
+//////////////////////////////////////////////////
+/// brief\ Test that translation fails if the 
+/// robot_num vector doesn't have the correct size
 TEST_F(ViewerDrawTest, TestExceptionNumberOfRobotNum) {
   draw_msg.robot_num.resize(draw_msg.num_links - 1);
   EXPECT_THROW(translate(draw_msg, &ign_poses_stamped), TranslateException);
 }
 
-// Test that translation fails if the position
-// vector doesn't have the correct size
+//////////////////////////////////////////////////
+/// brief\ Test that translation fails if the
+/// position vector doesn't have the correct size
 TEST_F(ViewerDrawTest, TestExceptionNumberOfPositions) {
   draw_msg.position.resize(draw_msg.num_links - 1);
   EXPECT_THROW(translate(draw_msg, &ign_poses_stamped), TranslateException);
 }
 
-// Test that translation fails if the quaternion
-// vector doesn't have the correct size
+//////////////////////////////////////////////////
+/// brief\ Test that translation fails if the
+/// quaternion vector doesn't have the correct size
 TEST_F(ViewerDrawTest, TestExceptionNumberOfQuaternions) {
   draw_msg.position.resize(draw_msg.num_links + 1);
   EXPECT_THROW(translate(draw_msg, &ign_poses_stamped), TranslateException);
 }
 
-// Test that an LCM geometry message describing a box is properly
-// translated to an ignition Geometry message.
+//////////////////////////////////////////////////
+/// brief\ Test that an LCM geometry message describing a 
+/// box is properly translated to an ignition Geometry message.
 GTEST_TEST(BoxTest, TestBoxTranslation) {
   // Define LCM box geometry message
   drake::lcmt_viewer_geometry_data boxMsg;
@@ -180,10 +192,8 @@ GTEST_TEST(BoxTest, TestBoxTranslation) {
   ASSERT_EQ(boxMsg.float_data[2], ign_box_geometry.box().size().z());
 }
 
-//////////////////////////////////////////////////
-/// \brief Test that translation fails if an LCM geometry message describing a
-/// box is
-/// not properly filled.
+/// brief\ Test that translation fails if an LCM geometry 
+/// message describing a box was not properly filled.
 GTEST_TEST(BoxTest, TestExceptionInBoxTranslation) {
   // Define LCM box geometry message
   drake::lcmt_viewer_geometry_data boxMsg;
@@ -200,8 +210,8 @@ GTEST_TEST(BoxTest, TestExceptionInBoxTranslation) {
 }
 
 //////////////////////////////////////////////////
-/// \brief Test that an LCM geometry message describing a cylinder is properly
-/// translated to an ignition Geometry message.
+/// brief\ Test that an LCM geometry message describing a cylinder 
+/// was properly translated to an ignition Geometry message.
 GTEST_TEST(CylinderTest, TestCylinderTranslation) {
   // Define LCM cylinder geometry message
   drake::lcmt_viewer_geometry_data cylinderMsg;
@@ -227,8 +237,8 @@ GTEST_TEST(CylinderTest, TestCylinderTranslation) {
 }
 
 //////////////////////////////////////////////////
-/// \brief Test that translation fails if an LCM geometry message describing a
-/// cylinder is not properly filled.
+/// brief\ Test that translation fails if an LCM geometry 
+/// message describing a cylinder was not properly filled.
 GTEST_TEST(CylinderTest, TestExceptionInCylinderTranslation) {
   // Define LCM cylinder geometry message
   drake::lcmt_viewer_geometry_data cylinderMsg;
@@ -245,8 +255,8 @@ GTEST_TEST(CylinderTest, TestExceptionInCylinderTranslation) {
 }
 
 //////////////////////////////////////////////////
-/// \brief Test that an LCM geometry message describing a sphere is properly
-/// translated to an ignition Geometry message.
+// brief\ Test that an LCM geometry message describing a sphere 
+// was properly translated to an ignition Geometry message.
 GTEST_TEST(SphereTest, TestSphereTranslation) {
   // Define LCM sphere geometry message
   drake::lcmt_viewer_geometry_data sphereMsg;
@@ -268,8 +278,8 @@ GTEST_TEST(SphereTest, TestSphereTranslation) {
 }
 
 //////////////////////////////////////////////////
-/// \brief Test that translation fails if an LCM geometry message describing a
-/// sphere is not properly filled.
+/// brief\ Test that translation fails if an LCM geometry 
+/// message describing a sphere was not properly filled.
 GTEST_TEST(SphereTest, TestExceptionInCylinderTranslation) {
   // Define LCM sphere geometry message
   drake::lcmt_viewer_geometry_data sphereMsg;
@@ -284,8 +294,8 @@ GTEST_TEST(SphereTest, TestExceptionInCylinderTranslation) {
 }
 
 //////////////////////////////////////////////////
-/// \brief Test that an LCM geometry message describing a mesh with scaling
-/// data is properly translated to an ignition Geometry message.
+/// brief\ Test that an LCM geometry message describing a mesh with 
+/// scaling data was properly translated to an ignition Geometry message.
 GTEST_TEST(MeshTest, TestMeshTranslationWithScale) {
   // Define LCM mesh geometry message
   drake::lcmt_viewer_geometry_data meshMsg;
@@ -314,8 +324,8 @@ GTEST_TEST(MeshTest, TestMeshTranslationWithScale) {
 }
 
 //////////////////////////////////////////////////
-/// \brief Test that an LCM geometry message describing a mesh without scaling
-/// data is properly translated to an ignition Geometry message.
+/// brief\ Test that an LCM geometry message describing a mesh without
+/// scaling data is properly translated to an ignition Geometry message.
 GTEST_TEST(MeshTest, TestMeshTranslationWithoutScale) {
   // Define LCM mesh geometry message
   drake::lcmt_viewer_geometry_data meshMsg;

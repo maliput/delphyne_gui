@@ -50,15 +50,7 @@ void translateCylinderGeometry(drake::lcmt_viewer_geometry_data geometry_data,
 void translateMeshGeometry(drake::lcmt_viewer_geometry_data geometry_data,
                            ignition::msgs::Geometry* geometry_model);
 
-void checkVectorSize(int vector_size, int expected_size,
-                     std::string field_name) {
-  if (vector_size != expected_size) {
-    std::stringstream message;
-    message << "Wrong size for " << field_name << ": expecting "
-            << expected_size << " elements but " << vector_size << " given.";
-    throw TranslateException(message.str());
-  }
-}
+void checkVectorSize(int vector_size, int expected_size, std::string field_name);
 
 //////////////////////////////////////////////////
 void translate(drake::lcmt_viewer_draw robot_viewer_data,
@@ -258,6 +250,16 @@ void translateMeshGeometry(drake::lcmt_viewer_geometry_data geometry_data,
       scale_msg->set_y(geometry_data.float_data[1]);
       scale_msg->set_z(geometry_data.float_data[2]);
     }
+  }
+}
+
+void checkVectorSize(int vector_size, int expected_size,
+                     std::string field_name) {
+  if (vector_size != expected_size) {
+    std::stringstream message;
+    message << "Wrong size for " << field_name << ": expecting "
+            << expected_size << " elements but " << vector_size << " given.";
+    throw TranslateException(message.str());
   }
 }
 

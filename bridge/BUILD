@@ -17,6 +17,19 @@ cc_library(
 )
 
 cc_library(
+    name = "ign-to-lcm-translation",
+    srcs = ["ign_to_lcm_translation.cc",
+    ],
+    hdrs = ["ign_to_lcm_translation.hh",
+    ],
+    deps = [
+        "@ignition-transport3",
+        "@lcm",
+        "//bridge:drake-lcmt-headers",
+    ],
+)
+
+cc_library(
     name = "lcm-channel-repeater",
     hdrs = ["lcm_channel_repeater.hh",
     ],
@@ -35,6 +48,7 @@ cc_library(
             "drake/lcmt_viewer_geometry_data.hpp",
             "drake/lcmt_viewer_link_data.hpp",
             "drake/lcmt_viewer_load_robot.hpp",
+            "drake/lcmt_driving_command_t.hpp",
     ],
 )
 
@@ -88,6 +102,15 @@ drake_cc_googletest(
     deps = [
         "@lcm",
         "//bridge:lcm-to-ign-translation",
+        "//bridge:drake-lcmt-headers",
+    ],
+)
+
+drake_cc_googletest(
+    name = "ign_to_lcm_translation_test",
+    deps = [
+        "@lcm",
+        "//bridge:ign-to-lcm-translation",
         "//bridge:drake-lcmt-headers",
     ],
 )

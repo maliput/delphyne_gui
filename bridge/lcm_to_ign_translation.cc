@@ -53,7 +53,7 @@ void translateMeshGeometry(drake::lcmt_viewer_geometry_data geometryData,
 void checkVectorSize(int vectorSize, int expectedSize, std::string fieldName);
 
 //////////////////////////////////////////////////
-void translate(drake::lcmt_viewer_draw robotViewerData,
+void lcm_to_ign(drake::lcmt_viewer_draw robotViewerData,
                ignition::msgs::PosesStamped* posesStampedModel) {
   // Check the size of each vector on an lcm_viewer_draw message
   // num_links represents the ammount of links declarated and
@@ -84,47 +84,47 @@ void translate(drake::lcmt_viewer_draw robotViewerData,
     // Check position size and translate
     checkVectorSize(robotViewerData.position[i].size(), 3,
                     "position[" + std::to_string(i) + "]");
-    translate(robotViewerData.position[i].data(), currentPose->mutable_position());
+    lcm_to_ign(robotViewerData.position[i].data(), currentPose->mutable_position());
     // Check orientation size and translate
     checkVectorSize(robotViewerData.quaternion[i].size(), 4,
                     "quaternion[" + std::to_string(i) + "]");
-    translate(robotViewerData.quaternion[i].data(),
-              currentPose->mutable_orientation());
+    lcm_to_ign(robotViewerData.quaternion[i].data(),
+               currentPose->mutable_orientation());
   }
 }
 
 //////////////////////////////////////////////////
-void translate(drake::lcmt_viewer_load_robot robotData,
+void lcm_to_ign(drake::lcmt_viewer_load_robot robotData,
                ignition::msgs::Model* robotModel) {
   for (int i = 0; i < robotData.num_links; ++i) {
-    translate(robotData.link[i], robotModel->add_link());
+    lcm_to_ign(robotData.link[i], robotModel->add_link());
   }
 }
 
 //////////////////////////////////////////////////
-void translate(drake::lcmt_viewer_link_data linkData,
+void lcm_to_ign(drake::lcmt_viewer_link_data linkData,
                ignition::msgs::Link* linkModel) {
   linkModel->set_name(linkData.name);
   linkModel->set_id(linkData.robot_num);
   for (int i = 0; i < linkData.num_geom; ++i) {
-    translate(linkData.geom[i], linkModel->add_visual());
+    lcm_to_ign(linkData.geom[i], linkModel->add_visual());
   }
 }
 
 //////////////////////////////////////////////////
-void translate(drake::lcmt_viewer_geometry_data geometryData,
+void lcm_to_ign(drake::lcmt_viewer_geometry_data geometryData,
                ignition::msgs::Visual* visualModel) {
   auto* poseMsg = visualModel->mutable_pose();
   auto* materialMsg = visualModel->mutable_material();
 
-  translate(geometryData.position, poseMsg->mutable_position());
-  translate(geometryData.quaternion, poseMsg->mutable_orientation());
-  translate(geometryData.color, materialMsg->mutable_diffuse());
-  translate(geometryData, visualModel->mutable_geometry());
+  lcm_to_ign(geometryData.position, poseMsg->mutable_position());
+  lcm_to_ign(geometryData.quaternion, poseMsg->mutable_orientation());
+  lcm_to_ign(geometryData.color, materialMsg->mutable_diffuse());
+  lcm_to_ign(geometryData, visualModel->mutable_geometry());
 }
 
 //////////////////////////////////////////////////
-void translate(float positionData[3],
+void lcm_to_ign(float positionData[3],
                ignition::msgs::Vector3d* positionModel) {
   positionModel->set_x(positionData[0]);
   positionModel->set_y(positionData[1]);
@@ -132,7 +132,7 @@ void translate(float positionData[3],
 }
 
 //////////////////////////////////////////////////
-void translate(float quaternionData[4],
+void lcm_to_ign(float quaternionData[4],
                ignition::msgs::Quaternion* quaternionModel) {
   quaternionModel->set_x(quaternionData[0]);
   quaternionModel->set_y(quaternionData[1]);
@@ -141,7 +141,7 @@ void translate(float quaternionData[4],
 }
 
 //////////////////////////////////////////////////
-void translate(float colorData[4], ignition::msgs::Color* colorModel) {
+void lcm_to_ign(float colorData[4], ignition::msgs::Color* colorModel) {
   colorModel->set_r(colorData[0]);
   colorModel->set_g(colorData[1]);
   colorModel->set_b(colorData[2]);
@@ -149,7 +149,7 @@ void translate(float colorData[4], ignition::msgs::Color* colorModel) {
 }
 
 //////////////////////////////////////////////////
-void translate(drake::lcmt_viewer_geometry_data geometryData,
+void lcm_to_ign(drake::lcmt_viewer_geometry_data geometryData,
                ignition::msgs::Geometry* geometryModel) {
   switch (geometryData.type) {
     case geometryData.BOX:

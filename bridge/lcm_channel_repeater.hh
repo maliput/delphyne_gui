@@ -100,7 +100,7 @@ class LcmChannelRepeater {
                      const LCM_TYPE* lcmMsg) {
     IGN_TYPE ignMsg;
     try {
-      translate(*lcmMsg, &ignMsg);
+      lcm_to_ign(*lcmMsg, &ignMsg);
       publisher_.Publish(ignMsg);
     } catch (const delphyne::bridge::TranslateException& e) {
       ignerr

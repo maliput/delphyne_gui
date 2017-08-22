@@ -39,6 +39,7 @@
 #include "drake/lcmt_viewer_geometry_data.hpp"
 #include "drake/lcmt_viewer_link_data.hpp"
 #include "drake/lcmt_viewer_load_robot.hpp"
+#include "drake/lcmt_viewer_draw.hpp"
 
 // Publishes a defined lcmt_viewer_load_robot message into
 // the DRAKE_VIEWER_LOAD_ROBOT channel.
@@ -200,12 +201,37 @@ int main(int argc, char* argv[]) {
   robotMsg.link[3] = meshURLLinkMsg;
   robotMsg.link[4] = meshPackageLinkMsg;
 
+  drake::lcmt_viewer_draw drawMsg;
+  drawMsg.timestamp = 0;
+  drawMsg.num_links = 1;
+  drawMsg.link_name.resize(drawMsg.num_links);
+  drawMsg.link_name[0] = "box";
+  drawMsg.robot_num.resize(1);
+  drawMsg.robot_num[0] = 0;
+  drawMsg.position.resize(1);
+  drawMsg.position[0].resize(3);
+  drawMsg.position[0][0] = 0.0;
+  drawMsg.position[0][1] = 0.0;
+  drawMsg.position[0][2] = 0.0;
+  drawMsg.quaternion.resize(1);
+  drawMsg.quaternion[0].resize(4);
+  drawMsg.quaternion[0][0] = 0.0;
+  drawMsg.quaternion[0][1] = 0.0;
+  drawMsg.quaternion[0][2] = 0.0;
+  drawMsg.quaternion[0][3] = 1.0;
+
   // Publish a robot message into the lcm_channel every 1 second
+  std::string lcm_load_channel = "DRAKE_VIEWER_LOAD_ROBOT";
+  std::string lcm_draw_channel = "DRAKE_VIEWER_DRAW";
   while (1) {
-    std::string lcm_channel = "DRAKE_VIEWER_LOAD_ROBOT";
-    ignmsg << "Publishing message into " << lcm_channel << std::endl;
-    if (lcm.publish(lcm_channel, &robotMsg) == -1) {
-      ignerr << "Failed to publish message into " << lcm_channel << std::endl;
+    ignmsg << "Publishing message into " << lcm_load_channel << std::endl;
+    if (lcm.publish(lcm_load_channel, &robotMsg) == -1) {
+      ignerr << "Failed to publish message into " << lcm_load_channel << std::endl;
+      return 1;
+    }
+    ignmsg << "Publishing message into " << lcm_draw_channel << std::endl;
+    if (lcm.publish(lcm_draw_channel, &drawMsg) == -1) {
+      ignerr << "Failed to publish message into " << lcm_draw_channel << std::endl;
       return 1;
     }
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));

@@ -47,19 +47,27 @@
 #include "RenderWidget.hh"
 
 Q_DECLARE_METATYPE(ignition::msgs::Model)
+Q_DECLARE_METATYPE(ignition::msgs::PosesStamped)
 
 namespace delphyne {
 namespace gui {
 
-void RenderWidget::cb(const ignition::msgs::Model &_msg)
+void RenderWidget::load_robot_cb(const ignition::msgs::Model &_msg)
 {
   ignmsg << "Saw new model msg on subscription" << std::endl;
-  emit newGraphic(_msg);
+  emit newInitialModel(_msg);
+}
+
+void RenderWidget::draw_cb(const ignition::msgs::PosesStamped &_msg)
+{
+  ignmsg << "Saw new draw msg on subscription" << std::endl;
+  emit newDraw(_msg);
 }
 
 RenderWidget::RenderWidget(QWidget *parent) : Plugin(), initialized_scene(false)
 {
   qRegisterMetaType<ignition::msgs::Model>();
+  qRegisterMetaType<ignition::msgs::PosesStamped>();
 
   this->setAttribute(Qt::WA_OpaquePaintEvent, true);
   this->setAttribute(Qt::WA_PaintOnScreen, true);
@@ -75,9 +83,11 @@ RenderWidget::RenderWidget(QWidget *parent) : Plugin(), initialized_scene(false)
   // first time that showEvent() is called.
   this->updateTimer = new QTimer(this);
   QObject::connect(this->updateTimer, SIGNAL(timeout()), this, SLOT(update()));
-  QObject::connect(this, SIGNAL(newGraphic(const ignition::msgs::Model &)), this, SLOT(setNewGraphic(const ignition::msgs::Model &)));
+  QObject::connect(this, SIGNAL(newInitialModel(const ignition::msgs::Model &)), this, SLOT(setInitialModel(const ignition::msgs::Model &)));
+  QObject::connect(this, SIGNAL(newDraw(const ignition::msgs::PosesStamped &)), this, SLOT(updateScene(const ignition::msgs::PosesStamped &)));
 
-  this->node.Subscribe("/DRAKE_VIEWER_LOAD_ROBOT", &RenderWidget::cb, this);
+  this->node.Subscribe("/DRAKE_VIEWER_LOAD_ROBOT", &RenderWidget::load_robot_cb, this);
+  this->node.Subscribe("/DRAKE_VIEWER_DRAW", &RenderWidget::draw_cb, this);
 
   this->setMinimumHeight(100);
 }
@@ -271,7 +281,7 @@ bool RenderWidget::renderCylinder(ignition::msgs::Link &_link)
   return true;
 }
 
-void RenderWidget::setNewGraphic(const ignition::msgs::Model &_msg)
+void RenderWidget::setInitialModel(const ignition::msgs::Model &_msg)
 {
   ignmsg << "Saw new graphic!" << std::endl;
 
@@ -295,6 +305,18 @@ void RenderWidget::setNewGraphic(const ignition::msgs::Model &_msg)
   }
 
   this->initialized_scene = true;
+}
+
+void RenderWidget::updateScene(const ignition::msgs::PosesStamped &_msg)
+{
+  ignmsg << "Saw updateScene" << std::endl;
+
+  for (int i = 0; i < _msg.pose_size(); i++) {
+    auto pose = _msg.pose(i);
+    if (pose.has_name()) {
+      ignmsg << "Name is " << pose.name() << std::endl;
+    }
+  }
 }
 
 void RenderWidget::CreateRenderWindow()

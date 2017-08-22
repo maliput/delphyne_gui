@@ -53,8 +53,10 @@ class RenderWidget: public ignition::gui::Plugin
   /// \brief Destructor
   virtual ~RenderWidget();
 
-  public slots: void setNewGraphic(const ignition::msgs::Model &_msg);
-  signals: void newGraphic(const ignition::msgs::Model &_msg);
+  public slots: void setInitialModel(const ignition::msgs::Model &_msg);
+  public slots: void updateScene(const ignition::msgs::PosesStamped &_msg);
+  signals: void newInitialModel(const ignition::msgs::Model &_msg);
+  signals: void newDraw(const ignition::msgs::PosesStamped &_msg);
 
  protected:
 
@@ -97,7 +99,9 @@ class RenderWidget: public ignition::gui::Plugin
   ignition::rendering::CameraPtr camera;
 
   ignition::transport::Node node;
-  void cb(const ignition::msgs::Model &_msg);
+  void load_robot_cb(const ignition::msgs::Model &_msg);
+
+  void draw_cb(const ignition::msgs::PosesStamped &_msg);
 
   ignition::rendering::ScenePtr scene;
 

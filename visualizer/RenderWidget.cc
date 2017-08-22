@@ -339,8 +339,11 @@ void RenderWidget::updateScene(const ignition::msgs::PosesStamped &_msg)
       continue;
     }
 
-    //set_local_position_from_pose(ignvis, );
-    //ignvis->SetLocalPosition();
+    // The set_local_position_from_pose() assumes an ignition::msgs::Visual message
+    // here, so we setup a dummy one to please it.
+    ignition::msgs::Visual tmpvis;
+    *tmpvis.mutable_pose() = pose;
+    set_local_position_from_pose(ignvis, tmpvis);
   }
 }
 

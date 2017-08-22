@@ -37,10 +37,10 @@
 #include <ignition/common/Console.hh>
 
 #include <lcm/lcm-cpp.hpp>
+#include "drake/lcmt_viewer_draw.hpp"
 #include "drake/lcmt_viewer_geometry_data.hpp"
 #include "drake/lcmt_viewer_link_data.hpp"
 #include "drake/lcmt_viewer_load_robot.hpp"
-#include "drake/lcmt_viewer_draw.hpp"
 
 const double pi = std::acos(-1);
 
@@ -117,17 +117,20 @@ int main(int argc, char* argv[]) {
   while (1) {
     drawMsg.timestamp = drawMsg.timestamp + timestep_ms;
 
+    // Circumference definition
     float radius = 3.0;
     std::vector<float> center = {0.0, 0.0, radius};
 
-    // Update each position by moving 1 degree along a circumference
-    for(int i=0; i<360; i++) {
+    // Update each position by moving 1 degree along the previously defined
+    // circumference
+    for (int i = 0; i < 360; i++) {
       drawMsg.position[0][0] = center[0] + radius * std::sin(i * 2 * pi / 360);
       drawMsg.position[0][2] = center[2] + radius * std::cos(i * 2 * pi / 360);
 
       ignmsg << "Publishing message into DRAKE_VIEWER_DRAW" << std::endl;
       if (lcm.publish("DRAKE_VIEWER_DRAW", &drawMsg) == -1) {
-        ignerr << "Failed to publish message into DRAKE_VIEWER_DRAW" << std::endl;
+        ignerr << "Failed to publish message into DRAKE_VIEWER_DRAW"
+               << std::endl;
         return 1;
       }
       // Wait 10ms

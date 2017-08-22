@@ -38,12 +38,12 @@
 namespace delphyne {
 namespace bridge {
 
-void ign_to_lcm(drake::lcmt_driving_command_t driving_command,
-               ignition::msgs::CmdVel2D* cmd_vel) {
-    cmd_vel->set_theta(driving_command.steering_angle);
-    //cmd_vel->set_velocity(driving_command.acceleration);
+void ignToLcm(drake::lcmt_driving_command_t driving_command,
+              ignition::msgs::AutomotiveDrivingCommand* automotive_command) {
+    automotive_command->set_theta(driving_command.steering_angle);
+    automotive_command->set_acceleration(driving_command.acceleration);
 }
-    
+
 
 }  // namespace bridge
 }  // namespace delphyne

@@ -17,19 +17,22 @@
 
 package ignition.msgs;
 option java_package = "com.ignition.msgs";
-option java_outer_classname = "CmdAcc2DProtos";
+option java_outer_classname = "AutomotiveDrivingCommandProtos";
 
 /// \ingroup ignition.msgs
-/// \interface CmdVel2D
-/// \brief A planar velocity and orientation.
+/// \interface AutomotiveDrivingCommand
+/// \brief The ignition equivalent of the LCM command used to
+/// drive the Prius in Drake's automotive demo.
 
 import "ignition/msgs/header.proto";
+import "ignition/msgs/time.proto";
 
-message CmdAcc2D
+message AutomotiveDrivingCommand
 {
   /// \brief Optional header data
   optional Header header    = 1;
 
-  optional double acceleration  = 2 [default = 0];
-  optional double theta     = 3 [default = 0];
+  optional Time time            = 2; // Time when the data was captured
+  optional double acceleration  = 3 [default = 0];
+  optional double theta         = 4 [default = 0];
 }

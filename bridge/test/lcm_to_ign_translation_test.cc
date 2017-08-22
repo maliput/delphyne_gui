@@ -69,7 +69,7 @@ TEST_F(ViewerDrawTest, TestZeroPosesInPosesStamp) {
   drawMsg.position.resize(0);
   drawMsg.quaternion.resize(0);
   ignition::msgs::PosesStamped ignMsg;
-  lcm_to_ign(drawMsg, &ignMsg);
+  lcmToIgn(drawMsg, &ignMsg);
   ASSERT_EQ(ignMsg.pose_size(), 0);
 }
 
@@ -84,7 +84,7 @@ TEST_F(ViewerDrawTest, TestOnePoseInPosesStamp) {
   drawMsg.position.resize(1);
   drawMsg.quaternion.resize(1);
   ignition::msgs::PosesStamped ignMsg;
-  lcm_to_ign(drawMsg, &ignMsg);
+  lcmToIgn(drawMsg, &ignMsg);
   checkMsgTranslation(&drawMsg, &ignMsg);
 }
 
@@ -104,7 +104,7 @@ TEST_F(ViewerDrawTest, TestThreePosesInPosesStamp) {
   drawMsg.position[2] = {7.0, 8.0, 9.0};
   drawMsg.quaternion[2] = {12.0, 11.0, 10.0, 9.0};
   ignition::msgs::PosesStamped ignMsg;
-  lcm_to_ign(drawMsg, &ignMsg);
+  lcmToIgn(drawMsg, &ignMsg);
   checkMsgTranslation(&drawMsg, &ignMsg);
 }
 
@@ -112,7 +112,7 @@ TEST_F(ViewerDrawTest, TestThreePosesInPosesStamp) {
 /// \brief Test that a header's sec and nsec were
 /// correctly calculated
 TEST_F(ViewerDrawTest, TestTimeStamp) {
-  lcm_to_ign(drawMsg, &ignPosesStamped);
+  lcmToIgn(drawMsg, &ignPosesStamped);
   int secs = 123;
   int nsecs = 456000000;
   ASSERT_EQ(secs, ignPosesStamped.time().sec());
@@ -124,7 +124,7 @@ TEST_F(ViewerDrawTest, TestTimeStamp) {
 ///  defined position vectors doesn't have the correct size
 TEST_F(ViewerDrawTest, TestExceptionInPosition) {
   drawMsg.position[1] = {1.0, 2.0, 3.0, 4.0};
-  EXPECT_THROW(lcm_to_ign(drawMsg, &ignPosesStamped), TranslateException);
+  EXPECT_THROW(lcmToIgn(drawMsg, &ignPosesStamped), TranslateException);
 }
 
 //////////////////////////////////////////////////
@@ -133,7 +133,7 @@ TEST_F(ViewerDrawTest, TestExceptionInPosition) {
 /// have the correct size
 TEST_F(ViewerDrawTest, TestExceptionInOrientation) {
   drawMsg.quaternion[1] = {4.0, 2.0, 1.0};
-  EXPECT_THROW(lcm_to_ign(drawMsg, &ignPosesStamped), TranslateException);
+  EXPECT_THROW(lcmToIgn(drawMsg, &ignPosesStamped), TranslateException);
 }
 
 //////////////////////////////////////////////////
@@ -141,7 +141,7 @@ TEST_F(ViewerDrawTest, TestExceptionInOrientation) {
 /// link_name vector doesn't have the correct size
 TEST_F(ViewerDrawTest, TestExceptionNumberOfLinkNames) {
   drawMsg.link_name.resize(drawMsg.num_links + 1);
-  EXPECT_THROW(lcm_to_ign(drawMsg, &ignPosesStamped), TranslateException);
+  EXPECT_THROW(lcmToIgn(drawMsg, &ignPosesStamped), TranslateException);
 }
 
 //////////////////////////////////////////////////
@@ -149,7 +149,7 @@ TEST_F(ViewerDrawTest, TestExceptionNumberOfLinkNames) {
 /// robot_num vector doesn't have the correct size
 TEST_F(ViewerDrawTest, TestExceptionNumberOfRobotNum) {
   drawMsg.robot_num.resize(drawMsg.num_links - 1);
-  EXPECT_THROW(lcm_to_ign(drawMsg, &ignPosesStamped), TranslateException);
+  EXPECT_THROW(lcmToIgn(drawMsg, &ignPosesStamped), TranslateException);
 }
 
 //////////////////////////////////////////////////
@@ -157,7 +157,7 @@ TEST_F(ViewerDrawTest, TestExceptionNumberOfRobotNum) {
 /// position vector doesn't have the correct size
 TEST_F(ViewerDrawTest, TestExceptionNumberOfPositions) {
   drawMsg.position.resize(drawMsg.num_links - 1);
-  EXPECT_THROW(lcm_to_ign(drawMsg, &ignPosesStamped), TranslateException);
+  EXPECT_THROW(lcmToIgn(drawMsg, &ignPosesStamped), TranslateException);
 }
 
 //////////////////////////////////////////////////
@@ -165,7 +165,7 @@ TEST_F(ViewerDrawTest, TestExceptionNumberOfPositions) {
 /// quaternion vector doesn't have the correct size
 TEST_F(ViewerDrawTest, TestExceptionNumberOfQuaternions) {
   drawMsg.position.resize(drawMsg.num_links + 1);
-  EXPECT_THROW(lcm_to_ign(drawMsg, &ignPosesStamped), TranslateException);
+  EXPECT_THROW(lcmToIgn(drawMsg, &ignPosesStamped), TranslateException);
 }
 
 //////////////////////////////////////////////////
@@ -185,7 +185,7 @@ GTEST_TEST(BoxTest, TestBoxTranslation) {
   boxMsg.float_data[2] = 0.031;
 
   // Translate from LCM to ignition
-  lcm_to_ign(boxMsg, &ignBoxGeometry);
+  lcmToIgn(boxMsg, &ignBoxGeometry);
 
   // Verify generated ignition geometry
   ASSERT_EQ(true, ignBoxGeometry.has_box());
@@ -210,7 +210,7 @@ GTEST_TEST(BoxTest, TestExceptionInBoxTranslation) {
   boxMsg.float_data[0] = 1;
   boxMsg.float_data[1] = 2;
 
-  EXPECT_THROW(lcm_to_ign(boxMsg, &ignBoxGeometry), TranslateException);
+  EXPECT_THROW(lcmToIgn(boxMsg, &ignBoxGeometry), TranslateException);
 }
 
 //////////////////////////////////////////////////
@@ -229,7 +229,7 @@ GTEST_TEST(CylinderTest, TestCylinderTranslation) {
   cylinderMsg.float_data[1] = 4.246;  // length
 
   // Translate from LCM to ignition
-  lcm_to_ign(cylinderMsg, &ignCylinderGeometry);
+  lcmToIgn(cylinderMsg, &ignCylinderGeometry);
 
   // Verify generated ignition geometry
   ASSERT_EQ(true, ignCylinderGeometry.has_cylinder());
@@ -254,7 +254,7 @@ GTEST_TEST(CylinderTest, TestExceptionInCylinderTranslation) {
   cylinderMsg.float_data.resize(cylinderMsg.num_float_data);
   cylinderMsg.float_data[0] = 1.368;  // radius
 
-  EXPECT_THROW(lcm_to_ign(cylinderMsg, &ignCylinderGeometry),
+  EXPECT_THROW(lcmToIgn(cylinderMsg, &ignCylinderGeometry),
                TranslateException);
 }
 
@@ -273,7 +273,7 @@ GTEST_TEST(SphereTest, TestSphereTranslation) {
   sphereMsg.float_data[0] = 2.534;  // radius
 
   // Translate from LCM to ignition
-  lcm_to_ign(sphereMsg, &ignSphereGeometry);
+  lcmToIgn(sphereMsg, &ignSphereGeometry);
 
   // Verify generated ignition geometry
   ASSERT_EQ(true, ignSphereGeometry.has_sphere());
@@ -294,7 +294,7 @@ GTEST_TEST(SphereTest, TestExceptionInCylinderTranslation) {
   sphereMsg.num_float_data = 0;
   sphereMsg.float_data.resize(sphereMsg.num_float_data);
 
-  EXPECT_THROW(lcm_to_ign(sphereMsg, &ignSphereGeometry), TranslateException);
+  EXPECT_THROW(lcmToIgn(sphereMsg, &ignSphereGeometry), TranslateException);
 }
 
 //////////////////////////////////////////////////
@@ -315,7 +315,7 @@ GTEST_TEST(MeshTest, TestMeshTranslationWithScale) {
   meshMsg.float_data[2] = 6.7;
 
   // Translate from LCM to ignition
-  lcm_to_ign(meshMsg, &ignMeshGeometry);
+  lcmToIgn(meshMsg, &ignMeshGeometry);
 
   // Verify generated ignition geometry
   ASSERT_EQ(true, ignMeshGeometry.has_mesh());
@@ -342,7 +342,7 @@ GTEST_TEST(MeshTest, TestMeshTranslationWithoutScale) {
   meshMsg.float_data.resize(meshMsg.num_float_data);
 
   // Translate from LCM to ignition
-  lcm_to_ign(meshMsg, &ignMeshGeometry);
+  lcmToIgn(meshMsg, &ignMeshGeometry);
 
   // Verify generated ignition geometry
   ASSERT_EQ(true, ignMeshGeometry.has_mesh());

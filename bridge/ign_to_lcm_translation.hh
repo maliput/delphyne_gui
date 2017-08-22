@@ -31,6 +31,7 @@
 
 #include <ignition/msgs.hh>
 #include "drake/lcmt_driving_command_t.hpp"
+#include "protobuf/headers/automotive_driving_command.pb.h"
 
 namespace delphyne {
 namespace bridge {
@@ -42,9 +43,9 @@ class TranslateException : public std::runtime_error {
 
 /// \brief Translate a driving command from LCM to ignition
 /// \param[in]  driving_command  An LCM message containing the driving command
-/// \param[out] cmd_vel The resulting ignition message of the cmd_vel type
-void ign_to_lcm(drake::lcmt_driving_command_t driving_command,
-               ignition::msgs::CmdVel2D* cmd_vel);
+/// \param[out] automotive_command The resulting ignition message
+void ignToLcm(drake::lcmt_driving_command_t driving_command,
+              ignition::msgs::AutomotiveDrivingCommand* automotive_command);
 
 }  // namespace bridge
 }  // namespace delphyne

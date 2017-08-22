@@ -4,6 +4,17 @@ load(
 )
 
 cc_library(
+    name = "ignition-custom-messages",
+    srcs = ["protobuf/headers/automotive_driving_command.pb.cc",
+    ],
+    hdrs = ["protobuf/headers/automotive_driving_command.pb.h",
+    ],
+    deps = [
+        "@ignition-transport3",
+    ],
+)
+
+cc_library(
     name = "lcm-to-ign-translation",
     srcs = ["lcm_to_ign_translation.cc",
     ],
@@ -25,6 +36,7 @@ cc_library(
     deps = [
         "@ignition-transport3",
         "@lcm",
+        "//bridge:ignition-custom-messages",
         "//bridge:drake-lcmt-headers",
     ],
 )

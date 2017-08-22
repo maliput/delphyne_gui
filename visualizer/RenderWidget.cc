@@ -94,7 +94,7 @@ RenderWidget::RenderWidget(QWidget *parent) : Plugin(), initialized_scene(false)
 
 RenderWidget::~RenderWidget() {}
 
-bool RenderWidget::renderBox(ignition::msgs::Link &_link)
+bool RenderWidget::renderBox(ignition::msgs::Visual &_vis)
 {
   ignmsg << "Has a box!" << std::endl;
   ignition::rendering::VisualPtr root = this->scene->RootVisual();
@@ -115,31 +115,26 @@ bool RenderWidget::renderBox(ignition::msgs::Link &_link)
   double y = 0.0;
   double z = 0.0;
 
-  if (_link.visual(0).has_pose()) {
+  if (_vis.has_pose()) {
     // The default Ogre coordinate system is X left/right,
     // Y up/down, and Z in/out (of the screen).  However,
     // ignition-rendering switches that to be consistent with
     // Gazebo.  Thus, the coordinate system is X in/out, Y
     // left/right, and Z up/down.
-    x += _link.visual(0).pose().position().z();
-    y += -_link.visual(0).pose().position().x();
-    z += _link.visual(0).pose().position().y();
+    x += _vis.pose().position().z();
+    y += -_vis.pose().position().x();
+    z += _vis.pose().position().y();
   }
 
   double x_scale = 1.0;
   double y_scale = 1.0;
   double z_scale = 1.0;
 
-  if (_link.visual(0).has_geometry()) {
-    auto geom = _link.visual(0).geometry();
-    if (geom.has_box()) {
-      auto box = geom.box();
-      if (box.has_size()) {
-        x_scale = _link.visual(0).geometry().box().size().z();
-        y_scale = _link.visual(0).geometry().box().size().x();
-        z_scale = _link.visual(0).geometry().box().size().y();
-      }
-    }
+  auto geom_box = _vis.geometry().box();
+  if (geom_box.has_size()) {
+    x_scale = geom_box.size().z();
+    y_scale = geom_box.size().x();
+    z_scale = geom_box.size().y();
   }
 
   green->SetAmbient(0.0, 0.5, 0.0);
@@ -156,7 +151,7 @@ bool RenderWidget::renderBox(ignition::msgs::Link &_link)
   return true;
 }
 
-bool RenderWidget::renderSphere(ignition::msgs::Link &_link)
+bool RenderWidget::renderSphere(ignition::msgs::Visual &_vis)
 {
   ignmsg << "Has a sphere!" << std::endl;
   ignition::rendering::VisualPtr root = this->scene->RootVisual();
@@ -176,32 +171,26 @@ bool RenderWidget::renderSphere(ignition::msgs::Link &_link)
   double y = 0.0;
   double z = 0.0;
 
-  if (_link.visual(0).has_pose()) {
+  if (_vis.has_pose()) {
     // The default Ogre coordinate system is X left/right,
     // Y up/down, and Z in/out (of the screen).  However,
     // ignition-rendering switches that to be consistent with
     // Gazebo.  Thus, the coordinate system is X in/out, Y
     // left/right, and Z up/down.
-    x += _link.visual(0).pose().position().z();
-    y += -_link.visual(0).pose().position().x();
-    z += _link.visual(0).pose().position().y();
+    x += _vis.pose().position().z();
+    y += -_vis.pose().position().x();
+    z += _vis.pose().position().y();
   }
 
   double x_scale = 1.0;
   double y_scale = 1.0;
   double z_scale = 1.0;
 
-  if (_link.visual(0).has_geometry()) {
-    auto geom = _link.visual(0).geometry();
-    if (geom.has_sphere()) {
-      auto sphere = geom.sphere();
-      if (sphere.has_radius()) {
-        ignmsg << "Setting radius to " << sphere.radius() << std::endl;
-        x_scale *= sphere.radius();
-        y_scale *= sphere.radius();
-        z_scale *= sphere.radius();
-      }
-    }
+  auto geom_sphere = _vis.geometry().sphere();
+  if (geom_sphere.has_radius()) {
+    x_scale *= geom_sphere.radius();
+    y_scale *= geom_sphere.radius();
+    z_scale *= geom_sphere.radius();
   }
 
   red->SetAmbient(0.5, 0.0, 0.0);
@@ -218,7 +207,7 @@ bool RenderWidget::renderSphere(ignition::msgs::Link &_link)
   return true;
 }
 
-bool RenderWidget::renderCylinder(ignition::msgs::Link &_link)
+bool RenderWidget::renderCylinder(ignition::msgs::Visual &_vis)
 {
   ignmsg << "Has a cylinder!" << std::endl;
 
@@ -239,32 +228,28 @@ bool RenderWidget::renderCylinder(ignition::msgs::Link &_link)
   double y = 0.0;
   double z = 0.0;
 
-  if (_link.visual(0).has_pose()) {
+  if (_vis.has_pose()) {
     // The default Ogre coordinate system is X left/right,
     // Y up/down, and Z in/out (of the screen).  However,
     // ignition-rendering switches that to be consistent with
     // Gazebo.  Thus, the coordinate system is X in/out, Y
     // left/right, and Z up/down.
-    x += _link.visual(0).pose().position().z();
-    y += -_link.visual(0).pose().position().x();
-    z += _link.visual(0).pose().position().y();
+    x += _vis.pose().position().z();
+    y += -_vis.pose().position().x();
+    z += _vis.pose().position().y();
   }
 
   double x_scale = 1.0;
   double y_scale = 1.0;
   double z_scale = 1.0;
 
-  if (_link.visual(0).has_geometry()) {
-    auto geom = _link.visual(0).geometry();
-    if (geom.has_cylinder()) {
-      auto cylinder = geom.cylinder();
-      if (cylinder.has_radius()) {
-        ignmsg << "Setting radius to " << cylinder.radius() << std::endl;
-        x_scale *= cylinder.radius();
-        y_scale *= cylinder.radius();
-        z_scale = cylinder.length();
-      }
-    }
+  auto geom_cylinder = _vis.geometry().cylinder();
+  if (geom_cylinder.has_radius()) {
+    x_scale *= geom_cylinder.radius();
+    y_scale *= geom_cylinder.radius();
+  }
+  if (geom_cylinder.has_length()) {
+    z_scale = geom_cylinder.length();
   }
 
   blue->SetAmbient(0.0, 0.0, 0.3);
@@ -283,8 +268,6 @@ bool RenderWidget::renderCylinder(ignition::msgs::Link &_link)
 
 void RenderWidget::setInitialModel(const ignition::msgs::Model &_msg)
 {
-  ignmsg << "Saw new graphic!" << std::endl;
-
   if (this->initialized_scene) {
     return;
   }
@@ -293,14 +276,24 @@ void RenderWidget::setInitialModel(const ignition::msgs::Model &_msg)
     auto link = _msg.link(i);
     ignmsg << "Rendering: " << link.name() << std::endl;
 
-    if (link.visual(0).geometry().has_box()) {
-      renderBox(link);
+    if (link.visual_size() != 1) {
+      ignerr << "Invalid number of visuals for " << link.name() << ", skipping" << std::endl;
+      continue;
     }
-    else if (link.visual(0).geometry().has_sphere()) {
-      renderSphere(link);
+    auto vis = link.visual(0);
+    if (!vis.has_geometry()) {
+      ignerr << "No geometry in link " << link.name() << ", skipping" << std::endl;
+      continue;
     }
-    else if (link.visual(0).geometry().has_cylinder()) {
-      renderCylinder(link);
+
+    if (vis.geometry().has_box()) {
+      renderBox(vis);
+    }
+    else if (vis.geometry().has_sphere()) {
+      renderSphere(vis);
+    }
+    else if (vis.geometry().has_cylinder()) {
+      renderCylinder(vis);
     }
   }
 
@@ -313,7 +306,7 @@ void RenderWidget::updateScene(const ignition::msgs::PosesStamped &_msg)
 
   for (int i = 0; i < _msg.pose_size(); i++) {
     auto pose = _msg.pose(i);
-    if (pose.has_name()) {
+    if (!pose.has_name()) {
       ignmsg << "Name is " << pose.name() << std::endl;
     }
   }

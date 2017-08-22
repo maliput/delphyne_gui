@@ -105,11 +105,11 @@ class RenderWidget: public ignition::gui::Plugin
 
   ignition::rendering::ScenePtr scene;
 
-  bool renderBox(ignition::msgs::Link &_link);
+  bool renderBox(ignition::msgs::Visual &_vis);
 
-  bool renderSphere(ignition::msgs::Link &_link);
+  bool renderSphere(ignition::msgs::Visual &_vis);
 
-  bool renderCylinder(ignition::msgs::Link &_link);
+  bool renderCylinder(ignition::msgs::Visual &_vis);
 
   bool initialized_scene;
 };

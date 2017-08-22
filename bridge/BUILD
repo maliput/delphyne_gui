@@ -59,6 +59,18 @@ cc_binary(
     ],
 )
 
+cc_binary(
+    name = "lcm-mock-moving-sphere",
+    srcs = [
+        "lcm_mock_moving_sphere.cc",
+    ],
+    deps = [
+        "//bridge:drake-lcmt-headers",
+        "@ignition_common//:ignition_common_shared_library",
+        "@lcm",
+    ],
+)
+
 py_binary(
     name = "mocked-robot-demo",
     srcs = ["mocked_robot_demo.py"],

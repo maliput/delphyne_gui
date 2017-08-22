@@ -42,7 +42,7 @@ struct lcmt_viewer_geometry_data {
 
 with this in mind, we can apply the following one-way mapping between LCM messages and ignition ones:
 
-## General
+### General
 
 | LCM                                               | ign-msgs                                      |
 |:--------------------------------------------------|----------------------------------------------:|
@@ -107,3 +107,35 @@ with this in mind, we can apply the following one-way mapping between LCM messag
 | viewer_load_robot_t.link[n].geom[k].type.ELLIPSOID = 6 |                                |
 
 **Important:** Note that the `float_data` array holds different values depending on the geometry type (e.g. it has 3 elements when describing a box -x, y and z- while two elements when describing a cylinder -radius and length-).
+
+## DRAKE_VIEWER_DRAW mapping
+
+Drake publishes in the `DRAKE_VIEWER_DRAW` channel all the links of each of the robots loaded by the visualizer. In contrast with `DRAKE_VIEWER_LOAD_ROBOT`, this message is sent continuously across all the simulation's lifespan, updating the link poses and orientations. This channel uses the `lcmt_viewer_draw` type, with the following definition:
+
+```
+struct lcmt_viewer_draw {
+  // The timestamp in milliseconds.
+  int64_t timestamp;
+
+  int32_t num_links;
+  string link_name[num_links];
+  int32_t robot_num[num_links];
+  float position[num_links][3];
+  float quaternion[num_links][4];
+}
+```
+with this in mind, we can apply the following one-way mapping between LCM messages and ignition ones:
+
+
+| LCM                            | ign-msgs                           |
+|:-------------------------------|-----------------------------------:|
+| viewer_draw_t.timestamp        | PosesStamped.time                  |
+| viewer_draw_t.robot_num[i]     | PosesStamped.pose[i].id            |
+| viewer_draw_t.link_name[i]     | PosesStamped.pose[i].name          |
+| viewer_draw_t.position[i][0]   | PosesStamped.pose[i].position.x    |
+| viewer_draw_t.position[i][1]   | PosesStamped.pose[i].position.y    |
+| viewer_draw_t.position[i][2]   | PosesStamped.pose[i].position.z    |
+| viewer_draw_t.quaternion[i][0] | PosesStamped.pose[i].orientation.x |
+| viewer_draw_t.quaternion[i][1] | PosesStamped.pose[i].orientation.y |
+| viewer_draw_t.quaternion[i][2] | PosesStamped.pose[i].orientation.z |
+| viewer_draw_t.quaternion[i][3] | PosesStamped.pose[i].orientation.w |

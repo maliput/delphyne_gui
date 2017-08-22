@@ -29,6 +29,9 @@
 #ifndef RENDER_WIDGET_HH
 #define RENDER_WIDGET_HH
 
+#include <map>
+#include <string>
+
 #include <ignition/gui/Plugin.hh>
 
 #include <ignition/rendering/RenderTypes.hh>
@@ -105,13 +108,17 @@ class RenderWidget: public ignition::gui::Plugin
 
   ignition::rendering::ScenePtr scene;
 
-  bool renderBox(ignition::msgs::Visual &_vis);
+  ignition::rendering::VisualPtr renderBox(ignition::msgs::Visual &_vis);
 
-  bool renderSphere(ignition::msgs::Visual &_vis);
+  ignition::rendering::VisualPtr renderSphere(ignition::msgs::Visual &_vis);
 
-  bool renderCylinder(ignition::msgs::Visual &_vis);
+  ignition::rendering::VisualPtr renderCylinder(ignition::msgs::Visual &_vis);
 
   bool initialized_scene;
+
+  // FIXME(clalancette): this multimap is a little unwieldy, and not that
+  // performant.  We should probably replace it with something smarter.
+  std::multimap<uint32_t, std::pair<std::string, ignition::rendering::VisualPtr>> robotToLink;
 };
 
 }

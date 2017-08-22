@@ -29,6 +29,7 @@
 #include <cmath>
 #include <functional>
 #include <iostream>
+#include <map>
 #include <string>
 
 #include <ignition/common/Console.hh>
@@ -94,23 +95,8 @@ RenderWidget::RenderWidget(QWidget *parent) : Plugin(), initialized_scene(false)
 
 RenderWidget::~RenderWidget() {}
 
-bool RenderWidget::renderBox(ignition::msgs::Visual &_vis)
+static void set_local_position_from_pose(ignition::rendering::VisualPtr _shape, ignition::msgs::Visual &_vis)
 {
-  ignmsg << "Has a box!" << std::endl;
-  ignition::rendering::VisualPtr root = this->scene->RootVisual();
-
-  ignition::rendering::VisualPtr box = this->scene->CreateVisual();
-  if (box == nullptr) {
-    ignerr << "Failed to create visual" << std::endl;
-    return false;
-  }
-
-  ignition::rendering::MaterialPtr green = this->scene->CreateMaterial();
-  if (green == nullptr) {
-    ignerr << "Failed to create green material" << std::endl;
-    return false;
-  }
-
   double x = 2.0;
   double y = 0.0;
   double z = 0.0;
@@ -124,6 +110,26 @@ bool RenderWidget::renderBox(ignition::msgs::Visual &_vis)
     x += _vis.pose().position().z();
     y += -_vis.pose().position().x();
     z += _vis.pose().position().y();
+  }
+
+  _shape->SetLocalPosition(x, y, z);
+}
+
+ignition::rendering::VisualPtr RenderWidget::renderBox(ignition::msgs::Visual &_vis)
+{
+  ignmsg << "Has a box!" << std::endl;
+  ignition::rendering::VisualPtr root = this->scene->RootVisual();
+
+  ignition::rendering::VisualPtr box = this->scene->CreateVisual();
+  if (box == nullptr) {
+    ignerr << "Failed to create visual" << std::endl;
+    return nullptr;
+  }
+
+  ignition::rendering::MaterialPtr green = this->scene->CreateMaterial();
+  if (green == nullptr) {
+    ignerr << "Failed to create green material" << std::endl;
+    return nullptr;
   }
 
   double x_scale = 1.0;
@@ -143,15 +149,15 @@ bool RenderWidget::renderBox(ignition::msgs::Visual &_vis)
   green->SetShininess(50);
   green->SetReflectivity(0);
   box->AddGeometry(scene->CreateBox());
-  box->SetLocalPosition(x, y, z);
+  set_local_position_from_pose(box, _vis);
   box->SetLocalScale(x_scale, y_scale, z_scale);
   box->SetMaterial(green);
   root->AddChild(box);
 
-  return true;
+  return box;
 }
 
-bool RenderWidget::renderSphere(ignition::msgs::Visual &_vis)
+ignition::rendering::VisualPtr RenderWidget::renderSphere(ignition::msgs::Visual &_vis)
 {
   ignmsg << "Has a sphere!" << std::endl;
   ignition::rendering::VisualPtr root = this->scene->RootVisual();
@@ -159,27 +165,12 @@ bool RenderWidget::renderSphere(ignition::msgs::Visual &_vis)
   ignition::rendering::VisualPtr sphere = this->scene->CreateVisual();
   if (sphere == nullptr) {
     ignerr << "Failed to create visual" << std::endl;
-    return false;
+    return nullptr;
   }
   ignition::rendering::MaterialPtr red = scene->CreateMaterial();
   if (red == nullptr) {
     ignerr << "Failed to create red material" << std::endl;
-    return false;
-  }
-
-  double x = 2.0;
-  double y = 0.0;
-  double z = 0.0;
-
-  if (_vis.has_pose()) {
-    // The default Ogre coordinate system is X left/right,
-    // Y up/down, and Z in/out (of the screen).  However,
-    // ignition-rendering switches that to be consistent with
-    // Gazebo.  Thus, the coordinate system is X in/out, Y
-    // left/right, and Z up/down.
-    x += _vis.pose().position().z();
-    y += -_vis.pose().position().x();
-    z += _vis.pose().position().y();
+    return nullptr;
   }
 
   double x_scale = 1.0;
@@ -199,15 +190,15 @@ bool RenderWidget::renderSphere(ignition::msgs::Visual &_vis)
   red->SetShininess(50);
   red->SetReflectivity(0);
   sphere->AddGeometry(scene->CreateSphere());
-  sphere->SetLocalPosition(x, y, z);
+  set_local_position_from_pose(sphere, _vis);
   sphere->SetLocalScale(x_scale, y_scale, z_scale);
   sphere->SetMaterial(red);
   root->AddChild(sphere);
 
-  return true;
+  return sphere;
 }
 
-bool RenderWidget::renderCylinder(ignition::msgs::Visual &_vis)
+ignition::rendering::VisualPtr RenderWidget::renderCylinder(ignition::msgs::Visual &_vis)
 {
   ignmsg << "Has a cylinder!" << std::endl;
 
@@ -216,27 +207,12 @@ bool RenderWidget::renderCylinder(ignition::msgs::Visual &_vis)
   ignition::rendering::VisualPtr cylinder = this->scene->CreateVisual();
   if (cylinder == nullptr) {
     ignerr << "Failed to create visual" << std::endl;
-    return false;
+    return nullptr;
   }
   ignition::rendering::MaterialPtr blue = scene->CreateMaterial();
   if (blue == nullptr) {
     ignerr << "Failed to create blue material" << std::endl;
-    return false;
-  }
-
-  double x = 2.0;
-  double y = 0.0;
-  double z = 0.0;
-
-  if (_vis.has_pose()) {
-    // The default Ogre coordinate system is X left/right,
-    // Y up/down, and Z in/out (of the screen).  However,
-    // ignition-rendering switches that to be consistent with
-    // Gazebo.  Thus, the coordinate system is X in/out, Y
-    // left/right, and Z up/down.
-    x += _vis.pose().position().z();
-    y += -_vis.pose().position().x();
-    z += _vis.pose().position().y();
+    return nullptr;
   }
 
   double x_scale = 1.0;
@@ -258,12 +234,12 @@ bool RenderWidget::renderCylinder(ignition::msgs::Visual &_vis)
   blue->SetShininess(50);
   blue->SetReflectivity(0);
   cylinder->AddGeometry(scene->CreateCylinder());
-  cylinder->SetLocalPosition(x, y, z);
+  set_local_position_from_pose(cylinder, _vis);
   cylinder->SetLocalScale(x_scale, y_scale, z_scale);
   cylinder->SetMaterial(blue);
   root->AddChild(cylinder);
 
-  return true;
+  return cylinder;
 }
 
 void RenderWidget::setInitialModel(const ignition::msgs::Model &_msg)
@@ -274,27 +250,59 @@ void RenderWidget::setInitialModel(const ignition::msgs::Model &_msg)
 
   for (int i = 0; i < _msg.link_size(); i++) {
     auto link = _msg.link(i);
-    ignmsg << "Rendering: " << link.name() << std::endl;
 
-    if (link.visual_size() != 1) {
-      ignerr << "Invalid number of visuals for " << link.name() << ", skipping" << std::endl;
+    if (!link.has_name()) {
+      ignerr << "No name on link, skipping" << std::endl;
       continue;
     }
+    if (!link.has_id()) {
+      ignerr << "No robot number on link " << link.name() << ", skipping" << std::endl;
+      continue;
+    }
+    if (link.visual_size() != 1) {
+      ignerr << "Expected exactly 1 visual for " << link.name() << ", saw " << link.visual_size() << "; skipping" << std::endl;
+      continue;
+    }
+
+    bool duplicate = false;
+    auto range = robotToLink.equal_range(link.id());
+    for (auto i = range.first; i != range.second; ++i) {
+      if (i->second.first == link.name()) {
+        ignerr << "Duplicate link " << link.name() << " for robot " << link.id() << ", skipping" << std::endl;
+        duplicate = true;
+        break;
+      }
+    }
+    if (duplicate) {
+      continue;
+    }
+
+    ignmsg << "Rendering: " << link.name() << " (" << link.id() << ")" << std::endl;
+
     auto vis = link.visual(0);
     if (!vis.has_geometry()) {
       ignerr << "No geometry in link " << link.name() << ", skipping" << std::endl;
       continue;
     }
 
+    ignition::rendering::VisualPtr ignvis;
+
     if (vis.geometry().has_box()) {
-      renderBox(vis);
+      ignvis = renderBox(vis);
     }
     else if (vis.geometry().has_sphere()) {
-      renderSphere(vis);
+      ignvis = renderSphere(vis);
     }
     else if (vis.geometry().has_cylinder()) {
-      renderCylinder(vis);
+      ignvis = renderCylinder(vis);
     }
+    else {
+      ignerr << "Invalid shape for " << link.name() << ", skipping" << std::endl;
+      continue;
+    }
+
+    auto nameAndVisual = std::pair<std::string, ignition::rendering::VisualPtr>(link.name(), ignvis);
+    robotToLink.insert(std::pair<uint32_t, std::pair<std::string, ignition::rendering::VisualPtr>>(link.id(), nameAndVisual));
   }
 
   this->initialized_scene = true;
@@ -307,8 +315,32 @@ void RenderWidget::updateScene(const ignition::msgs::PosesStamped &_msg)
   for (int i = 0; i < _msg.pose_size(); i++) {
     auto pose = _msg.pose(i);
     if (!pose.has_name()) {
-      ignmsg << "Name is " << pose.name() << std::endl;
+      ignerr << "Skipping pose without name" << std::endl;
+      continue;
     }
+    if (!pose.has_id()) {
+      ignerr << "Skipping pose " << pose.name() << " without id" << std::endl;
+      continue;
+    }
+
+    ignition::rendering::VisualPtr ignvis = nullptr;
+    auto range = robotToLink.equal_range(pose.id());
+    for (auto i = range.first; i != range.second; ++i) {
+      if (i->second.first == pose.name()) {
+        // found!
+        ignmsg << "Found " << pose.id() << " " << pose.name() << std::endl;
+        ignvis = i->second.second;
+        break;
+      }
+    }
+
+    if (ignvis == nullptr) {
+      ignerr << "Could not find link " << pose.name() << " on robot " << pose.id() << ", skipping" << std::endl;
+      continue;
+    }
+
+    //set_local_position_from_pose(ignvis, );
+    //ignvis->SetLocalPosition();
   }
 }
 

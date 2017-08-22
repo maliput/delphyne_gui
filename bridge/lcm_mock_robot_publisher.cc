@@ -99,9 +99,9 @@ int main(int argc, char* argv[]) {
   sphereMsg.num_float_data = 1;
   sphereMsg.float_data.resize(sphereMsg.num_float_data);
   sphereMsg.float_data[0] = 1;
-  sphereMsg.position[0] = 1;
+  sphereMsg.position[0] = 3;
   sphereMsg.position[1] = 3;
-  sphereMsg.position[2] = 2.5;
+  sphereMsg.position[2] = 0.5;
   std::copy(quaternion.begin(), quaternion.end(), sphereMsg.quaternion);
   std::copy(color.begin(), color.end(), sphereMsg.color);
 
@@ -124,9 +124,9 @@ int main(int argc, char* argv[]) {
   cylinderMsg.float_data.resize(cylinderMsg.num_float_data);
   cylinderMsg.float_data[0] = 1;
   cylinderMsg.float_data[1] = 4;
-  cylinderMsg.position[0] = 1.1;
-  cylinderMsg.position[1] = 1.2;
-  cylinderMsg.position[2] = 1.3;
+  cylinderMsg.position[0] = -3;
+  cylinderMsg.position[1] = -3;
+  cylinderMsg.position[2] = 2;
   std::copy(quaternion.begin(), quaternion.end(), cylinderMsg.quaternion);
   std::copy(color.begin(), color.end(), cylinderMsg.color);
 
@@ -148,11 +148,14 @@ int main(int argc, char* argv[]) {
   meshURLMsg.string_data =
       "drake/automotive/models/prius/prius.dae";  // Relative to drake's package
                                                   // path or absolute.
-  meshURLMsg.num_float_data = 0;
+  meshURLMsg.num_float_data = 3;
   meshURLMsg.float_data.resize(meshURLMsg.num_float_data);
-  meshURLMsg.position[0] = 0;
-  meshURLMsg.position[1] = 0;
-  meshURLMsg.position[2] = 3;
+  meshURLMsg.float_data[0] = 1.0;  // scale
+  meshURLMsg.float_data[1] = 1.0;
+  meshURLMsg.float_data[2] = 0.5;
+  meshURLMsg.position[0] = 6;
+  meshURLMsg.position[1] = 3;
+  meshURLMsg.position[2] = 0;
   std::copy(quaternion.begin(), quaternion.end(), meshURLMsg.quaternion);
   std::copy(color.begin(), color.end(), meshURLMsg.color);
 
@@ -164,7 +167,6 @@ int main(int argc, char* argv[]) {
   meshURLLinkMsg.geom.resize(meshURLLinkMsg.num_geom);
   meshURLLinkMsg.geom[0] = meshURLMsg;
 
-
   // Define mesh-from-package geometry message
   drake::lcmt_viewer_geometry_data meshPackageMsg;
   meshPackageMsg.type = meshPackageMsg.MESH;
@@ -174,12 +176,12 @@ int main(int argc, char* argv[]) {
   meshPackageMsg.string_data = "package://drake/car/car.vtp";
   meshPackageMsg.num_float_data = 3;
   meshPackageMsg.float_data.resize(meshPackageMsg.num_float_data);
-  meshPackageMsg.float_data[0] = 1.0;  // float_data needs to be populated
+  meshPackageMsg.float_data[0] = 1.0;  // scale
   meshPackageMsg.float_data[1] = 1.0;
   meshPackageMsg.float_data[2] = 0.5;
-  meshPackageMsg.position[0] = 0.5;
-  meshPackageMsg.position[1] = 0.5;
-  meshPackageMsg.position[2] = 0.5;
+  meshPackageMsg.position[0] = -6;
+  meshPackageMsg.position[1] = 3;
+  meshPackageMsg.position[2] = 0;
   std::copy(quaternion.begin(), quaternion.end(), meshPackageMsg.quaternion);
   std::copy(color.begin(), color.end(), meshPackageMsg.color);
 
@@ -206,8 +208,7 @@ int main(int argc, char* argv[]) {
     std::string lcm_channel = "DRAKE_VIEWER_LOAD_ROBOT";
     ignmsg << "Publishing message into " << lcm_channel << std::endl;
     if (lcm.publish(lcm_channel, &robotMsg) == -1) {
-      ignerr << "Failed to publish message into " << lcm_channel
-                << std::endl;
+      ignerr << "Failed to publish message into " << lcm_channel << std::endl;
       return 1;
     }
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));

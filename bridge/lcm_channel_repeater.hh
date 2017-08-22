@@ -111,6 +111,21 @@ class LcmChannelRepeater {
   }
 };
 
+// Calls the Start method on a repeater catching
+//  any runtime error and handling it properly
+template <typename T, typename R>
+void startRepeater(delphyne::bridge::LcmChannelRepeater<T, R>& repeater,
+                   const std::string& channel_name) {
+  try {
+    repeater.Start();
+  } catch (const std::runtime_error& error) {
+    ignerr << "Failed to start LCM channel repeater for initialize "
+           << channel_name << std::endl;
+    ignerr << "Details: " << error.what() << std::endl;
+    exit(1);
+  }
+}
+
 }  // namespace bridge
 }  // namespace delphyne
 

@@ -55,24 +55,14 @@ int main(int argc, char* argv[]) {
                                        ignition::msgs::PosesStamped>
       viewerDrawRepeater(lcm, "DRAKE_VIEWER_DRAW");
 
-  try {
-    viewerLoadRobotRepeater.Start();
-  } catch (const std::runtime_error& error) {
-    ignerr << "Failed to start LCM channel repeater for initialize "
-              "DRAKE_VIEWER_LOAD_ROBOT"
-           << std::endl;
-    ignerr << "Details: " << error.what() << std::endl;
-    exit(1);
-  }
-  try {
-    viewerDrawRepeater.Start();
-  } catch (const std::runtime_error& error) {
-    ignerr << "Failed to start LCM channel repeater for initialize "
-              "DRAKE_VIEWER_DRAW"
-           << std::endl;
-    ignerr << "Details: " << error.what() << std::endl;
-    exit(1);
-  }
+  // Start DRAKE_VIEWER_LOAD_ROBOT repeater
+  delphyne::bridge::startRepeater<drake::lcmt_viewer_load_robot,
+                                  ignition::msgs::Model>(
+      viewerLoadRobotRepeater, "DRAKE_VIEWER_LOAD_ROBOT");
+  // Start DRAKE_VIEWER_DRAW repeater
+  delphyne::bridge::startRepeater<drake::lcmt_viewer_draw,
+                                  ignition::msgs::PosesStamped>(
+      viewerDrawRepeater, "DRAKE_VIEWER_DRAW");
 
   while (true) {
     lcm->handle();
@@ -80,3 +70,4 @@ int main(int argc, char* argv[]) {
 
   return 0;
 }
+

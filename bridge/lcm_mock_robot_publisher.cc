@@ -45,16 +45,16 @@
 #include "drake/lcmt_viewer_load_robot.hpp"
 
 /// \brief Flag used to break the publisher loop and terminate the program.
-static std::atomic<bool> g_terminatePub(false);
+static std::atomic<bool> terminatePub(false);
 
 //////////////////////////////////////////////////
 /// \brief Function callback executed when a SIGINT or SIGTERM signals are
 /// captured. This is used to break the infinite loop that publishes messages
 /// and exit the program smoothly.
-void signal_handler(int _signal)
+void signalHandler(int signal)
 {
-  if (_signal == SIGINT || _signal == SIGTERM)
-    g_terminatePub = true;
+  if (signal == SIGINT || signal == SIGTERM)
+    terminatePub = true;
 }
 
 //////////////////////////////////////////////////
@@ -68,8 +68,8 @@ void signal_handler(int _signal)
 // - A mesh loaded from a "package" styled path
 int main(int argc, char* argv[]) {
   // Install a signal handler for SIGINT and SIGTERM.
-  std::signal(SIGINT,  signal_handler);
-  std::signal(SIGTERM, signal_handler);
+  std::signal(SIGINT,  signalHandler);
+  std::signal(SIGTERM, signalHandler);
 
   ignition::common::Console::SetVerbosity(3);
   ignmsg << "Starting up mock publisher" << std::endl;
@@ -258,7 +258,7 @@ int main(int argc, char* argv[]) {
   int timeStepMs = 10;
   int i = 0;
   // Update sphere position every 10ms
-  while (!g_terminatePub) {
+  while (!terminatePub) {
     // Update timestamp
     drawMsg.timestamp = drawMsg.timestamp + timeStepMs;
     // Update each position by moving 1 degree along the previously defined

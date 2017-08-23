@@ -30,6 +30,7 @@
 #define DELPHYNE_BRIDGE_LCMTOIGNTRANSLATION_HH_
 
 #include <ignition/msgs.hh>
+#include "drake/lcmt_viewer_draw.hpp"
 #include "drake/lcmt_viewer_geometry_data.hpp"
 #include "drake/lcmt_viewer_load_robot.hpp"
 
@@ -37,8 +38,15 @@ namespace delphyne {
 namespace bridge {
 
 class TranslateException : public std::runtime_error {
-  public: TranslateException(std::string message) :std::runtime_error(message) {}
+ public:
+  TranslateException(std::string message) : std::runtime_error(message) {}
 };
+
+/// \brief Translate a list of robot poses from LCM to ignition
+/// \param[in]  robot_draw_data  An LCM message containing the robot poses
+/// \param[out] robot_model The resulting ignition message with the poses vector
+void translate(drake::lcmt_viewer_draw robot_draw_data,
+               ignition::msgs::PosesStamped* poses_stamped_model);
 
 /// \brief Translate a whole robot model definition from LCM to ignition
 /// \param[in]  robot_data  An LCM message containing the robot data

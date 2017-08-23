@@ -27,9 +27,10 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <iostream>
-#include <string>
 #include <sstream>
+#include <string>
 #include <typeinfo>
+#include <vector>
 #include <ignition/msgs.hh>
 
 #include "lcm_to_ign_translation.hh"
@@ -49,6 +50,49 @@ void translateCylinderGeometry(drake::lcmt_viewer_geometry_data geometry_data,
 void translateMeshGeometry(drake::lcmt_viewer_geometry_data geometry_data,
                            ignition::msgs::Geometry* geometry_model);
 
+void checkVectorSize(int vector_size, int expected_size, std::string field_name);
+
+//////////////////////////////////////////////////
+void translate(drake::lcmt_viewer_draw robot_viewer_data,
+               ignition::msgs::PosesStamped* poses_stamped_model) {
+  // Check the size of each vector on an lcm_viewer_draw message
+  // num_links represents the ammount of links declarated and
+  // should be matched by the size of each of the following vectors
+  checkVectorSize(robot_viewer_data.link_name.size(),
+                  robot_viewer_data.num_links, "link_name");
+  checkVectorSize(robot_viewer_data.robot_num.size(),
+                  robot_viewer_data.num_links, "robot_num");
+  checkVectorSize(robot_viewer_data.position.size(),
+                  robot_viewer_data.num_links, "position");
+  checkVectorSize(robot_viewer_data.quaternion.size(),
+                  robot_viewer_data.num_links, "quaternion");
+
+  // Convert from milliseconds to seconds
+  int64_t sec = robot_viewer_data.timestamp / 1000;
+  // Convert the remainder of division above to nanoseconds
+  int64_t nsec = robot_viewer_data.timestamp % 1000 * 1000000;
+  // Set timestamp
+  poses_stamped_model->mutable_time()->set_sec(sec);
+  poses_stamped_model->mutable_time()->set_nsec(nsec);
+
+  // Add one pose per link
+  for (int i = 0; i < robot_viewer_data.num_links; ++i) {
+    ignition::msgs::Pose* pose_i = poses_stamped_model->add_pose();
+
+    pose_i->set_name(robot_viewer_data.link_name[i]);
+    pose_i->set_id(robot_viewer_data.robot_num[i]);
+    // Check position size and translate
+    checkVectorSize(robot_viewer_data.position[i].size(), 3,
+                    "position[" + std::to_string(i) + "]");
+    translate(robot_viewer_data.position[i].data(), pose_i->mutable_position());
+    // Check orientation size and translate
+    checkVectorSize(robot_viewer_data.quaternion[i].size(), 4,
+                    "quaternion[" + std::to_string(i) + "]");
+    translate(robot_viewer_data.quaternion[i].data(),
+              pose_i->mutable_orientation());
+  }
+}
+
 //////////////////////////////////////////////////
 void translate(drake::lcmt_viewer_load_robot robot_data,
                ignition::msgs::Model* robot_model) {
@@ -61,6 +105,7 @@ void translate(drake::lcmt_viewer_load_robot robot_data,
 void translate(drake::lcmt_viewer_link_data link_data,
                ignition::msgs::Link* link_model) {
   link_model->set_name(link_data.name);
+  link_model->set_id(link_data.robot_num);
   for (int i = 0; i < link_data.num_geom; ++i) {
     translate(link_data.geom[i], link_model->add_visual());
   }
@@ -128,7 +173,8 @@ void translate(drake::lcmt_viewer_geometry_data geometry_data,
           unsupported_geometries.end()) {
         type = unsupported_geometries[geometry_data.type];
       }
-      throw TranslateException("Geometry of type: " + type + " is currently unsupported");
+      throw TranslateException("Geometry of type: " + type +
+                               " is currently unsupported");
       break;
   }
 }
@@ -136,12 +182,10 @@ void translate(drake::lcmt_viewer_geometry_data geometry_data,
 //////////////////////////////////////////////////
 void translateBoxGeometry(drake::lcmt_viewer_geometry_data geometry_data,
                           ignition::msgs::Geometry* geometry_model) {
-
   if (geometry_data.num_float_data != 3) {
     std::stringstream message;
     message << "Wrong float_data information for box: expecting 3 elements but "
-            << geometry_data.num_float_data
-            << " given.";
+            << geometry_data.num_float_data << " given.";
     throw TranslateException(message.str());
   }
 
@@ -157,12 +201,10 @@ void translateBoxGeometry(drake::lcmt_viewer_geometry_data geometry_data,
 //////////////////////////////////////////////////
 void translateSphereGeometry(drake::lcmt_viewer_geometry_data geometry_data,
                              ignition::msgs::Geometry* geometry_model) {
-
   if (geometry_data.num_float_data != 1) {
     std::stringstream message;
     message << "Wrong float_data information for sphere: "
-            << "expecting 1 element but "
-            << geometry_data.num_float_data
+            << "expecting 1 element but " << geometry_data.num_float_data
             << " given.";
     throw TranslateException(message.str());
   }
@@ -179,8 +221,7 @@ void translateCylinderGeometry(drake::lcmt_viewer_geometry_data geometry_data,
   if (geometry_data.num_float_data != 2) {
     std::stringstream message;
     message << "Wrong float_data information for cylinder: "
-            << "expecting 2 elements but "
-            << geometry_data.num_float_data
+            << "expecting 2 elements but " << geometry_data.num_float_data
             << " given.";
     throw TranslateException(message.str());
   }
@@ -196,7 +237,8 @@ void translateMeshGeometry(drake::lcmt_viewer_geometry_data geometry_data,
                            ignition::msgs::Geometry* geometry_model) {
   // If no string_data, we assume MeshMessage, which is unsupported
   if (geometry_data.string_data.empty()) {
-    throw TranslateException("Meshes generated from array are currently unsupported");
+    throw TranslateException(
+        "Meshes generated from array are currently unsupported");
   } else {
     auto* mesh_msg = geometry_model->mutable_mesh();
 
@@ -209,6 +251,16 @@ void translateMeshGeometry(drake::lcmt_viewer_geometry_data geometry_data,
       scale_msg->set_y(geometry_data.float_data[1]);
       scale_msg->set_z(geometry_data.float_data[2]);
     }
+  }
+}
+
+void checkVectorSize(int vector_size, int expected_size,
+                     std::string field_name) {
+  if (vector_size != expected_size) {
+    std::stringstream message;
+    message << "Wrong size for " << field_name << ": expecting "
+            << expected_size << " elements but " << vector_size << " given.";
+    throw TranslateException(message.str());
   }
 }
 

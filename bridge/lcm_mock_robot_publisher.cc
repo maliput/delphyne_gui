@@ -51,10 +51,8 @@ static std::atomic<bool> terminatePub(false);
 /// \brief Function callback executed when a SIGINT or SIGTERM signals are
 /// captured. This is used to break the infinite loop that publishes messages
 /// and exit the program smoothly.
-void signalHandler(int signal)
-{
-  if (signal == SIGINT || signal == SIGTERM)
-    terminatePub = true;
+void signalHandler(int signal) {
+  if (signal == SIGINT || signal == SIGTERM) terminatePub = true;
 }
 
 //////////////////////////////////////////////////
@@ -68,7 +66,7 @@ void signalHandler(int signal)
 // - A mesh loaded from a "package" styled path
 int main(int argc, char* argv[]) {
   // Install a signal handler for SIGINT and SIGTERM.
-  std::signal(SIGINT,  signalHandler);
+  std::signal(SIGINT, signalHandler);
   std::signal(SIGTERM, signalHandler);
 
   ignition::common::Console::SetVerbosity(3);
@@ -263,8 +261,10 @@ int main(int argc, char* argv[]) {
     drawMsg.timestamp = drawMsg.timestamp + timeStepMs;
     // Update each position by moving 1 degree along the previously defined
     // circumference
-    drawMsg.position[0][0] = center[0] + radius * std::sin(i * 2 * IGN_PI / 360);
-    drawMsg.position[0][2] = center[2] + radius * std::cos(i * 2 * IGN_PI / 360);
+    drawMsg.position[0][0] =
+        center[0] + radius * std::sin(i * 2 * IGN_PI / 360);
+    drawMsg.position[0][2] =
+        center[2] + radius * std::cos(i * 2 * IGN_PI / 360);
     // Publish message with updated position
     ignmsg << "Publishing message into DRAKE_VIEWER_DRAW" << std::endl;
     if (lcm.publish("DRAKE_VIEWER_DRAW", &drawMsg) == -1) {

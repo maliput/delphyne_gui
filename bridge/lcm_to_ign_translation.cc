@@ -55,7 +55,7 @@ void checkVectorSize(int vectorSize, int expectedSize, std::string fieldName);
 
 //////////////////////////////////////////////////
 void lcmToIgn(drake::lcmt_viewer_draw robotViewerData,
-               ignition::msgs::PosesStamped* posesStampedModel) {
+              ignition::msgs::PosesStamped* posesStampedModel) {
   // Check the size of each vector on an lcm_viewer_draw message
   // num_links represents the ammount of links declarated and
   // should be matched by the size of each of the following vectors

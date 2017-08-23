@@ -29,17 +29,17 @@
 #include <ignition/common/Console.hh>
 
 // Drake LCM message headers
+#include "drake/lcmt_driving_command_t.hpp"
+#include "drake/lcmt_viewer_draw.hpp"
 #include "drake/lcmt_viewer_geometry_data.hpp"
 #include "drake/lcmt_viewer_load_robot.hpp"
-#include "drake/lcmt_viewer_draw.hpp"
-#include "drake/lcmt_driving_command_t.hpp"
 
 // Custom ignition message headers
 #include "protobuf/headers/automotive_driving_command.pb.h"
 
 // Repeater classes
-#include "lcm_channel_repeater.hh"
 #include "ign_topic_repeater.hh"
+#include "lcm_channel_repeater.hh"
 
 // LCM entry point
 #include "lcm/lcm-cpp.hpp"
@@ -88,7 +88,7 @@ int main(int argc, char* argv[]) {
   // from ignition::msgs::AutomotiveDrivingCommand to
   // drake::lcmt_driving_command_t
   delphyne::bridge::IgnTopicRepeater<ignition::msgs::AutomotiveDrivingCommand,
-                                       drake::lcmt_driving_command_t>
+                                     drake::lcmt_driving_command_t>
       drivingCommandRepeater(lcm, "DRIVING_COMMAND_0");
 
   // Start DRIVING_COMMAND_0 repeater
@@ -107,4 +107,3 @@ int main(int argc, char* argv[]) {
 
   return 0;
 }
-

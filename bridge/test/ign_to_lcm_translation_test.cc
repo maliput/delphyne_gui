@@ -31,4 +31,3 @@ GTEST_TEST(ignToLcm, TestAutomotiveDrivingCommand) {
 
 }  // namespace bridge
 }  // namespace delphyne
-

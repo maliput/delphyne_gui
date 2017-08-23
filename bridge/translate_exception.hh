@@ -29,8 +29,8 @@
 #ifndef DELPHYNE_BRIDGE_TRANSLATE_EXCEPTION_HH_
 #define DELPHYNE_BRIDGE_TRANSLATE_EXCEPTION_HH_
 
-#include <string>
 #include <stdexcept>
+#include <string>
 
 namespace delphyne {
 namespace bridge {

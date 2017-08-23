@@ -42,7 +42,7 @@ namespace bridge {
 /// \param[in]  robot_draw_data  An LCM message containing the robot poses
 /// \param[out] robot_model The resulting ignition message with the poses vector
 void lcmToIgn(drake::lcmt_viewer_draw robotDrawData,
-               ignition::msgs::PosesStamped* posesStampedModel);
+              ignition::msgs::PosesStamped* posesStampedModel);
 
 /// \brief Translate a whole robot model definition from LCM to ignition
 /// \param[in]  robot_data  An LCM message containing the robot data

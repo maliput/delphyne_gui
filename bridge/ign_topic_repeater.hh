@@ -53,21 +53,21 @@ namespace bridge {
 template <class IGN_TYPE, class LCM_TYPE>
 class IgnTopicRepeater {
  public:
-  IgnTopicRepeater(std::shared_ptr<lcm::LCM> lcm,
-                     const std::string& topic_name)
+  IgnTopicRepeater(std::shared_ptr<lcm::LCM> lcm, const std::string& topic_name)
       : lcm_(lcm), topic_name_(topic_name) {}
 
   /// \brief Subscribe to the ignition topic and echo every message
   /// into the LCM channel as new messages arrive.
   void Start() {
-
     if (!lcm_->good()) {
       throw std::runtime_error("LCM is not ready");
     }
 
     std::string topic = "/" + topic_name_;
 
-    if (!node_.Subscribe(topic, &IgnTopicRepeater<IGN_TYPE,LCM_TYPE>::handleMessage, this)) {
+    if (!node_.Subscribe(topic,
+                         &IgnTopicRepeater<IGN_TYPE, LCM_TYPE>::handleMessage,
+                         this)) {
       throw std::runtime_error("Error subscribing to topic: " + topic);
     }
   }
@@ -89,7 +89,7 @@ class IgnTopicRepeater {
   /// ignition topic channel.
   /// \param[in] ign_msg The ignition message that arrived to the topic
 
-  void handleMessage(const IGN_TYPE &ign_msg) {
+  void handleMessage(const IGN_TYPE& ign_msg) {
     LCM_TYPE lcm_msg;
     try {
       ignToLcm(ign_msg, &lcm_msg);

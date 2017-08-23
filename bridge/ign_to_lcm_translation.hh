@@ -36,16 +36,11 @@
 namespace delphyne {
 namespace bridge {
 
-class TranslateException : public std::runtime_error {
- public:
-  TranslateException(std::string message) : std::runtime_error(message) {}
-};
-
 /// \brief Translate a driving command from LCM to ignition
-/// \param[in]  driving_command  An LCM message containing the driving command
-/// \param[out] automotive_command The resulting ignition message
-void ignToLcm(drake::lcmt_driving_command_t driving_command,
-              ignition::msgs::AutomotiveDrivingCommand* automotive_command);
+/// \param[in]  ign_driving_command An ignition message containing the driving command
+/// \param[out] lcm_driving_command The resulting LCM command
+void ignToLcm(const ignition::msgs::AutomotiveDrivingCommand& ign_driving_command,
+              drake::lcmt_driving_command_t* lcm_driving_command);
 
 }  // namespace bridge
 }  // namespace delphyne

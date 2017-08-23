@@ -54,6 +54,18 @@ cc_library(
 )
 
 cc_library(
+    name = "ign-channel-repeater",
+    hdrs = ["ign_channel_repeater.hh",
+    ],
+    deps = [
+        "@ignition-transport3",
+        "@lcm",
+        "//bridge:drake-lcmt-headers",
+        "@ignition_common//:ignition_common_shared_library",
+    ],
+)
+
+cc_library(
     name = "drake-lcmt-headers",
     hdrs = ["drake/lcmt_viewer_command.hpp",
             "drake/lcmt_viewer_draw.hpp",
@@ -65,16 +77,18 @@ cc_library(
 )
 
 cc_binary(
-    name = "lcm-to-ign-transport-bridge",
-    srcs = ["lcm_to_ign_transport_bridge.cc",
+    name = "lcm-ign-transport-bridge",
+    srcs = ["lcm_ign_transport_bridge.cc",
     ],
     deps = [
         "@ignition-transport3",
         "@lcm",
         "@ignition_common//:ignition_common_shared_library",
         "//bridge:lcm-to-ign-translation",
+        "//bridge:ign-to-lcm-translation",
         "//bridge:drake-lcmt-headers",
         "//bridge:lcm-channel-repeater",
+        "//bridge:ign-channel-repeater",
     ],
     data = [
         "drake/car/car.vtp",
@@ -92,6 +106,7 @@ cc_binary(
         "@ignition_common//:ignition_common_shared_library",
         "@lcm",
         "//bridge:drake-lcmt-headers",
+        "//bridge:ignition-custom-messages",
     ],
 )
 
@@ -100,12 +115,12 @@ py_binary(
     srcs = ["mocked_robot_demo.py"],
     data = [
         ":lcm-mock-robot-publisher",
-        ":lcm-to-ign-transport-bridge",
+        ":lcm-ign-transport-bridge",
     ],
     main = "mocked_robot_demo.py",
     args = [
         "$(location :lcm-mock-robot-publisher)",
-        "$(location :lcm-to-ign-transport-bridge)",
+        "$(location :lcm-ign-transport-bridge)",
     ],
 )
 

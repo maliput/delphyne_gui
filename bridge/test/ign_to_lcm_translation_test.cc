@@ -7,23 +7,24 @@ namespace delphyne {
 namespace bridge {
 
 //////////////////////////////////////////////////
-/// \brief Test
-GTEST_TEST(DrivingCommandTest, TestSteering) {
-  // Define LCM mesh geometry message
-  drake::lcmt_driving_command_t lcm_driving_msg;
-  // Define the expected ignition geometry
+/// \brief Test that the ignition AutomotiveDrivingCommand
+/// message is properly translated to its LCM counterpart
+GTEST_TEST(ignToLcm, TestAutomotiveDrivingCommand) {
+  // Define the ignition command
   ignition::msgs::AutomotiveDrivingCommand ign_driving_msg;
+  // Define LCM expected message
+  drake::lcmt_driving_command_t lcm_driving_msg;
   // Fill LCM data
-  lcm_driving_msg.steering_angle = 2.54;
-  lcm_driving_msg.acceleration = 5.26;
+  ign_driving_msg.set_theta(0.12);
+  ign_driving_msg.set_acceleration(15.7);
 
-  // Translate from LCM to ignition
-  ignToLcm(lcm_driving_msg, &ign_driving_msg);
+  // Translate from ignition to LCM
+  ignToLcm(ign_driving_msg, &lcm_driving_msg);
 
-  // Verify generated ignition geometry
-  ASSERT_TRUE(ign_driving_msg.has_theta());
+  // Verify generated LCM message
+  ASSERT_EQ(lcm_driving_msg.steering_angle, 0.12);
+  ASSERT_EQ(lcm_driving_msg.acceleration, 15.7);
 }
-
 
 }  // namespace bridge
 }  // namespace delphyne

@@ -34,12 +34,12 @@
 #include <ignition/transport.hh>
 #include <lcm/lcm-cpp.hpp>
 
-  #include <ignition/common/Console.hh>
-
 #include "drake/lcmt_viewer_geometry_data.hpp"
 #include "drake/lcmt_viewer_load_robot.hpp"
 
 #include "ign_to_lcm_translation.hh"
+
+#include "translate_exception.hh"
 
 namespace delphyne {
 namespace bridge {
@@ -94,7 +94,7 @@ class IgnTopicRepeater {
     try {
       ignToLcm(ign_msg, &lcm_msg);
       lcm_->publish(topic_name_, &lcm_msg);
-    } catch (const std::exception& e) {
+    } catch (const delphyne::bridge::TranslateException& e) {
       ignerr
           << "An error occurred while trying to translate a message in channel "
           << topic_name_ << ": " << std::endl;

@@ -26,21 +26,19 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef DELPHYNE_BRIDGE_IGNTOLCMTRANSLATION_HH_
-#define DELPHYNE_BRIDGE_IGNTOLCMTRANSLATION_HH_
+#ifndef DELPHYNE_BRIDGE_TRANSLATE_EXCEPTION_HH_
+#define DELPHYNE_BRIDGE_TRANSLATE_EXCEPTION_HH_
 
-#include "drake/lcmt_driving_command_t.hpp"
-#include "translate_exception.hh"
-#include "protobuf/headers/automotive_driving_command.pb.h"
+#include <string>
+#include <stdexcept>
 
 namespace delphyne {
 namespace bridge {
 
-/// \brief Translate a driving command from LCM to ignition
-/// \param[in]  ign_driving_command An ignition message containing the driving command
-/// \param[out] lcm_driving_command The resulting LCM command
-void ignToLcm(const ignition::msgs::AutomotiveDrivingCommand& ign_driving_command,
-              drake::lcmt_driving_command_t* lcm_driving_command);
+class TranslateException : public std::runtime_error {
+ public:
+  TranslateException(std::string message) : std::runtime_error(message) {}
+};
 
 }  // namespace bridge
 }  // namespace delphyne

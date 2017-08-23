@@ -16,7 +16,9 @@ cc_library(
 
 cc_library(
     name = "lcm-to-ign-translation",
-    srcs = ["lcm_to_ign_translation.cc",
+    srcs = [
+        "lcm_to_ign_translation.cc",
+        "translate_exception.hh",
     ],
     hdrs = ["lcm_to_ign_translation.hh",
     ],
@@ -29,7 +31,9 @@ cc_library(
 
 cc_library(
     name = "ign-to-lcm-translation",
-    srcs = ["ign_to_lcm_translation.cc",
+    srcs = [
+        "ign_to_lcm_translation.cc",
+        "translate_exception.hh",
     ],
     hdrs = ["ign_to_lcm_translation.hh",
     ],

@@ -26,22 +26,27 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <iostream>
-#include <sstream>
-#include <string>
-#include <typeinfo>
-#include <vector>
-#include <ignition/msgs.hh>
-
+#include <chrono>
+#include <cstdint>
+#include "drake/lcmt_driving_command_t.hpp"
 #include "ign_to_lcm_translation.hh"
+#include "translate_exception.hh"
+#include "protobuf/headers/automotive_driving_command.pb.h"
 
 namespace delphyne {
 namespace bridge {
 
 void ignToLcm(const ignition::msgs::AutomotiveDrivingCommand& ign_driving_command,
               drake::lcmt_driving_command_t* lcm_driving_command) {
-    lcm_driving_command->steering_angle = ign_driving_command.theta();
-    lcm_driving_command->acceleration = ign_driving_command.acceleration();
+
+  if (ign_driving_command.has_time()) {
+    lcm_driving_command->timestamp = ign_driving_command.time().sec() * 1000 + ign_driving_command.time().nsec() / 1000000;
+  } else {
+    int64_t milliseconds = std::chrono::system_clock::now().time_since_epoch() / std::chrono::milliseconds(1);
+    lcm_driving_command->timestamp = milliseconds;
+  }
+  lcm_driving_command->steering_angle = ign_driving_command.theta();
+  lcm_driving_command->acceleration = ign_driving_command.acceleration();
 }
 
 }  // namespace bridge

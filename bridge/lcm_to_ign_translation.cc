@@ -34,6 +34,7 @@
 #include <ignition/msgs.hh>
 
 #include "lcm_to_ign_translation.hh"
+#include "translate_exception.hh"
 
 namespace delphyne {
 namespace bridge {

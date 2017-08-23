@@ -33,14 +33,10 @@
 #include "drake/lcmt_viewer_draw.hpp"
 #include "drake/lcmt_viewer_geometry_data.hpp"
 #include "drake/lcmt_viewer_load_robot.hpp"
+#include "translate_exception.hh"
 
 namespace delphyne {
 namespace bridge {
-
-class TranslateException : public std::runtime_error {
- public:
-  TranslateException(std::string message) : std::runtime_error(message) {}
-};
 
 /// \brief Translate a list of robot poses from LCM to ignition
 /// \param[in]  robot_draw_data  An LCM message containing the robot poses

@@ -61,13 +61,11 @@ cc_binary(
     name = "lcm-mock-robot-publisher",
     srcs = [
         "lcm_mock_robot_publisher.cc",
-        "drake/lcmt_viewer_geometry_data.hpp",
-        "drake/lcmt_viewer_link_data.hpp",
-        "drake/lcmt_viewer_load_robot.hpp",
     ],
     deps = [
         "@ignition_common//:ignition_common_shared_library",
         "@lcm",
+        "//bridge:drake-lcmt-headers",
     ],
 )
 

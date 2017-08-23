@@ -9,7 +9,7 @@ namespace bridge {
 //////////////////////////////////////////////////
 /// \brief Test that the ignition AutomotiveDrivingCommand
 /// message is properly translated to its LCM counterpart
-GTEST_TEST(ignToLcm, TestAutomotiveDrivingCommand) {
+GTEST_TEST(ignToLcm, TestAutomotiveDrivingCommandTranslation) {
   // Define the ignition command
   ignition::msgs::AutomotiveDrivingCommand ign_driving_msg;
   // Define LCM expected message
@@ -27,6 +27,23 @@ GTEST_TEST(ignToLcm, TestAutomotiveDrivingCommand) {
   ASSERT_EQ(lcm_driving_msg.timestamp, 123987);
   ASSERT_EQ(lcm_driving_msg.steering_angle, 0.12);
   ASSERT_EQ(lcm_driving_msg.acceleration, 15.7);
+}
+
+//////////////////////////////////////////////////
+/// \brief Test that the ignition AutomotiveDrivingCommand
+/// message is properly translated to its LCM counterpart
+GTEST_TEST(ignToLcm, TestAutomotiveDrivingCommandTranslationDefaultValues) {
+  // Define the ignition command
+  ignition::msgs::AutomotiveDrivingCommand ign_driving_msg;
+  // Define LCM expected message
+  drake::lcmt_driving_command_t lcm_driving_msg;
+
+  // Translate from ignition to LCM
+  ignToLcm(ign_driving_msg, &lcm_driving_msg);
+
+  // Verify generated LCM message
+  ASSERT_EQ(lcm_driving_msg.steering_angle, 0);
+  ASSERT_EQ(lcm_driving_msg.acceleration, 0);
 }
 
 }  // namespace bridge

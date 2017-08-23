@@ -250,11 +250,17 @@ int main(int argc, char* argv[]) {
   ign_driving_msg.set_theta(0.5);
   ign_driving_msg.set_acceleration(10);
 
-  while (1) {
+  for(int i=0; i<3; i++) {
     ignmsg << "Publishing message into " << topic_name << std::endl;
     ign_publisher.Publish(ign_driving_msg);
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
   }
+
+  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+
+  ign_driving_msg.set_acceleration(0);
+  ignmsg << "Publishing message into " << topic_name << std::endl;
+  ign_publisher.Publish(ign_driving_msg);
 
 /*
   std::this_thread::sleep_for(std::chrono::milliseconds(1000));

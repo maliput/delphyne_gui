@@ -44,16 +44,16 @@
 namespace delphyne {
 namespace bridge {
 
-// \brief IgnChannelRepeater listens to all the messages that arrive
+// \brief IgnTopicRepeater listens to all the messages that arrive
 // to an ignition topic, translates them into their lcm message counterpart
 // and re-publishes them into an lcm channel of the same name.
 // IGN_TYPE is the type of the ignition message that we want to consume
 // whereas LCM_TYPE is the type of the LCM message that we will
 // be generating
 template <class IGN_TYPE, class LCM_TYPE>
-class IgnChannelRepeater {
+class IgnTopicRepeater {
  public:
-  IgnChannelRepeater(std::shared_ptr<lcm::LCM> lcm,
+  IgnTopicRepeater(std::shared_ptr<lcm::LCM> lcm,
                      const std::string& topic_name)
       : lcm_(lcm), topic_name_(topic_name) {}
 
@@ -67,7 +67,7 @@ class IgnChannelRepeater {
 
     std::string topic = "/" + topic_name_;
 
-    if (!node_.Subscribe(topic, &IgnChannelRepeater<IGN_TYPE,LCM_TYPE>::handleMessage, this)) {
+    if (!node_.Subscribe(topic, &IgnTopicRepeater<IGN_TYPE,LCM_TYPE>::handleMessage, this)) {
       throw std::runtime_error("Error subscribing to topic: " + topic);
     }
   }

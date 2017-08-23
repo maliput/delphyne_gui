@@ -39,7 +39,7 @@
 
 // Repeater classes
 #include "lcm_channel_repeater.hh"
-#include "ign_channel_repeater.hh"
+#include "ign_topic_repeater.hh"
 
 // LCM entry point
 #include "lcm/lcm-cpp.hpp"
@@ -87,7 +87,7 @@ int main(int argc, char* argv[]) {
   // Create a repeater on ignition DRIVING_COMMAND_0 topic, translating
   // from ignition::msgs::AutomotiveDrivingCommand to
   // drake::lcmt_driving_command_t
-  delphyne::bridge::IgnChannelRepeater<ignition::msgs::AutomotiveDrivingCommand,
+  delphyne::bridge::IgnTopicRepeater<ignition::msgs::AutomotiveDrivingCommand,
                                        drake::lcmt_driving_command_t>
       drivingCommandRepeater(lcm, "DRIVING_COMMAND_0");
 

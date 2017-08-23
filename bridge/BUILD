@@ -54,8 +54,8 @@ cc_library(
 )
 
 cc_library(
-    name = "ign-channel-repeater",
-    hdrs = ["ign_channel_repeater.hh",
+    name = "ign-topic-repeater",
+    hdrs = ["ign_topic_repeater.hh",
     ],
     deps = [
         "@ignition-transport3",
@@ -88,7 +88,7 @@ cc_binary(
         "//bridge:ign-to-lcm-translation",
         "//bridge:drake-lcmt-headers",
         "//bridge:lcm-channel-repeater",
-        "//bridge:ign-channel-repeater",
+        "//bridge:ign-topic-repeater",
     ],
     data = [
         "drake/car/car.vtp",

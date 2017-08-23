@@ -44,7 +44,6 @@
 #include "drake/lcmt_viewer_link_data.hpp"
 #include "drake/lcmt_viewer_load_robot.hpp"
 
-
 /// \brief Flag used to break the publisher loop and terminate the program.
 static std::atomic<bool> terminatePub(false);
 
@@ -225,13 +224,51 @@ int main(int argc, char* argv[]) {
   robotMsg.link[3] = meshURLLinkMsg;
   robotMsg.link[4] = meshPackageLinkMsg;
 
-  // Publish a robot message into the lcm_channel every 1 second
-  /*
-  while (1) {
-    std::string lcm_channel = "DRAKE_VIEWER_LOAD_ROBOT";
-    ignmsg << "Publishing message into " << lcm_channel << std::endl;
-    if (lcm.publish(lcm_channel, &robotMsg) == -1) {
-      ignerr << "Failed to publish message into " << lcm_channel << std::endl;
+  // Define draw message
+  drake::lcmt_viewer_draw drawMsg;
+  drawMsg.timestamp = 0.0;
+  drawMsg.num_links = 1;
+  drawMsg.link_name.resize(1);
+  drawMsg.robot_num.resize(1);
+  drawMsg.position.resize(1);
+  drawMsg.quaternion.resize(1);
+  drawMsg.position[0].resize(3);
+  drawMsg.quaternion[0].resize(4);
+  drawMsg.link_name[0] = sphereLinkMsg.name;
+  drawMsg.position[0][0] = 3;
+  drawMsg.position[0][1] = 3;
+  drawMsg.position[0][2] = 1;
+  drawMsg.quaternion[0][0] = 1.0;
+  drawMsg.quaternion[0][1] = 0.0;
+  drawMsg.quaternion[0][2] = 0.0;
+  drawMsg.quaternion[0][3] = 0.0;
+
+  // Load robot model into drake
+  std::string lcmChannel = "DRAKE_VIEWER_LOAD_ROBOT";
+  ignmsg << "Publishing message into " << lcmChannel << std::endl;
+  if (lcm.publish(lcmChannel, &robotMsg) == -1) {
+    ignerr << "Failed to publish message into " << lcmChannel << std::endl;
+    return 1;
+  }
+
+  // Circumference definition
+  float radius = 3.0;
+  std::vector<float> center = {0.0, 0.0, 4.0};
+  // Initialize timestep and counter
+  int timeStepMs = 10;
+  int i = 0;
+  // Update sphere position every 10ms
+  while (!terminatePub) {
+    // Update timestamp
+    drawMsg.timestamp = drawMsg.timestamp + timeStepMs;
+    // Update each position by moving 1 degree along the previously defined
+    // circumference
+    drawMsg.position[0][0] = center[0] + radius * std::sin(i * 2 * IGN_PI / 360);
+    drawMsg.position[0][2] = center[2] + radius * std::cos(i * 2 * IGN_PI / 360);
+    // Publish message with updated position
+    ignmsg << "Publishing message into DRAKE_VIEWER_DRAW" << std::endl;
+    if (lcm.publish("DRAKE_VIEWER_DRAW", &drawMsg) == -1) {
+      ignerr << "Failed to publish message into DRAKE_VIEWER_DRAW" << std::endl;
       return 1;
     }
     // Wait 10ms
@@ -239,37 +276,5 @@ int main(int argc, char* argv[]) {
     // Increment i value and keep it bounded between 0 and 359
     i = (i + 1) % 360;
   }
-  */
-
-
-  std::string topic_name = "DRIVING_COMMAND_0";
-  ignition::transport::Node node;
-  ignition::transport::Node::Publisher ign_publisher = node.Advertise<ignition::msgs::AutomotiveDrivingCommand>("/" + topic_name);
-
-  ignition::msgs::AutomotiveDrivingCommand ign_driving_msg;
-  ign_driving_msg.set_theta(0.5);
-  ign_driving_msg.set_acceleration(10);
-
-  for(int i=0; i<3; i++) {
-    ignmsg << "Publishing message into " << topic_name << std::endl;
-    ign_publisher.Publish(ign_driving_msg);
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
-  }
-
-  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-
-  ign_driving_msg.set_acceleration(0);
-  ignmsg << "Publishing message into " << topic_name << std::endl;
-  ign_publisher.Publish(ign_driving_msg);
-
-/*
-  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-
-    if (lcm.publish(lcm_channel, &robotMsg) == -1) {
-      ignerr << "Failed to publish message into " << lcm_channel << std::endl;
-      return 1;
-    }
-  }
-*/
   return 0;
 }

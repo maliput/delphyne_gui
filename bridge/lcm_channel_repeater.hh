@@ -54,23 +54,23 @@ template <class LCM_TYPE, class IGN_TYPE>
 class LcmChannelRepeater {
  public:
   LcmChannelRepeater(std::shared_ptr<lcm::LCM> lcm,
-                     const std::string& topic_name)
-      : lcm_(lcm), topic_name_(topic_name) {}
+                     const std::string& topicName)
+      : lcm_(lcm), topicName_(topicName) {}
 
   /// \brief Subscribe to the LCM channel and echo into the
   /// ignition topic as new messages arrive.
   void Start() {
-    publisher_ = node_.Advertise<IGN_TYPE>("/" + topic_name_);
+    publisher_ = node_.Advertise<IGN_TYPE>("/" + topicName_);
 
     if (!lcm_->good()) {
       throw std::runtime_error("LCM is not ready");
     }
 
     if (!publisher_) {
-      throw std::runtime_error("Error advertising topic: " + topic_name_);
+      throw std::runtime_error("Error advertising topic: " + topicName_);
     }
 
-    lcm_->subscribe(topic_name_, &LcmChannelRepeater::handleMessage, this);
+    lcm_->subscribe(topicName_, &LcmChannelRepeater::handleMessage, this);
   }
 
  private:
@@ -81,7 +81,7 @@ class LcmChannelRepeater {
   /// \internal
   /// \brief The topic this repeater subscribes to LCM and
   /// repeats on ignition
-  const std::string topic_name_;
+  const std::string topicName_;
 
   /// \internal
   /// \brief The ignition node used to create the publisher
@@ -95,13 +95,13 @@ class LcmChannelRepeater {
   /// LCM channel.
   /// \param[in] rbuf A buffer with the raw bytes of the publication
   /// \param[in] chan The channel where the message arrived
-  /// \param[in] lcm_msg The actual LCM message
+  /// \param[in] lcmMsg The actual LCM message
   void handleMessage(const lcm::ReceiveBuffer* rbuf, const std::string& chan,
-                     const LCM_TYPE* lcm_msg) {
-    IGN_TYPE ign_msg;
+                     const LCM_TYPE* lcmMsg) {
+    IGN_TYPE ignMsg;
     try {
-      translate(*lcm_msg, &ign_msg);
-      publisher_.Publish(ign_msg);
+      translate(*lcmMsg, &ignMsg);
+      publisher_.Publish(ignMsg);
     } catch (const delphyne::bridge::TranslateException& e) {
       ignerr
           << "An error occurred while trying to translate a message in channel "

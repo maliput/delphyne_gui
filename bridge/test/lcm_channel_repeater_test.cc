@@ -12,7 +12,7 @@ static bool handler2Called;
 //////////////////////////////////////////////////
 /// \brief Assert that a given ign Geometry is a box and has
 /// the specified size
-void assert_is_box_with_size(const ignition::msgs::Geometry& message, float x,
+void assertIsBoxWithSize(const ignition::msgs::Geometry& message, float x,
                              float y, float z) {
   ASSERT_EQ(message.type(), ignition::msgs::Geometry::BOX);
   ASSERT_EQ(message.box().size().x(), x);
@@ -23,7 +23,7 @@ void assert_is_box_with_size(const ignition::msgs::Geometry& message, float x,
 //////////////////////////////////////////////////
 /// \brief Fill an LCM viewer_geometry_data message with a box
 /// geometry with the specified size
-void fill_box_with(drake::lcmt_viewer_geometry_data& boxMsg, float x, float y,
+void fillBoxWith(drake::lcmt_viewer_geometry_data& boxMsg, float x, float y,
                    float z) {
   boxMsg.type = boxMsg.BOX;
   boxMsg.num_float_data = 3;
@@ -37,8 +37,8 @@ void fill_box_with(drake::lcmt_viewer_geometry_data& boxMsg, float x, float y,
 /// \brief Handler called in TEST_CHANNEL_1. Checks that the
 /// box message has the expected size and flags the handler as
 /// called
-void test_1_handler(const ignition::msgs::Geometry& message) {
-  assert_is_box_with_size(message, 1, 2, 3);
+void test1Handler(const ignition::msgs::Geometry& message) {
+  assertIsBoxWithSize(message, 1, 2, 3);
   handler1Called = true;
 }
 
@@ -46,8 +46,8 @@ void test_1_handler(const ignition::msgs::Geometry& message) {
 /// \brief Handler called in TEST_CHANNEL_2. Checks that the
 /// box message has the expected size and flags the handler as
 /// called
-void test_2_handler(const ignition::msgs::Geometry& message) {
-  assert_is_box_with_size(message, 5, 5, 5);
+void test2Handler(const ignition::msgs::Geometry& message) {
+  assertIsBoxWithSize(message, 5, 5, 5);
   handler2Called = true;
 }
 
@@ -78,11 +78,11 @@ GTEST_TEST(LCMChannelRepeaterTest, TestEndToEndEcho) {
   testRepeater.Start();
 
   ignition::transport::Node node;
-  node.Subscribe("TEST_CHANNEL_1", test_1_handler);
+  node.Subscribe("TEST_CHANNEL_1", test1Handler);
 
   // Create and publish geometry message
   drake::lcmt_viewer_geometry_data boxMsg;
-  fill_box_with(boxMsg, 1, 2, 3);
+  fillBoxWith(boxMsg, 1, 2, 3);
 
   lcm->publish("TEST_CHANNEL_1", &boxMsg);
 
@@ -110,11 +110,11 @@ GTEST_TEST(LCMChannelRepeaterTest, TestHandlerNotCalled) {
       testRepeater(lcm, "TEST_CHANNEL_1");
 
   ignition::transport::Node node;
-  node.Subscribe("TEST_CHANNEL_1", test_1_handler);
+  node.Subscribe("TEST_CHANNEL_1", test1Handler);
 
   // Create and publish geometry message
   drake::lcmt_viewer_geometry_data boxMsg;
-  fill_box_with(boxMsg, 1, 2, 3);
+  fillBoxWith(boxMsg, 1, 2, 3);
 
   lcm->publish("TEST_CHANNEL_1", &boxMsg);
 
@@ -145,7 +145,7 @@ GTEST_TEST(LCMChannelRepeaterTest, TestMultipleChannels) {
   channel1Repeater.Start();
 
   ignition::transport::Node node1;
-  node1.Subscribe("TEST_CHANNEL_1", test_1_handler);
+  node1.Subscribe("TEST_CHANNEL_1", test1Handler);
 
   // Setup repeater 2 and hook handler to ignition topic
   delphyne::bridge::LcmChannelRepeater<drake::lcmt_viewer_geometry_data,
@@ -155,17 +155,17 @@ GTEST_TEST(LCMChannelRepeaterTest, TestMultipleChannels) {
   channel2Repeater.Start();
 
   ignition::transport::Node node2;
-  node2.Subscribe("TEST_CHANNEL_2", test_2_handler);
+  node2.Subscribe("TEST_CHANNEL_2", test2Handler);
 
   // Create and publish geometry message to channel 1
   drake::lcmt_viewer_geometry_data box1Msg;
-  fill_box_with(box1Msg, 1, 2, 3);
+  fillBoxWith(box1Msg, 1, 2, 3);
 
   lcm->publish("TEST_CHANNEL_1", &box1Msg);
 
   // Create and publish geometry message to channel 2
   drake::lcmt_viewer_geometry_data box2Msg;
-  fill_box_with(box2Msg, 5, 5, 5);
+  fillBoxWith(box2Msg, 5, 5, 5);
 
   lcm->publish("TEST_CHANNEL_2", &box2Msg);
 

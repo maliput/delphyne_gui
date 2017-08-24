@@ -38,6 +38,7 @@
 
 #include <ignition/rendering/Camera.hh>
 #include <ignition/rendering/RenderEngine.hh>
+#include <ignition/rendering/RenderEngineManager.hh>
 #include <ignition/rendering/RenderTarget.hh>
 #include <ignition/rendering/RenderTypes.hh>
 #include <ignition/rendering/RenderingIface.hh>
@@ -120,8 +121,9 @@ RenderWidget::~RenderWidget() {}
 
 void RenderWidget::CreateRenderWindow() {
   std::string engineName = "ogre";
-  ignition::rendering::RenderEngine* engine =
-      ignition::rendering::get_engine(engineName);
+  ignition::rendering::RenderEngineManager* manager =
+    ignition::rendering::RenderEngineManager::Instance();
+  ignition::rendering::RenderEngine* engine = manager->Engine(engineName);
   if (!engine) {
     ignerr << "Engine '" << engineName << "' is not supported" << std::endl;
     return;
@@ -249,4 +251,4 @@ void RenderWidget::moveEvent(QMoveEvent* _e) {
 }  // namespace delphyne
 
 IGN_COMMON_REGISTER_SINGLE_PLUGIN(delphyne::gui::RenderWidget,
-                                  ignition::gui::Plugin);
+                                  ignition::gui::Plugin)

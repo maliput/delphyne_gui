@@ -6,21 +6,21 @@
 
 #include <lcm/lcm_coretypes.h>
 
-#ifndef __drake_lcmt_viewer_load_robot_hpp__
-#define __drake_lcmt_viewer_load_robot_hpp__
+#ifndef __drake_lcmt_driving_command_t_hpp__
+#define __drake_lcmt_driving_command_t_hpp__
 
-#include <vector>
-#include "lcmt_viewer_link_data.hpp"
 
 namespace drake
 {
 
-class lcmt_viewer_load_robot
+class lcmt_driving_command_t
 {
     public:
-        int32_t    num_links;
+        int64_t    timestamp;
 
-        std::vector< drake::lcmt_viewer_link_data > link;
+        double     steering_angle;
+
+        double     acceleration;
 
     public:
         /**
@@ -58,7 +58,7 @@ class lcmt_viewer_load_robot
         inline static int64_t getHash();
 
         /**
-         * Returns "lcmt_viewer_load_robot"
+         * Returns "lcmt_driving_command_t"
          */
         inline static const char* getTypeName();
 
@@ -69,7 +69,7 @@ class lcmt_viewer_load_robot
         inline static uint64_t _computeHash(const __lcm_hash_ptr *p);
 };
 
-int lcmt_viewer_load_robot::encode(void *buf, int offset, int maxlen) const
+int lcmt_driving_command_t::encode(void *buf, int offset, int maxlen) const
 {
     int pos = 0, tlen;
     int64_t hash = (int64_t)getHash();
@@ -83,7 +83,7 @@ int lcmt_viewer_load_robot::encode(void *buf, int offset, int maxlen) const
     return pos;
 }
 
-int lcmt_viewer_load_robot::decode(const void *buf, int offset, int maxlen)
+int lcmt_driving_command_t::decode(const void *buf, int offset, int maxlen)
 {
     int pos = 0, thislen;
 
@@ -98,74 +98,66 @@ int lcmt_viewer_load_robot::decode(const void *buf, int offset, int maxlen)
     return pos;
 }
 
-int lcmt_viewer_load_robot::getEncodedSize() const
+int lcmt_driving_command_t::getEncodedSize() const
 {
     return 8 + _getEncodedSizeNoHash();
 }
 
-int64_t lcmt_viewer_load_robot::getHash()
+int64_t lcmt_driving_command_t::getHash()
 {
     static int64_t hash = _computeHash(NULL);
     return hash;
 }
 
-const char* lcmt_viewer_load_robot::getTypeName()
+const char* lcmt_driving_command_t::getTypeName()
 {
-    return "lcmt_viewer_load_robot";
+    return "lcmt_driving_command_t";
 }
 
-int lcmt_viewer_load_robot::_encodeNoHash(void *buf, int offset, int maxlen) const
+int lcmt_driving_command_t::_encodeNoHash(void *buf, int offset, int maxlen) const
 {
     int pos = 0, tlen;
 
-    tlen = __int32_t_encode_array(buf, offset + pos, maxlen - pos, &this->num_links, 1);
+    tlen = __int64_t_encode_array(buf, offset + pos, maxlen - pos, &this->timestamp, 1);
     if(tlen < 0) return tlen; else pos += tlen;
 
-    for (int a0 = 0; a0 < this->num_links; a0++) {
-        tlen = this->link[a0]._encodeNoHash(buf, offset + pos, maxlen - pos);
-        if(tlen < 0) return tlen; else pos += tlen;
-    }
+    tlen = __double_encode_array(buf, offset + pos, maxlen - pos, &this->steering_angle, 1);
+    if(tlen < 0) return tlen; else pos += tlen;
+
+    tlen = __double_encode_array(buf, offset + pos, maxlen - pos, &this->acceleration, 1);
+    if(tlen < 0) return tlen; else pos += tlen;
 
     return pos;
 }
 
-int lcmt_viewer_load_robot::_decodeNoHash(const void *buf, int offset, int maxlen)
+int lcmt_driving_command_t::_decodeNoHash(const void *buf, int offset, int maxlen)
 {
     int pos = 0, tlen;
 
-    tlen = __int32_t_decode_array(buf, offset + pos, maxlen - pos, &this->num_links, 1);
+    tlen = __int64_t_decode_array(buf, offset + pos, maxlen - pos, &this->timestamp, 1);
     if(tlen < 0) return tlen; else pos += tlen;
 
-    this->link.resize(this->num_links);
-    for (int a0 = 0; a0 < this->num_links; a0++) {
-        tlen = this->link[a0]._decodeNoHash(buf, offset + pos, maxlen - pos);
-        if(tlen < 0) return tlen; else pos += tlen;
-    }
+    tlen = __double_decode_array(buf, offset + pos, maxlen - pos, &this->steering_angle, 1);
+    if(tlen < 0) return tlen; else pos += tlen;
+
+    tlen = __double_decode_array(buf, offset + pos, maxlen - pos, &this->acceleration, 1);
+    if(tlen < 0) return tlen; else pos += tlen;
 
     return pos;
 }
 
-int lcmt_viewer_load_robot::_getEncodedSizeNoHash() const
+int lcmt_driving_command_t::_getEncodedSizeNoHash() const
 {
     int enc_size = 0;
-    enc_size += __int32_t_encoded_array_size(NULL, 1);
-    for (int a0 = 0; a0 < this->num_links; a0++) {
-        enc_size += this->link[a0]._getEncodedSizeNoHash();
-    }
+    enc_size += __int64_t_encoded_array_size(NULL, 1);
+    enc_size += __double_encoded_array_size(NULL, 1);
+    enc_size += __double_encoded_array_size(NULL, 1);
     return enc_size;
 }
 
-uint64_t lcmt_viewer_load_robot::_computeHash(const __lcm_hash_ptr *p)
+uint64_t lcmt_driving_command_t::_computeHash(const __lcm_hash_ptr *)
 {
-    const __lcm_hash_ptr *fp;
-    for(fp = p; fp != NULL; fp = fp->parent)
-        if(fp->v == lcmt_viewer_load_robot::getHash)
-            return 0;
-    const __lcm_hash_ptr cp = { p, (void*)lcmt_viewer_load_robot::getHash };
-
-    uint64_t hash = 0x739e6927d8bcec39LL +
-         drake::lcmt_viewer_link_data::_computeHash(&cp);
-
+    uint64_t hash = 0x07b142585469aae8LL;
     return (hash<<1) + ((hash>>63)&1);
 }
 

@@ -34,6 +34,8 @@
 #include <ignition/gui/Iface.hh>
 #endif
 
+#include "delphyne/config.hh"
+
 static const char version_str[] = "Visualizer 0.1.0";
 
 int main(int argc, char* argv[]) {

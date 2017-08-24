@@ -362,7 +362,7 @@ GTEST_TEST(MeshTest, TestLinkTranslationWithRobotNum) {
   linkMsg.robot_num = 1234;
   linkMsg.num_geom = 0;
 
-  translate(linkMsg, &ignLink);
+  lcmToIgn(linkMsg, &ignLink);
 
   ASSERT_EQ(1234, ignLink.id());
   ASSERT_EQ("test_link", ignLink.name());

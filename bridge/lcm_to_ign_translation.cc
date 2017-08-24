@@ -38,140 +38,140 @@
 namespace delphyne {
 namespace bridge {
 
-void translateBoxGeometry(drake::lcmt_viewer_geometry_data geometry_data,
-                          ignition::msgs::Geometry* geometry_model);
+void translateBoxGeometry(drake::lcmt_viewer_geometry_data geometryData,
+                          ignition::msgs::Geometry* geometryModel);
 
-void translateSphereGeometry(drake::lcmt_viewer_geometry_data geometry_data,
-                             ignition::msgs::Geometry* geometry_model);
+void translateSphereGeometry(drake::lcmt_viewer_geometry_data geometryData,
+                             ignition::msgs::Geometry* geometryModel);
 
-void translateCylinderGeometry(drake::lcmt_viewer_geometry_data geometry_data,
-                               ignition::msgs::Geometry* geometry_model);
+void translateCylinderGeometry(drake::lcmt_viewer_geometry_data geometryData,
+                               ignition::msgs::Geometry* geometryModel);
 
-void translateMeshGeometry(drake::lcmt_viewer_geometry_data geometry_data,
-                           ignition::msgs::Geometry* geometry_model);
+void translateMeshGeometry(drake::lcmt_viewer_geometry_data geometryData,
+                           ignition::msgs::Geometry* geometryModel);
 
-void checkVectorSize(int vector_size, int expected_size, std::string field_name);
+void checkVectorSize(int vectorSize, int expectedSize, std::string fieldName);
 
 //////////////////////////////////////////////////
-void translate(drake::lcmt_viewer_draw robot_viewer_data,
-               ignition::msgs::PosesStamped* poses_stamped_model) {
+void translate(drake::lcmt_viewer_draw robotViewerData,
+               ignition::msgs::PosesStamped* posesStampedModel) {
   // Check the size of each vector on an lcm_viewer_draw message
   // num_links represents the ammount of links declarated and
   // should be matched by the size of each of the following vectors
-  checkVectorSize(robot_viewer_data.link_name.size(),
-                  robot_viewer_data.num_links, "link_name");
-  checkVectorSize(robot_viewer_data.robot_num.size(),
-                  robot_viewer_data.num_links, "robot_num");
-  checkVectorSize(robot_viewer_data.position.size(),
-                  robot_viewer_data.num_links, "position");
-  checkVectorSize(robot_viewer_data.quaternion.size(),
-                  robot_viewer_data.num_links, "quaternion");
+  checkVectorSize(robotViewerData.link_name.size(),
+                  robotViewerData.num_links, "link_name");
+  checkVectorSize(robotViewerData.robot_num.size(),
+                  robotViewerData.num_links, "robot_num");
+  checkVectorSize(robotViewerData.position.size(),
+                  robotViewerData.num_links, "position");
+  checkVectorSize(robotViewerData.quaternion.size(),
+                  robotViewerData.num_links, "quaternion");
 
   // Convert from milliseconds to seconds
-  int64_t sec = robot_viewer_data.timestamp / 1000;
+  int64_t sec = robotViewerData.timestamp / 1000;
   // Convert the remainder of division above to nanoseconds
-  int64_t nsec = robot_viewer_data.timestamp % 1000 * 1000000;
+  int64_t nsec = robotViewerData.timestamp % 1000 * 1000000;
   // Set timestamp
-  poses_stamped_model->mutable_time()->set_sec(sec);
-  poses_stamped_model->mutable_time()->set_nsec(nsec);
+  posesStampedModel->mutable_time()->set_sec(sec);
+  posesStampedModel->mutable_time()->set_nsec(nsec);
 
   // Add one pose per link
-  for (int i = 0; i < robot_viewer_data.num_links; ++i) {
-    ignition::msgs::Pose* pose_i = poses_stamped_model->add_pose();
+  for (int i = 0; i < robotViewerData.num_links; ++i) {
+    ignition::msgs::Pose* currentPose = posesStampedModel->add_pose();
 
-    pose_i->set_name(robot_viewer_data.link_name[i]);
-    pose_i->set_id(robot_viewer_data.robot_num[i]);
+    currentPose->set_name(robotViewerData.link_name[i]);
+    currentPose->set_id(robotViewerData.robot_num[i]);
     // Check position size and translate
-    checkVectorSize(robot_viewer_data.position[i].size(), 3,
+    checkVectorSize(robotViewerData.position[i].size(), 3,
                     "position[" + std::to_string(i) + "]");
-    translate(robot_viewer_data.position[i].data(), pose_i->mutable_position());
+    translate(robotViewerData.position[i].data(), currentPose->mutable_position());
     // Check orientation size and translate
-    checkVectorSize(robot_viewer_data.quaternion[i].size(), 4,
+    checkVectorSize(robotViewerData.quaternion[i].size(), 4,
                     "quaternion[" + std::to_string(i) + "]");
-    translate(robot_viewer_data.quaternion[i].data(),
-              pose_i->mutable_orientation());
+    translate(robotViewerData.quaternion[i].data(),
+              currentPose->mutable_orientation());
   }
 }
 
 //////////////////////////////////////////////////
-void translate(drake::lcmt_viewer_load_robot robot_data,
-               ignition::msgs::Model* robot_model) {
-  for (int i = 0; i < robot_data.num_links; ++i) {
-    translate(robot_data.link[i], robot_model->add_link());
+void translate(drake::lcmt_viewer_load_robot robotData,
+               ignition::msgs::Model* robotModel) {
+  for (int i = 0; i < robotData.num_links; ++i) {
+    translate(robotData.link[i], robotModel->add_link());
   }
 }
 
 //////////////////////////////////////////////////
-void translate(drake::lcmt_viewer_link_data link_data,
-               ignition::msgs::Link* link_model) {
-  link_model->set_name(link_data.name);
-  link_model->set_id(link_data.robot_num);
-  for (int i = 0; i < link_data.num_geom; ++i) {
-    translate(link_data.geom[i], link_model->add_visual());
+void translate(drake::lcmt_viewer_link_data linkData,
+               ignition::msgs::Link* linkModel) {
+  linkModel->set_name(linkData.name);
+  linkModel->set_id(linkData.robot_num);
+  for (int i = 0; i < linkData.num_geom; ++i) {
+    translate(linkData.geom[i], linkModel->add_visual());
   }
 }
 
 //////////////////////////////////////////////////
-void translate(drake::lcmt_viewer_geometry_data geometry_data,
-               ignition::msgs::Visual* visual_model) {
-  auto* pose_msg = visual_model->mutable_pose();
-  auto* material_msg = visual_model->mutable_material();
+void translate(drake::lcmt_viewer_geometry_data geometryData,
+               ignition::msgs::Visual* visualModel) {
+  auto* poseMsg = visualModel->mutable_pose();
+  auto* materialMsg = visualModel->mutable_material();
 
-  translate(geometry_data.position, pose_msg->mutable_position());
-  translate(geometry_data.quaternion, pose_msg->mutable_orientation());
-  translate(geometry_data.color, material_msg->mutable_diffuse());
-  translate(geometry_data, visual_model->mutable_geometry());
+  translate(geometryData.position, poseMsg->mutable_position());
+  translate(geometryData.quaternion, poseMsg->mutable_orientation());
+  translate(geometryData.color, materialMsg->mutable_diffuse());
+  translate(geometryData, visualModel->mutable_geometry());
 }
 
 //////////////////////////////////////////////////
-void translate(float position_data[3],
-               ignition::msgs::Vector3d* position_model) {
-  position_model->set_x(position_data[0]);
-  position_model->set_y(position_data[1]);
-  position_model->set_z(position_data[2]);
+void translate(float positionData[3],
+               ignition::msgs::Vector3d* positionModel) {
+  positionModel->set_x(positionData[0]);
+  positionModel->set_y(positionData[1]);
+  positionModel->set_z(positionData[2]);
 }
 
 //////////////////////////////////////////////////
-void translate(float quaternion_data[4],
-               ignition::msgs::Quaternion* quaternion_model) {
-  quaternion_model->set_x(quaternion_data[0]);
-  quaternion_model->set_y(quaternion_data[1]);
-  quaternion_model->set_z(quaternion_data[2]);
-  quaternion_model->set_w(quaternion_data[3]);
+void translate(float quaternionData[4],
+               ignition::msgs::Quaternion* quaternionModel) {
+  quaternionModel->set_x(quaternionData[0]);
+  quaternionModel->set_y(quaternionData[1]);
+  quaternionModel->set_z(quaternionData[2]);
+  quaternionModel->set_w(quaternionData[3]);
 }
 
 //////////////////////////////////////////////////
-void translate(float color_data[4], ignition::msgs::Color* color_model) {
-  color_model->set_r(color_data[0]);
-  color_model->set_g(color_data[1]);
-  color_model->set_b(color_data[2]);
-  color_model->set_a(color_data[3]);
+void translate(float colorData[4], ignition::msgs::Color* colorModel) {
+  colorModel->set_r(colorData[0]);
+  colorModel->set_g(colorData[1]);
+  colorModel->set_b(colorData[2]);
+  colorModel->set_a(colorData[3]);
 }
 
 //////////////////////////////////////////////////
-void translate(drake::lcmt_viewer_geometry_data geometry_data,
-               ignition::msgs::Geometry* geometry_model) {
-  switch (geometry_data.type) {
-    case geometry_data.BOX:
-      translateBoxGeometry(geometry_data, geometry_model);
+void translate(drake::lcmt_viewer_geometry_data geometryData,
+               ignition::msgs::Geometry* geometryModel) {
+  switch (geometryData.type) {
+    case geometryData.BOX:
+      translateBoxGeometry(geometryData, geometryModel);
       break;
-    case geometry_data.SPHERE:
-      translateSphereGeometry(geometry_data, geometry_model);
+    case geometryData.SPHERE:
+      translateSphereGeometry(geometryData, geometryModel);
       break;
-    case geometry_data.CYLINDER:
-      translateCylinderGeometry(geometry_data, geometry_model);
+    case geometryData.CYLINDER:
+      translateCylinderGeometry(geometryData, geometryModel);
       break;
-    case geometry_data.MESH:
-      translateMeshGeometry(geometry_data, geometry_model);
+    case geometryData.MESH:
+      translateMeshGeometry(geometryData, geometryModel);
       break;
     default:
-      std::map<int, std::string> unsupported_geometries;
-      unsupported_geometries[geometry_data.CAPSULE] = "CAPSULE";
-      unsupported_geometries[geometry_data.ELLIPSOID] = "ELLIPSOID";
-      std::string type = std::to_string(geometry_data.type);
-      if (unsupported_geometries.find(geometry_data.type) !=
-          unsupported_geometries.end()) {
-        type = unsupported_geometries[geometry_data.type];
+      std::map<int, std::string> unsupportedGeometries;
+      unsupportedGeometries[geometryData.CAPSULE] = "CAPSULE";
+      unsupportedGeometries[geometryData.ELLIPSOID] = "ELLIPSOID";
+      std::string type = std::to_string(geometryData.type);
+      if (unsupportedGeometries.find(geometryData.type) !=
+          unsupportedGeometries.end()) {
+        type = unsupportedGeometries[geometryData.type];
       }
       throw TranslateException("Geometry of type: " + type +
                                " is currently unsupported");
@@ -180,86 +180,86 @@ void translate(drake::lcmt_viewer_geometry_data geometry_data,
 }
 
 //////////////////////////////////////////////////
-void translateBoxGeometry(drake::lcmt_viewer_geometry_data geometry_data,
-                          ignition::msgs::Geometry* geometry_model) {
-  if (geometry_data.num_float_data != 3) {
+void translateBoxGeometry(drake::lcmt_viewer_geometry_data geometryData,
+                          ignition::msgs::Geometry* geometryModel) {
+  if (geometryData.num_float_data != 3) {
     std::stringstream message;
     message << "Wrong float_data information for box: expecting 3 elements but "
-            << geometry_data.num_float_data << " given.";
+            << geometryData.num_float_data << " given.";
     throw TranslateException(message.str());
   }
 
-  auto* box_msg = geometry_model->mutable_box();
-  auto* size_msg = box_msg->mutable_size();
+  auto* boxMsg = geometryModel->mutable_box();
+  auto* sizeMsg = boxMsg->mutable_size();
 
-  geometry_model->set_type(ignition::msgs::Geometry::BOX);
-  size_msg->set_x(geometry_data.float_data[0]);
-  size_msg->set_y(geometry_data.float_data[1]);
-  size_msg->set_z(geometry_data.float_data[2]);
+  geometryModel->set_type(ignition::msgs::Geometry::BOX);
+  sizeMsg->set_x(geometryData.float_data[0]);
+  sizeMsg->set_y(geometryData.float_data[1]);
+  sizeMsg->set_z(geometryData.float_data[2]);
 }
 
 //////////////////////////////////////////////////
-void translateSphereGeometry(drake::lcmt_viewer_geometry_data geometry_data,
-                             ignition::msgs::Geometry* geometry_model) {
-  if (geometry_data.num_float_data != 1) {
+void translateSphereGeometry(drake::lcmt_viewer_geometry_data geometryData,
+                             ignition::msgs::Geometry* geometryModel) {
+  if (geometryData.num_float_data != 1) {
     std::stringstream message;
     message << "Wrong float_data information for sphere: "
-            << "expecting 1 element but " << geometry_data.num_float_data
+            << "expecting 1 element but " << geometryData.num_float_data
             << " given.";
     throw TranslateException(message.str());
   }
 
-  auto* sphere_msg = geometry_model->mutable_sphere();
+  auto* sphereMsg = geometryModel->mutable_sphere();
 
-  geometry_model->set_type(ignition::msgs::Geometry::SPHERE);
-  sphere_msg->set_radius(geometry_data.float_data[0]);
+  geometryModel->set_type(ignition::msgs::Geometry::SPHERE);
+  sphereMsg->set_radius(geometryData.float_data[0]);
 }
 
 //////////////////////////////////////////////////
-void translateCylinderGeometry(drake::lcmt_viewer_geometry_data geometry_data,
-                               ignition::msgs::Geometry* geometry_model) {
-  if (geometry_data.num_float_data != 2) {
+void translateCylinderGeometry(drake::lcmt_viewer_geometry_data geometryData,
+                               ignition::msgs::Geometry* geometryModel) {
+  if (geometryData.num_float_data != 2) {
     std::stringstream message;
     message << "Wrong float_data information for cylinder: "
-            << "expecting 2 elements but " << geometry_data.num_float_data
+            << "expecting 2 elements but " << geometryData.num_float_data
             << " given.";
     throw TranslateException(message.str());
   }
-  auto* cylinder_msg = geometry_model->mutable_cylinder();
+  auto* cylinderMsg = geometryModel->mutable_cylinder();
 
-  geometry_model->set_type(ignition::msgs::Geometry::CYLINDER);
-  cylinder_msg->set_radius(geometry_data.float_data[0]);
-  cylinder_msg->set_length(geometry_data.float_data[1]);
+  geometryModel->set_type(ignition::msgs::Geometry::CYLINDER);
+  cylinderMsg->set_radius(geometryData.float_data[0]);
+  cylinderMsg->set_length(geometryData.float_data[1]);
 }
 
 //////////////////////////////////////////////////
-void translateMeshGeometry(drake::lcmt_viewer_geometry_data geometry_data,
-                           ignition::msgs::Geometry* geometry_model) {
+void translateMeshGeometry(drake::lcmt_viewer_geometry_data geometryData,
+                           ignition::msgs::Geometry* geometryModel) {
   // If no string_data, we assume MeshMessage, which is unsupported
-  if (geometry_data.string_data.empty()) {
+  if (geometryData.string_data.empty()) {
     throw TranslateException(
         "Meshes generated from array are currently unsupported");
   } else {
-    auto* mesh_msg = geometry_model->mutable_mesh();
+    auto* meshMsh = geometryModel->mutable_mesh();
 
-    geometry_model->set_type(ignition::msgs::Geometry::MESH);
-    mesh_msg->set_filename(geometry_data.string_data);
+    geometryModel->set_type(ignition::msgs::Geometry::MESH);
+    meshMsh->set_filename(geometryData.string_data);
 
-    if (geometry_data.num_float_data == 3) {
-      auto* scale_msg = mesh_msg->mutable_scale();
-      scale_msg->set_x(geometry_data.float_data[0]);
-      scale_msg->set_y(geometry_data.float_data[1]);
-      scale_msg->set_z(geometry_data.float_data[2]);
+    if (geometryData.num_float_data == 3) {
+      auto* scale_msg = meshMsh->mutable_scale();
+      scale_msg->set_x(geometryData.float_data[0]);
+      scale_msg->set_y(geometryData.float_data[1]);
+      scale_msg->set_z(geometryData.float_data[2]);
     }
   }
 }
 
-void checkVectorSize(int vector_size, int expected_size,
-                     std::string field_name) {
-  if (vector_size != expected_size) {
+void checkVectorSize(int vectorSize, int expectedSize,
+                     std::string fieldName) {
+  if (vectorSize != expectedSize) {
     std::stringstream message;
-    message << "Wrong size for " << field_name << ": expecting "
-            << expected_size << " elements but " << vector_size << " given.";
+    message << "Wrong size for " << fieldName << ": expecting "
+            << expectedSize << " elements but " << vectorSize << " given.";
     throw TranslateException(message.str());
   }
 }

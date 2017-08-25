@@ -26,18 +26,27 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef RENDER_WIDGET_HH
-#define RENDER_WIDGET_HH
+#ifndef DELPHYNE_GUI_RENDERWIDGET_HH
+#define DELPHYNE_GUI_RENDERWIDGET_HH
 
+#include <cmath>
 #include <map>
 #include <string>
+#include <utility>
 
 #include <ignition/gui/Plugin.hh>
-
 #include <ignition/rendering/RenderTypes.hh>
 #include <ignition/rendering/RenderingIface.hh>
-
 #include <ignition/transport.hh>
+
+// Forward declarations;
+namespace ignition {
+  namespace msgs {
+    class Model;
+    class PosesStamped;
+    class Visual;
+  }
+}
 
 namespace delphyne {
 namespace gui {
@@ -49,76 +58,97 @@ class RenderWidget: public ignition::gui::Plugin
 {
   Q_OBJECT
 
- public:
-  /// \brief Constructor
-  RenderWidget(QWidget *parent = 0);
+  public:
+    /// \brief Default constructor.
+    explicit RenderWidget(QWidget *parent = 0);
 
-  /// \brief Destructor
-  virtual ~RenderWidget();
+    /// \brief Default Destructor.
+    virtual ~RenderWidget();
 
-  public slots: void setInitialModel(const ignition::msgs::Model &_msg);
-  public slots: void updateScene(const ignition::msgs::PosesStamped &_msg);
-  signals: void newInitialModel(const ignition::msgs::Model &_msg);
-  signals: void newDraw(const ignition::msgs::PosesStamped &_msg);
+  /// \brief Callback to set a model for the first time.
+  /// \param[in] _msg The new model.
+  public slots: void SetInitialModel(const ignition::msgs::Model &_msg);
 
- protected:
+  /// \brief Callback to update the scene.
+  /// \param[in] _msg Message containing an update.
+  public slots: void UpdateScene(const ignition::msgs::PosesStamped &_msg);
 
-  /// \brief Overridden method to receive Qt paint event.
-  /// \param[in] _e  The event that happened
-  virtual void paintEvent(QPaintEvent *_e);
+  /// \brief Notify that there's a new model.
+  /// \param[in] _msg The new model.
+  signals: void NewInitialModel(const ignition::msgs::Model &_msg);
 
-  /// \brief Overridden method to receive Qt show event.
-  /// \param[in] _e  The event that happened
-  virtual void showEvent(QShowEvent *_e);
+  /// \brief Notify that there's a new draw update.
+  /// \param[in] _msg Message contining the update.
+  signals: void NewDraw(const ignition::msgs::PosesStamped &_msg);
 
-  /// \brief Overridden method to receive Qt resize event.
-  /// \param[in] _e  The event that happened.
-  virtual void resizeEvent(QResizeEvent *_e);
+  protected:
+    /// \brief Overridden method to receive Qt paint event.
+    /// \param[in] _e  The event that happened.
+    virtual void paintEvent(QPaintEvent *_e);
 
-  /// \brief Overridden method to receive Qt move event.
-  /// \param[in] _e  The event that happened.
-  virtual void moveEvent(QMoveEvent *_e);
+    /// \brief Overridden method to receive Qt show event.
+    /// \param[in] _e  The event that happened.
+    virtual void showEvent(QShowEvent *_e);
 
-  /// \brief Override paintEngine to stop Qt From trying to draw on top of
-  /// render window.
-  /// \return NULL.
-  virtual QPaintEngine *paintEngine() const;
+    /// \brief Overridden method to receive Qt resize event.
+    /// \param[in] _e  The event that happened.
+    virtual void resizeEvent(QResizeEvent *_e);
 
- private:
-  /// \brief Internal method to create the render window the first time
-  /// RenderWidget::showEvent is called.
-  void CreateRenderWindow();
+    /// \brief Overridden method to receive Qt move event.
+    /// \param[in] _e  The event that happened.
+    virtual void moveEvent(QMoveEvent *_e);
 
-  /// \brief Pointer to timer to call update on a periodic basis.
-  QTimer *updateTimer = nullptr;
+    /// \brief Override paintEngine to stop Qt From trying to draw on top of
+    /// render window.
+    /// \return NULL.
+    virtual QPaintEngine *paintEngine() const;
 
-  /// \brief The frequency at which we'll do an update on the widget.
-  const int kUpdateTimeFrequency = static_cast<int>(std::round(1000.0 / 60.0));
+  private:
+    /// \brief Internal method to create the render window the first time
+    /// RenderWidget::showEvent is called.
+    void CreateRenderWindow();
 
-  /// \brief Pointer to the renderWindow created by this class.
-  ignition::rendering::RenderWindowPtr renderWindow;
+    /// \brief ToDo.
+    void LoadRobotCb(const ignition::msgs::Model &_msg);
 
-  /// \brief Pointer to the camera created by this class.
-  ignition::rendering::CameraPtr camera;
+    /// \brief ToDo.
+    void DrawCb(const ignition::msgs::PosesStamped &_msg);
 
-  ignition::transport::Node node;
-  void load_robot_cb(const ignition::msgs::Model &_msg);
+    /// \brief ToDo.
+    ignition::rendering::VisualPtr RenderBox(ignition::msgs::Visual &_vis);
 
-  void draw_cb(const ignition::msgs::PosesStamped &_msg);
+    /// \brief ToDo.
+    ignition::rendering::VisualPtr RenderSphere(ignition::msgs::Visual &_vis);
 
-  ignition::rendering::ScenePtr scene;
+    /// \brief ToDo.
+    ignition::rendering::VisualPtr RenderCylinder(ignition::msgs::Visual &_vis);
 
-  ignition::rendering::VisualPtr renderBox(ignition::msgs::Visual &_vis);
+    /// \brief The frequency at which we'll do an update on the widget.
+    const int kUpdateTimeFrequency =
+      static_cast<int>(std::round(1000.0 / 60.0));
 
-  ignition::rendering::VisualPtr renderSphere(ignition::msgs::Visual &_vis);
+    /// \brief Pointer to timer to call update on a periodic basis.
+    QTimer *updateTimer = nullptr;
 
-  ignition::rendering::VisualPtr renderCylinder(ignition::msgs::Visual &_vis);
+    /// \brief Pointer to the renderWindow created by this class.
+    ignition::rendering::RenderWindowPtr renderWindow;
 
-  bool initialized_scene;
+    /// \brief Pointer to the camera created by this class.
+    ignition::rendering::CameraPtr camera;
 
-  // FIXME(clalancette): this multimap is a little unwieldy, and not that
-  // performant.  We should probably replace it with something smarter.
-  std::multimap<uint32_t, std::pair<std::string, ignition::rendering::VisualPtr>> robotToLink;
+    /// \brief A transport node.
+    ignition::transport::Node node;
+
+    /// \brief ToDo.
+    ignition::rendering::ScenePtr scene;
+
+    /// \brief ToDo.
+    bool initializedScene;
+
+    // FIXME(clalancette): this multimap is a little unwieldy, and not that
+    // performant. We should probably replace it with something smarter.
+    std::multimap<uint32_t,
+      std::pair<std::string, ignition::rendering::VisualPtr>> robotToLink;
 };
 
 }

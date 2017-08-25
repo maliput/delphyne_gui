@@ -29,10 +29,12 @@
 #ifndef DELPHYNE_BRIDGE_IGNTOPICREPEATER_HH_
 #define DELPHYNE_BRIDGE_IGNTOPICREPEATER_HH_
 
-#include <string>
+#include <ignition/common/Console.hh>
 #include <ignition/msgs.hh>
 #include <ignition/transport.hh>
 #include <lcm/lcm-cpp.hpp>
+#include <memory>
+#include <string>
 
 #include "drake/lcmt_viewer_geometry_data.hpp"
 #include "drake/lcmt_viewer_load_robot.hpp"
@@ -53,8 +55,8 @@ namespace bridge {
 template <class IGN_TYPE, class LCM_TYPE>
 class IgnTopicRepeater {
  public:
-  IgnTopicRepeater(std::shared_ptr<lcm::LCM> lcm, const std::string& topic_name)
-      : lcm_(lcm), topic_name_(topic_name) {}
+  IgnTopicRepeater(std::shared_ptr<lcm::LCM> lcm, const std::string& topicName)
+      : lcm_(lcm), topicName_(topicName) {}
 
   /// \brief Subscribe to the ignition topic and echo every message
   /// into the LCM channel as new messages arrive.
@@ -63,7 +65,7 @@ class IgnTopicRepeater {
       throw std::runtime_error("LCM is not ready");
     }
 
-    std::string topic = "/" + topic_name_;
+    std::string topic = "/" + topicName_;
 
     if (!node_.Subscribe(topic,
                          &IgnTopicRepeater<IGN_TYPE, LCM_TYPE>::handleMessage,
@@ -79,7 +81,7 @@ class IgnTopicRepeater {
 
   /// \internal
   /// \brief The topic this repeater subscribes to
-  const std::string topic_name_;
+  const std::string topicName_;
 
   /// \internal
   /// \brief The ignition node used to create the subscription
@@ -87,17 +89,16 @@ class IgnTopicRepeater {
 
   /// \brief Callback to be triggered when a new message arrives to the
   /// ignition topic channel.
-  /// \param[in] ign_msg The ignition message that arrived to the topic
-
-  void handleMessage(const IGN_TYPE& ign_msg) {
-    LCM_TYPE lcm_msg;
+  /// \param[in] ignMsg The ignition message that arrived to the topic
+  void handleMessage(const IGN_TYPE& ignMsg) {
+    LCM_TYPE lcmMsg;
     try {
-      ignToLcm(ign_msg, &lcm_msg);
-      lcm_->publish(topic_name_, &lcm_msg);
+      ignToLcm(ignMsg, &lcmMsg);
+      lcm_->publish(topicName_, &lcmMsg);
     } catch (const delphyne::bridge::TranslateException& e) {
       ignerr
           << "An error occurred while trying to translate a message in channel "
-          << topic_name_ << ": " << std::endl;
+          << topicName_ << ": " << std::endl;
       ignerr << e.what() << std::endl;
     }
   }

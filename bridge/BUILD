@@ -33,7 +33,6 @@ cc_library(
     name = "ign-to-lcm-translation",
     srcs = [
         "ign_to_lcm_translation.cc",
-        "translate_exception.hh",
     ],
     hdrs = ["ign_to_lcm_translation.hh",
     ],
@@ -143,6 +142,7 @@ drake_cc_googletest(
         "@lcm",
         "//bridge:ign-to-lcm-translation",
         "//bridge:drake-lcmt-headers",
+        "//bridge:ignition-custom-messages",
     ],
 )
 

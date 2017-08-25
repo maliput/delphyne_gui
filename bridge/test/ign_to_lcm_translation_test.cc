@@ -1,7 +1,10 @@
-#include "bridge/ign_to_lcm_translation.hh"
 #include <iostream>
 #include <gtest/gtest.h>
 #include <ignition/msgs.hh>
+
+#include "bridge/ign_to_lcm_translation.hh"
+#include "bridge/protobuf/headers/automotive_driving_command.pb.h"
+#include "bridge/drake/lcmt_driving_command_t.hpp"
 
 namespace delphyne {
 namespace bridge {
@@ -11,22 +14,22 @@ namespace bridge {
 /// message is properly translated to its LCM counterpart
 GTEST_TEST(ignToLcm, TestAutomotiveDrivingCommandTranslation) {
   // Define the ignition command
-  ignition::msgs::AutomotiveDrivingCommand ign_driving_msg;
+  ignition::msgs::AutomotiveDrivingCommand ignDrivingMsg;
   // Define LCM expected message
-  drake::lcmt_driving_command_t lcm_driving_msg;
+  drake::lcmt_driving_command_t lcmDrivingMsg;
   // Fill LCM data
-  ign_driving_msg.mutable_time()->set_sec(123);
-  ign_driving_msg.mutable_time()->set_nsec(987222111);
-  ign_driving_msg.set_theta(0.12);
-  ign_driving_msg.set_acceleration(15.7);
+  ignDrivingMsg.mutable_time()->set_sec(123);
+  ignDrivingMsg.mutable_time()->set_nsec(987222111);
+  ignDrivingMsg.set_theta(0.12);
+  ignDrivingMsg.set_acceleration(15.7);
 
   // Translate from ignition to LCM
-  ignToLcm(ign_driving_msg, &lcm_driving_msg);
+  ignToLcm(ignDrivingMsg, &lcmDrivingMsg);
 
   // Verify generated LCM message
-  ASSERT_EQ(lcm_driving_msg.timestamp, 123987);
-  ASSERT_EQ(lcm_driving_msg.steering_angle, 0.12);
-  ASSERT_EQ(lcm_driving_msg.acceleration, 15.7);
+  EXPECT_EQ(123987, lcmDrivingMsg.timestamp);
+  EXPECT_EQ(0.12, lcmDrivingMsg.steering_angle);
+  EXPECT_EQ(15.7, lcmDrivingMsg.acceleration);
 }
 
 //////////////////////////////////////////////////
@@ -34,16 +37,16 @@ GTEST_TEST(ignToLcm, TestAutomotiveDrivingCommandTranslation) {
 /// message is properly translated to its LCM counterpart
 GTEST_TEST(ignToLcm, TestAutomotiveDrivingCommandTranslationDefaultValues) {
   // Define the ignition command
-  ignition::msgs::AutomotiveDrivingCommand ign_driving_msg;
+  ignition::msgs::AutomotiveDrivingCommand ignDrivingMsg;
   // Define LCM expected message
-  drake::lcmt_driving_command_t lcm_driving_msg;
+  drake::lcmt_driving_command_t lcmDrivingMsg;
 
   // Translate from ignition to LCM
-  ignToLcm(ign_driving_msg, &lcm_driving_msg);
+  ignToLcm(ignDrivingMsg, &lcmDrivingMsg);
 
   // Verify generated LCM message
-  ASSERT_EQ(lcm_driving_msg.steering_angle, 0);
-  ASSERT_EQ(lcm_driving_msg.acceleration, 0);
+  EXPECT_EQ(lcmDrivingMsg.steering_angle, 0);
+  EXPECT_EQ(lcmDrivingMsg.acceleration, 0);
 }
 
 }  // namespace bridge

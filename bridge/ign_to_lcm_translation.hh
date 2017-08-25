@@ -29,20 +29,26 @@
 #ifndef DELPHYNE_BRIDGE_IGNTOLCMTRANSLATION_HH_
 #define DELPHYNE_BRIDGE_IGNTOLCMTRANSLATION_HH_
 
-#include "drake/lcmt_driving_command_t.hpp"
-#include "protobuf/headers/automotive_driving_command.pb.h"
-#include "translate_exception.hh"
+namespace ignition {
+namespace msgs {
+  class AutomotiveDrivingCommand;
+}
+}
+
+namespace drake {
+  class lcmt_driving_command_t;
+}
 
 namespace delphyne {
 namespace bridge {
 
 /// \brief Translate a driving command from LCM to ignition
-/// \param[in]  ign_driving_command An ignition message containing the driving
+/// \param[in]  ignDrivingCommand An ignition message containing the driving
 /// command
-/// \param[out] lcm_driving_command The resulting LCM command
+/// \param[out] lcmDrivingCommand The resulting LCM command
 void ignToLcm(
-    const ignition::msgs::AutomotiveDrivingCommand& ign_driving_command,
-    drake::lcmt_driving_command_t* lcm_driving_command);
+    const ignition::msgs::AutomotiveDrivingCommand& ignDrivingCommand,
+    drake::lcmt_driving_command_t* lcmDrivingCommand);
 
 }  // namespace bridge
 }  // namespace delphyne

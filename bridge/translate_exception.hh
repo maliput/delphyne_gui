@@ -35,8 +35,12 @@
 namespace delphyne {
 namespace bridge {
 
+// \brief TranslateException is used to signal an error when
+// performing a translation between ignition and LCM messages
 class TranslateException : public std::runtime_error {
  public:
+  /// \brief Creates a new exception
+  /// \param[in]  message The message explaining the error
   TranslateException(std::string message) : std::runtime_error(message) {}
 };
 

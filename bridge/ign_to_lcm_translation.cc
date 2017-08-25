@@ -26,30 +26,30 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include "ign_to_lcm_translation.hh"
 #include <chrono>
 #include <cstdint>
+
 #include "drake/lcmt_driving_command_t.hpp"
+#include "ign_to_lcm_translation.hh"
 #include "protobuf/headers/automotive_driving_command.pb.h"
-#include "translate_exception.hh"
 
 namespace delphyne {
 namespace bridge {
 
 void ignToLcm(
-    const ignition::msgs::AutomotiveDrivingCommand& ign_driving_command,
-    drake::lcmt_driving_command_t* lcm_driving_command) {
-  if (ign_driving_command.has_time()) {
-    lcm_driving_command->timestamp =
-        ign_driving_command.time().sec() * 1000 +
-        ign_driving_command.time().nsec() / 1000000;
+    const ignition::msgs::AutomotiveDrivingCommand& ignDrivingCommand,
+    drake::lcmt_driving_command_t* lcmDrivingCommand) {
+  if (ignDrivingCommand.has_time()) {
+    lcmDrivingCommand->timestamp =
+        ignDrivingCommand.time().sec() * 1000 +
+        ignDrivingCommand.time().nsec() / 1000000;
   } else {
     int64_t milliseconds = std::chrono::system_clock::now().time_since_epoch() /
                            std::chrono::milliseconds(1);
-    lcm_driving_command->timestamp = milliseconds;
+    lcmDrivingCommand->timestamp = milliseconds;
   }
-  lcm_driving_command->steering_angle = ign_driving_command.theta();
-  lcm_driving_command->acceleration = ign_driving_command.acceleration();
+  lcmDrivingCommand->steering_angle = ignDrivingCommand.theta();
+  lcmDrivingCommand->acceleration = ignDrivingCommand.acceleration();
 }
 
 }  // namespace bridge

@@ -123,6 +123,9 @@ class RenderWidget: public ignition::gui::Plugin
     /// \brief ToDo.
     ignition::rendering::VisualPtr RenderCylinder(ignition::msgs::Visual &_vis);
 
+    /// \brief ToDo.
+    ignition::rendering::VisualPtr RenderMesh(ignition::msgs::Visual &_vis);
+
     /// \brief The frequency at which we'll do an update on the widget.
     const int kUpdateTimeFrequency =
       static_cast<int>(std::round(1000.0 / 60.0));

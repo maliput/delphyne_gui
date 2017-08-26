@@ -32,12 +32,16 @@
 #include <utility>
 
 #include <ignition/common/Console.hh>
+#include <ignition/common/MeshManager.hh>
 #include <ignition/common/PluginMacros.hh>
 #include <ignition/gui/Iface.hh>
 #include <ignition/gui/Plugin.hh>
 #include <ignition/msgs.hh>
 #include <ignition/rendering/Camera.hh>
+#include <ignition/rendering/Light.hh>
+#include <ignition/rendering/MeshDescriptor.hh>
 #include <ignition/rendering/RenderEngine.hh>
+#include <ignition/rendering/RenderEngineManager.hh>
 #include <ignition/rendering/RenderTarget.hh>
 #include <ignition/rendering/RenderTypes.hh>
 #include <ignition/rendering/RenderingIface.hh>
@@ -259,6 +263,45 @@ ignition::rendering::VisualPtr RenderWidget::RenderCylinder(
 }
 
 /////////////////////////////////////////////////
+ignition::rendering::VisualPtr RenderWidget::RenderMesh(
+  ignition::msgs::Visual &_vis)
+{
+  ignmsg << "Has a mesh!" << std::endl;
+
+  ignition::rendering::VisualPtr root = this->scene->RootVisual();
+
+  // create directional light
+  ignition::rendering::DirectionalLightPtr light0 =
+    this->scene->CreateDirectionalLight();
+  light0->SetDirection(0.5, 0.5, -1);
+  light0->SetDiffuseColor(0.8, 0.8, 0.8);
+  light0->SetSpecularColor(0.5, 0.5, 0.5);
+  root->AddChild(light0);
+
+  ignition::rendering::VisualPtr mesh = this->scene->CreateVisual();
+  if (!mesh) {
+    ignerr << "Failed to create visual" << std::endl;
+    return nullptr;
+  }
+
+  std::cout << "Mesh: " << _vis.geometry().mesh().filename() << std::endl;
+
+  ignition::rendering::MeshDescriptor descriptor;
+  descriptor.meshName = ignition::common::joinPaths("/tmp", "duck.dae");
+  ignition::common::MeshManager *meshManager =
+    ignition::common::MeshManager::Instance();
+  descriptor.mesh = meshManager->Load(descriptor.meshName);
+  ignition::rendering::MeshPtr meshGeom = this->scene->CreateMesh(descriptor);
+  mesh->AddGeometry(meshGeom);
+  //  setLocalPositionFromPose(mesh, _vis);
+  mesh->SetLocalPosition(3, 0, 0);
+  mesh->SetLocalRotation(1.5708, 0, 2.0);
+  root->AddChild(mesh);
+
+  return mesh;
+}
+
+/////////////////////////////////////////////////
 void RenderWidget::SetInitialModel(const ignition::msgs::Model &_msg)
 {
   if (this->initializedScene) {
@@ -317,6 +360,9 @@ void RenderWidget::SetInitialModel(const ignition::msgs::Model &_msg)
     }
     else if (vis.geometry().has_cylinder()) {
       ignvis = this->RenderCylinder(vis);
+    }
+    else if (vis.geometry().has_mesh()) {
+      ignvis = this->RenderMesh(vis);
     }
     else {
       ignerr << "Invalid shape for " << link.name() << ", skipping"
@@ -378,8 +424,9 @@ void RenderWidget::UpdateScene(const ignition::msgs::PosesStamped &_msg)
 void RenderWidget::CreateRenderWindow()
 {
   std::string engineName = "ogre";
-  ignition::rendering::RenderEngine* engine =
-      ignition::rendering::get_engine(engineName);
+  ignition::rendering::RenderEngineManager* manager =
+    ignition::rendering::RenderEngineManager::Instance();
+  ignition::rendering::RenderEngine* engine = manager->Engine(engineName);
   if (!engine) {
     ignerr << "Engine '" << engineName << "' is not supported" << std::endl;
     return;

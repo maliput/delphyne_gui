@@ -49,8 +49,86 @@
 // LCM entry point
 #include "lcm/lcm-cpp.hpp"
 
+// Register custom msg
+// The name has to include "ign_msgs" at the beginning
+IGN_REGISTER_STATIC_MSG("ign_msgs.AutomotiveDrivingCommand", AutomotiveDrivingCommand)
+
 /// \brief Flag used to break the LCM loop and terminate the program.
 static std::atomic<bool> terminatePub(false);
+
+//////////////////////////////////////////////////
+/// \brief Repeat an Ignition service call into an LCM channel
+void srvCustomMsgTopic(const ignition::msgs::StringMsg_V &_req,
+  ignition::msgs::StringMsg_V &_rep, bool &_result)
+{
+  std::string msgType = _req.data(0);
+  std::string msgData = _req.data(1);
+
+  //auto msg = ignition::msgs::Factory::New("ign_msgs.AutomotiveDrivingCommand", "acceleration: 2.0 theta: 3.14");
+  auto msg = ignition::msgs::Factory::New(msgType, msgData);
+  std::cout << msg->GetDescriptor()->name() << std::endl;
+  std::cout << msg->DebugString() << std::endl;
+  //msg->set_acceleration(2.0);
+
+  //auto msg = ignition::msgs::Factory::New(msgType, msgData);
+  //std::cout << msg->GetDescriptor()->name() << std::endl;
+  //std::cout << msg->DebugString() << std::endl;
+
+  // The response succeed.
+  _result = true;
+}
+
+//////////////////////////////////////////////////
+/// \brief Repeat an Ignition service call into an LCM channel
+void srvRepeatIgnitionTopic(const ignition::msgs::StringMsg_V &_req,
+  ignition::msgs::StringMsg_V &_rep, bool &_result)
+{
+  // list of available ignition messages types
+  std::vector<std::string> types;
+  ignition::msgs::Factory::Types(types);
+
+  // Example of compile-time defined message type
+
+  //auto msg = ignition::msgs::Factory::New<ignition::msgs::StringMsg>("ign_msgs.StringMsg");
+  // we won't be able to use set_data if we don't define the message type inside the <>
+  //msg->set_data("hola!!");
+  //std::cout << msg->data() << std::endl;
+
+  std::string msgType = _req.data(0);
+  std::string msgData = _req.data(1);
+  if (std::find(types.begin(), types.end(), msgType) != types.end()) {
+    auto msg2 = ignition::msgs::Factory::New(msgType, msgData);
+    std::cout << msg2->GetDescriptor()->name() << std::endl;
+    std::cout << msg2->DebugString() << std::endl;
+  }
+  else {
+    ignerr << "The type "
+           << msgType
+           << "is not a valid ignition msgs data type"
+           << std::endl;
+  }
+
+
+  //for(int i=0; i< _req.data_size(); i++) {
+  //  std::cout << _req.data(i) << std::endl;
+  //  _rep.add_data(_req.data(i));
+  //}
+
+  // The response succeed.
+  _result = true;
+}
+
+//////////////////////////////////////////////////
+/// \brief Hello world
+void srvHelloWorld(const ignition::msgs::StringMsg &_req,
+  ignition::msgs::StringMsg &_rep, bool &_result)
+{
+  // Set the response's content.
+  _rep.set_data("Hello world!");
+
+  // The response succeed.
+  _result = true;
+}
 
 //////////////////////////////////////////////////
 /// \brief Function callback executed when a SIGINT or SIGTERM signals are
@@ -133,6 +211,38 @@ int main(int argc, char* argv[]) {
                                              drake::lcmt_viewer_command>
       ignToLcmRepublisher(lcm, notifierServiceName, channelName);
   ignToLcmRepublisher.Start();
+
+  // Create a transport node.
+  ignition::transport::Node node;
+  std::string service = "/repeat_ignition_topic";
+  std::string customMsgService = "/custom_msg";
+  std::string helloWorldService = "/hello_world";
+
+  // Advertise a service call.
+  if (!node.Advertise(helloWorldService, srvHelloWorld))
+  {
+    std::cerr << "Error advertising service [" << helloWorldService << "]" << std::endl;
+    return 1;
+  }
+
+  // Advertise another service call.
+  if (!node.Advertise(service, srvRepeatIgnitionTopic))
+  {
+    std::cerr << "Error advertising service [" << service << "]" << std::endl;
+    return 1;
+  }
+
+  // Advertise another service call.
+  if (!node.Advertise(customMsgService, srvCustomMsgTopic))
+  {
+    std::cerr << "Error advertising service [" << customMsgService << "]" << std::endl;
+    return 1;
+  }
+
+  //ignition::msgs::AutomotiveDrivingCommand drivingCommand;
+  //drivingCommand.set_acceleration(1.54);
+  //drivingCommand.set_theta(3.14);
+  //std::cout << drivingCommand.DebugString() << std::endl;
 
   while (!terminatePub) {
     lcm->handleTimeout(100);

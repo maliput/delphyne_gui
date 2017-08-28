@@ -49,6 +49,10 @@
 // LCM entry point
 #include "lcm/lcm-cpp.hpp"
 
+#include "bridge/ign_to_lcm_translation.hh"
+#include "bridge/protobuf/headers/automotive_driving_command.pb.h"
+#include "bridge/drake/lcmt_driving_command_t.hpp"
+
 // Register custom msg
 // The name has to include "ign_msgs" at the beginning
 IGN_REGISTER_STATIC_MSG("ign_msgs.AutomotiveDrivingCommand", AutomotiveDrivingCommand)
@@ -61,13 +65,28 @@ static std::atomic<bool> terminatePub(false);
 void srvCustomMsgTopic(const ignition::msgs::StringMsg_V &_req,
   ignition::msgs::StringMsg_V &_rep, bool &_result)
 {
-  std::string msgType = _req.data(0);
-  std::string msgData = _req.data(1);
+  //std::string msgType = _req.data(0);
+  //std::string msgData = _req.data(1);
+  std::string msgType = "ign_msgs.AutomotiveDrivingCommand";
+  std::string msgData = "acceleration: 2.0 theta: 3.14";
 
-  //auto msg = ignition::msgs::Factory::New("ign_msgs.AutomotiveDrivingCommand", "acceleration: 2.0 theta: 3.14");
   auto msg = ignition::msgs::Factory::New(msgType, msgData);
-  std::cout << msg->GetDescriptor()->name() << std::endl;
-  std::cout << msg->DebugString() << std::endl;
+  if (msgType == "ign_msgs.AutomotiveDrivingCommand") {
+    drake::lcmt_driving_command_t lcmDrivingMsg;
+    ignition::msgs::AutomotiveDrivingCommand ignDrivingMsg;
+    ignDrivingMsg.CopyFrom(*msg);
+    delphyne::bridge::ignToLcm(ignDrivingMsg, &lcmDrivingMsg);
+    std::cout << lcmDrivingMsg.acceleration << std::endl;
+  }
+
+  // Translate from ignition to LCM
+  //delphyne::bridge::ignToLcm(msg, &lcmDrivingMsg);
+
+  //std::cout << lcmDrivingMsg.acceleration << std::endl;
+
+  //auto msg = ignition::msgs::Factory::New(msgType, msgData);
+  //std::cout << msg->GetDescriptor()->name() << std::endl;
+  //std::cout << msg->DebugString() << std::endl;
   //msg->set_acceleration(2.0);
 
   //auto msg = ignition::msgs::Factory::New(msgType, msgData);

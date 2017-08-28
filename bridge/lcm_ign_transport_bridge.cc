@@ -28,10 +28,20 @@
 
 #include <ignition/common/Console.hh>
 
+// Drake LCM message headers
+#include "drake/lcmt_driving_command_t.hpp"
+#include "drake/lcmt_viewer_draw.hpp"
 #include "drake/lcmt_viewer_geometry_data.hpp"
 #include "drake/lcmt_viewer_load_robot.hpp"
+
+// Custom ignition message headers
+#include "protobuf/headers/automotive_driving_command.pb.h"
+
+// Repeater classes
+#include "ign_topic_repeater.hh"
 #include "lcm_channel_repeater.hh"
 
+// LCM entry point
 #include "lcm/lcm-cpp.hpp"
 
 // Runs a program that listens for new messages in a set
@@ -59,7 +69,7 @@ int main(int argc, char* argv[]) {
   try {
     viewerLoadRobotRepeater.Start();
   } catch (const std::runtime_error& error) {
-    ignerr << "Failed to start LCM channel repeater for initialize "
+    ignerr << "Failed to start LCM channel repeater for "
            << "DRAKE_VIEWER_LOAD_ROBOT" << std::endl;
     ignerr << "Details: " << error.what() << std::endl;
     exit(1);
@@ -68,8 +78,25 @@ int main(int argc, char* argv[]) {
   try {
     viewerDrawRepeater.Start();
   } catch (const std::runtime_error& error) {
-    ignerr << "Failed to start LCM channel repeater for initialize "
+    ignerr << "Failed to start LCM channel repeater for "
            << "DRAKE_VIEWER_DRAW" << std::endl;
+    ignerr << "Details: " << error.what() << std::endl;
+    exit(1);
+  }
+
+  // Create a repeater on ignition DRIVING_COMMAND_0 topic, translating
+  // from ignition::msgs::AutomotiveDrivingCommand to
+  // drake::lcmt_driving_command_t
+  delphyne::bridge::IgnTopicRepeater<ignition::msgs::AutomotiveDrivingCommand,
+                                     drake::lcmt_driving_command_t>
+      drivingCommandRepeater(lcm, "DRIVING_COMMAND_0");
+
+  // Start DRIVING_COMMAND_0 repeater
+  try {
+    drivingCommandRepeater.Start();
+  } catch (const std::runtime_error& error) {
+    ignerr << "Failed to start ignition channel repeater for "
+           << "DRIVING_COMMAND_0" << std::endl;
     ignerr << "Details: " << error.what() << std::endl;
     exit(1);
   }
@@ -80,4 +107,3 @@ int main(int argc, char* argv[]) {
 
   return 0;
 }
-

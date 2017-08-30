@@ -26,31 +26,49 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <algorithm>
+#include <atomic>
 #include <chrono>
+#include <cmath>
+#include <csignal>
 #include <iostream>
 #include <string>
 #include <thread>
 #include <vector>
 
 #include <ignition/common/Console.hh>
+#include <ignition/math/Helpers.hh>
 
 #include <lcm/lcm-cpp.hpp>
+#include "drake/lcmt_viewer_draw.hpp"
 #include "drake/lcmt_viewer_geometry_data.hpp"
 #include "drake/lcmt_viewer_link_data.hpp"
 #include "drake/lcmt_viewer_load_robot.hpp"
-#include "drake/lcmt_viewer_draw.hpp"
 
-// Publishes a defined lcmt_viewer_load_robot message into
-// the DRAKE_VIEWER_LOAD_ROBOT channel.
+/// \brief Flag used to break the publisher loop and terminate the program.
+static std::atomic<bool> terminatePub(false);
+
+//////////////////////////////////////////////////
+/// \brief Function callback executed when a SIGINT or SIGTERM signals are
+/// captured. This is used to break the infinite loop that publishes messages
+/// and exit the program smoothly.
+void signalHandler(int signal) {
+  if (signal == SIGINT || signal == SIGTERM) terminatePub = true;
+}
+
+//////////////////////////////////////////////////
+// \brief Publishes a defined lcmt_viewer_load_robot
+// message into the DRAKE_VIEWER_LOAD_ROBOT channel.
 // It consists on:
 // - A box
 // - A cylinder
 // - A sphere
 // - A mesh loaded from a URL path
 // - A mesh loaded from a "package" styled path
-
 int main(int argc, char* argv[]) {
+  // Install a signal handler for SIGINT and SIGTERM.
+  std::signal(SIGINT, signalHandler);
+  std::signal(SIGTERM, signalHandler);
+
   ignition::common::Console::SetVerbosity(3);
   ignmsg << "Starting up mock publisher" << std::endl;
 
@@ -100,9 +118,9 @@ int main(int argc, char* argv[]) {
   sphereMsg.num_float_data = 1;
   sphereMsg.float_data.resize(sphereMsg.num_float_data);
   sphereMsg.float_data[0] = 1;
-  sphereMsg.position[0] = 1;
+  sphereMsg.position[0] = 3;
   sphereMsg.position[1] = 3;
-  sphereMsg.position[2] = 2.5;
+  sphereMsg.position[2] = 0.5;
   std::copy(quaternion.begin(), quaternion.end(), sphereMsg.quaternion);
   std::copy(color.begin(), color.end(), sphereMsg.color);
 
@@ -125,9 +143,9 @@ int main(int argc, char* argv[]) {
   cylinderMsg.float_data.resize(cylinderMsg.num_float_data);
   cylinderMsg.float_data[0] = 1;
   cylinderMsg.float_data[1] = 4;
-  cylinderMsg.position[0] = 1.1;
-  cylinderMsg.position[1] = 1.2;
-  cylinderMsg.position[2] = 1.3;
+  cylinderMsg.position[0] = -3;
+  cylinderMsg.position[1] = -3;
+  cylinderMsg.position[2] = 2;
   std::copy(quaternion.begin(), quaternion.end(), cylinderMsg.quaternion);
   std::copy(color.begin(), color.end(), cylinderMsg.color);
 
@@ -149,11 +167,14 @@ int main(int argc, char* argv[]) {
   meshURLMsg.string_data =
       "drake/automotive/models/prius/prius.dae";  // Relative to drake's package
                                                   // path or absolute.
-  meshURLMsg.num_float_data = 0;
+  meshURLMsg.num_float_data = 3;
   meshURLMsg.float_data.resize(meshURLMsg.num_float_data);
-  meshURLMsg.position[0] = 0;
-  meshURLMsg.position[1] = 0;
-  meshURLMsg.position[2] = 3;
+  meshURLMsg.float_data[0] = 1.0;  // scale
+  meshURLMsg.float_data[1] = 1.0;
+  meshURLMsg.float_data[2] = 0.5;
+  meshURLMsg.position[0] = 6;
+  meshURLMsg.position[1] = 3;
+  meshURLMsg.position[2] = 0;
   std::copy(quaternion.begin(), quaternion.end(), meshURLMsg.quaternion);
   std::copy(color.begin(), color.end(), meshURLMsg.color);
 
@@ -174,12 +195,12 @@ int main(int argc, char* argv[]) {
   meshPackageMsg.string_data = "package://drake/car/car.vtp";
   meshPackageMsg.num_float_data = 3;
   meshPackageMsg.float_data.resize(meshPackageMsg.num_float_data);
-  meshPackageMsg.float_data[0] = 1.0;  // float_data needs to be populated
+  meshPackageMsg.float_data[0] = 1.0;  // scale
   meshPackageMsg.float_data[1] = 1.0;
   meshPackageMsg.float_data[2] = 0.5;
-  meshPackageMsg.position[0] = 0.5;
-  meshPackageMsg.position[1] = 0.5;
-  meshPackageMsg.position[2] = 0.5;
+  meshPackageMsg.position[0] = -6;
+  meshPackageMsg.position[1] = 3;
+  meshPackageMsg.position[2] = 0;
   std::copy(quaternion.begin(), quaternion.end(), meshPackageMsg.quaternion);
   std::copy(color.begin(), color.end(), meshPackageMsg.color);
 
@@ -201,6 +222,7 @@ int main(int argc, char* argv[]) {
   robotMsg.link[3] = meshURLLinkMsg;
   robotMsg.link[4] = meshPackageLinkMsg;
 
+  // Define draw message
   drake::lcmt_viewer_draw drawMsg;
   drawMsg.timestamp = 0;
   drawMsg.num_links = 1;
@@ -220,22 +242,40 @@ int main(int argc, char* argv[]) {
   drawMsg.quaternion[0][2] = 0.0;
   drawMsg.quaternion[0][3] = 1.0;
 
-  // Publish a robot message into the lcm_channel every 1 second
-  std::string lcm_load_channel = "DRAKE_VIEWER_LOAD_ROBOT";
-  std::string lcm_draw_channel = "DRAKE_VIEWER_DRAW";
-  while (1) {
-    ignmsg << "Publishing message into " << lcm_load_channel << std::endl;
-    if (lcm.publish(lcm_load_channel, &robotMsg) == -1) {
-      ignerr << "Failed to publish message into " << lcm_load_channel << std::endl;
+  // Circumference definition
+  float radius = 3.0;
+  std::vector<float> center = {0.0, 0.0, 4.0};
+  // Initialize timestep and counter
+  int timeStepMs = 10;
+  int i = 0;
+  // Update sphere position every 10ms
+  while (!terminatePub) {
+    // Load robot model into drake
+    std::string lcmChannel = "DRAKE_VIEWER_LOAD_ROBOT";
+    igndbg << "Publishing message into " << lcmChannel << std::endl;
+    if (lcm.publish(lcmChannel, &robotMsg) == -1) {
+      ignerr << "Failed to publish message into " << lcmChannel << std::endl;
       return 1;
     }
-    ignmsg << "Publishing message into " << lcm_draw_channel << std::endl;
-    if (lcm.publish(lcm_draw_channel, &drawMsg) == -1) {
-      ignerr << "Failed to publish message into " << lcm_draw_channel << std::endl;
+
+    // Update timestamp
+    drawMsg.timestamp = drawMsg.timestamp + timeStepMs;
+    // Update each position by moving 1 degree along the previously defined
+    // circumference
+    drawMsg.position[0][0] =
+        center[0] + radius * std::sin(i * 2 * IGN_PI / 360);
+    drawMsg.position[0][2] =
+        center[2] + radius * std::cos(i * 2 * IGN_PI / 360);
+    // Publish message with updated position
+    igndbg << "Publishing message into DRAKE_VIEWER_DRAW" << std::endl;
+    if (lcm.publish("DRAKE_VIEWER_DRAW", &drawMsg) == -1) {
+      ignerr << "Failed to publish message into DRAKE_VIEWER_DRAW" << std::endl;
       return 1;
     }
-    drawMsg.position[0][0] += 0.2;
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    // Wait 10ms
+    std::this_thread::sleep_for(std::chrono::milliseconds(timeStepMs));
+    // Increment i value and keep it bounded between 0 and 359
+    i = (i + 1) % 360;
   }
   return 0;
 }

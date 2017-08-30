@@ -44,10 +44,22 @@ To run the bridge, run:
 $ bazel run //bridge:lcm-to-ign-trans-bridge
 ```
 
+Set the DELPHYNE_MEDIA_PATH environment variable to the path containing the
+`media` directory. E.g.:
+```
+$ export DELPHYNE_MEDIA_PATH=/home/caguero/workspace/delphyne/media
+```
+
 To run the visualizer, run:
 
 ```
 $ bazel run //visualizer:visualizer
+```
+
+To run the visualizer & bridge bundle, run:
+
+```
+$ bazel run //bridge:mocked-robot-demo
 ```
 
 # Instructions for the clang-format tool

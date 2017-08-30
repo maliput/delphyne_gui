@@ -32,14 +32,13 @@
 #include <cmath>
 #include <map>
 #include <string>
-#include <utility>
 
 #include <ignition/gui/Plugin.hh>
 #include <ignition/rendering/RenderTypes.hh>
 #include <ignition/rendering/RenderingIface.hh>
 #include <ignition/transport.hh>
 
-// Forward declarations;
+// Forward declarations.
 namespace ignition {
   namespace msgs {
     class Model;
@@ -83,19 +82,19 @@ class RenderWidget: public ignition::gui::Plugin
 
   protected:
     /// \brief Overridden method to receive Qt paint event.
-    /// \param[in] _e  The event that happened.
+    /// \param[in] _e The event that happened.
     virtual void paintEvent(QPaintEvent *_e);
 
     /// \brief Overridden method to receive Qt show event.
-    /// \param[in] _e  The event that happened.
+    /// \param[in] _e The event that happened.
     virtual void showEvent(QShowEvent *_e);
 
     /// \brief Overridden method to receive Qt resize event.
-    /// \param[in] _e  The event that happened.
+    /// \param[in] _e The event that happened.
     virtual void resizeEvent(QResizeEvent *_e);
 
     /// \brief Overridden method to receive Qt move event.
-    /// \param[in] _e  The event that happened.
+    /// \param[in] _e The event that happened.
     virtual void moveEvent(QMoveEvent *_e);
 
     /// \brief Override paintEngine to stop Qt From trying to draw on top of
@@ -108,23 +107,37 @@ class RenderWidget: public ignition::gui::Plugin
     /// RenderWidget::showEvent is called.
     void CreateRenderWindow();
 
-    /// \brief ToDo.
-    void LoadRobotCb(const ignition::msgs::Model &_msg);
+    /// \brief Load a new model.
+    /// \param[in] _msg The message containing the model.
+    void OnInitialModel(const ignition::msgs::Model &_msg);
 
-    /// \brief ToDo.
-    void DrawCb(const ignition::msgs::PosesStamped &_msg);
+    /// \brief Update an existing visual.
+    /// \param[in] _msg The pose of the new visual.
+    void OnUpdateScene(const ignition::msgs::PosesStamped &_msg);
 
-    /// \brief ToDo.
-    ignition::rendering::VisualPtr RenderBox(ignition::msgs::Visual &_vis);
+    /// \brief Render a new box.
+    /// \param[in] _vis the visual containing the properties of the object.
+    /// \return A pointer to the new visual.
+    ignition::rendering::VisualPtr RenderBox(
+      const ignition::msgs::Visual &_vis);
 
-    /// \brief ToDo.
-    ignition::rendering::VisualPtr RenderSphere(ignition::msgs::Visual &_vis);
+    /// \brief Render a new sphere.
+    /// \param[in] _vis the visual containing the properties of the object.
+    /// \return A pointer to the new visual.
+    ignition::rendering::VisualPtr RenderSphere(
+      const ignition::msgs::Visual &_vis);
 
-    /// \brief ToDo.
-    ignition::rendering::VisualPtr RenderCylinder(ignition::msgs::Visual &_vis);
+    /// \brief Render a new cylinder.
+    /// \param[in] _vis the visual containing the properties of the object.
+    /// \return A pointer to the new visual.
+    ignition::rendering::VisualPtr RenderCylinder(
+      const ignition::msgs::Visual &_vis);
 
-    /// \brief ToDo.
-    ignition::rendering::VisualPtr RenderMesh(ignition::msgs::Visual &_vis);
+    /// \brief Render a new mesh.
+    /// \param[in] _vis the visual containing the properties of the object.
+    /// \return A pointer to the new visual.
+    ignition::rendering::VisualPtr RenderMesh(
+      const ignition::msgs::Visual &_vis);
 
     /// \brief The frequency at which we'll do an update on the widget.
     const int kUpdateTimeFrequency =
@@ -142,16 +155,18 @@ class RenderWidget: public ignition::gui::Plugin
     /// \brief A transport node.
     ignition::transport::Node node;
 
-    /// \brief ToDo.
+    /// \brief The scene.
     ignition::rendering::ScenePtr scene;
 
-    /// \brief ToDo.
+    /// \brief Is the scene initialized?.
     bool initializedScene;
 
-    // FIXME(clalancette): this multimap is a little unwieldy, and not that
-    // performant. We should probably replace it with something smarter.
-    std::multimap<uint32_t,
-      std::pair<std::string, ignition::rendering::VisualPtr>> robotToLink;
+    /// \brief This the data structure that stores the pointers to all visuals.
+    /// The key is the link Id.
+    /// The value is another map, where the key is the link name, and the
+    /// value is the pointer to the visual.
+    std::map<uint32_t,
+      std::map<std::string, ignition::rendering::VisualPtr>> visuals;
 };
 
 }

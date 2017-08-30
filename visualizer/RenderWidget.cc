@@ -26,6 +26,7 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+#include <cstdlib>
 #include <functional>
 #include <map>
 #include <string>
@@ -56,8 +57,8 @@ using namespace delphyne;
 using namespace gui;
 
 /////////////////////////////////////////////////
-static void setLocalPositionFromPose(ignition::rendering::VisualPtr _shape,
-  ignition::msgs::Visual &_vis)
+static void setLocalPositionFromPose(const ignition::msgs::Visual &_vis,
+  ignition::rendering::VisualPtr _shape)
 {
   double x = 2.0;
   double y = 0.0;
@@ -93,19 +94,21 @@ RenderWidget::RenderWidget(QWidget *parent)
   this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
   // The below block means that every time the updateTime expires, we do an
-  // update on the widget.  Later on, we call the start() method to start this
+  // update on the widget. Later on, we call the start() method to start this
   // time at a fixed frequency.  Note that we do not start this timer until the
   // first time that showEvent() is called.
   this->updateTimer = new QTimer(this);
   QObject::connect(this->updateTimer, SIGNAL(timeout()), this, SLOT(update()));
   QObject::connect(this, SIGNAL(NewInitialModel(const ignition::msgs::Model &)),
     this, SLOT(SetInitialModel(const ignition::msgs::Model &)));
-  QObject::connect(this, SIGNAL(NewDraw(const ignition::msgs::PosesStamped &)),
-    this, SLOT(UpdateScene(const ignition::msgs::PosesStamped &)));
+  QObject::connect(this,
+    SIGNAL(NewDraw(const ignition::msgs::PosesStamped &)), this,
+    SLOT(UpdateScene(const ignition::msgs::PosesStamped &)));
 
-  this->node.Subscribe("/DRAKE_VIEWER_LOAD_ROBOT", &RenderWidget::LoadRobotCb,
-    this);
-  this->node.Subscribe("/DRAKE_VIEWER_DRAW", &RenderWidget::DrawCb, this);
+  this->node.Subscribe("/DRAKE_VIEWER_LOAD_ROBOT",
+    &RenderWidget::OnInitialModel, this);
+  this->node.Subscribe("/DRAKE_VIEWER_DRAW",
+    &RenderWidget::OnUpdateScene, this);
 
   this->setMinimumHeight(100);
 }
@@ -116,24 +119,21 @@ RenderWidget::~RenderWidget()
 }
 
 /////////////////////////////////////////////////
-void RenderWidget::LoadRobotCb(const ignition::msgs::Model &_msg)
+void RenderWidget::OnInitialModel(const ignition::msgs::Model &_msg)
 {
-  ignmsg << "Saw new model msg on subscription" << std::endl;
   emit this->NewInitialModel(_msg);
 }
 
 /////////////////////////////////////////////////
-void RenderWidget::DrawCb(const ignition::msgs::PosesStamped &_msg)
+void RenderWidget::OnUpdateScene(const ignition::msgs::PosesStamped &_msg)
 {
-  ignmsg << "Saw new draw msg on subscription" << std::endl;
   emit this->NewDraw(_msg);
 }
 
 /////////////////////////////////////////////////
 ignition::rendering::VisualPtr RenderWidget::RenderBox(
-  ignition::msgs::Visual &_vis)
+  const ignition::msgs::Visual &_vis)
 {
-  ignmsg << "Has a box!" << std::endl;
   ignition::rendering::VisualPtr root = this->scene->RootVisual();
 
   ignition::rendering::VisualPtr box = this->scene->CreateVisual();
@@ -165,7 +165,7 @@ ignition::rendering::VisualPtr RenderWidget::RenderBox(
   green->SetShininess(50);
   green->SetReflectivity(0);
   box->AddGeometry(scene->CreateBox());
-  setLocalPositionFromPose(box, _vis);
+  setLocalPositionFromPose(_vis, box);
   box->SetLocalScale(xScale, yScale, zScale);
   box->SetMaterial(green);
   root->AddChild(box);
@@ -175,9 +175,8 @@ ignition::rendering::VisualPtr RenderWidget::RenderBox(
 
 /////////////////////////////////////////////////
 ignition::rendering::VisualPtr RenderWidget::RenderSphere(
-  ignition::msgs::Visual &_vis)
+  const ignition::msgs::Visual &_vis)
 {
-  ignmsg << "Has a sphere!" << std::endl;
   ignition::rendering::VisualPtr root = this->scene->RootVisual();
 
   ignition::rendering::VisualPtr sphere = this->scene->CreateVisual();
@@ -208,7 +207,7 @@ ignition::rendering::VisualPtr RenderWidget::RenderSphere(
   red->SetShininess(50);
   red->SetReflectivity(0);
   sphere->AddGeometry(scene->CreateSphere());
-  setLocalPositionFromPose(sphere, _vis);
+  setLocalPositionFromPose(_vis, sphere);
   sphere->SetLocalScale(xScale, yScale, zScale);
   sphere->SetMaterial(red);
   root->AddChild(sphere);
@@ -218,10 +217,8 @@ ignition::rendering::VisualPtr RenderWidget::RenderSphere(
 
 /////////////////////////////////////////////////
 ignition::rendering::VisualPtr RenderWidget::RenderCylinder(
-  ignition::msgs::Visual &_vis)
+  const ignition::msgs::Visual &_vis)
 {
-  ignmsg << "Has a cylinder!" << std::endl;
-
   ignition::rendering::VisualPtr root = this->scene->RootVisual();
 
   ignition::rendering::VisualPtr cylinder = this->scene->CreateVisual();
@@ -254,7 +251,7 @@ ignition::rendering::VisualPtr RenderWidget::RenderCylinder(
   blue->SetShininess(50);
   blue->SetReflectivity(0);
   cylinder->AddGeometry(scene->CreateCylinder());
-  setLocalPositionFromPose(cylinder, _vis);
+  setLocalPositionFromPose(_vis, cylinder);
   cylinder->SetLocalScale(xScale, yScale, zScale);
   cylinder->SetMaterial(blue);
   root->AddChild(cylinder);
@@ -264,13 +261,11 @@ ignition::rendering::VisualPtr RenderWidget::RenderCylinder(
 
 /////////////////////////////////////////////////
 ignition::rendering::VisualPtr RenderWidget::RenderMesh(
-  ignition::msgs::Visual &_vis)
+  const ignition::msgs::Visual &_vis)
 {
-  ignmsg << "Has a mesh!" << std::endl;
-
   ignition::rendering::VisualPtr root = this->scene->RootVisual();
 
-  // create directional light
+  // Create directional light
   ignition::rendering::DirectionalLightPtr light0 =
     this->scene->CreateDirectionalLight();
   light0->SetDirection(0.5, 0.5, -1);
@@ -284,18 +279,32 @@ ignition::rendering::VisualPtr RenderWidget::RenderMesh(
     return nullptr;
   }
 
-  std::cout << "Mesh: " << _vis.geometry().mesh().filename() << std::endl;
+  // ToDo: Add support for multiple paths.
+  // ToDo: Figure out how to use bazel for generating paths from this project
+  //   E.g.: the "media/" directory.
+  std::string mediaPath;
+  char *pathCStr = std::getenv("DELPHYNE_MEDIA_PATH");
+  if (!pathCStr || *pathCStr == '\0')
+  {
+    ignerr << "DELPHYNE_MEDIA_PATH environmet variable not set. Meshes will not"
+           << " work" << std::endl;
+    return nullptr;
+  }
+  mediaPath = pathCStr;
 
   ignition::rendering::MeshDescriptor descriptor;
-  descriptor.meshName = ignition::common::joinPaths("/tmp", "duck.dae");
+  descriptor.meshName = ignition::common::joinPaths(mediaPath, "duck.dae");
   ignition::common::MeshManager *meshManager =
     ignition::common::MeshManager::Instance();
   descriptor.mesh = meshManager->Load(descriptor.meshName);
   ignition::rendering::MeshPtr meshGeom = this->scene->CreateMesh(descriptor);
   mesh->AddGeometry(meshGeom);
-  //  setLocalPositionFromPose(mesh, _vis);
+
+  // ToDo: Remove this hardcoded position when we can control the camera.
+  // setLocalPositionFromPose(_vis, mesh);
   mesh->SetLocalPosition(3, 0, 0);
   mesh->SetLocalRotation(1.5708, 0, 2.0);
+
   root->AddChild(mesh);
 
   return mesh;
@@ -326,24 +335,20 @@ void RenderWidget::SetInitialModel(const ignition::msgs::Model &_msg)
       continue;
     }
 
-    bool duplicate = false;
-    auto range = robotToLink.equal_range(link.id());
-    for (auto i = range.first; i != range.second; ++i) {
-      if (i->second.first == link.name()) {
+    // Sanity check: Verify that the visual doesn't exist already.
+    const auto &modelIt = this->visuals.find(link.id());
+    if (modelIt != this->visuals.end()) {
+      if (modelIt->second.find(link.name()) != modelIt->second.end()) {
         ignerr << "Duplicate link " << link.name() << " for robot "
                << link.id() << ", skipping" << std::endl;
-        duplicate = true;
-        break;
+        continue;
       }
     }
-    if (duplicate) {
-      continue;
-    }
 
-    ignmsg << "Rendering: " << link.name() << " (" << link.id() << ")"
+    igndbg << "Rendering: " << link.name() << " (" << link.id() << ")"
            << std::endl;
 
-    auto vis = link.visual(0);
+    const auto &vis = link.visual(0);
     if (!vis.has_geometry()) {
       ignerr << "No geometry in link " << link.name() << ", skipping"
              << std::endl;
@@ -372,8 +377,9 @@ void RenderWidget::SetInitialModel(const ignition::msgs::Model &_msg)
 
     auto nameAndVisual = std::pair<std::string,
       ignition::rendering::VisualPtr>(link.name(), ignvis);
-    robotToLink.insert(std::pair<uint32_t, std::pair<std::string,
-      ignition::rendering::VisualPtr>>(link.id(), nameAndVisual));
+
+    auto &v = this->visuals[link.id()];
+    v.insert(nameAndVisual);
   }
 
   this->initializedScene = true;
@@ -382,8 +388,6 @@ void RenderWidget::SetInitialModel(const ignition::msgs::Model &_msg)
 /////////////////////////////////////////////////
 void RenderWidget::UpdateScene(const ignition::msgs::PosesStamped &_msg)
 {
-  ignmsg << "Saw updateScene" << std::endl;
-
   for (int i = 0; i < _msg.pose_size(); ++i) {
     auto pose = _msg.pose(i);
     if (!pose.has_name()) {
@@ -396,27 +400,30 @@ void RenderWidget::UpdateScene(const ignition::msgs::PosesStamped &_msg)
     }
 
     ignition::rendering::VisualPtr ignvis = nullptr;
-    auto range = robotToLink.equal_range(pose.id());
-    for (auto i = range.first; i != range.second; ++i) {
-      if (i->second.first == pose.name()) {
-        // found!
-        ignmsg << "Found " << pose.id() << " " << pose.name() << std::endl;
-        ignvis = i->second.second;
-        break;
-      }
-    }
 
-    if (ignvis == nullptr) {
-      ignerr << "Could not find link " << pose.name() << " on robot "
-             << pose.id() << ", skipping" << std::endl;
+    // Sanity check: Make sure that the model Id exists.
+    auto robotIt = this->visuals.find(pose.id());
+    if (robotIt == this->visuals.end()) {
+      ignerr << "Could not find robot Id [" << pose.id() << "]. Skipping"
+             << std::endl;
       continue;
     }
+
+    // Sanity check: Make sure that the link name exists.
+    auto visualsIt = robotIt->second.find(pose.name());
+    if (visualsIt == robotIt->second.end()) {
+      ignerr << "Could not find link name [" << pose.name() << "]. Skipping"
+             << std::endl;
+      continue;
+    }
+
+    ignvis = visualsIt->second;
 
     // The setLocalPositionFromPose() assumes an ignition::msgs::Visual
     // message here, so we setup a dummy one to please it.
     ignition::msgs::Visual tmpvis;
     *tmpvis.mutable_pose() = pose;
-    setLocalPositionFromPose(ignvis, tmpvis);
+    setLocalPositionFromPose(tmpvis, ignvis);
   }
 }
 

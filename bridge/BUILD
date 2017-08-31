@@ -157,22 +157,6 @@ cc_binary(
 )
 
 cc_binary(
-    name = "temporal-tester",
-    srcs = ["temporal_tester.cc",
-    ],
-    deps = [
-        "@ignition-transport3",
-        "@lcm",
-        "@ignition_common//:ignition_common_shared_library",
-        "//bridge:lcm-to-ign-translation",
-        "//bridge:ign-to-lcm-translation",
-        "//bridge:drake-lcmt-headers",
-        "//bridge:lcm-channel-repeater",
-        "//bridge:ign-topic-repeater",
-    ]
-)
-
-cc_binary(
     name = "lcm-mock-robot-publisher",
     srcs = [
         "lcm_mock_robot_publisher.cc",

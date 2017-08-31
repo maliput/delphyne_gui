@@ -188,3 +188,12 @@ drake_cc_googletest(
         "//bridge:ign-service-converter",
     ],
 )
+
+drake_cc_googletest(
+    name = "service_to_channel_translation_test",
+    deps = [
+        "@lcm",
+        "//bridge:drake-lcmt-headers",
+        "//bridge:ign-service-converter",
+    ],
+)

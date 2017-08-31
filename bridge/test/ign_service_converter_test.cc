@@ -9,6 +9,7 @@
 // LCM entry point
 #include "lcm/lcm-cpp.hpp"
 
+
 namespace delphyne {
 namespace bridge {
 
@@ -25,11 +26,14 @@ class LCMHandler {
 };
 
 //////////////////////////////////////////////////
-/// \brief To be called before a test, clears the handlers
-/// called flags
-void reset() { lcmHandlerCalled = false; }
+/// \brief To be called before a test, clears the handler
+void reset() {
+  lcmHandlerCalled = false;
+}
 
-GTEST_TEST(ignServiceToLCMChannelTest, TestRepublishingEndToEnd) {
+//////////////////////////////////////////////////
+/// \brief Test an end to end service to lcm msg conversion
+GTEST_TEST(IgnServiceToLCMChannelTest, TestConversionEndToEnd) {
   // Reset handler flag
   reset();
 
@@ -40,7 +44,7 @@ GTEST_TEST(ignServiceToLCMChannelTest, TestRepublishingEndToEnd) {
   ignition::msgs::Empty req;
   ignition::msgs::StringMsg rep;
   // Ignition service name
-  std::string notifierServiceName = "/visualizer_start_notifier";
+  std::string notifierServiceName = "/test_service";
   std::string lcmChannelName = "DRAKE_VIEWER_STATUS";
 
   // Create an lcm instance
@@ -49,24 +53,24 @@ GTEST_TEST(ignServiceToLCMChannelTest, TestRepublishingEndToEnd) {
   LCMHandler handlerObject;
   lcm->subscribe(lcmChannelName, &LCMHandler::handleMessage, &handlerObject);
 
-  // Start republishing into LCM
-  auto ignToLcmRepublisher = delphyne::bridge::IgnitionToLCMRepublisher(
-      notifierServiceName, node, lcmChannelName, lcm);
-  ignToLcmRepublisher.start();
+
+  // Start ignition service to lcm channel converter
+  delphyne::bridge::IgnitionServiceConverter<ignition::msgs::Empty,
+                                             drake::lcmt_viewer_command>
+      ignToLcmRepublisher(node, notifierServiceName, lcm, lcmChannelName);
+  ignToLcmRepublisher.Start();
 
   bool srv_result;
-  unsigned int timeout = 5000;
+  unsigned int timeout = 500;
   // Request the republisher service.
   node->Request(notifierServiceName, req, timeout, rep, srv_result);
 
-  // Wait up to 500 milis before timeout
+  // Wait for lcm message up to 500 millis before timeout
   lcm->handleTimeout(500);
 
   // Check handler has been called
   ASSERT_TRUE(lcmHandlerCalled);
 }
-
-GTEST_TEST(ignServiceToLCMChannelTest, tRepublishingEndToEnd) {}
 
 }  // namespace bridge
 }  // namespace delphyne

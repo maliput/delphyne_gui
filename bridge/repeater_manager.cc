@@ -26,30 +26,42 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+#include <ignition/common/Console.hh>
+
+#include "repeater_manager.hh"
 #include "repeater_factory.hh"
 
 namespace delphyne {
 namespace bridge {
 
-std::map<std::string, RepeaterFactoryFunction> *RepeaterFactory::repeaterMap = NULL;
-
 /////////////////////////////////////////////////
-void RepeaterFactory::Register(const std::string &messageType,
-                               RepeaterFactoryFunction factoryFunction)
-{
-  // Create the repeaterMap if it's null
-  if (!repeaterMap)
-    repeaterMap = new std::map<std::string, RepeaterFactoryFunction>;
-
-  (*repeaterMap)[messageType] = factoryFunction;
+void RepeaterManager::Start() {
+  if (!node_.Advertise(ignitionRepeaterServiceName_, &RepeaterManager::IgnitionRepeaterSericeHandler, this))
+  {
+    ignerr << "Error starting the repeater manager while " << "advertising service [" << ignitionRepeaterServiceName_ << "]" << std::endl;
+  }
 }
 
 /////////////////////////////////////////////////
-std::shared_ptr<delphyne::bridge::AbstractRepeater> RepeaterFactory::New(
-              const std::string &messageType, std::shared_ptr<lcm::LCM> lcm, const std::string& topicName)
-{
-  return ((*repeaterMap)[messageType])(lcm, topicName);
+void RepeaterManager::IgnitionRepeaterSericeHandler(const ignition::msgs::StringMsg_V &request, ignition::msgs::Boolean &response, bool &result) {
+  std::string topicName = request.data(0);
+  std::string messageType = request.data(1);
+
+  std::shared_ptr<delphyne::bridge::AbstractRepeater> repeater = delphyne::bridge::RepeaterFactory::New(messageType, lcm_, topicName);
+
+  try {
+    repeater->Start();
+    repeaters_.push_back(repeater);
+    igndbg << "Repeater for " << topicName << " started " << std::endl;
+    response.set_data(true);
+  } catch (const std::runtime_error& error) {
+    ignerr << "Failed to start ignition channel repeater for "
+           << topicName << std::endl;
+    ignerr << "Details: " << error.what() << std::endl;
+    response.set_data(false);
+  }
+  result = true;
 }
 
-}
-}
+}  // namespace bridge
+}  // namespace delphyne

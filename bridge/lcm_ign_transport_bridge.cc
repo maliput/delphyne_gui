@@ -53,101 +53,17 @@
 #include "bridge/protobuf/headers/automotive_driving_command.pb.h"
 #include "bridge/drake/lcmt_driving_command_t.hpp"
 
-// Register custom msg
-// The name has to include "ign_msgs" at the beginning
-IGN_REGISTER_STATIC_MSG("ign_msgs.AutomotiveDrivingCommand", AutomotiveDrivingCommand)
+#include "bridge/repeater_factory.hh"
+#include "bridge/repeater_manager.hh"
+
+// Register custom msg. Note that the name has to include "ign_msgs" at the beginning
+IGN_REGISTER_STATIC_MSG("ign_msgs.AutomotiveDrivingCommand", AutomotiveDrivingCommand);
+
+// Register a topic repeater for AutomotiveDrivingCommand
+REGISTER_STATIC_REPEATER("ign_msgs.AutomotiveDrivingCommand", ignition::msgs::AutomotiveDrivingCommand, drake::lcmt_driving_command_t, 1);
 
 /// \brief Flag used to break the LCM loop and terminate the program.
 static std::atomic<bool> terminatePub(false);
-
-//////////////////////////////////////////////////
-/// \brief Repeat an Ignition service call into an LCM channel
-void srvCustomMsgTopic(const ignition::msgs::StringMsg_V &_req,
-  ignition::msgs::StringMsg_V &_rep, bool &_result)
-{
-  //std::string msgType = _req.data(0);
-  //std::string msgData = _req.data(1);
-  std::string msgType = "ign_msgs.AutomotiveDrivingCommand";
-  std::string msgData = "acceleration: 2.0 theta: 3.14";
-
-  auto msg = ignition::msgs::Factory::New(msgType, msgData);
-  if (msgType == "ign_msgs.AutomotiveDrivingCommand") {
-    drake::lcmt_driving_command_t lcmDrivingMsg;
-    ignition::msgs::AutomotiveDrivingCommand ignDrivingMsg;
-    ignDrivingMsg.CopyFrom(*msg);
-    delphyne::bridge::ignToLcm(ignDrivingMsg, &lcmDrivingMsg);
-    std::cout << lcmDrivingMsg.acceleration << std::endl;
-  }
-
-  // Translate from ignition to LCM
-  //delphyne::bridge::ignToLcm(msg, &lcmDrivingMsg);
-
-  //std::cout << lcmDrivingMsg.acceleration << std::endl;
-
-  //auto msg = ignition::msgs::Factory::New(msgType, msgData);
-  //std::cout << msg->GetDescriptor()->name() << std::endl;
-  //std::cout << msg->DebugString() << std::endl;
-  //msg->set_acceleration(2.0);
-
-  //auto msg = ignition::msgs::Factory::New(msgType, msgData);
-  //std::cout << msg->GetDescriptor()->name() << std::endl;
-  //std::cout << msg->DebugString() << std::endl;
-
-  // The response succeed.
-  _result = true;
-}
-
-//////////////////////////////////////////////////
-/// \brief Repeat an Ignition service call into an LCM channel
-void srvRepeatIgnitionTopic(const ignition::msgs::StringMsg_V &_req,
-  ignition::msgs::StringMsg_V &_rep, bool &_result)
-{
-  // list of available ignition messages types
-  std::vector<std::string> types;
-  ignition::msgs::Factory::Types(types);
-
-  // Example of compile-time defined message type
-
-  //auto msg = ignition::msgs::Factory::New<ignition::msgs::StringMsg>("ign_msgs.StringMsg");
-  // we won't be able to use set_data if we don't define the message type inside the <>
-  //msg->set_data("hola!!");
-  //std::cout << msg->data() << std::endl;
-
-  std::string msgType = _req.data(0);
-  std::string msgData = _req.data(1);
-  if (std::find(types.begin(), types.end(), msgType) != types.end()) {
-    auto msg2 = ignition::msgs::Factory::New(msgType, msgData);
-    std::cout << msg2->GetDescriptor()->name() << std::endl;
-    std::cout << msg2->DebugString() << std::endl;
-  }
-  else {
-    ignerr << "The type "
-           << msgType
-           << "is not a valid ignition msgs data type"
-           << std::endl;
-  }
-
-
-  //for(int i=0; i< _req.data_size(); i++) {
-  //  std::cout << _req.data(i) << std::endl;
-  //  _rep.add_data(_req.data(i));
-  //}
-
-  // The response succeed.
-  _result = true;
-}
-
-//////////////////////////////////////////////////
-/// \brief Hello world
-void srvHelloWorld(const ignition::msgs::StringMsg &_req,
-  ignition::msgs::StringMsg &_rep, bool &_result)
-{
-  // Set the response's content.
-  _rep.set_data("Hello world!");
-
-  // The response succeed.
-  _result = true;
-}
 
 //////////////////////////////////////////////////
 /// \brief Function callback executed when a SIGINT or SIGTERM signals are
@@ -170,27 +86,23 @@ int main(int argc, char* argv[]) {
   ignition::common::Console::SetVerbosity(3);
   ignmsg << "LCM to ignition-transport bridge 0.1.0" << std::endl;
 
-  // Create an lcm object
-  std::shared_ptr<lcm::LCM> lcm = std::make_shared<lcm::LCM>();
+  std::shared_ptr<lcm::LCM> sharedLCM = std::make_shared<lcm::LCM>();
+
+  delphyne::bridge::RepeaterManager manager(sharedLCM);
+
+  manager.Start();
 
   // Create a repeater on DRAKE_VIEWER_LOAD_ROBOT channel, translating
   // from drake::lcmt_viewer_load_robot to ignition::msgs::Model
   delphyne::bridge::LcmChannelRepeater<drake::lcmt_viewer_load_robot,
                                        ignition::msgs::Model>
-      viewerLoadRobotRepeater(lcm, "DRAKE_VIEWER_LOAD_ROBOT");
+      viewerLoadRobotRepeater(sharedLCM, "DRAKE_VIEWER_LOAD_ROBOT");
 
   // Create a repeater on DRAKE_VIEWER_DRAW channel, translating
   // from drake::lcmt_viewer_draw to ignition::msgs::PosesStamped
   delphyne::bridge::LcmChannelRepeater<drake::lcmt_viewer_draw,
                                        ignition::msgs::PosesStamped>
-      viewerDrawRepeater(lcm, "DRAKE_VIEWER_DRAW");
-
-  // Create a repeater on ignition DRIVING_COMMAND_0 topic, translating
-  // from ignition::msgs::AutomotiveDrivingCommand to
-  // drake::lcmt_driving_command_t
-  delphyne::bridge::IgnTopicRepeater<ignition::msgs::AutomotiveDrivingCommand,
-                                     drake::lcmt_driving_command_t>
-      drivingCommandRepeater(lcm, "DRIVING_COMMAND_0");
+      viewerDrawRepeater(sharedLCM, "DRAKE_VIEWER_DRAW");
 
   // Start DRAKE_VIEWER_LOAD_ROBOT repeater
   try {
@@ -264,7 +176,7 @@ int main(int argc, char* argv[]) {
   //std::cout << drivingCommand.DebugString() << std::endl;
 
   while (!terminatePub) {
-    lcm->handleTimeout(100);
+    sharedLCM->handleTimeout(100);
   }
 
   return 0;

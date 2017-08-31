@@ -36,6 +36,8 @@
 #include <memory>
 #include <string>
 
+#include "abstract_repeater.hh"
+
 #include "drake/lcmt_viewer_geometry_data.hpp"
 #include "drake/lcmt_viewer_load_robot.hpp"
 
@@ -53,7 +55,7 @@ namespace bridge {
 // whereas LCM_TYPE is the type of the LCM message that we will
 // be generating
 template <class IGN_TYPE, class LCM_TYPE>
-class IgnTopicRepeater {
+class IgnTopicRepeater : public AbstractRepeater {
  public:
   IgnTopicRepeater(std::shared_ptr<lcm::LCM> lcm, const std::string& topicName)
       : lcm_(lcm), topicName_(topicName) {}

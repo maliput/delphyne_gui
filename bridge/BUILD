@@ -18,9 +18,10 @@ cc_library(
     name = "lcm-to-ign-translation",
     srcs = [
         "lcm_to_ign_translation.cc",
-        "translate_exception.hh",
     ],
-    hdrs = ["lcm_to_ign_translation.hh",
+    hdrs = [
+        "lcm_to_ign_translation.hh",
+        "translate_exception.hh",
     ],
     deps = [
         "@ignition-transport3",
@@ -34,7 +35,10 @@ cc_library(
     srcs = [
         "ign_to_lcm_translation.cc",
     ],
-    hdrs = ["ign_to_lcm_translation.hh",
+    hdrs = [
+        "ign_to_lcm_translation.hh",
+        "translate_exception.hh",
+        "abstract_repeater.hh",
     ],
     deps = [
         "@ignition-transport3",
@@ -68,6 +72,22 @@ cc_library(
 )
 
 cc_library(
+    name = "repeater-manager",
+    hdrs = [
+        "repeater_manager.hh",
+        "abstract_repeater.hh",
+    ],
+    srcs = ["repeater_manager.cc",
+    ],
+    deps = [
+        "@lcm",
+        "@ignition_common//:ignition_common_shared_library",
+        "@ignition-transport3",
+        "//bridge:repeater-factory"
+    ],
+)
+
+cc_library(
     name = "ign-topic-repeater",
     hdrs = ["ign_topic_repeater.hh",
     ],
@@ -75,6 +95,7 @@ cc_library(
         "@ignition-transport3",
         "@lcm",
         "//bridge:drake-lcmt-headers",
+        "//bridge:ign-to-lcm-translation",
         "@ignition_common//:ignition_common_shared_library",
     ],
 )
@@ -99,6 +120,18 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "repeater-factory",
+    srcs = [
+        "repeater_factory.cc",
+    ],
+    hdrs = ["repeater_factory.hh",
+    ],
+    deps = [
+        "//bridge:ign-topic-repeater",
+    ],
+)
+
 cc_binary(
     name = "lcm-ign-transport-bridge",
     srcs = ["lcm_ign_transport_bridge.cc",
@@ -113,12 +146,30 @@ cc_binary(
         "//bridge:lcm-channel-repeater",
         "//bridge:ign-service-converter",
         "//bridge:ign-topic-repeater",
+        "//bridge:repeater-factory",
+        "//bridge:repeater-manager",
     ],
     data = [
         "drake/car/car.vtp",
         "drake/package.xml",
         "drake/car/package.xml",
     ],
+)
+
+cc_binary(
+    name = "temporal-tester",
+    srcs = ["temporal_tester.cc",
+    ],
+    deps = [
+        "@ignition-transport3",
+        "@lcm",
+        "@ignition_common//:ignition_common_shared_library",
+        "//bridge:lcm-to-ign-translation",
+        "//bridge:ign-to-lcm-translation",
+        "//bridge:drake-lcmt-headers",
+        "//bridge:lcm-channel-repeater",
+        "//bridge:ign-topic-repeater",
+    ]
 )
 
 cc_binary(

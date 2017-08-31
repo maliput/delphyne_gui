@@ -37,7 +37,8 @@ namespace bridge {
 /////////////////////////////////////////////////
 void RepeaterManager::Start() {
   if (!node_.Advertise(ignitionRepeaterServiceName_,
-                       &RepeaterManager::IgnitionRepeaterSericeHandler, this)) {
+                       &RepeaterManager::IgnitionRepeaterServiceHandler,
+                       this)) {
     ignerr << "Error starting the repeater manager while "
            << "advertising service [" << ignitionRepeaterServiceName_ << "]"
            << std::endl;
@@ -45,7 +46,7 @@ void RepeaterManager::Start() {
 }
 
 /////////////////////////////////////////////////
-void RepeaterManager::IgnitionRepeaterSericeHandler(
+void RepeaterManager::IgnitionRepeaterServiceHandler(
     const ignition::msgs::StringMsg_V& request,
     ignition::msgs::Boolean& response, bool& result) {
   std::string topicName = request.data(0);

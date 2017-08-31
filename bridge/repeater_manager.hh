@@ -60,9 +60,9 @@ class RepeaterManager {
   /// \param[out] response A boolean indicating if the manager was able to
   /// properly setup the repeater or not.
   /// \param[out] result Always true
-  void IgnitionRepeaterSericeHandler(const ignition::msgs::StringMsg_V& request,
-                                     ignition::msgs::Boolean& response,
-                                     bool& result);
+  void IgnitionRepeaterServiceHandler(
+      const ignition::msgs::StringMsg_V& request,
+      ignition::msgs::Boolean& response, bool& result);
 
   /// \internal
   /// \brief The LCM manager

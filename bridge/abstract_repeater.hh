@@ -36,6 +36,7 @@ namespace bridge {
 class AbstractRepeater {
  public:
   virtual void Start() {}
+  virtual ~AbstractRepeater() {}
 };
 
 }  // namespace bridge

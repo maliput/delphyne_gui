@@ -247,3 +247,11 @@ drake_cc_googletest(
         "//bridge:ign-service-converter",
     ],
 )
+
+drake_cc_googletest(
+    name = "repeater_factory_test",
+    deps = [
+        "@lcm",
+        "//bridge:repeater-factory",
+    ],
+)

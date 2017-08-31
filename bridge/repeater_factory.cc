@@ -48,7 +48,11 @@ void RepeaterFactory::Register(const std::string& messageType,
 std::shared_ptr<delphyne::bridge::AbstractRepeater> RepeaterFactory::New(
     const std::string& messageType, std::shared_ptr<lcm::LCM> lcm,
     const std::string& topicName) {
-  return ((*repeaterMap)[messageType])(lcm, topicName);
+  if (repeaterMap && (*repeaterMap).count(messageType) == 1) {
+    return ((*repeaterMap)[messageType])(lcm, topicName);
+  } else {
+    return nullptr;
+  }
 }
 }
 }

@@ -36,13 +36,11 @@
 namespace delphyne {
 namespace bridge {
 
-void ignToLcm(
-    const ignition::msgs::AutomotiveDrivingCommand& ignDrivingCommand,
-    drake::lcmt_driving_command_t* lcmDrivingCommand) {
+void ignToLcm(const ignition::msgs::AutomotiveDrivingCommand& ignDrivingCommand,
+              drake::lcmt_driving_command_t* lcmDrivingCommand) {
   if (ignDrivingCommand.has_time()) {
-    lcmDrivingCommand->timestamp =
-        ignDrivingCommand.time().sec() * 1000 +
-        ignDrivingCommand.time().nsec() / 1000000;
+    lcmDrivingCommand->timestamp = ignDrivingCommand.time().sec() * 1000 +
+                                   ignDrivingCommand.time().nsec() / 1000000;
   } else {
     int64_t milliseconds = std::chrono::system_clock::now().time_since_epoch() /
                            std::chrono::milliseconds(1);

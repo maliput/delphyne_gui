@@ -13,7 +13,7 @@ static bool handler2Called;
 /// \brief Assert that a given ign Geometry is a box and has
 /// the specified size
 void assertIsBoxWithSize(const ignition::msgs::Geometry& message, float x,
-                             float y, float z) {
+                         float y, float z) {
   ASSERT_EQ(message.type(), ignition::msgs::Geometry::BOX);
   ASSERT_EQ(message.box().size().x(), x);
   ASSERT_EQ(message.box().size().y(), y);
@@ -24,7 +24,7 @@ void assertIsBoxWithSize(const ignition::msgs::Geometry& message, float x,
 /// \brief Fill an LCM viewer_geometry_data message with a box
 /// geometry with the specified size
 void fillBoxWith(drake::lcmt_viewer_geometry_data& boxMsg, float x, float y,
-                   float z) {
+                 float z) {
   boxMsg.type = boxMsg.BOX;
   boxMsg.num_float_data = 3;
   boxMsg.float_data.resize(boxMsg.num_float_data);

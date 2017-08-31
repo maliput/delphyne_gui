@@ -29,9 +29,9 @@
 #ifndef DELPHYNE_BRIDGE_REPEATERFACTORY_HH_
 #define DELPHYNE_BRIDGE_REPEATERFACTORY_HH_
 
-#include <string>
 #include <map>
 #include <memory>
+#include <string>
 
 #include "ign_topic_repeater.hh"
 
@@ -39,31 +39,35 @@ namespace delphyne {
 namespace bridge {
 
 /// \brief Prototype for repeater factory generation
-typedef std::shared_ptr<delphyne::bridge::AbstractRepeater> (*RepeaterFactoryFunction) (std::shared_ptr<lcm::LCM> lcm, const std::string& topicName);
+typedef std::shared_ptr<delphyne::bridge::AbstractRepeater> (
+    *RepeaterFactoryFunction)(std::shared_ptr<lcm::LCM> lcm,
+                              const std::string& topicName);
 
 /// \brief A factory that creates repeater objects based on a string type
 /// describing the origin type to repeat.
-class RepeaterFactory
-{
+class RepeaterFactory {
  public:
   /// \brief Register a new repeater.
   /// \param[in] messageType Type of message to register.
   /// \param[in] factoryFunction Function that creates a new repeater.
-  static void Register(const std::string &messageType, RepeaterFactoryFunction factoryFunction);
+  static void Register(const std::string& messageType,
+                       RepeaterFactoryFunction factoryFunction);
 
   /// \brief Create a new repeater.
   /// \param[in] messageType Type of message this repeater will be translating.
   /// \param[in] lcm The LCM instance we are using to dispatch messages
   /// \param[in] topicName The name of the topic to repeat
   /// \return Pointer to a repeater. Null if the mapping can't be found.
-  static std::shared_ptr<delphyne::bridge::AbstractRepeater> New(const std::string &messageType, std::shared_ptr<lcm::LCM> lcm, const std::string& topicName);
+  static std::shared_ptr<delphyne::bridge::AbstractRepeater> New(
+      const std::string& messageType, std::shared_ptr<lcm::LCM> lcm,
+      const std::string& topicName);
 
   /// \brief A list of registered message types
  private:
   /// \internal
   /// \brief A map between ignition message types and functions used to
   /// create repeaters
-  static std::map<std::string, RepeaterFactoryFunction> *repeaterMap;
+  static std::map<std::string, RepeaterFactoryFunction>* repeaterMap;
 };
 
 /// \brief Static message registration macro
@@ -73,19 +77,20 @@ class RepeaterFactory
 /// \param[in] ignitionType Class name for the ignition message.
 /// \param[in] lcmType Class name for the lcm message.
 /// \param[in] uid A unique id used to define the new function and class.
-#define REGISTER_STATIC_REPEATER(messageType, ignitionType, lcmType, uid) \
-std::shared_ptr<delphyne::bridge::AbstractRepeater> New##uid(std::shared_ptr<lcm::LCM> lcm, const std::string& topicName) \
-{ \
-  return std::make_shared<delphyne::bridge::IgnTopicRepeater<ignitionType, lcmType>>(lcm, topicName); \
-} \
-class Repeater##uid \
-{ \
-  public: Repeater##uid() \
-  { \
-    delphyne::bridge::RepeaterFactory::Register(messageType, New##uid); \
-  } \
-}; \
-static Repeater##uid RepeaterInitializer;
+#define REGISTER_STATIC_REPEATER(messageType, ignitionType, lcmType, uid)      \
+  std::shared_ptr<delphyne::bridge::AbstractRepeater> New##uid(                \
+      std::shared_ptr<lcm::LCM> lcm, const std::string& topicName) {           \
+    return std::make_shared<                                                   \
+        delphyne::bridge::IgnTopicRepeater<ignitionType, lcmType>>(lcm,        \
+                                                                   topicName); \
+  }                                                                            \
+  class Repeater##uid {                                                        \
+   public:                                                                     \
+    Repeater##uid() {                                                          \
+      delphyne::bridge::RepeaterFactory::Register(messageType, New##uid);      \
+    }                                                                          \
+  };                                                                           \
+  static Repeater##uid RepeaterInitializer;
 
 }  // namespace bridge
 }  // namespace delphyne

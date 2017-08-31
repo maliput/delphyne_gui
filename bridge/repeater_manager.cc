@@ -28,26 +28,31 @@
 
 #include <ignition/common/Console.hh>
 
-#include "repeater_manager.hh"
 #include "repeater_factory.hh"
+#include "repeater_manager.hh"
 
 namespace delphyne {
 namespace bridge {
 
 /////////////////////////////////////////////////
 void RepeaterManager::Start() {
-  if (!node_.Advertise(ignitionRepeaterServiceName_, &RepeaterManager::IgnitionRepeaterSericeHandler, this))
-  {
-    ignerr << "Error starting the repeater manager while " << "advertising service [" << ignitionRepeaterServiceName_ << "]" << std::endl;
+  if (!node_.Advertise(ignitionRepeaterServiceName_,
+                       &RepeaterManager::IgnitionRepeaterSericeHandler, this)) {
+    ignerr << "Error starting the repeater manager while "
+           << "advertising service [" << ignitionRepeaterServiceName_ << "]"
+           << std::endl;
   }
 }
 
 /////////////////////////////////////////////////
-void RepeaterManager::IgnitionRepeaterSericeHandler(const ignition::msgs::StringMsg_V &request, ignition::msgs::Boolean &response, bool &result) {
+void RepeaterManager::IgnitionRepeaterSericeHandler(
+    const ignition::msgs::StringMsg_V& request,
+    ignition::msgs::Boolean& response, bool& result) {
   std::string topicName = request.data(0);
   std::string messageType = request.data(1);
 
-  std::shared_ptr<delphyne::bridge::AbstractRepeater> repeater = delphyne::bridge::RepeaterFactory::New(messageType, lcm_, topicName);
+  std::shared_ptr<delphyne::bridge::AbstractRepeater> repeater =
+      delphyne::bridge::RepeaterFactory::New(messageType, lcm_, topicName);
 
   try {
     repeater->Start();
@@ -55,8 +60,8 @@ void RepeaterManager::IgnitionRepeaterSericeHandler(const ignition::msgs::String
     igndbg << "Repeater for " << topicName << " started " << std::endl;
     response.set_data(true);
   } catch (const std::runtime_error& error) {
-    ignerr << "Failed to start ignition channel repeater for "
-           << topicName << std::endl;
+    ignerr << "Failed to start ignition channel repeater for " << topicName
+           << std::endl;
     ignerr << "Details: " << error.what() << std::endl;
     response.set_data(false);
   }

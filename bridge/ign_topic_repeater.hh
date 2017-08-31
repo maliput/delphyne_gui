@@ -29,12 +29,12 @@
 #ifndef DELPHYNE_BRIDGE_IGNTOPICREPEATER_HH_
 #define DELPHYNE_BRIDGE_IGNTOPICREPEATER_HH_
 
+#include <memory>
+#include <string>
 #include <ignition/common/Console.hh>
 #include <ignition/msgs.hh>
 #include <ignition/transport.hh>
 #include <lcm/lcm-cpp.hpp>
-#include <memory>
-#include <string>
 
 #include "abstract_repeater.hh"
 

@@ -33,10 +33,9 @@ namespace delphyne {
 namespace bridge {
 
 /// \brief This class is the base class for all topic / channel repeaters.
-class AbstractRepeater
-{
-  public: virtual void Start() {
-  }
+class AbstractRepeater {
+ public:
+  virtual void Start() {}
 };
 
 }  // namespace bridge

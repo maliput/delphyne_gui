@@ -29,12 +29,12 @@
 #ifndef DELPHYNE_BRIDGE_REPEATERMANAGER_HH_
 #define DELPHYNE_BRIDGE_REPEATERMANAGER_HH_
 
+#include <vector>
 #include <ignition/msgs.hh>
 #include <ignition/transport.hh>
-#include <vector>
 
-#include "lcm/lcm-cpp.hpp"
 #include "abstract_repeater.hh"
+#include "lcm/lcm-cpp.hpp"
 
 namespace delphyne {
 namespace bridge {
@@ -43,7 +43,9 @@ namespace bridge {
 /// their life cycle.
 class RepeaterManager {
  public:
-  RepeaterManager(std::shared_ptr<lcm::LCM> lcm, std::string ignitionRepeaterServiceName = "/repeat_ignition_topic")
+  RepeaterManager(
+      std::shared_ptr<lcm::LCM> lcm,
+      std::string ignitionRepeaterServiceName = "/repeat_ignition_topic")
       : lcm_(lcm), ignitionRepeaterServiceName_(ignitionRepeaterServiceName) {}
 
   /// \brief Start the manager by registering the ignition service
@@ -53,12 +55,16 @@ class RepeaterManager {
   /// \brief This method is set as a callback of the published service to
   /// start a new repeater.
   /// \param[in] request An array of two strings. The first string dictates the
-  /// ignition topic name to repeat and the second one the ignition type that will
+  /// ignition topic name to repeat and the second one the ignition type that
+  /// will
   /// be delivered in that topic
-  /// \param[out] response A boolean indicating if the manager was able to properly
+  /// \param[out] response A boolean indicating if the manager was able to
+  /// properly
   /// setup the repeater or not.
   /// \param[out] result Always true
-  void IgnitionRepeaterSericeHandler(const ignition::msgs::StringMsg_V &request, ignition::msgs::Boolean &response, bool &result);
+  void IgnitionRepeaterSericeHandler(const ignition::msgs::StringMsg_V& request,
+                                     ignition::msgs::Boolean& response,
+                                     bool& result);
 
   /// \internal
   /// \brief The LCM manager
@@ -73,7 +79,8 @@ class RepeaterManager {
   ignition::transport::Node node_;
 
   /// \internal
-  /// \brief The name of the service used to create a new ignition topic repeater
+  /// \brief The name of the service used to create a new ignition topic
+  /// repeater
   std::string ignitionRepeaterServiceName_;
 };
 

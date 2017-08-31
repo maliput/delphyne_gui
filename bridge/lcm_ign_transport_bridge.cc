@@ -49,18 +49,22 @@
 // LCM entry point
 #include "lcm/lcm-cpp.hpp"
 
+#include "bridge/drake/lcmt_driving_command_t.hpp"
 #include "bridge/ign_to_lcm_translation.hh"
 #include "bridge/protobuf/headers/automotive_driving_command.pb.h"
-#include "bridge/drake/lcmt_driving_command_t.hpp"
 
 #include "bridge/repeater_factory.hh"
 #include "bridge/repeater_manager.hh"
 
-// Register custom msg. Note that the name has to include "ign_msgs" at the beginning
-IGN_REGISTER_STATIC_MSG("ign_msgs.AutomotiveDrivingCommand", AutomotiveDrivingCommand);
+// Register custom msg. Note that the name has to include "ign_msgs" at the
+// beginning
+IGN_REGISTER_STATIC_MSG("ign_msgs.AutomotiveDrivingCommand",
+                        AutomotiveDrivingCommand);
 
 // Register a topic repeater for AutomotiveDrivingCommand
-REGISTER_STATIC_REPEATER("ign_msgs.AutomotiveDrivingCommand", ignition::msgs::AutomotiveDrivingCommand, drake::lcmt_driving_command_t, 1);
+REGISTER_STATIC_REPEATER("ign_msgs.AutomotiveDrivingCommand",
+                         ignition::msgs::AutomotiveDrivingCommand,
+                         drake::lcmt_driving_command_t, 1);
 
 /// \brief Flag used to break the LCM loop and terminate the program.
 static std::atomic<bool> terminatePub(false);

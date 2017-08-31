@@ -56,11 +56,9 @@ class RepeaterManager {
   /// start a new repeater.
   /// \param[in] request An array of two strings. The first string dictates the
   /// ignition topic name to repeat and the second one the ignition type that
-  /// will
-  /// be delivered in that topic
+  /// will be delivered in that topic
   /// \param[out] response A boolean indicating if the manager was able to
-  /// properly
-  /// setup the repeater or not.
+  /// properly setup the repeater or not.
   /// \param[out] result Always true
   void IgnitionRepeaterSericeHandler(const ignition::msgs::StringMsg_V& request,
                                      ignition::msgs::Boolean& response,

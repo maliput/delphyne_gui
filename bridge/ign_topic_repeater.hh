@@ -52,8 +52,7 @@ namespace bridge {
 // to an ignition topic, translates them into their lcm message counterpart
 // and re-publishes them into an lcm channel of the same name.
 // IGN_TYPE is the type of the ignition message that we want to consume
-// whereas LCM_TYPE is the type of the LCM message that we will
-// be generating
+// whereas LCM_TYPE is the type of the LCM message that we will be generating.
 template <class IGN_TYPE, class LCM_TYPE>
 class IgnTopicRepeater : public AbstractRepeater {
  public:

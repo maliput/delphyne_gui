@@ -242,6 +242,16 @@ int main(int argc, char* argv[]) {
   drawMsg.quaternion[0][2] = 0.0;
   drawMsg.quaternion[0][3] = 1.0;
 
+  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+
+  // Load robot model into drake
+  std::string lcmChannel = "DRAKE_VIEWER_LOAD_ROBOT";
+  igndbg << "Publishing message into " << lcmChannel << std::endl;
+  if (lcm.publish(lcmChannel, &robotMsg) == -1) {
+    ignerr << "Failed to publish message into " << lcmChannel << std::endl;
+    return 1;
+  }
+
   // Circumference definition
   float radius = 3.0;
   std::vector<float> center = {0.0, 0.0, 4.0};
@@ -250,14 +260,6 @@ int main(int argc, char* argv[]) {
   int i = 0;
   // Update sphere position every 10ms
   while (!terminatePub) {
-    // Load robot model into drake
-    std::string lcmChannel = "DRAKE_VIEWER_LOAD_ROBOT";
-    igndbg << "Publishing message into " << lcmChannel << std::endl;
-    if (lcm.publish(lcmChannel, &robotMsg) == -1) {
-      ignerr << "Failed to publish message into " << lcmChannel << std::endl;
-      return 1;
-    }
-
     // Update timestamp
     drawMsg.timestamp = drawMsg.timestamp + timeStepMs;
     // Update each position by moving 1 degree along the previously defined

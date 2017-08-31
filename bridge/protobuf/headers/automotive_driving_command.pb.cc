@@ -7,7 +7,6 @@
 #include <algorithm>
 
 #include <google/protobuf/stubs/common.h>
-#include <google/protobuf/stubs/port.h>
 #include <google/protobuf/stubs/once.h>
 #include <google/protobuf/io/coded_stream.h>
 #include <google/protobuf/wire_format_lite_inl.h>
@@ -29,7 +28,6 @@ const ::google::protobuf::internal::GeneratedMessageReflection*
 }  // namespace
 
 
-void protobuf_AssignDesc_automotive_5fdriving_5fcommand_2eproto() GOOGLE_ATTRIBUTE_COLD;
 void protobuf_AssignDesc_automotive_5fdriving_5fcommand_2eproto() {
   protobuf_AddDesc_automotive_5fdriving_5fcommand_2eproto();
   const ::google::protobuf::FileDescriptor* file =
@@ -44,16 +42,16 @@ void protobuf_AssignDesc_automotive_5fdriving_5fcommand_2eproto() {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(AutomotiveDrivingCommand, theta_),
   };
   AutomotiveDrivingCommand_reflection_ =
-    ::google::protobuf::internal::GeneratedMessageReflection::NewGeneratedMessageReflection(
+    new ::google::protobuf::internal::GeneratedMessageReflection(
       AutomotiveDrivingCommand_descriptor_,
       AutomotiveDrivingCommand::default_instance_,
       AutomotiveDrivingCommand_offsets_,
       GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(AutomotiveDrivingCommand, _has_bits_[0]),
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(AutomotiveDrivingCommand, _unknown_fields_),
       -1,
-      -1,
-      sizeof(AutomotiveDrivingCommand),
-      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(AutomotiveDrivingCommand, _internal_metadata_),
-      -1);
+      ::google::protobuf::DescriptorPool::generated_pool(),
+      ::google::protobuf::MessageFactory::generated_factory(),
+      sizeof(AutomotiveDrivingCommand));
 }
 
 namespace {
@@ -64,11 +62,10 @@ inline void protobuf_AssignDescriptorsOnce() {
                  &protobuf_AssignDesc_automotive_5fdriving_5fcommand_2eproto);
 }
 
-void protobuf_RegisterTypes(const ::std::string&) GOOGLE_ATTRIBUTE_COLD;
 void protobuf_RegisterTypes(const ::std::string&) {
   protobuf_AssignDescriptorsOnce();
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
-      AutomotiveDrivingCommand_descriptor_, &AutomotiveDrivingCommand::default_instance());
+    AutomotiveDrivingCommand_descriptor_, &AutomotiveDrivingCommand::default_instance());
 }
 
 }  // namespace
@@ -78,7 +75,6 @@ void protobuf_ShutdownFile_automotive_5fdriving_5fcommand_2eproto() {
   delete AutomotiveDrivingCommand_reflection_;
 }
 
-void protobuf_AddDesc_automotive_5fdriving_5fcommand_2eproto() GOOGLE_ATTRIBUTE_COLD;
 void protobuf_AddDesc_automotive_5fdriving_5fcommand_2eproto() {
   static bool already_here = false;
   if (already_here) return;
@@ -112,15 +108,15 @@ struct StaticDescriptorInitializer_automotive_5fdriving_5fcommand_2eproto {
 
 // ===================================================================
 
-#if !defined(_MSC_VER) || _MSC_VER >= 1900
+#ifndef _MSC_VER
 const int AutomotiveDrivingCommand::kHeaderFieldNumber;
 const int AutomotiveDrivingCommand::kTimeFieldNumber;
 const int AutomotiveDrivingCommand::kAccelerationFieldNumber;
 const int AutomotiveDrivingCommand::kThetaFieldNumber;
-#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+#endif  // !_MSC_VER
 
 AutomotiveDrivingCommand::AutomotiveDrivingCommand()
-  : ::google::protobuf::Message(), _internal_metadata_(NULL) {
+  : ::google::protobuf::Message() {
   SharedCtor();
   // @@protoc_insertion_point(constructor:ignition.msgs.AutomotiveDrivingCommand)
 }
@@ -131,8 +127,7 @@ void AutomotiveDrivingCommand::InitAsDefaultInstance() {
 }
 
 AutomotiveDrivingCommand::AutomotiveDrivingCommand(const AutomotiveDrivingCommand& from)
-  : ::google::protobuf::Message(),
-    _internal_metadata_(NULL) {
+  : ::google::protobuf::Message() {
   SharedCtor();
   MergeFrom(from);
   // @@protoc_insertion_point(copy_constructor:ignition.msgs.AutomotiveDrivingCommand)
@@ -176,33 +171,22 @@ const AutomotiveDrivingCommand& AutomotiveDrivingCommand::default_instance() {
 
 AutomotiveDrivingCommand* AutomotiveDrivingCommand::default_instance_ = NULL;
 
-AutomotiveDrivingCommand* AutomotiveDrivingCommand::New(::google::protobuf::Arena* arena) const {
-  AutomotiveDrivingCommand* n = new AutomotiveDrivingCommand;
-  if (arena != NULL) {
-    arena->Own(n);
-  }
-  return n;
+AutomotiveDrivingCommand* AutomotiveDrivingCommand::New() const {
+  return new AutomotiveDrivingCommand;
 }
 
 void AutomotiveDrivingCommand::Clear() {
-// @@protoc_insertion_point(message_clear_start:ignition.msgs.AutomotiveDrivingCommand)
-#if defined(__clang__)
-#define ZR_HELPER_(f) \
-  _Pragma("clang diagnostic push") \
-  _Pragma("clang diagnostic ignored \"-Winvalid-offsetof\"") \
-  __builtin_offsetof(AutomotiveDrivingCommand, f) \
-  _Pragma("clang diagnostic pop")
-#else
-#define ZR_HELPER_(f) reinterpret_cast<char*>(\
-  &reinterpret_cast<AutomotiveDrivingCommand*>(16)->f)
-#endif
+#define OFFSET_OF_FIELD_(f) (reinterpret_cast<char*>(      \
+  &reinterpret_cast<AutomotiveDrivingCommand*>(16)->f) - \
+   reinterpret_cast<char*>(16))
 
-#define ZR_(first, last) do {\
-  ::memset(&first, 0,\
-           ZR_HELPER_(last) - ZR_HELPER_(first) + sizeof(last));\
-} while (0)
+#define ZR_(first, last) do {                              \
+    size_t f = OFFSET_OF_FIELD_(first);                    \
+    size_t n = OFFSET_OF_FIELD_(last) - f + sizeof(last);  \
+    ::memset(&first, 0, n);                                \
+  } while (0)
 
-  if (_has_bits_[0 / 32] & 15u) {
+  if (_has_bits_[0 / 32] & 15) {
     ZR_(acceleration_, theta_);
     if (has_header()) {
       if (header_ != NULL) header_->::ignition::msgs::Header::Clear();
@@ -212,18 +196,16 @@ void AutomotiveDrivingCommand::Clear() {
     }
   }
 
-#undef ZR_HELPER_
+#undef OFFSET_OF_FIELD_
 #undef ZR_
 
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
-  if (_internal_metadata_.have_unknown_fields()) {
-    mutable_unknown_fields()->Clear();
-  }
+  mutable_unknown_fields()->Clear();
 }
 
 bool AutomotiveDrivingCommand::MergePartialFromCodedStream(
     ::google::protobuf::io::CodedInputStream* input) {
-#define DO_(EXPRESSION) if (!GOOGLE_PREDICT_TRUE(EXPRESSION)) goto failure
+#define DO_(EXPRESSION) if (!(EXPRESSION)) goto failure
   ::google::protobuf::uint32 tag;
   // @@protoc_insertion_point(parse_start:ignition.msgs.AutomotiveDrivingCommand)
   for (;;) {
@@ -314,13 +296,13 @@ void AutomotiveDrivingCommand::SerializeWithCachedSizes(
   // optional .ignition.msgs.Header header = 1;
   if (has_header()) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      1, *this->header_, output);
+      1, this->header(), output);
   }
 
   // optional .ignition.msgs.Time time = 2;
   if (has_time()) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      2, *this->time_, output);
+      2, this->time(), output);
   }
 
   // optional double acceleration = 3 [default = 0];
@@ -333,28 +315,28 @@ void AutomotiveDrivingCommand::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteDouble(4, this->theta(), output);
   }
 
-  if (_internal_metadata_.have_unknown_fields()) {
+  if (!unknown_fields().empty()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         unknown_fields(), output);
   }
   // @@protoc_insertion_point(serialize_end:ignition.msgs.AutomotiveDrivingCommand)
 }
 
-::google::protobuf::uint8* AutomotiveDrivingCommand::InternalSerializeWithCachedSizesToArray(
-    bool deterministic, ::google::protobuf::uint8* target) const {
+::google::protobuf::uint8* AutomotiveDrivingCommand::SerializeWithCachedSizesToArray(
+    ::google::protobuf::uint8* target) const {
   // @@protoc_insertion_point(serialize_to_array_start:ignition.msgs.AutomotiveDrivingCommand)
   // optional .ignition.msgs.Header header = 1;
   if (has_header()) {
     target = ::google::protobuf::internal::WireFormatLite::
-      InternalWriteMessageNoVirtualToArray(
-        1, *this->header_, false, target);
+      WriteMessageNoVirtualToArray(
+        1, this->header(), target);
   }
 
   // optional .ignition.msgs.Time time = 2;
   if (has_time()) {
     target = ::google::protobuf::internal::WireFormatLite::
-      InternalWriteMessageNoVirtualToArray(
-        2, *this->time_, false, target);
+      WriteMessageNoVirtualToArray(
+        2, this->time(), target);
   }
 
   // optional double acceleration = 3 [default = 0];
@@ -367,7 +349,7 @@ void AutomotiveDrivingCommand::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::WriteDoubleToArray(4, this->theta(), target);
   }
 
-  if (_internal_metadata_.have_unknown_fields()) {
+  if (!unknown_fields().empty()) {
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
         unknown_fields(), target);
   }
@@ -376,22 +358,21 @@ void AutomotiveDrivingCommand::SerializeWithCachedSizes(
 }
 
 int AutomotiveDrivingCommand::ByteSize() const {
-// @@protoc_insertion_point(message_byte_size_start:ignition.msgs.AutomotiveDrivingCommand)
   int total_size = 0;
 
-  if (_has_bits_[0 / 32] & 15u) {
+  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
     // optional .ignition.msgs.Header header = 1;
     if (has_header()) {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
-          *this->header_);
+          this->header());
     }
 
     // optional .ignition.msgs.Time time = 2;
     if (has_time()) {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
-          *this->time_);
+          this->time());
     }
 
     // optional double acceleration = 3 [default = 0];
@@ -405,7 +386,7 @@ int AutomotiveDrivingCommand::ByteSize() const {
     }
 
   }
-  if (_internal_metadata_.have_unknown_fields()) {
+  if (!unknown_fields().empty()) {
     total_size +=
       ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
         unknown_fields());
@@ -417,27 +398,19 @@ int AutomotiveDrivingCommand::ByteSize() const {
 }
 
 void AutomotiveDrivingCommand::MergeFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_merge_from_start:ignition.msgs.AutomotiveDrivingCommand)
-  if (GOOGLE_PREDICT_FALSE(&from == this)) {
-    ::google::protobuf::internal::MergeFromFail(__FILE__, __LINE__);
-  }
-  const AutomotiveDrivingCommand* source = 
-      ::google::protobuf::internal::DynamicCastToGenerated<const AutomotiveDrivingCommand>(
-          &from);
+  GOOGLE_CHECK_NE(&from, this);
+  const AutomotiveDrivingCommand* source =
+    ::google::protobuf::internal::dynamic_cast_if_available<const AutomotiveDrivingCommand*>(
+      &from);
   if (source == NULL) {
-  // @@protoc_insertion_point(generalized_merge_from_cast_fail:ignition.msgs.AutomotiveDrivingCommand)
     ::google::protobuf::internal::ReflectionOps::Merge(from, this);
   } else {
-  // @@protoc_insertion_point(generalized_merge_from_cast_success:ignition.msgs.AutomotiveDrivingCommand)
     MergeFrom(*source);
   }
 }
 
 void AutomotiveDrivingCommand::MergeFrom(const AutomotiveDrivingCommand& from) {
-// @@protoc_insertion_point(class_specific_merge_from_start:ignition.msgs.AutomotiveDrivingCommand)
-  if (GOOGLE_PREDICT_FALSE(&from == this)) {
-    ::google::protobuf::internal::MergeFromFail(__FILE__, __LINE__);
-  }
+  GOOGLE_CHECK_NE(&from, this);
   if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
     if (from.has_header()) {
       mutable_header()->::ignition::msgs::Header::MergeFrom(from.header());
@@ -452,20 +425,16 @@ void AutomotiveDrivingCommand::MergeFrom(const AutomotiveDrivingCommand& from) {
       set_theta(from.theta());
     }
   }
-  if (from._internal_metadata_.have_unknown_fields()) {
-    mutable_unknown_fields()->MergeFrom(from.unknown_fields());
-  }
+  mutable_unknown_fields()->MergeFrom(from.unknown_fields());
 }
 
 void AutomotiveDrivingCommand::CopyFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_copy_from_start:ignition.msgs.AutomotiveDrivingCommand)
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
 void AutomotiveDrivingCommand::CopyFrom(const AutomotiveDrivingCommand& from) {
-// @@protoc_insertion_point(class_specific_copy_from_start:ignition.msgs.AutomotiveDrivingCommand)
   if (&from == this) return;
   Clear();
   MergeFrom(from);
@@ -477,17 +446,15 @@ bool AutomotiveDrivingCommand::IsInitialized() const {
 }
 
 void AutomotiveDrivingCommand::Swap(AutomotiveDrivingCommand* other) {
-  if (other == this) return;
-  InternalSwap(other);
-}
-void AutomotiveDrivingCommand::InternalSwap(AutomotiveDrivingCommand* other) {
-  std::swap(header_, other->header_);
-  std::swap(time_, other->time_);
-  std::swap(acceleration_, other->acceleration_);
-  std::swap(theta_, other->theta_);
-  std::swap(_has_bits_[0], other->_has_bits_[0]);
-  _internal_metadata_.Swap(&other->_internal_metadata_);
-  std::swap(_cached_size_, other->_cached_size_);
+  if (other != this) {
+    std::swap(header_, other->header_);
+    std::swap(time_, other->time_);
+    std::swap(acceleration_, other->acceleration_);
+    std::swap(theta_, other->theta_);
+    std::swap(_has_bits_[0], other->_has_bits_[0]);
+    _unknown_fields_.Swap(&other->_unknown_fields_);
+    std::swap(_cached_size_, other->_cached_size_);
+  }
 }
 
 ::google::protobuf::Metadata AutomotiveDrivingCommand::GetMetadata() const {
@@ -498,146 +465,6 @@ void AutomotiveDrivingCommand::InternalSwap(AutomotiveDrivingCommand* other) {
   return metadata;
 }
 
-#if PROTOBUF_INLINE_NOT_IN_HEADERS
-// AutomotiveDrivingCommand
-
-// optional .ignition.msgs.Header header = 1;
-bool AutomotiveDrivingCommand::has_header() const {
-  return (_has_bits_[0] & 0x00000001u) != 0;
-}
-void AutomotiveDrivingCommand::set_has_header() {
-  _has_bits_[0] |= 0x00000001u;
-}
-void AutomotiveDrivingCommand::clear_has_header() {
-  _has_bits_[0] &= ~0x00000001u;
-}
-void AutomotiveDrivingCommand::clear_header() {
-  if (header_ != NULL) header_->::ignition::msgs::Header::Clear();
-  clear_has_header();
-}
-const ::ignition::msgs::Header& AutomotiveDrivingCommand::header() const {
-  // @@protoc_insertion_point(field_get:ignition.msgs.AutomotiveDrivingCommand.header)
-  return header_ != NULL ? *header_ : *default_instance_->header_;
-}
-::ignition::msgs::Header* AutomotiveDrivingCommand::mutable_header() {
-  set_has_header();
-  if (header_ == NULL) {
-    header_ = new ::ignition::msgs::Header;
-  }
-  // @@protoc_insertion_point(field_mutable:ignition.msgs.AutomotiveDrivingCommand.header)
-  return header_;
-}
-::ignition::msgs::Header* AutomotiveDrivingCommand::release_header() {
-  // @@protoc_insertion_point(field_release:ignition.msgs.AutomotiveDrivingCommand.header)
-  clear_has_header();
-  ::ignition::msgs::Header* temp = header_;
-  header_ = NULL;
-  return temp;
-}
-void AutomotiveDrivingCommand::set_allocated_header(::ignition::msgs::Header* header) {
-  delete header_;
-  header_ = header;
-  if (header) {
-    set_has_header();
-  } else {
-    clear_has_header();
-  }
-  // @@protoc_insertion_point(field_set_allocated:ignition.msgs.AutomotiveDrivingCommand.header)
-}
-
-// optional .ignition.msgs.Time time = 2;
-bool AutomotiveDrivingCommand::has_time() const {
-  return (_has_bits_[0] & 0x00000002u) != 0;
-}
-void AutomotiveDrivingCommand::set_has_time() {
-  _has_bits_[0] |= 0x00000002u;
-}
-void AutomotiveDrivingCommand::clear_has_time() {
-  _has_bits_[0] &= ~0x00000002u;
-}
-void AutomotiveDrivingCommand::clear_time() {
-  if (time_ != NULL) time_->::ignition::msgs::Time::Clear();
-  clear_has_time();
-}
-const ::ignition::msgs::Time& AutomotiveDrivingCommand::time() const {
-  // @@protoc_insertion_point(field_get:ignition.msgs.AutomotiveDrivingCommand.time)
-  return time_ != NULL ? *time_ : *default_instance_->time_;
-}
-::ignition::msgs::Time* AutomotiveDrivingCommand::mutable_time() {
-  set_has_time();
-  if (time_ == NULL) {
-    time_ = new ::ignition::msgs::Time;
-  }
-  // @@protoc_insertion_point(field_mutable:ignition.msgs.AutomotiveDrivingCommand.time)
-  return time_;
-}
-::ignition::msgs::Time* AutomotiveDrivingCommand::release_time() {
-  // @@protoc_insertion_point(field_release:ignition.msgs.AutomotiveDrivingCommand.time)
-  clear_has_time();
-  ::ignition::msgs::Time* temp = time_;
-  time_ = NULL;
-  return temp;
-}
-void AutomotiveDrivingCommand::set_allocated_time(::ignition::msgs::Time* time) {
-  delete time_;
-  time_ = time;
-  if (time) {
-    set_has_time();
-  } else {
-    clear_has_time();
-  }
-  // @@protoc_insertion_point(field_set_allocated:ignition.msgs.AutomotiveDrivingCommand.time)
-}
-
-// optional double acceleration = 3 [default = 0];
-bool AutomotiveDrivingCommand::has_acceleration() const {
-  return (_has_bits_[0] & 0x00000004u) != 0;
-}
-void AutomotiveDrivingCommand::set_has_acceleration() {
-  _has_bits_[0] |= 0x00000004u;
-}
-void AutomotiveDrivingCommand::clear_has_acceleration() {
-  _has_bits_[0] &= ~0x00000004u;
-}
-void AutomotiveDrivingCommand::clear_acceleration() {
-  acceleration_ = 0;
-  clear_has_acceleration();
-}
- double AutomotiveDrivingCommand::acceleration() const {
-  // @@protoc_insertion_point(field_get:ignition.msgs.AutomotiveDrivingCommand.acceleration)
-  return acceleration_;
-}
- void AutomotiveDrivingCommand::set_acceleration(double value) {
-  set_has_acceleration();
-  acceleration_ = value;
-  // @@protoc_insertion_point(field_set:ignition.msgs.AutomotiveDrivingCommand.acceleration)
-}
-
-// optional double theta = 4 [default = 0];
-bool AutomotiveDrivingCommand::has_theta() const {
-  return (_has_bits_[0] & 0x00000008u) != 0;
-}
-void AutomotiveDrivingCommand::set_has_theta() {
-  _has_bits_[0] |= 0x00000008u;
-}
-void AutomotiveDrivingCommand::clear_has_theta() {
-  _has_bits_[0] &= ~0x00000008u;
-}
-void AutomotiveDrivingCommand::clear_theta() {
-  theta_ = 0;
-  clear_has_theta();
-}
- double AutomotiveDrivingCommand::theta() const {
-  // @@protoc_insertion_point(field_get:ignition.msgs.AutomotiveDrivingCommand.theta)
-  return theta_;
-}
- void AutomotiveDrivingCommand::set_theta(double value) {
-  set_has_theta();
-  theta_ = value;
-  // @@protoc_insertion_point(field_set:ignition.msgs.AutomotiveDrivingCommand.theta)
-}
-
-#endif  // PROTOBUF_INLINE_NOT_IN_HEADERS
 
 // @@protoc_insertion_point(namespace_scope)
 

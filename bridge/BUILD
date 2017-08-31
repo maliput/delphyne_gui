@@ -252,6 +252,17 @@ drake_cc_googletest(
     name = "repeater_factory_test",
     deps = [
         "@lcm",
+        "@ignition-transport3",
         "//bridge:repeater-factory",
+    ],
+)
+
+drake_cc_googletest(
+    name = "repeater_manager_test",
+    deps = [
+        "@lcm",
+        "@ignition-transport3",
+        "//bridge:repeater-factory",
+        "//bridge:repeater-manager",
     ],
 )

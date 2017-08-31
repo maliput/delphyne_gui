@@ -55,16 +55,21 @@ void RepeaterManager::IgnitionRepeaterServiceHandler(
   std::shared_ptr<delphyne::bridge::AbstractRepeater> repeater =
       delphyne::bridge::RepeaterFactory::New(messageType, lcm_, topicName);
 
-  try {
-    repeater->Start();
-    repeaters_.push_back(repeater);
-    igndbg << "Repeater for " << topicName << " started " << std::endl;
-    response.set_data(true);
-  } catch (const std::runtime_error& error) {
-    ignerr << "Failed to start ignition channel repeater for " << topicName
-           << std::endl;
-    ignerr << "Details: " << error.what() << std::endl;
+  if (!repeater) {
+    ignerr << "Couldn't create repeater for " << messageType << std::endl;
     response.set_data(false);
+  } else {
+    try {
+      repeater->Start();
+      repeaters_.push_back(repeater);
+      igndbg << "Repeater for " << topicName << " started " << std::endl;
+      response.set_data(true);
+    } catch (const std::runtime_error& error) {
+      ignerr << "Failed to start ignition channel repeater for " << topicName
+             << std::endl;
+      ignerr << "Details: " << error.what() << std::endl;
+      response.set_data(false);
+    }
   }
   result = true;
 }

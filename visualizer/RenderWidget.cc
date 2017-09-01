@@ -320,66 +320,74 @@ void RenderWidget::SetInitialModel(const ignition::msgs::Model &_msg)
   for (int i = 0; i < _msg.link_size(); ++i) {
     auto link = _msg.link(i);
 
+     // Sanity check: Verify that the model contains the required Id.
+    if (!link.has_id()) {
+      ignerr << "No model Id on link [" << link.name() << "]. Skipping"
+             << std::endl;
+      continue;
+    }
+
+    // Sanity check: Verify that the link contains the required name.
     if (!link.has_name()) {
       ignerr << "No name on link, skipping" << std::endl;
       continue;
     }
-    if (!link.has_id()) {
-      ignerr << "No robot number on link " << link.name() << ", skipping"
-             << std::endl;
-      continue;
-    }
-    if (link.visual_size() != 1) {
-      ignerr << "Expected exactly 1 visual for " << link.name() << ", saw "
-             << link.visual_size() << "; skipping" << std::endl;
-      continue;
-    }
 
     // Sanity check: Verify that the visual doesn't exist already.
-    const auto &modelIt = this->visuals.find(link.id());
-    if (modelIt != this->visuals.end()) {
+    const auto &modelIt = this->allVisuals.find(link.id());
+    if (modelIt != this->allVisuals.end()) {
       if (modelIt->second.find(link.name()) != modelIt->second.end()) {
-        ignerr << "Duplicate link " << link.name() << " for robot "
-               << link.id() << ", skipping" << std::endl;
+        ignerr << "Duplicated link [" << link.name() << "] for model "
+               << link.id() << ". Skipping" << std::endl;
         continue;
       }
     }
 
-    igndbg << "Rendering: " << link.name() << " (" << link.id() << ")"
+    if (link.visual_size() == 0) {
+      ignerr << "No visuals for [" << link.name() << "]. Skipping" << std::endl;
+      continue;
+    }
+
+    igndbg << "Rendering: [" << link.name() << "] (" << link.id() << ")"
            << std::endl;
 
-    const auto &vis = link.visual(0);
-    if (!vis.has_geometry()) {
-      ignerr << "No geometry in link " << link.name() << ", skipping"
-             << std::endl;
-      continue;
+    // Iterate through all the visuals of the link and store them.
+    VisualPtr_V visuals;
+    for (int j = 0; j < link.visual_size(); ++j) {
+
+      const auto &vis = link.visual(j);
+      if (!vis.has_geometry()) {
+        ignerr << "No geometry in link [" << link.name() << "][" << j
+               << "]. Skipping" << std::endl;
+        continue;
+      }
+
+      ignition::rendering::VisualPtr ignvis;
+
+      if (vis.geometry().has_box()) {
+        ignvis = this->RenderBox(vis);
+      }
+      else if (vis.geometry().has_sphere()) {
+        ignvis = this->RenderSphere(vis);
+      }
+      else if (vis.geometry().has_cylinder()) {
+        ignvis = this->RenderCylinder(vis);
+      }
+      else if (vis.geometry().has_mesh()) {
+        ignvis = this->RenderMesh(vis);
+      }
+      else {
+        ignerr << "Invalid shape for [" << link.name() << "]. Skipping"
+               << std::endl;
+        continue;
+      }
+
+      visuals.push_back(ignvis);
     }
 
-    ignition::rendering::VisualPtr ignvis;
-
-    if (vis.geometry().has_box()) {
-      ignvis = this->RenderBox(vis);
-    }
-    else if (vis.geometry().has_sphere()) {
-      ignvis = this->RenderSphere(vis);
-    }
-    else if (vis.geometry().has_cylinder()) {
-      ignvis = this->RenderCylinder(vis);
-    }
-    else if (vis.geometry().has_mesh()) {
-      ignvis = this->RenderMesh(vis);
-    }
-    else {
-      ignerr << "Invalid shape for " << link.name() << ", skipping"
-             << std::endl;
-      continue;
-    }
-
-    auto nameAndVisual = std::pair<std::string,
-      ignition::rendering::VisualPtr>(link.name(), ignvis);
-
-    auto &v = this->visuals[link.id()];
-    v.insert(nameAndVisual);
+    // Update the collection of visuals.
+    auto &links = this->allVisuals[link.id()];
+    links.insert(std::make_pair(link.name(), visuals));
   }
 
   this->initializedScene = true;
@@ -390,22 +398,24 @@ void RenderWidget::UpdateScene(const ignition::msgs::PosesStamped &_msg)
 {
   for (int i = 0; i < _msg.pose_size(); ++i) {
     auto pose = _msg.pose(i);
-    if (!pose.has_name()) {
-      ignerr << "Skipping pose without name" << std::endl;
-      continue;
-    }
+
+    // Sanity check: It's required to have a model Id.
     if (!pose.has_id()) {
       ignerr << "Skipping pose " << pose.name() << " without id" << std::endl;
       continue;
     }
 
-    ignition::rendering::VisualPtr ignvis = nullptr;
-
     // Sanity check: Make sure that the model Id exists.
-    auto robotIt = this->visuals.find(pose.id());
-    if (robotIt == this->visuals.end()) {
-      ignerr << "Could not find robot Id [" << pose.id() << "]. Skipping"
+    auto robotIt = this->allVisuals.find(pose.id());
+    if (robotIt == this->allVisuals.end()) {
+      ignerr << "Could not find model Id [" << pose.id() << "]. Skipping"
              << std::endl;
+      continue;
+    }
+
+    // Sanity check: It's required to have a link name.
+    if (!pose.has_name()) {
+      ignerr << "Skipping pose without name" << std::endl;
       continue;
     }
 
@@ -417,13 +427,15 @@ void RenderWidget::UpdateScene(const ignition::msgs::PosesStamped &_msg)
       continue;
     }
 
-    ignvis = visualsIt->second;
-
-    // The setLocalPositionFromPose() assumes an ignition::msgs::Visual
-    // message here, so we setup a dummy one to please it.
-    ignition::msgs::Visual tmpvis;
-    *tmpvis.mutable_pose() = pose;
-    setLocalPositionFromPose(tmpvis, ignvis);
+    // Update all visuals of this link.
+    auto &visuals = visualsIt->second;
+    for (auto &visual : visuals) {
+      // The setLocalPositionFromPose() assumes an ignition::msgs::Visual
+      // message here, so we setup a dummy one to please it.
+      ignition::msgs::Visual tmpvis;
+      *tmpvis.mutable_pose() = pose;
+      setLocalPositionFromPose(tmpvis, visual);
+    }
   }
 }
 

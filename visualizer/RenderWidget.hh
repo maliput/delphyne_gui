@@ -32,6 +32,7 @@
 #include <cmath>
 #include <map>
 #include <string>
+#include <vector>
 
 #include <ignition/gui/Plugin.hh>
 #include <ignition/rendering/RenderTypes.hh>
@@ -56,6 +57,10 @@ namespace gui {
 class RenderWidget: public ignition::gui::Plugin
 {
   Q_OBJECT
+
+  /// \def VisualPtr_V
+  /// \brief A vector of visual pointers.
+  using VisualPtr_V = std::vector<ignition::rendering::VisualPtr>;
 
   public:
     /// \brief Default constructor.
@@ -162,11 +167,10 @@ class RenderWidget: public ignition::gui::Plugin
     bool initializedScene;
 
     /// \brief This the data structure that stores the pointers to all visuals.
-    /// The key is the link Id.
+    /// The key is the model Id.
     /// The value is another map, where the key is the link name, and the
-    /// value is the pointer to the visual.
-    std::map<uint32_t,
-      std::map<std::string, ignition::rendering::VisualPtr>> visuals;
+    /// value is the vector of visuals associated to the link.
+    std::map<uint32_t, std::map<std::string, VisualPtr_V>> allVisuals;
 };
 
 }

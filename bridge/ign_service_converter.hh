@@ -57,10 +57,11 @@ class IgnitionServiceConverter {
   void Start() {
     // Advertise a service call.
     if (!ignNode_.Advertise(ignServiceName_,
-                             &IgnitionServiceConverter::IgnitionConverterHandler,
-                             this)) {
+                            &IgnitionServiceConverter::IgnitionConverterHandler,
+                            this)) {
       std::stringstream errorMsg;
-      errorMsg << "Error advertising service [" << ignServiceName_ << "]" << std::endl;
+      errorMsg << "Error advertising service [" << ignServiceName_ << "]"
+               << std::endl;
       throw std::runtime_error(errorMsg.str());
     }
   }
@@ -87,8 +88,8 @@ class IgnitionServiceConverter {
   /// convertServiceToMsg overloaded function and publish the
   /// result into an lcm channel
   void IgnitionConverterHandler(const IGN_REQ_TYPE& request,
-                           ignition::msgs::Boolean& response, bool& result) {
-
+                                ignition::msgs::Boolean& response,
+                                bool& result) {
     LCM_TYPE msg = delphyne::bridge::convertServiceToMsg(request);
     if (lcm_->publish(lcmChannelName_, &msg) == -1) {
       // The response failed

@@ -29,7 +29,7 @@ class LCMHandler {
 /// \brief Test that an LCM draw message is properly
 /// translated to an ignition Geometry message.
 class ServiceConverterTest : public ::testing::Test {
-protected:
+ protected:
   // Create an ignition transport node.
   ignition::transport::Node node;
   // Create empty request and response messages for ignition service
@@ -45,7 +45,7 @@ protected:
   // Subscribe lcm handler to channel
   LCMHandler handlerObject;
 
-  virtual void SetUp() override { 
+  virtual void SetUp() override {
     // Subscribe to LCM channel
     lcm->subscribe(lcmChannelName, &LCMHandler::handleMessage, &handlerObject);
   }
@@ -56,7 +56,7 @@ protected:
 TEST_F(ServiceConverterTest, TestConversionEndToEnd) {
   // Create service to channel converter instance
   delphyne::bridge::IgnitionServiceConverter<ignition::msgs::Empty,
-                                            drake::lcmt_viewer_command>
+                                             drake::lcmt_viewer_command>
       ignToLcmRepublisher(lcm, notifierServiceName, lcmChannelName);
 
   // Start ignition service to lcm channel converter
@@ -64,7 +64,8 @@ TEST_F(ServiceConverterTest, TestConversionEndToEnd) {
 
   // Request the republisher service.
   unsigned int serviceTimeout = 100;
-  node.Request(notifierServiceName, serviceRequest, serviceTimeout, serviceResponse, serviceResult);
+  node.Request(notifierServiceName, serviceRequest, serviceTimeout,
+               serviceResponse, serviceResult);
 
   // Wait for lcm message up to 100 millis before timeout
   lcm->handleTimeout(100);
@@ -78,11 +79,11 @@ TEST_F(ServiceConverterTest, TestConversionEndToEnd) {
 }
 
 //////////////////////////////////////////////////
-/// \brief Test convertion with multiple requests of the ignition service 
+/// \brief Test convertion with multiple requests of the ignition service
 TEST_F(ServiceConverterTest, TestConversionCalledMultipleTimes) {
   // Create service to channel converter instance
   delphyne::bridge::IgnitionServiceConverter<ignition::msgs::Empty,
-                                            drake::lcmt_viewer_command>
+                                             drake::lcmt_viewer_command>
       ignToLcmRepublisher(lcm, notifierServiceName, lcmChannelName);
 
   // Start ignition service to lcm channel converter
@@ -90,11 +91,14 @@ TEST_F(ServiceConverterTest, TestConversionCalledMultipleTimes) {
 
   // Request the republisher service.
   unsigned int serviceTimeout = 500;
-  node.Request(notifierServiceName, serviceRequest, serviceTimeout, serviceResponse, serviceResult);
+  node.Request(notifierServiceName, serviceRequest, serviceTimeout,
+               serviceResponse, serviceResult);
   lcm->handleTimeout(100);
-  node.Request(notifierServiceName, serviceRequest, serviceTimeout, serviceResponse, serviceResult);
+  node.Request(notifierServiceName, serviceRequest, serviceTimeout,
+               serviceResponse, serviceResult);
   lcm->handleTimeout(100);
-  node.Request(notifierServiceName, serviceRequest, serviceTimeout, serviceResponse, serviceResult);
+  node.Request(notifierServiceName, serviceRequest, serviceTimeout,
+               serviceResponse, serviceResult);
   lcm->handleTimeout(100);
 
   // Check handler has been called three times
@@ -106,12 +110,13 @@ TEST_F(ServiceConverterTest, TestConversionCalledMultipleTimes) {
 TEST_F(ServiceConverterTest, TestConversionNotStarted) {
   // Create service to channel converter instance
   delphyne::bridge::IgnitionServiceConverter<ignition::msgs::Empty,
-                                            drake::lcmt_viewer_command>
+                                             drake::lcmt_viewer_command>
       ignToLcmRepublisher(lcm, notifierServiceName, lcmChannelName);
 
   // Request the republisher service.
   unsigned int serviceTimeout = 500;
-  node.Request(notifierServiceName, serviceRequest, serviceTimeout, serviceResponse, serviceResult);
+  node.Request(notifierServiceName, serviceRequest, serviceTimeout,
+               serviceResponse, serviceResult);
   lcm->handleTimeout(100);
 
   // Check handler hasn't been called

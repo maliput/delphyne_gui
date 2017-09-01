@@ -3,7 +3,7 @@
 namespace delphyne {
 namespace bridge {
 
-/// \brief Generates an LCM message aimed to  
+/// \brief Generates an LCM message aimed to
 /// tell drake that the visualizer is ready
 drake::lcmt_viewer_command convertServiceToMsg(ignition::msgs::Empty _req) {
   // Create an empty lcm viewer command message

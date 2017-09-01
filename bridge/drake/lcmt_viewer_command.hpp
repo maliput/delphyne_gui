@@ -22,46 +22,14 @@ class lcmt_viewer_command
         std::string command_data;
 
     public:
-        // If you're using C++11 and are getting compiler errors saying things like
-        // ‘constexpr’ needed for in-class initialization of static data member
-        // then re-run lcm-gen with '--cpp-std=c++11' to generate code that is
-        // compliant with C++11
-        static const int8_t   STATUS = 0;
-        // If you're using C++11 and are getting compiler errors saying things like
-        // ‘constexpr’ needed for in-class initialization of static data member
-        // then re-run lcm-gen with '--cpp-std=c++11' to generate code that is
-        // compliant with C++11
-        static const int8_t   LOAD_MODEL = 1;
-        // If you're using C++11 and are getting compiler errors saying things like
-        // ‘constexpr’ needed for in-class initialization of static data member
-        // then re-run lcm-gen with '--cpp-std=c++11' to generate code that is
-        // compliant with C++11
-        static const int8_t   LOAD_RENDERER = 2;
-        // If you're using C++11 and are getting compiler errors saying things like
-        // ‘constexpr’ needed for in-class initialization of static data member
-        // then re-run lcm-gen with '--cpp-std=c++11' to generate code that is
-        // compliant with C++11
-        static const int8_t   SHUTDOWN = 3;
-        // If you're using C++11 and are getting compiler errors saying things like
-        // ‘constexpr’ needed for in-class initialization of static data member
-        // then re-run lcm-gen with '--cpp-std=c++11' to generate code that is
-        // compliant with C++11
-        static const int8_t   START_RECORDING = 4;
-        // If you're using C++11 and are getting compiler errors saying things like
-        // ‘constexpr’ needed for in-class initialization of static data member
-        // then re-run lcm-gen with '--cpp-std=c++11' to generate code that is
-        // compliant with C++11
-        static const int8_t   STOP_RECORDING = 5;
-        // If you're using C++11 and are getting compiler errors saying things like
-        // ‘constexpr’ needed for in-class initialization of static data member
-        // then re-run lcm-gen with '--cpp-std=c++11' to generate code that is
-        // compliant with C++11
-        static const int8_t   LOAD_TERRAIN = 6;
-        // If you're using C++11 and are getting compiler errors saying things like
-        // ‘constexpr’ needed for in-class initialization of static data member
-        // then re-run lcm-gen with '--cpp-std=c++11' to generate code that is
-        // compliant with C++11
-        static const int8_t   SET_TERRAIN_TRANSFORM = 7;
+        static constexpr int8_t   STATUS = 0;
+        static constexpr int8_t   LOAD_MODEL = 1;
+        static constexpr int8_t   LOAD_RENDERER = 2;
+        static constexpr int8_t   SHUTDOWN = 3;
+        static constexpr int8_t   START_RECORDING = 4;
+        static constexpr int8_t   STOP_RECORDING = 5;
+        static constexpr int8_t   LOAD_TERRAIN = 6;
+        static constexpr int8_t   SET_TERRAIN_TRANSFORM = 7;
 
     public:
         /**

@@ -40,6 +40,11 @@
 namespace delphyne {
 namespace bridge {
 
+//////////////////////////////////////////////////
+/// \brief IgnitionServiceConverter will listen to an
+/// ignition service with a request type of IGN_REQ_TYPE
+/// so that when it receives a request, an LCM
+/// message of type LCM_TYPE will be sent
 template <class IGN_REQ_TYPE, class LCM_TYPE>
 class IgnitionServiceConverter {
  public:

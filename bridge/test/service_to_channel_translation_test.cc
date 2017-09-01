@@ -14,7 +14,7 @@ namespace delphyne {
 namespace bridge {
 
 //////////////////////////////////////////////////
-/// \brief Test an end to end service to lcm msg conversion
+/// \brief Test that the content of the message was filled as expected
 GTEST_TEST(ServiceToChannelTranslationTest, TestConversionToLCMViewerCommand) {
   ignition::msgs::Empty req;
   drake::lcmt_viewer_command msg = delphyne::bridge::convertServiceToMsg(req);

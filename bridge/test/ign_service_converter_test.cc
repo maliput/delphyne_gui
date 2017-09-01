@@ -13,36 +13,30 @@
 namespace delphyne {
 namespace bridge {
 
-static bool lcmHandlerCalled;
 
 class LCMHandler {
  public:
   ~LCMHandler() {}
+  int handlerCounter = 0;
+  drake::lcmt_viewer_command responseMsg;
 
   void handleMessage(const lcm::ReceiveBuffer* rbuf, const std::string& chan,
                      const drake::lcmt_viewer_command* msg) {
-    lcmHandlerCalled = true;
+    handlerCounter++;
+    responseMsg = *msg;
   }
 };
-
-//////////////////////////////////////////////////
-/// \brief To be called before a test, clears the handler
-void reset() {
-  lcmHandlerCalled = false;
-}
 
 //////////////////////////////////////////////////
 /// \brief Test an end to end service to lcm msg conversion
 GTEST_TEST(IgnServiceToLCMChannelTest, TestConversionEndToEnd) {
   // Reset handler flag
-  reset();
 
   // Create an ignition transport node.
-  std::shared_ptr<ignition::transport::Node> node =
-      std::make_shared<ignition::transport::Node>();
+  ignition::transport::Node node;
   // Create empty request and response messages for ignition service
-  ignition::msgs::Empty req;
-  ignition::msgs::StringMsg rep;
+  ignition::msgs::Empty request;
+  ignition::msgs::Boolean response;
   // Ignition service name
   std::string notifierServiceName = "/test_service";
   std::string lcmChannelName = "DRAKE_VIEWER_STATUS";
@@ -53,23 +47,25 @@ GTEST_TEST(IgnServiceToLCMChannelTest, TestConversionEndToEnd) {
   LCMHandler handlerObject;
   lcm->subscribe(lcmChannelName, &LCMHandler::handleMessage, &handlerObject);
 
-
   // Start ignition service to lcm channel converter
   delphyne::bridge::IgnitionServiceConverter<ignition::msgs::Empty,
                                              drake::lcmt_viewer_command>
-      ignToLcmRepublisher(node, notifierServiceName, lcm, lcmChannelName);
+      ignToLcmRepublisher(lcm, notifierServiceName, lcmChannelName);
   ignToLcmRepublisher.Start();
 
-  bool srv_result;
+  bool serviceResult;
   unsigned int timeout = 500;
   // Request the republisher service.
-  node->Request(notifierServiceName, req, timeout, rep, srv_result);
+  node.Request(notifierServiceName, request, timeout, response, serviceResult);
 
   // Wait for lcm message up to 500 millis before timeout
   lcm->handleTimeout(500);
 
-  // Check handler has been called
-  ASSERT_TRUE(lcmHandlerCalled);
+  // Check handler has been called once
+  EXPECT_EQ(1, handlerObject.handlerCounter);
+  // Check msg content
+  EXPECT_EQ(0, handlerObject.responseMsg.command_type);
+  EXPECT_EQ("successfully loaded robot", handlerObject.responseMsg.command_data);
 }
 
 }  // namespace bridge

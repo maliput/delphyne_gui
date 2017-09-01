@@ -134,7 +134,7 @@ int main(int argc, char* argv[]) {
   // Start ignition service to lcm channel converter
   delphyne::bridge::IgnitionServiceConverter<ignition::msgs::Empty,
                                              drake::lcmt_viewer_command>
-      ignToLcmRepublisher(node, notifierServiceName, lcm, channelName);
+      ignToLcmRepublisher(lcm, notifierServiceName, channelName);
   ignToLcmRepublisher.Start();
 
   while (!terminatePub) {

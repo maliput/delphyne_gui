@@ -45,25 +45,19 @@ class IgnitionServiceConverter {
  public:
   //////////////////////////////////////////////////
   /// \brief Creates an ignition service converter
-  IgnitionServiceConverter(std::shared_ptr<ignition::transport::Node> ignNode,
+  IgnitionServiceConverter(std::shared_ptr<lcm::LCM> lcm,
                            const std::string& notifierServiceName,
-                           std::shared_ptr<lcm::LCM> lcm,
                            const std::string& channelName)
-      : ignNode_(ignNode),
-        ignServiceName_(notifierServiceName),
+      : ignServiceName_(notifierServiceName),
         lcm_(lcm),
         lcmChannelName_(channelName) {}
 
   //////////////////////////////////////////////////
   /// \brief Start advertising the ignition service call
   void Start() {
-    if (!lcm_->good()) {
-      throw std::runtime_error("LCM is not ready");
-    }
-
     // Advertise a service call.
-    if (!ignNode_->Advertise(ignServiceName_,
-                             &IgnitionServiceConverter::srvConverterHandler,
+    if (!ignNode_.Advertise(ignServiceName_,
+                             &IgnitionServiceConverter::IgnitionConverterHandler,
                              this)) {
       std::stringstream errorMsg;
       errorMsg << "Error advertising service [" << ignServiceName_ << "]" << std::endl;
@@ -74,7 +68,7 @@ class IgnitionServiceConverter {
  private:
   /// \internal
   /// \brief The ignition node
-  std::shared_ptr<ignition::transport::Node> ignNode_;
+  ignition::transport::Node ignNode_;
 
   /// \internal
   /// \brief The ignition service listened
@@ -92,20 +86,18 @@ class IgnitionServiceConverter {
   /// \brief Service handler function, this will call a
   /// convertServiceToMsg overloaded function and publish the
   /// result into an lcm channel
-  void srvConverterHandler(const IGN_REQ_TYPE& _req,
-                           ignition::msgs::StringMsg& _rep, bool& _result) {
-    // Using an Empty msg as _rep won't work, although it works as a _req
-    // So we are using an empty string as a response.
-    _rep.set_data("");
+  void IgnitionConverterHandler(const IGN_REQ_TYPE& request,
+                           ignition::msgs::Boolean& response, bool& result) {
 
-    LCM_TYPE msg = delphyne::bridge::convertServiceToMsg(_req);
+    LCM_TYPE msg = delphyne::bridge::convertServiceToMsg(request);
     if (lcm_->publish(lcmChannelName_, &msg) == -1) {
       // The response failed
-      _result = false;
+      response.set_data(false);
     } else {
       // The response succeed
-      _result = true;
+      response.set_data(true);
     }
+    result = true;
   }
 };
 

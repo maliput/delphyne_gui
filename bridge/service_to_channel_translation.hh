@@ -12,7 +12,7 @@ namespace bridge {
 
 /// \brief Generates an LCM message aimed to
 /// tell drake that the visualizer is ready
-drake::lcmt_viewer_command convertServiceToMsg(ignition::msgs::Empty _req);
+drake::lcmt_viewer_command convertServiceToMsg(ignition::msgs::Empty request);
 
 }  // namespace bridge
 }  // namespace delphyne

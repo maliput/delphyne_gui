@@ -26,8 +26,8 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef DELPHYNE_BRIDGE_IGNSERVICELCMCHANNEL_HH_
-#define DELPHYNE_BRIDGE_IGNSERVICELCMCHANNEL_HH_
+#ifndef DELPHYNE_BRIDGE_IGNSERVICECONVERTER_HH_
+#define DELPHYNE_BRIDGE_IGNSERVICECONVERTER_HH_
 
 #include <functional>
 #include <string>
@@ -50,6 +50,9 @@ class IgnitionServiceConverter {
  public:
   //////////////////////////////////////////////////
   /// \brief Creates an ignition service converter
+  /// \param[in] lcm The LCM instance we are using to dispatch messages
+  /// \param[in] notifierServiceName The ignition service name
+  /// \param[in] channelName The LCM channel name
   IgnitionServiceConverter(std::shared_ptr<lcm::LCM> lcm,
                            const std::string& notifierServiceName,
                            const std::string& channelName)
@@ -60,7 +63,6 @@ class IgnitionServiceConverter {
   //////////////////////////////////////////////////
   /// \brief Start advertising the ignition service call
   void Start() {
-    // Advertise a service call.
     if (!ignNode_.Advertise(ignServiceName_,
                             &IgnitionServiceConverter::IgnitionConverterHandler,
                             this)) {
@@ -95,13 +97,13 @@ class IgnitionServiceConverter {
   void IgnitionConverterHandler(const IGN_REQ_TYPE& request,
                                 ignition::msgs::Boolean& response,
                                 bool& result) {
-    LCM_TYPE msg = delphyne::bridge::convertServiceToMsg(request);
-    if (lcm_->publish(lcmChannelName_, &msg) == -1) {
-      // The response failed
-      response.set_data(false);
-    } else {
+    LCM_TYPE message = delphyne::bridge::convertServiceToMsg(request);
+    if (lcm_->publish(lcmChannelName_, &message) != -1) {
       // The response succeed
       response.set_data(true);
+    } else {
+      // The response failed
+      response.set_data(false);
     }
     result = true;
   }

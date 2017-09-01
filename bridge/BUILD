@@ -83,10 +83,7 @@ cc_library(
     hdrs = ["ign_service_converter.hh",
     ],
     deps = [
-        "@ignition_common//:ignition_common_shared_library",
-        "@ignition-transport3",
         "@lcm",
-        "//bridge:drake-lcmt-headers",
         "//bridge:service-to-channel-translation",
     ],
 )

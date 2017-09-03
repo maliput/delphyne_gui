@@ -120,12 +120,19 @@ class RenderWidget: public ignition::gui::Plugin
     /// \param[in] _msg The pose of the new visual.
     void OnUpdateScene(const ignition::msgs::PosesStamped &_msg);
 
-    /// \brief ToDo.
+    /// \brief Create a visual and material before rendering.
+    /// \param[in] _vis The input message containing the visual specs.
+    /// \param[out] _visual The new visual.
+    /// \param[out] _material The new material.
     bool CreateVisual(const ignition::msgs::Visual &_vis,
                       ignition::rendering::VisualPtr &_visual,
                       ignition::rendering::MaterialPtr &_material) const;
 
-    /// \brief ToDo.
+    /// \brief Helper function used during the last phase of rendering.
+    /// \param[in] _vis The input message containing the visual specs.
+    /// \param[in] _scale The scale vector.
+    /// \param[in] _material The material.
+    /// \param[in, out] _visual The visual that is going to be rendered.
     ignition::rendering::VisualPtr Render(const ignition::msgs::Visual &_vis,
                                          const ignition::math::Vector3d &_scale,
                               const ignition::rendering::MaterialPtr &_material,

@@ -37,6 +37,7 @@
 #include <ignition/common/PluginMacros.hh>
 #include <ignition/gui/Iface.hh>
 #include <ignition/gui/Plugin.hh>
+#include <ignition/math/Vector3.hh>
 #include <ignition/msgs.hh>
 #include <ignition/rendering/Camera.hh>
 #include <ignition/rendering/Light.hh>
@@ -131,132 +132,117 @@ void RenderWidget::OnUpdateScene(const ignition::msgs::PosesStamped &_msg)
 }
 
 /////////////////////////////////////////////////
-ignition::rendering::VisualPtr RenderWidget::RenderBox(
-  const ignition::msgs::Visual &_vis)
+bool RenderWidget::CreateVisual(const ignition::msgs::Visual &_vis,
+  ignition::rendering::VisualPtr &_visual,
+  ignition::rendering::MaterialPtr &_material) const
 {
-  ignition::rendering::VisualPtr root = this->scene->RootVisual();
-
-  ignition::rendering::VisualPtr box = this->scene->CreateVisual();
-  if (!box) {
+  _visual = this->scene->CreateVisual();
+  if (!_visual) {
     ignerr << "Failed to create visual" << std::endl;
-    return nullptr;
+    return false;
   }
 
-  ignition::rendering::MaterialPtr green = this->scene->CreateMaterial();
-  if (!green) {
-    ignerr << "Failed to create green material" << std::endl;
-    return nullptr;
+  _material = this->scene->CreateMaterial();
+  if (!_material) {
+    ignerr << "Failed to create material" << std::endl;
+    return false;
   }
 
-  double xScale = 1.0;
-  double yScale = 1.0;
-  double zScale = 1.0;
+  if (_vis.has_material()) {
+    const auto &material = _vis.material();
+    if (material.has_diffuse()) {
+      const auto &diffuse = material.diffuse();
+      if (diffuse.has_r() && diffuse.has_g() && diffuse.has_b()) {
+        _material->SetDiffuse(diffuse.r(), diffuse.g(), diffuse.b());
+      }
+      const auto &ambient = material.ambient();
+      if (ambient.has_r() && ambient.has_g() && ambient.has_b()) {
+        _material->SetAmbient(ambient.r(), ambient.g(), ambient.b());
+      }
+      const auto &specular = material.specular();
+      if (specular.has_r() && specular.has_g() && specular.has_b()) {
+        _material->SetSpecular(specular.r(), specular.g(), specular.b());
+      }
+    }
+  }
 
+  _material->SetShininess(50);
+  _material->SetReflectivity(0);
+
+  return true;
+}
+
+/////////////////////////////////////////////////
+ignition::rendering::VisualPtr RenderWidget::Render(
+  const ignition::msgs::Visual &_vis,
+  const ignition::math::Vector3d &_scale,
+  const ignition::rendering::MaterialPtr &_material,
+  ignition::rendering::VisualPtr &_visual)
+{
+  setLocalPositionFromPose(_vis, _visual);
+  _visual->SetLocalScale(_scale.X(), _scale.Y(), _scale.Z());
+  _visual->SetMaterial(_material);
+  this->scene->RootVisual()->AddChild(_visual);
+  return _visual;
+}
+
+/////////////////////////////////////////////////
+ignition::rendering::VisualPtr RenderWidget::RenderBox(
+  const ignition::msgs::Visual &_vis,
+  ignition::rendering::VisualPtr &_visual,
+  ignition::rendering::MaterialPtr &_material)
+{
+  ignition::math::Vector3d scale = ignition::math::Vector3d::One;
   auto geomBox = _vis.geometry().box();
   if (geomBox.has_size()) {
-    xScale = geomBox.size().z();
-    yScale = geomBox.size().x();
-    zScale = geomBox.size().y();
+    scale.X() = geomBox.size().z();
+    scale.Y() = geomBox.size().x();
+    scale.Z() = geomBox.size().y();
   }
 
-  green->SetAmbient(0.0, 0.5, 0.0);
-  green->SetDiffuse(0.0, 0.7, 0.0);
-  green->SetSpecular(0.5, 0.5, 0.5);
-  green->SetShininess(50);
-  green->SetReflectivity(0);
-  box->AddGeometry(scene->CreateBox());
-  setLocalPositionFromPose(_vis, box);
-  box->SetLocalScale(xScale, yScale, zScale);
-  box->SetMaterial(green);
-  root->AddChild(box);
-
-  return box;
+  _visual->AddGeometry(scene->CreateBox());
+  this->Render(_vis, scale, _material, _visual);
+  return _visual;
 }
 
 /////////////////////////////////////////////////
 ignition::rendering::VisualPtr RenderWidget::RenderSphere(
-  const ignition::msgs::Visual &_vis)
+  const ignition::msgs::Visual &_vis,
+  ignition::rendering::VisualPtr &_visual,
+  ignition::rendering::MaterialPtr &_material)
 {
-  ignition::rendering::VisualPtr root = this->scene->RootVisual();
-
-  ignition::rendering::VisualPtr sphere = this->scene->CreateVisual();
-  if (!sphere) {
-    ignerr << "Failed to create visual" << std::endl;
-    return nullptr;
-  }
-  ignition::rendering::MaterialPtr red = scene->CreateMaterial();
-  if (!red) {
-    ignerr << "Failed to create red material" << std::endl;
-    return nullptr;
-  }
-
-  double xScale = 1.0;
-  double yScale = 1.0;
-  double zScale = 1.0;
-
+  ignition::math::Vector3d scale = ignition::math::Vector3d::One;
   auto geomSphere = _vis.geometry().sphere();
   if (geomSphere.has_radius()) {
-    xScale *= geomSphere.radius();
-    yScale *= geomSphere.radius();
-    zScale *= geomSphere.radius();
+    scale.X() *= geomSphere.radius();
+    scale.Y() *= geomSphere.radius();
+    scale.Z() *= geomSphere.radius();
   }
 
-  red->SetAmbient(0.5, 0.0, 0.0);
-  red->SetDiffuse(1.0, 0.0, 0.0);
-  red->SetSpecular(0.5, 0.5, 0.5);
-  red->SetShininess(50);
-  red->SetReflectivity(0);
-  sphere->AddGeometry(scene->CreateSphere());
-  setLocalPositionFromPose(_vis, sphere);
-  sphere->SetLocalScale(xScale, yScale, zScale);
-  sphere->SetMaterial(red);
-  root->AddChild(sphere);
-
-  return sphere;
+  _visual->AddGeometry(scene->CreateSphere());
+  this->Render(_vis, scale, _material, _visual);
+  return _visual;
 }
 
 /////////////////////////////////////////////////
 ignition::rendering::VisualPtr RenderWidget::RenderCylinder(
-  const ignition::msgs::Visual &_vis)
+  const ignition::msgs::Visual &_vis,
+  ignition::rendering::VisualPtr &_visual,
+  ignition::rendering::MaterialPtr &_material)
 {
-  ignition::rendering::VisualPtr root = this->scene->RootVisual();
-
-  ignition::rendering::VisualPtr cylinder = this->scene->CreateVisual();
-  if (!cylinder) {
-    ignerr << "Failed to create visual" << std::endl;
-    return nullptr;
-  }
-  ignition::rendering::MaterialPtr blue = scene->CreateMaterial();
-  if (!blue) {
-    ignerr << "Failed to create blue material" << std::endl;
-    return nullptr;
-  }
-
-  double xScale = 1.0;
-  double yScale = 1.0;
-  double zScale = 1.0;
-
+  ignition::math::Vector3d scale = ignition::math::Vector3d::One;
   auto geomCylinder = _vis.geometry().cylinder();
   if (geomCylinder.has_radius()) {
-    xScale *= geomCylinder.radius();
-    yScale *= geomCylinder.radius();
+    scale.X() *= geomCylinder.radius();
+    scale.Y() *= geomCylinder.radius();
   }
   if (geomCylinder.has_length()) {
-    zScale = geomCylinder.length();
+    scale.Z() = geomCylinder.length();
   }
 
-  blue->SetAmbient(0.0, 0.0, 0.3);
-  blue->SetDiffuse(0.0, 0.0, 0.8);
-  blue->SetSpecular(0.8, 0.8, 0.8);
-  blue->SetShininess(50);
-  blue->SetReflectivity(0);
-  cylinder->AddGeometry(scene->CreateCylinder());
-  setLocalPositionFromPose(_vis, cylinder);
-  cylinder->SetLocalScale(xScale, yScale, zScale);
-  cylinder->SetMaterial(blue);
-  root->AddChild(cylinder);
-
-  return cylinder;
+  _visual->AddGeometry(scene->CreateCylinder());
+  this->Render(_vis, scale, _material, _visual);
+  return _visual;
 }
 
 /////////////////////////////////////////////////
@@ -362,16 +348,22 @@ void RenderWidget::SetInitialModel(const ignition::msgs::Model &_msg)
         continue;
       }
 
+      ignition::rendering::VisualPtr visual;
+      ignition::rendering::MaterialPtr material;
+      if (!this->CreateVisual(vis, visual, material)) {
+        continue;
+      }
+
       ignition::rendering::VisualPtr ignvis;
 
       if (vis.geometry().has_box()) {
-        ignvis = this->RenderBox(vis);
+        ignvis = this->RenderBox(vis, visual, material);
       }
       else if (vis.geometry().has_sphere()) {
-        ignvis = this->RenderSphere(vis);
+        ignvis = this->RenderSphere(vis, visual, material);
       }
       else if (vis.geometry().has_cylinder()) {
-        ignvis = this->RenderCylinder(vis);
+        ignvis = this->RenderCylinder(vis, visual, material);
       }
       else if (vis.geometry().has_mesh()) {
         ignvis = this->RenderMesh(vis);

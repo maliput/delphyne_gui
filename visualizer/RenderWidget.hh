@@ -120,23 +120,40 @@ class RenderWidget: public ignition::gui::Plugin
     /// \param[in] _msg The pose of the new visual.
     void OnUpdateScene(const ignition::msgs::PosesStamped &_msg);
 
+    /// \brief ToDo.
+    bool CreateVisual(const ignition::msgs::Visual &_vis,
+                      ignition::rendering::VisualPtr &_visual,
+                      ignition::rendering::MaterialPtr &_material) const;
+
+    /// \brief ToDo.
+    ignition::rendering::VisualPtr Render(const ignition::msgs::Visual &_vis,
+                                         const ignition::math::Vector3d &_scale,
+                              const ignition::rendering::MaterialPtr &_material,
+                                       ignition::rendering::VisualPtr &_visual);
+
     /// \brief Render a new box.
     /// \param[in] _vis the visual containing the properties of the object.
     /// \return A pointer to the new visual.
     ignition::rendering::VisualPtr RenderBox(
-      const ignition::msgs::Visual &_vis);
+      const ignition::msgs::Visual &_vis,
+      ignition::rendering::VisualPtr &_visual,
+      ignition::rendering::MaterialPtr &_material);
 
     /// \brief Render a new sphere.
     /// \param[in] _vis the visual containing the properties of the object.
     /// \return A pointer to the new visual.
     ignition::rendering::VisualPtr RenderSphere(
-      const ignition::msgs::Visual &_vis);
+      const ignition::msgs::Visual &_vis,
+      ignition::rendering::VisualPtr &_visual,
+      ignition::rendering::MaterialPtr &_material);
 
     /// \brief Render a new cylinder.
     /// \param[in] _vis the visual containing the properties of the object.
     /// \return A pointer to the new visual.
     ignition::rendering::VisualPtr RenderCylinder(
-      const ignition::msgs::Visual &_vis);
+      const ignition::msgs::Visual &_vis,
+      ignition::rendering::VisualPtr &_visual,
+      ignition::rendering::MaterialPtr &_material);
 
     /// \brief Render a new mesh.
     /// \param[in] _vis the visual containing the properties of the object.

@@ -71,7 +71,7 @@ TEST_F(ServiceConverterTest, TestConversionEndToEnd) {
   lcm->handleTimeout(100);
 
   // Check handler has been called once
-  EXPECT_EQ(1, handlerObject.handlerCounter);
+  ASSERT_EQ(1, handlerObject.handlerCounter);
   // Check msg content
   EXPECT_EQ(0, handlerObject.responseMsg.command_type);
   EXPECT_EQ("successfully loaded robot",

@@ -18,8 +18,8 @@ namespace bridge {
 GTEST_TEST(ServiceToChannelTranslationTest, TestConversionToLCMViewerCommand) {
   ignition::msgs::Empty req;
   drake::lcmt_viewer_command msg = delphyne::bridge::convertServiceToMsg(req);
-  ASSERT_EQ(msg.command_type, 0);
-  ASSERT_EQ(msg.command_data, "successfully loaded robot");
+  EXPECT_EQ(msg.command_type, 0);
+  EXPCET_EQ(msg.command_data, "successfully loaded robot");
 }
 
 }  // namespace bridge

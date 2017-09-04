@@ -36,6 +36,7 @@ class ServiceConverterTest : public ::testing::Test {
   ignition::msgs::Empty serviceRequest;
   ignition::msgs::Boolean serviceResponse;
   bool serviceResult;
+  unsigned int serviceTimeout = 100;
   // Ignition service name
   std::string notifierServiceName = "/test_service";
   std::string lcmChannelName = "DRAKE_VIEWER_STATUS";
@@ -57,13 +58,12 @@ TEST_F(ServiceConverterTest, TestConversionEndToEnd) {
   // Create service to channel converter instance
   delphyne::bridge::IgnitionServiceConverter<ignition::msgs::Empty,
                                              drake::lcmt_viewer_command>
-      ignToLcmRepublisher(lcm, notifierServiceName, lcmChannelName);
+      serviceConverter(lcm, notifierServiceName, lcmChannelName);
 
   // Start ignition service to lcm channel converter
-  ignToLcmRepublisher.Start();
+  serviceConverter.Start();
 
   // Request the republisher service.
-  unsigned int serviceTimeout = 100;
   node.Request(notifierServiceName, serviceRequest, serviceTimeout,
                serviceResponse, serviceResult);
 
@@ -84,25 +84,20 @@ TEST_F(ServiceConverterTest, TestConversionCalledMultipleTimes) {
   // Create service to channel converter instance
   delphyne::bridge::IgnitionServiceConverter<ignition::msgs::Empty,
                                              drake::lcmt_viewer_command>
-      ignToLcmRepublisher(lcm, notifierServiceName, lcmChannelName);
+      serviceConverter(lcm, notifierServiceName, lcmChannelName);
 
   // Start ignition service to lcm channel converter
-  ignToLcmRepublisher.Start();
+  serviceConverter.Start();
 
   // Request the republisher service.
-  unsigned int serviceTimeout = 500;
-  node.Request(notifierServiceName, serviceRequest, serviceTimeout,
-               serviceResponse, serviceResult);
-  lcm->handleTimeout(100);
-  node.Request(notifierServiceName, serviceRequest, serviceTimeout,
-               serviceResponse, serviceResult);
-  lcm->handleTimeout(100);
-  node.Request(notifierServiceName, serviceRequest, serviceTimeout,
-               serviceResponse, serviceResult);
-  lcm->handleTimeout(100);
+  for(int i=0; i<3; i++) {
+    node.Request(notifierServiceName, serviceRequest, serviceTimeout,
+                serviceResponse, serviceResult);
+    lcm->handleTimeout(100);
+  }
 
   // Check handler has been called three times
-  EXPECT_EQ(3, handlerObject.handlerCounter);
+  ASSERT_EQ(3, handlerObject.handlerCounter);
 }
 
 //////////////////////////////////////////////////
@@ -111,16 +106,15 @@ TEST_F(ServiceConverterTest, TestConversionNotStarted) {
   // Create service to channel converter instance
   delphyne::bridge::IgnitionServiceConverter<ignition::msgs::Empty,
                                              drake::lcmt_viewer_command>
-      ignToLcmRepublisher(lcm, notifierServiceName, lcmChannelName);
+      serviceConverter(lcm, notifierServiceName, lcmChannelName);
 
   // Request the republisher service.
-  unsigned int serviceTimeout = 500;
   node.Request(notifierServiceName, serviceRequest, serviceTimeout,
                serviceResponse, serviceResult);
   lcm->handleTimeout(100);
 
   // Check handler hasn't been called
-  EXPECT_EQ(0, handlerObject.handlerCounter);
+  ASSERT_EQ(0, handlerObject.handlerCounter);
 }
 
 }  // namespace bridge

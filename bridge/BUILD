@@ -80,8 +80,7 @@ cc_library(
 
 cc_library(
     name = "ign-service-converter",
-    hdrs = ["ign_service_converter.hh",
-    ],
+    hdrs = ["ign_service_converter.hh"],
     deps = [
         "@lcm",
         "//bridge:service-to-channel-translation",

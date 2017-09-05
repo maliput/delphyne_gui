@@ -150,7 +150,8 @@ void OrbitViewControl::Update() {
       this->camera, ignition::math::Vector2d(nx, ny));
     this->target  = this->rayQuery->ClosestPoint();
     if (!this->target) {
-      ignerr << "No target" << std::endl;
+      this->target.point = this->rayQuery->Origin() +
+        this->rayQuery->Direction() * 10;
       return;
     }
   }

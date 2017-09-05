@@ -97,9 +97,37 @@ void lcmToIgn(drake::lcmt_viewer_draw robotViewerData,
 
 //////////////////////////////////////////////////
 void lcmToIgn(drake::lcmt_viewer_load_robot robotData,
-              ignition::msgs::Model* robotModel) {
+              ignition::msgs::Model_V* robotModels) {
+
+  std::map<int32_t, std::vector<drake::lcmt_viewer_link_data>> groupedLinks;
+
+  for (int i = 0; i < robotData.num_links; ++i) {
+    groupedLinks[robotData.link[i].robot_num].push_back(robotData.link[i]);
+  }
+
+  for (auto iterator = groupedLinks.begin(); iterator != groupedLinks.end(); ++iterator) {
+    drake::lcmt_viewer_load_robot robot;
+    std::vector<drake::lcmt_viewer_link_data> links;
+
+    links = (*iterator).second;
+
+    robot.num_links = links.size();
+    robot.link.resize(robot.num_links);
+    std::copy(links.begin(), links.end(), robot.link);
+
+    lcmToIgn(robot, robotModels->add_models());
+  }
+}
+
+//////////////////////////////////////////////////
+void lcmToIgn(drake::lcmt_viewer_load_robot robotData,
+               ignition::msgs::Model* robotModel) {
   for (int i = 0; i < robotData.num_links; ++i) {
     lcmToIgn(robotData.link[i], robotModel->add_link());
+  }
+  // If there is at least one link, take the robot id from it
+  if (robotData.num_links > 0) {
+    robotModel->set_id(robotData.link[0].robot_num);
   }
 }
 
@@ -107,7 +135,6 @@ void lcmToIgn(drake::lcmt_viewer_load_robot robotData,
 void lcmToIgn(drake::lcmt_viewer_link_data linkData,
               ignition::msgs::Link* linkModel) {
   linkModel->set_name(linkData.name);
-  linkModel->set_id(linkData.robot_num);
   for (int i = 0; i < linkData.num_geom; ++i) {
     lcmToIgn(linkData.geom[i], linkModel->add_visual());
   }

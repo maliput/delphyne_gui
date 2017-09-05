@@ -45,6 +45,16 @@ cc_library(
 )
 
 cc_library(
+    name = "service-to-channel-translation",
+    srcs = ["service_to_channel_translation.cc"],
+    hdrs = ["service_to_channel_translation.hh"],
+    deps = [
+        "@ignition-transport3",
+        "//bridge:drake-lcmt-headers",
+    ],
+)
+
+cc_library(
     name = "lcm-channel-repeater",
     hdrs = ["lcm_channel_repeater.hh",
     ],
@@ -65,6 +75,15 @@ cc_library(
         "@lcm",
         "//bridge:drake-lcmt-headers",
         "@ignition_common//:ignition_common_shared_library",
+    ],
+)
+
+cc_library(
+    name = "ign-service-converter",
+    hdrs = ["ign_service_converter.hh"],
+    deps = [
+        "@lcm",
+        "//bridge:service-to-channel-translation",
     ],
 )
 
@@ -91,6 +110,7 @@ cc_binary(
         "//bridge:ign-to-lcm-translation",
         "//bridge:drake-lcmt-headers",
         "//bridge:lcm-channel-repeater",
+        "//bridge:ign-service-converter",
         "//bridge:ign-topic-repeater",
     ],
     data = [
@@ -155,5 +175,23 @@ drake_cc_googletest(
         "//bridge:lcm-to-ign-translation",
         "//bridge:lcm-channel-repeater",
         "//bridge:drake-lcmt-headers",
+    ],
+)
+
+drake_cc_googletest(
+    name = "ign_service_converter_test",
+    deps = [
+        "@lcm",
+        "//bridge:drake-lcmt-headers",
+        "//bridge:ign-service-converter",
+    ],
+)
+
+drake_cc_googletest(
+    name = "service_to_channel_translation_test",
+    deps = [
+        "@lcm",
+        "//bridge:drake-lcmt-headers",
+        "//bridge:ign-service-converter",
     ],
 )

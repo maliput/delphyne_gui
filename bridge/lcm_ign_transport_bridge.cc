@@ -32,6 +32,7 @@
 
 // Drake LCM message headers
 #include "drake/lcmt_driving_command_t.hpp"
+#include "drake/lcmt_viewer_command.hpp"
 #include "drake/lcmt_viewer_draw.hpp"
 #include "drake/lcmt_viewer_geometry_data.hpp"
 #include "drake/lcmt_viewer_load_robot.hpp"
@@ -40,8 +41,10 @@
 #include "protobuf/headers/automotive_driving_command.pb.h"
 
 // Repeater classes
+#include "ign_service_converter.hh"
 #include "ign_topic_repeater.hh"
 #include "lcm_channel_repeater.hh"
+#include "service_to_channel_translation.hh"
 
 // LCM entry point
 #include "lcm/lcm-cpp.hpp"
@@ -70,6 +73,7 @@ int main(int argc, char* argv[]) {
   ignition::common::Console::SetVerbosity(3);
   ignmsg << "LCM to ignition-transport bridge 0.1.0" << std::endl;
 
+  // Create an lcm object
   std::shared_ptr<lcm::LCM> lcm = std::make_shared<lcm::LCM>();
 
   // Create a repeater on DRAKE_VIEWER_LOAD_ROBOT channel, translating
@@ -120,10 +124,19 @@ int main(int argc, char* argv[]) {
     exit(1);
   }
 
+  // Service name
+  std::string notifierServiceName = "/visualizer_start_notifier";
+  std::string channelName = "DRAKE_VIEWER_STATUS";
+
+  // Start ignition service to lcm channel converter
+  delphyne::bridge::IgnitionServiceConverter<ignition::msgs::Empty,
+                                             drake::lcmt_viewer_command>
+      ignToLcmRepublisher(lcm, notifierServiceName, channelName);
+  ignToLcmRepublisher.Start();
+
   while (!terminatePub) {
     lcm->handleTimeout(100);
   }
 
   return 0;
 }
-

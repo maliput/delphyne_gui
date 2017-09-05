@@ -133,16 +133,6 @@ int main(int argc, char* argv[]) {
     exit(1);
   }
 
-  // Start DRIVING_COMMAND_0 repeater
-  try {
-    drivingCommandRepeater.Start();
-  } catch (const std::runtime_error& error) {
-    ignerr << "Failed to start ignition channel repeater for "
-           << "DRIVING_COMMAND_0" << std::endl;
-    ignerr << "Details: " << error.what() << std::endl;
-    exit(1);
-  }
-
   // Service name
   std::string notifierServiceName = "/visualizer_start_notifier";
   std::string channelName = "DRAKE_VIEWER_STATUS";
@@ -150,40 +140,8 @@ int main(int argc, char* argv[]) {
   // Start ignition service to lcm channel converter
   delphyne::bridge::IgnitionServiceConverter<ignition::msgs::Empty,
                                              drake::lcmt_viewer_command>
-      ignToLcmRepublisher(lcm, notifierServiceName, channelName);
+      ignToLcmRepublisher(sharedLCM, notifierServiceName, channelName);
   ignToLcmRepublisher.Start();
-
-  // Create a transport node.
-  ignition::transport::Node node;
-  std::string service = "/repeat_ignition_topic";
-  std::string customMsgService = "/custom_msg";
-  std::string helloWorldService = "/hello_world";
-
-  // Advertise a service call.
-  if (!node.Advertise(helloWorldService, srvHelloWorld))
-  {
-    std::cerr << "Error advertising service [" << helloWorldService << "]" << std::endl;
-    return 1;
-  }
-
-  // Advertise another service call.
-  if (!node.Advertise(service, srvRepeatIgnitionTopic))
-  {
-    std::cerr << "Error advertising service [" << service << "]" << std::endl;
-    return 1;
-  }
-
-  // Advertise another service call.
-  if (!node.Advertise(customMsgService, srvCustomMsgTopic))
-  {
-    std::cerr << "Error advertising service [" << customMsgService << "]" << std::endl;
-    return 1;
-  }
-
-  //ignition::msgs::AutomotiveDrivingCommand drivingCommand;
-  //drivingCommand.set_acceleration(1.54);
-  //drivingCommand.set_theta(3.14);
-  //std::cout << drivingCommand.DebugString() << std::endl;
 
   while (!terminatePub) {
     sharedLCM->handleTimeout(100);

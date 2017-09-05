@@ -94,7 +94,13 @@ int main(int argc, char* argv[]) {
 
   delphyne::bridge::RepeaterManager manager(sharedLCM);
 
-  manager.Start();
+  try {
+    manager.Start();
+  } catch (const std::runtime_error& error) {
+    ignerr << "Failed to start the repeater manager" << std::endl;
+    ignerr << "Details: " << error.what() << std::endl;
+    exit(1);
+  }
 
   // Create a repeater on DRAKE_VIEWER_LOAD_ROBOT channel, translating
   // from drake::lcmt_viewer_load_robot to ignition::msgs::Model

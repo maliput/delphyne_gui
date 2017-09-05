@@ -62,12 +62,11 @@ class RepeaterFactory {
       const std::string& messageType, std::shared_ptr<lcm::LCM> lcm,
       const std::string& topicName);
 
-  /// \brief A list of registered message types
  private:
   /// \internal
   /// \brief A map between ignition message types and functions used to
   /// create repeaters
-  static std::map<std::string, RepeaterFactoryFunction>* repeaterMap;
+  static std::map<std::string, RepeaterFactoryFunction> repeaterMap;
 };
 
 /// \brief Static message registration macro

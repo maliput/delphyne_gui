@@ -31,6 +31,7 @@
 
 #include <memory>
 #include <string>
+
 #include <ignition/common/Console.hh>
 #include <ignition/msgs.hh>
 #include <ignition/transport.hh>

@@ -26,6 +26,8 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+#include <sstream>
+
 #include <ignition/common/Console.hh>
 
 #include "repeater_factory.hh"
@@ -39,9 +41,10 @@ void RepeaterManager::Start() {
   if (!node_.Advertise(ignitionRepeaterServiceName_,
                        &RepeaterManager::IgnitionRepeaterServiceHandler,
                        this)) {
-    ignerr << "Error starting the repeater manager while "
-           << "advertising service [" << ignitionRepeaterServiceName_ << "]"
-           << std::endl;
+    std::stringstream message;
+    message << "Error while advertising service ["
+            << ignitionRepeaterServiceName_ << "]";
+    throw std::runtime_error(message.str());
   }
 }
 

@@ -31,11 +31,11 @@
 
 #include <cmath>
 #include <map>
+#include <memory>
 #include <string>
 #include <vector>
 
 #include <ignition/gui/Plugin.hh>
-#include <ignition/rendering/RayQuery.hh>
 #include <ignition/rendering/RenderTypes.hh>
 #include <ignition/rendering/RenderingIface.hh>
 #include <ignition/transport.hh>

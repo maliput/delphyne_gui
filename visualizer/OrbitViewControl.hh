@@ -131,7 +131,8 @@ class OrbitViewControl
     /// \brief Stores the mouse state.
     struct MouseButton mouse;
 
-    /// \brief The mutex to avoid races among all the callbacks.
+    /// \brief Protect the MouseButton struct from being simultaneously modified
+    /// and read.
     std::mutex mouseMutex;
 };
 

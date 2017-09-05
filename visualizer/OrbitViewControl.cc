@@ -41,6 +41,11 @@ using namespace gui;
 OrbitViewControl::OrbitViewControl(const ignition::rendering::CameraPtr &_cam)
   : camera(_cam)
 {
+  this->rayQuery = this->camera->Scene()->CreateRayQuery();
+  if (!this->rayQuery) {
+    ignerr << "Failed to create Ray Query" << std::endl;
+    return;
+  }
 }
 
 /////////////////////////////////////////////////
@@ -60,8 +65,9 @@ void OrbitViewControl::OnMouseRelease(const QMouseEvent *_e) {
 
 /////////////////////////////////////////////////
 void OrbitViewControl::OnMouseMove(const QMouseEvent *_e) {
-  if (!this->camera)
+  if (!this->camera) {
     return;
+  }
 
   {
     std::lock_guard<std::mutex> lock(this->mouseMutex);
@@ -103,8 +109,9 @@ void OrbitViewControl::OnMouseWheel(const QWheelEvent *_e) {
 //////////////////////////////////////////////////
 void OrbitViewControl::OnMouseButtonAction(const QMouseEvent *_e,
   const ButtonState_t &_state) {
-  if (!this->camera)
+  if (!this->camera) {
     return;
+  }
 
   // Ignore unknown mouse buttons.
   if (_e->button() != Qt::LeftButton &&
@@ -129,17 +136,11 @@ void OrbitViewControl::OnMouseButtonAction(const QMouseEvent *_e,
 
 //////////////////////////////////////////////////
 void OrbitViewControl::Update() {
-  if (!this->camera)
+  if (!this->camera || !this->rayQuery){
     return;
+  }
 
   std::lock_guard<std::mutex> lock(this->mouseMutex);
-  if (!this->rayQuery) {
-    this->rayQuery = this->camera->Scene()->CreateRayQuery();
-    if (!this->rayQuery) {
-      ignerr << "Failed to create Ray Query" << std::endl;
-      return;
-    }
-  }
   if (this->mouse.buttonDirty) {
     this->mouse.buttonDirty = false;
     double nx = 2.0 * this->mouse.x / static_cast<double>(

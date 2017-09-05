@@ -545,32 +545,36 @@ void RenderWidget::moveEvent(QMoveEvent* _e) {
 
 /////////////////////////////////////////////////
 void RenderWidget::mousePressEvent(QMouseEvent *_e) {
-  if (!this->orbitViewControl)
+  if (!this->orbitViewControl) {
     return;
+  }
 
   this->orbitViewControl->OnMousePress(_e);
 }
 
 /////////////////////////////////////////////////
 void RenderWidget::mouseReleaseEvent(QMouseEvent *_e) {
-  if (!this->orbitViewControl)
+  if (!this->orbitViewControl) {
     return;
+  }
 
   this->orbitViewControl->OnMouseRelease(_e);
 }
 
 /////////////////////////////////////////////////
 void RenderWidget::mouseMoveEvent(QMouseEvent *_e) {
-  if (!this->orbitViewControl)
+  if (!this->orbitViewControl) {
     return;
+  }
 
   this->orbitViewControl->OnMouseMove(_e);
 }
 
 /////////////////////////////////////////////////
 void RenderWidget::wheelEvent(QWheelEvent *_e) {
-  if (!this->orbitViewControl)
+  if (!this->orbitViewControl) {
     return;
+  }
 
   this->orbitViewControl->OnMouseWheel(_e);
 }

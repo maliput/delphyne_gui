@@ -26,78 +26,66 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <cmath>
-#include <iostream>
+#include <cstdlib>
+#include <functional>
+#include <map>
 #include <string>
+#include <utility>
 
 #include <ignition/common/Console.hh>
+#include <ignition/common/MeshManager.hh>
 #include <ignition/common/PluginMacros.hh>
-
 #include <ignition/gui/Iface.hh>
 #include <ignition/gui/Plugin.hh>
-
+#include <ignition/math/Vector3.hh>
+#include <ignition/msgs.hh>
 #include <ignition/rendering/Camera.hh>
+#include <ignition/rendering/Light.hh>
+#include <ignition/rendering/MeshDescriptor.hh>
 #include <ignition/rendering/RenderEngine.hh>
+#include <ignition/rendering/RenderEngineManager.hh>
 #include <ignition/rendering/RenderTarget.hh>
 #include <ignition/rendering/RenderTypes.hh>
 #include <ignition/rendering/RenderingIface.hh>
 #include <ignition/rendering/Scene.hh>
 
-namespace delphyne {
-namespace gui {
+#include "RenderWidget.hh"
 
-/// \class RenderWidget
-/// \brief This is a class that implements a simple ign-gui widget for
-/// rendering a scene, using the ign-rendering functionality.
-class RenderWidget : public ignition::gui::Plugin {
- public:
-  /// \brief Constructor
-  RenderWidget();
+Q_DECLARE_METATYPE(ignition::msgs::Model)
+Q_DECLARE_METATYPE(ignition::msgs::PosesStamped)
 
-  /// \brief Destructor
-  virtual ~RenderWidget();
+using namespace delphyne;
+using namespace gui;
 
- protected:
-  /// \brief Overridden method to receive Qt paint event.
-  /// \param[in] _e  The event that happened
-  virtual void paintEvent(QPaintEvent* _e);
+/////////////////////////////////////////////////
+static void setLocalPositionFromPose(const ignition::msgs::Visual &_vis,
+  ignition::rendering::VisualPtr _shape)
+{
+  double x = 2.0;
+  double y = 0.0;
+  double z = 0.0;
 
-  /// \brief Overridden method to receive Qt show event.
-  /// \param[in] _e  The event that happened
-  virtual void showEvent(QShowEvent* _e);
+  if (_vis.has_pose()) {
+    // The default Ogre coordinate system is X left/right,
+    // Y up/down, and Z in/out (of the screen).  However,
+    // ignition-rendering switches that to be consistent with
+    // Gazebo.  Thus, the coordinate system is X in/out, Y
+    // left/right, and Z up/down.
+    x += _vis.pose().position().z();
+    y += -_vis.pose().position().x();
+    z += _vis.pose().position().y();
+  }
 
-  /// \brief Overridden method to receive Qt resize event.
-  /// \param[in] _e  The event that happened.
-  virtual void resizeEvent(QResizeEvent* _e);
+  _shape->SetLocalPosition(x, y, z);
+}
 
-  /// \brief Overridden method to receive Qt move event.
-  /// \param[in] _e  The event that happened.
-  virtual void moveEvent(QMoveEvent* _e);
+/////////////////////////////////////////////////
+RenderWidget::RenderWidget(QWidget *parent)
+  : Plugin(), initializedScene(false)
+{
+  qRegisterMetaType<ignition::msgs::Model>();
+  qRegisterMetaType<ignition::msgs::PosesStamped>();
 
-  /// \brief Override paintEngine to stop Qt From trying to draw on top of
-  /// render window.
-  /// \return NULL.
-  virtual QPaintEngine* paintEngine() const;
-
- private:
-  /// \brief Internal method to create the render window the first time
-  /// RenderWidget::showEvent is called.
-  void CreateRenderWindow();
-
-  /// \brief Pointer to timer to call update on a periodic basis.
-  QTimer* updateTimer = nullptr;
-
-  /// \brief The frequency at which we'll do an update on the widget.
-  const int kUpdateTimeFrequency = static_cast<int>(std::round(1000.0 / 60.0));
-
-  /// \brief Pointer to the renderWindow created by this class.
-  ignition::rendering::RenderWindowPtr renderWindow;
-
-  /// \brief Pointer to the camera created by this class.
-  ignition::rendering::CameraPtr camera;
-};
-
-RenderWidget::RenderWidget() : Plugin() {
   this->setAttribute(Qt::WA_OpaquePaintEvent, true);
   this->setAttribute(Qt::WA_PaintOnScreen, true);
   this->setAttribute(Qt::WA_NoSystemBackground, true);
@@ -107,42 +95,370 @@ RenderWidget::RenderWidget() : Plugin() {
   this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
   // The below block means that every time the updateTime expires, we do an
-  // update on the widget.  Later on, we call the start() method to start this
+  // update on the widget. Later on, we call the start() method to start this
   // time at a fixed frequency.  Note that we do not start this timer until the
   // first time that showEvent() is called.
   this->updateTimer = new QTimer(this);
   QObject::connect(this->updateTimer, SIGNAL(timeout()), this, SLOT(update()));
+  QObject::connect(this, SIGNAL(NewInitialModel(const ignition::msgs::Model &)),
+    this, SLOT(SetInitialModel(const ignition::msgs::Model &)));
+  QObject::connect(this,
+    SIGNAL(NewDraw(const ignition::msgs::PosesStamped &)), this,
+    SLOT(UpdateScene(const ignition::msgs::PosesStamped &)));
+
+  this->node.Subscribe("/DRAKE_VIEWER_LOAD_ROBOT",
+    &RenderWidget::OnInitialModel, this);
+  this->node.Subscribe("/DRAKE_VIEWER_DRAW",
+    &RenderWidget::OnUpdateScene, this);
 
   this->setMinimumHeight(100);
 }
 
-RenderWidget::~RenderWidget() {}
+/////////////////////////////////////////////////
+RenderWidget::~RenderWidget()
+{
+}
 
-void RenderWidget::CreateRenderWindow() {
+/////////////////////////////////////////////////
+void RenderWidget::OnInitialModel(const ignition::msgs::Model &_msg)
+{
+  emit this->NewInitialModel(_msg);
+}
+
+/////////////////////////////////////////////////
+void RenderWidget::OnUpdateScene(const ignition::msgs::PosesStamped &_msg)
+{
+  emit this->NewDraw(_msg);
+}
+
+/////////////////////////////////////////////////
+bool RenderWidget::CreateVisual(const ignition::msgs::Visual &_vis,
+  ignition::rendering::VisualPtr &_visual,
+  ignition::rendering::MaterialPtr &_material) const
+{
+  _visual = this->scene->CreateVisual();
+  if (!_visual) {
+    ignerr << "Failed to create visual" << std::endl;
+    return false;
+  }
+
+  _material = this->scene->CreateMaterial();
+  if (!_material) {
+    ignerr << "Failed to create material" << std::endl;
+    return false;
+  }
+
+  if (_vis.has_material()) {
+    const auto &material = _vis.material();
+    if (material.has_diffuse()) {
+      const auto &diffuse = material.diffuse();
+      if (diffuse.has_r() && diffuse.has_g() && diffuse.has_b()) {
+        _material->SetDiffuse(diffuse.r(), diffuse.g(), diffuse.b());
+      }
+      const auto &ambient = material.ambient();
+      if (ambient.has_r() && ambient.has_g() && ambient.has_b()) {
+        _material->SetAmbient(ambient.r(), ambient.g(), ambient.b());
+      }
+      const auto &specular = material.specular();
+      if (specular.has_r() && specular.has_g() && specular.has_b()) {
+        _material->SetSpecular(specular.r(), specular.g(), specular.b());
+      }
+    }
+  }
+
+  _material->SetShininess(50);
+  _material->SetReflectivity(0);
+
+  return true;
+}
+
+/////////////////////////////////////////////////
+ignition::rendering::VisualPtr RenderWidget::Render(
+  const ignition::msgs::Visual &_vis,
+  const ignition::math::Vector3d &_scale,
+  const ignition::rendering::MaterialPtr &_material,
+  ignition::rendering::VisualPtr &_visual)
+{
+  setLocalPositionFromPose(_vis, _visual);
+  _visual->SetLocalScale(_scale.X(), _scale.Y(), _scale.Z());
+  _visual->SetMaterial(_material);
+  this->scene->RootVisual()->AddChild(_visual);
+  return _visual;
+}
+
+/////////////////////////////////////////////////
+ignition::rendering::VisualPtr RenderWidget::RenderBox(
+  const ignition::msgs::Visual &_vis,
+  ignition::rendering::VisualPtr &_visual,
+  ignition::rendering::MaterialPtr &_material)
+{
+  ignition::math::Vector3d scale = ignition::math::Vector3d::One;
+  auto geomBox = _vis.geometry().box();
+  if (geomBox.has_size()) {
+    scale.X() = geomBox.size().z();
+    scale.Y() = geomBox.size().x();
+    scale.Z() = geomBox.size().y();
+  }
+
+  _visual->AddGeometry(scene->CreateBox());
+  this->Render(_vis, scale, _material, _visual);
+  return _visual;
+}
+
+/////////////////////////////////////////////////
+ignition::rendering::VisualPtr RenderWidget::RenderSphere(
+  const ignition::msgs::Visual &_vis,
+  ignition::rendering::VisualPtr &_visual,
+  ignition::rendering::MaterialPtr &_material)
+{
+  ignition::math::Vector3d scale = ignition::math::Vector3d::One;
+  auto geomSphere = _vis.geometry().sphere();
+  if (geomSphere.has_radius()) {
+    scale.X() *= geomSphere.radius();
+    scale.Y() *= geomSphere.radius();
+    scale.Z() *= geomSphere.radius();
+  }
+
+  _visual->AddGeometry(scene->CreateSphere());
+  this->Render(_vis, scale, _material, _visual);
+  return _visual;
+}
+
+/////////////////////////////////////////////////
+ignition::rendering::VisualPtr RenderWidget::RenderCylinder(
+  const ignition::msgs::Visual &_vis,
+  ignition::rendering::VisualPtr &_visual,
+  ignition::rendering::MaterialPtr &_material)
+{
+  ignition::math::Vector3d scale = ignition::math::Vector3d::One;
+  auto geomCylinder = _vis.geometry().cylinder();
+  if (geomCylinder.has_radius()) {
+    scale.X() *= geomCylinder.radius();
+    scale.Y() *= geomCylinder.radius();
+  }
+  if (geomCylinder.has_length()) {
+    scale.Z() = geomCylinder.length();
+  }
+
+  _visual->AddGeometry(scene->CreateCylinder());
+  this->Render(_vis, scale, _material, _visual);
+  return _visual;
+}
+
+/////////////////////////////////////////////////
+ignition::rendering::VisualPtr RenderWidget::RenderMesh(
+  const ignition::msgs::Visual &_vis)
+{
+  ignition::rendering::VisualPtr root = this->scene->RootVisual();
+
+  // Create directional light
+  ignition::rendering::DirectionalLightPtr light0 =
+    this->scene->CreateDirectionalLight();
+  light0->SetDirection(0.5, 0.5, -1);
+  light0->SetDiffuseColor(0.8, 0.8, 0.8);
+  light0->SetSpecularColor(0.5, 0.5, 0.5);
+  root->AddChild(light0);
+
+  ignition::rendering::VisualPtr mesh = this->scene->CreateVisual();
+  if (!mesh) {
+    ignerr << "Failed to create visual" << std::endl;
+    return nullptr;
+  }
+
+  // ToDo: Add support for multiple paths.
+  // ToDo: Figure out how to use bazel for generating paths from this project
+  //   E.g.: the "media/" directory.
+  std::string mediaPath;
+  char *pathCStr = std::getenv("DELPHYNE_MEDIA_PATH");
+  if (!pathCStr || *pathCStr == '\0')
+  {
+    ignerr << "DELPHYNE_MEDIA_PATH environmet variable not set. Meshes will not"
+           << " work" << std::endl;
+    return nullptr;
+  }
+  mediaPath = pathCStr;
+
+  ignition::rendering::MeshDescriptor descriptor;
+  descriptor.meshName = ignition::common::joinPaths(mediaPath, "duck.dae");
+  ignition::common::MeshManager *meshManager =
+    ignition::common::MeshManager::Instance();
+  descriptor.mesh = meshManager->Load(descriptor.meshName);
+  ignition::rendering::MeshPtr meshGeom = this->scene->CreateMesh(descriptor);
+  mesh->AddGeometry(meshGeom);
+
+  // ToDo: Remove this hardcoded position when we can control the camera.
+  // setLocalPositionFromPose(_vis, mesh);
+  mesh->SetLocalPosition(3, 0, 0);
+  mesh->SetLocalRotation(1.5708, 0, 2.0);
+
+  root->AddChild(mesh);
+
+  return mesh;
+}
+
+/////////////////////////////////////////////////
+void RenderWidget::SetInitialModel(const ignition::msgs::Model &_msg)
+{
+  if (this->initializedScene) {
+    return;
+  }
+
+  for (int i = 0; i < _msg.link_size(); ++i) {
+    auto link = _msg.link(i);
+
+     // Sanity check: Verify that the model contains the required Id.
+    if (!link.has_id()) {
+      ignerr << "No model Id on link [" << link.name() << "]. Skipping"
+             << std::endl;
+      continue;
+    }
+
+    // Sanity check: Verify that the link contains the required name.
+    if (!link.has_name()) {
+      ignerr << "No name on link, skipping" << std::endl;
+      continue;
+    }
+
+    // Sanity check: Verify that the visual doesn't exist already.
+    const auto &modelIt = this->allVisuals.find(link.id());
+    if (modelIt != this->allVisuals.end()) {
+      if (modelIt->second.find(link.name()) != modelIt->second.end()) {
+        ignerr << "Duplicated link [" << link.name() << "] for model "
+               << link.id() << ". Skipping" << std::endl;
+        continue;
+      }
+    }
+
+    if (link.visual_size() == 0) {
+      ignerr << "No visuals for [" << link.name() << "]. Skipping" << std::endl;
+      continue;
+    }
+
+    igndbg << "Rendering: [" << link.name() << "] (" << link.id() << ")"
+           << std::endl;
+
+    // Iterate through all the visuals of the link and store them.
+    VisualPtr_V visuals;
+    for (int j = 0; j < link.visual_size(); ++j) {
+
+      const auto &vis = link.visual(j);
+      if (!vis.has_geometry()) {
+        ignerr << "No geometry in link [" << link.name() << "][" << j
+               << "]. Skipping" << std::endl;
+        continue;
+      }
+
+      ignition::rendering::VisualPtr visual;
+      ignition::rendering::MaterialPtr material;
+      if (!this->CreateVisual(vis, visual, material)) {
+        continue;
+      }
+
+      ignition::rendering::VisualPtr ignvis;
+
+      if (vis.geometry().has_box()) {
+        ignvis = this->RenderBox(vis, visual, material);
+      }
+      else if (vis.geometry().has_sphere()) {
+        ignvis = this->RenderSphere(vis, visual, material);
+      }
+      else if (vis.geometry().has_cylinder()) {
+        ignvis = this->RenderCylinder(vis, visual, material);
+      }
+      else if (vis.geometry().has_mesh()) {
+        ignvis = this->RenderMesh(vis);
+      }
+      else {
+        ignerr << "Invalid shape for [" << link.name() << "]. Skipping"
+               << std::endl;
+        continue;
+      }
+
+      visuals.push_back(ignvis);
+    }
+
+    // Update the collection of visuals.
+    auto &links = this->allVisuals[link.id()];
+    links.insert(std::make_pair(link.name(), visuals));
+  }
+
+  this->initializedScene = true;
+}
+
+/////////////////////////////////////////////////
+void RenderWidget::UpdateScene(const ignition::msgs::PosesStamped &_msg)
+{
+  for (int i = 0; i < _msg.pose_size(); ++i) {
+    auto pose = _msg.pose(i);
+
+    // Sanity check: It's required to have a model Id.
+    if (!pose.has_id()) {
+      ignerr << "Skipping pose " << pose.name() << " without id" << std::endl;
+      continue;
+    }
+
+    // Sanity check: Make sure that the model Id exists.
+    auto robotIt = this->allVisuals.find(pose.id());
+    if (robotIt == this->allVisuals.end()) {
+      ignerr << "Could not find model Id [" << pose.id() << "]. Skipping"
+             << std::endl;
+      continue;
+    }
+
+    // Sanity check: It's required to have a link name.
+    if (!pose.has_name()) {
+      ignerr << "Skipping pose without name" << std::endl;
+      continue;
+    }
+
+    // Sanity check: Make sure that the link name exists.
+    auto visualsIt = robotIt->second.find(pose.name());
+    if (visualsIt == robotIt->second.end()) {
+      ignerr << "Could not find link name [" << pose.name() << "]. Skipping"
+             << std::endl;
+      continue;
+    }
+
+    // Update all visuals of this link.
+    auto &visuals = visualsIt->second;
+    for (auto &visual : visuals) {
+      // The setLocalPositionFromPose() assumes an ignition::msgs::Visual
+      // message here, so we setup a dummy one to please it.
+      ignition::msgs::Visual tmpvis;
+      *tmpvis.mutable_pose() = pose;
+      setLocalPositionFromPose(tmpvis, visual);
+    }
+  }
+}
+
+/////////////////////////////////////////////////
+void RenderWidget::CreateRenderWindow()
+{
   std::string engineName = "ogre";
-  ignition::rendering::RenderEngine* engine =
-      ignition::rendering::get_engine(engineName);
+  ignition::rendering::RenderEngineManager* manager =
+    ignition::rendering::RenderEngineManager::Instance();
+  ignition::rendering::RenderEngine* engine = manager->Engine(engineName);
   if (!engine) {
     ignerr << "Engine '" << engineName << "' is not supported" << std::endl;
     return;
   }
 
   // Create sample scene
-  ignition::rendering::ScenePtr scene = engine->CreateScene("scene");
-  if (scene == nullptr) {
+  this->scene = engine->CreateScene("scene");
+  if (!this->scene) {
     ignerr << "Failed to create scene" << std::endl;
     return;
   }
 
-  scene->SetAmbientLight(0.3, 0.3, 0.3);
-  ignition::rendering::VisualPtr root = scene->RootVisual();
-  if (root == nullptr) {
+  this->scene->SetAmbientLight(0.3, 0.3, 0.3);
+  ignition::rendering::VisualPtr root = this->scene->RootVisual();
+  if (!root) {
     ignerr << "Failed to find the root visual" << std::endl;
     return;
   }
   ignition::rendering::DirectionalLightPtr light0 =
-      scene->CreateDirectionalLight();
-  if (light0 == nullptr) {
+      this->scene->CreateDirectionalLight();
+  if (!light0) {
     ignerr << "Failed to create a directional light" << std::endl;
     return;
   }
@@ -151,31 +467,9 @@ void RenderWidget::CreateRenderWindow() {
   light0->SetSpecularColor(0.5, 0.5, 0.5);
   root->AddChild(light0);
 
-  ignition::rendering::MaterialPtr green = scene->CreateMaterial();
-  if (green == nullptr) {
-    ignerr << "Failed to create green material" << std::endl;
-    return;
-  }
-  green->SetAmbient(0.0, 0.5, 0.0);
-  green->SetDiffuse(0.0, 0.7, 0.0);
-  green->SetSpecular(0.5, 0.5, 0.5);
-  green->SetShininess(50);
-  green->SetReflectivity(0);
-
-  ignition::rendering::VisualPtr vis = scene->CreateVisual();
-  if (vis == nullptr) {
-    ignerr << "Failed to create visual" << std::endl;
-    return;
-  }
-  vis->AddGeometry(scene->CreateBox());
-  vis->SetLocalPosition(3, 0, 0);
-  vis->SetLocalScale(1, 1, 1);
-  vis->SetMaterial(green);
-  root->AddChild(vis);
-
   // create user camera
-  this->camera = scene->CreateCamera("user_camera");
-  if (this->camera == nullptr) {
+  this->camera = this->scene->CreateCamera("user_camera");
+  if (!this->camera) {
     ignerr << "Failed to create camera" << std::endl;
     return;
   }
@@ -188,7 +482,7 @@ void RenderWidget::CreateRenderWindow() {
   // create render window
   std::string winHandle = std::to_string(static_cast<uint64_t>(this->winId()));
   this->renderWindow = this->camera->CreateRenderWindow();
-  if (this->renderWindow == nullptr) {
+  if (!this->renderWindow) {
     ignerr << "Failed to create camera render window" << std::endl;
     return;
   }
@@ -216,7 +510,9 @@ void RenderWidget::showEvent(QShowEvent* _e) {
 }
 
 /////////////////////////////////////////////////
-QPaintEngine* RenderWidget::paintEngine() const { return nullptr; }
+QPaintEngine* RenderWidget::paintEngine() const {
+  return nullptr;
+}
 
 /////////////////////////////////////////////////
 void RenderWidget::paintEvent(QPaintEvent* _e) {
@@ -245,8 +541,5 @@ void RenderWidget::moveEvent(QMoveEvent* _e) {
   this->renderWindow->OnMove();
 }
 
-}  // namespace gui
-}  // namespace delphyne
-
 IGN_COMMON_REGISTER_SINGLE_PLUGIN(delphyne::gui::RenderWidget,
-                                  ignition::gui::Plugin);
+                                  ignition::gui::Plugin)

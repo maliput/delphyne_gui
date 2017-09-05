@@ -119,11 +119,13 @@ py_binary(
     data = [
         ":lcm-mock-robot-publisher",
         ":lcm-ign-transport-bridge",
+        "//visualizer:visualizer",
     ],
     main = "mocked_robot_demo.py",
     args = [
         "$(location :lcm-mock-robot-publisher)",
         "$(location :lcm-ign-transport-bridge)",
+        "$(location //visualizer:visualizer)",
     ],
 )
 

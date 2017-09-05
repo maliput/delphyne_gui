@@ -94,9 +94,9 @@ pkg_config_package(
 bitbucket_archive(
     name = "ignition_common",
     repository = "ignitionrobotics/ign-common",
-    commit = "276d8d9eff47",
-    sha256 = "48a4752e69e5416815d8e96448fd734798cc4d4334c9c364787b7200163d509d",
-    strip_prefix = "ignitionrobotics-ign-common-276d8d9eff47",
+    commit = "1466279",
+    sha256 = "d43f3c0057efccd93e6f4794169e8d3b611f1e41327e4d4d64a564588a1ab984",
+    strip_prefix = "ignitionrobotics-ign-common-1466279f7840",
     build_file = "tools/ignition_common.BUILD",
 )
 
@@ -112,9 +112,9 @@ bitbucket_archive(
 bitbucket_archive(
     name = "ignition_rendering",
     repository = "ignitionrobotics/ign-rendering",
-    commit = "0ead5eb3dc20",
-    sha256 = "43cfdbdef50382ea8a0b820b10320083f2c1257722ec16b7e57949468ba51fd8",
-    strip_prefix = "ignitionrobotics-ign-rendering-0ead5eb3dc20",
+    commit = "4323a26",
+    sha256 = "de7426baf61a3c2fa584de7b769c0a25f446d8a81ca2433b9a8df1a783174235",
+    strip_prefix = "ignitionrobotics-ign-rendering-4323a267a516",
     build_file = "tools/ignition_rendering.BUILD",
 )
 

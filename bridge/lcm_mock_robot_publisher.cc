@@ -224,26 +224,29 @@ int main(int argc, char* argv[]) {
 
   // Define draw message
   drake::lcmt_viewer_draw drawMsg;
-  drawMsg.timestamp = 0.0;
+  drawMsg.timestamp = 0;
   drawMsg.num_links = 1;
-  drawMsg.link_name.resize(1);
+  drawMsg.link_name.resize(drawMsg.num_links);
+  drawMsg.link_name[0] = "box";
   drawMsg.robot_num.resize(1);
+  drawMsg.robot_num[0] = 0;
   drawMsg.position.resize(1);
-  drawMsg.quaternion.resize(1);
   drawMsg.position[0].resize(3);
+  drawMsg.position[0][0] = 0.0;
+  drawMsg.position[0][1] = 0.0;
+  drawMsg.position[0][2] = 0.0;
+  drawMsg.quaternion.resize(1);
   drawMsg.quaternion[0].resize(4);
-  drawMsg.link_name[0] = sphereLinkMsg.name;
-  drawMsg.position[0][0] = 3;
-  drawMsg.position[0][1] = 3;
-  drawMsg.position[0][2] = 1;
-  drawMsg.quaternion[0][0] = 1.0;
+  drawMsg.quaternion[0][0] = 0.0;
   drawMsg.quaternion[0][1] = 0.0;
   drawMsg.quaternion[0][2] = 0.0;
-  drawMsg.quaternion[0][3] = 0.0;
+  drawMsg.quaternion[0][3] = 1.0;
+
+  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 
   // Load robot model into drake
   std::string lcmChannel = "DRAKE_VIEWER_LOAD_ROBOT";
-  ignmsg << "Publishing message into " << lcmChannel << std::endl;
+  igndbg << "Publishing message into " << lcmChannel << std::endl;
   if (lcm.publish(lcmChannel, &robotMsg) == -1) {
     ignerr << "Failed to publish message into " << lcmChannel << std::endl;
     return 1;
@@ -266,7 +269,7 @@ int main(int argc, char* argv[]) {
     drawMsg.position[0][2] =
         center[2] + radius * std::cos(i * 2 * IGN_PI / 360);
     // Publish message with updated position
-    ignmsg << "Publishing message into DRAKE_VIEWER_DRAW" << std::endl;
+    igndbg << "Publishing message into DRAKE_VIEWER_DRAW" << std::endl;
     if (lcm.publish("DRAKE_VIEWER_DRAW", &drawMsg) == -1) {
       ignerr << "Failed to publish message into DRAKE_VIEWER_DRAW" << std::endl;
       return 1;

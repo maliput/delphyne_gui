@@ -92,8 +92,9 @@ void OrbitViewControl::OnMouseMove(const QMouseEvent *_e) {
 
 /////////////////////////////////////////////////
 void OrbitViewControl::OnMouseWheel(const QWheelEvent *_e) {
-  if (!this->camera)
+  if (!this->camera) {
     return;
+  }
 
   std::lock_guard<std::mutex> lock(this->mouseMutex);
   double scroll = (_e->angleDelta().y() > 0) ? -1.0 : 1.0;

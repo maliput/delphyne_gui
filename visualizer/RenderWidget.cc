@@ -492,6 +492,8 @@ void RenderWidget::CreateRenderWindow()
 
   // render once to create the window.
   this->camera->Update();
+
+  this->orbitViewControl.reset(new OrbitViewControl(this->camera));
 }
 
 /////////////////////////////////////////////////
@@ -539,6 +541,42 @@ void RenderWidget::moveEvent(QMoveEvent* _e) {
     return;
   }
   this->renderWindow->OnMove();
+}
+
+/////////////////////////////////////////////////
+void RenderWidget::mousePressEvent(QMouseEvent *_e) {
+  if (!this->orbitViewControl) {
+    return;
+  }
+
+  this->orbitViewControl->OnMousePress(_e);
+}
+
+/////////////////////////////////////////////////
+void RenderWidget::mouseReleaseEvent(QMouseEvent *_e) {
+  if (!this->orbitViewControl) {
+    return;
+  }
+
+  this->orbitViewControl->OnMouseRelease(_e);
+}
+
+/////////////////////////////////////////////////
+void RenderWidget::mouseMoveEvent(QMouseEvent *_e) {
+  if (!this->orbitViewControl) {
+    return;
+  }
+
+  this->orbitViewControl->OnMouseMove(_e);
+}
+
+/////////////////////////////////////////////////
+void RenderWidget::wheelEvent(QWheelEvent *_e) {
+  if (!this->orbitViewControl) {
+    return;
+  }
+
+  this->orbitViewControl->OnMouseWheel(_e);
 }
 
 IGN_COMMON_REGISTER_SINGLE_PLUGIN(delphyne::gui::RenderWidget,

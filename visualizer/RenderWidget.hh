@@ -31,6 +31,7 @@
 
 #include <cmath>
 #include <map>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -38,6 +39,8 @@
 #include <ignition/rendering/RenderTypes.hh>
 #include <ignition/rendering/RenderingIface.hh>
 #include <ignition/transport.hh>
+
+#include "OrbitViewControl.hh"
 
 // Forward declarations.
 namespace ignition {
@@ -101,6 +104,22 @@ class RenderWidget: public ignition::gui::Plugin
     /// \brief Overridden method to receive Qt move event.
     /// \param[in] _e The event that happened.
     virtual void moveEvent(QMoveEvent *_e);
+
+    /// \brief Overridden method to receive Qt mouse press event.
+    /// \param[in] _e The mouse event that happened.
+    virtual void mousePressEvent(QMouseEvent *_event);
+
+    /// \brief Overridden method to receive Qt mouse release event.
+    /// \param[in] _e The mouse event that happened.
+    virtual void mouseReleaseEvent(QMouseEvent *_event);
+
+    /// \brief Overridden method to receive Qt mouse move event.
+    /// \param[in] _e The mouse event that happened.
+    virtual void mouseMoveEvent(QMouseEvent *_event);
+
+    /// \brief Overridden method to receive Qt mouse wheel event.
+    /// \param[in] _e The mouse event that happened.
+    virtual void wheelEvent(QWheelEvent *_event);
 
     /// \brief Override paintEngine to stop Qt From trying to draw on top of
     /// render window.
@@ -189,6 +208,9 @@ class RenderWidget: public ignition::gui::Plugin
 
     /// \brief Is the scene initialized?.
     bool initializedScene;
+
+    /// \brief ToDo.
+    std::unique_ptr<OrbitViewControl> orbitViewControl;
 
     /// \brief This the data structure that stores the pointers to all visuals.
     /// The key is the model Id.

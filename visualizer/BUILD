@@ -10,10 +10,12 @@ qt_moc_gen(
 cc_library(
     name = "_libRenderWidget.so",
     srcs = [
+        "OrbitViewControl.cc",
         "RenderWidget.cc",
         "moc_renderwidget.cc", # from qt_moc_get above
     ],
     hdrs = [
+        "OrbitViewControl.hh",
         "RenderWidget.hh",
     ],
     deps = [

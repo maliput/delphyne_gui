@@ -54,6 +54,8 @@ class RepeaterManager {
       : lcm_(lcm), ignitionRepeaterServiceName_(ignitionRepeaterServiceName) {}
 
   /// \brief Start the manager by registering the ignition service
+  /// @throws std::runtime_error if there is a problem while advertising the
+  /// ignition service.
   void Start();
 
  private:

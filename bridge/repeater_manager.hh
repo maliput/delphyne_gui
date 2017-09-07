@@ -43,6 +43,11 @@ namespace bridge {
 /// their life cycle.
 class RepeaterManager {
  public:
+  /// \brief Constructor
+  /// \param[in] lcm The LCM manager that will be in turn passed to the
+  /// repeaters we create.
+  /// \param[in] ignitionRepeaterServiceName The name of the ignition service
+  /// that the manager will expose.
   RepeaterManager(
       std::shared_ptr<lcm::LCM> lcm,
       std::string ignitionRepeaterServiceName = "/repeat_ignition_topic")

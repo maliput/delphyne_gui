@@ -59,25 +59,38 @@ using namespace delphyne;
 using namespace gui;
 
 /////////////////////////////////////////////////
-static void setLocalPositionFromPose(const ignition::msgs::Visual &_vis,
+static void setPoseFromMessage(const ignition::msgs::Visual &_vis,
   ignition::rendering::VisualPtr _shape)
 {
   double x = 2.0;
   double y = 0.0;
   double z = 0.0;
+  double qw = 1.0;
+  double qx = 0.0;
+  double qy = 0.0;
+  double qz = 0.0;
 
   if (_vis.has_pose()) {
-    // The default Ogre coordinate system is X left/right,
-    // Y up/down, and Z in/out (of the screen).  However,
-    // ignition-rendering switches that to be consistent with
-    // Gazebo.  Thus, the coordinate system is X in/out, Y
-    // left/right, and Z up/down.
-    x += _vis.pose().position().z();
-    y += -_vis.pose().position().x();
-    z += _vis.pose().position().y();
+    if (_vis.pose().has_position()) {
+      // The default Ogre coordinate system is X left/right, Y up/down,
+      // and Z in/out (of the screen).  However, ignition-rendering switches that
+      // to be consistent with Gazebo.  Thus, the coordinate system is X in/out,
+      // Y left/right, and Z up/down.
+      x += _vis.pose().position().z();
+      y += -_vis.pose().position().x();
+      z += _vis.pose().position().y();
+    }
+    if (_vis.pose().has_orientation()) {
+      qw = _vis.pose().orientation().w();
+      qx = _vis.pose().orientation().x();
+      qy = _vis.pose().orientation().y();
+      qz = _vis.pose().orientation().z();
+    }
   }
 
-  _shape->SetLocalPosition(x, y, z);
+  ignition::math::Pose3d newpose(x, y, z, qw, qx, qy, qz);
+
+  _shape->SetLocalPose(newpose);
 }
 
 /////////////////////////////////////////////////
@@ -120,6 +133,8 @@ RenderWidget::RenderWidget(QWidget *parent)
   this->setFocusPolicy(Qt::StrongFocus);
   this->setMouseTracking(true);
   this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
+  this->title = "RenderWidget";
 
   // The below block means that every time the updateTime expires, we do an
   // update on the widget. Later on, we call the start() method to start this
@@ -214,7 +229,7 @@ ignition::rendering::VisualPtr RenderWidget::Render(
   const ignition::rendering::MaterialPtr &_material,
   ignition::rendering::VisualPtr &_visual)
 {
-  setLocalPositionFromPose(_vis, _visual);
+  setPoseFromMessage(_vis, _visual);
   _visual->SetLocalScale(_scale.X(), _scale.Y(), _scale.Z());
   _visual->SetMaterial(_material);
   this->scene->RootVisual()->AddChild(_visual);
@@ -315,7 +330,7 @@ ignition::rendering::VisualPtr RenderWidget::RenderMesh(
   ignition::rendering::MeshPtr meshGeom = this->scene->CreateMesh(descriptor);
   mesh->AddGeometry(meshGeom);
 
-  setLocalPositionFromPose(_vis, mesh);
+  setPoseFromMessage(_vis, mesh);
 
   ignition::rendering::VisualPtr root = this->scene->RootVisual();
   root->AddChild(mesh);
@@ -333,7 +348,7 @@ void RenderWidget::SetInitialModel(const ignition::msgs::Model &_msg)
   for (int i = 0; i < _msg.link_size(); ++i) {
     auto link = _msg.link(i);
 
-     // Sanity check: Verify that the model contains the required Id.
+    // Sanity check: Verify that the model contains the required Id.
     if (!link.has_id()) {
       ignerr << "No model Id on link [" << link.name() << "]. Skipping"
              << std::endl;
@@ -449,11 +464,11 @@ void RenderWidget::UpdateScene(const ignition::msgs::PosesStamped &_msg)
     // Update all visuals of this link.
     auto &visuals = visualsIt->second;
     for (auto &visual : visuals) {
-      // The setLocalPositionFromPose() assumes an ignition::msgs::Visual
+      // The setPoseFromMessage() assumes an ignition::msgs::Visual
       // message here, so we setup a dummy one to please it.
       ignition::msgs::Visual tmpvis;
       *tmpvis.mutable_pose() = pose;
-      setLocalPositionFromPose(tmpvis, visual);
+      setPoseFromMessage(tmpvis, visual);
     }
   }
 }

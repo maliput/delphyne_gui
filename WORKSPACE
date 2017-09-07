@@ -94,9 +94,9 @@ pkg_config_package(
 bitbucket_archive(
     name = "ignition_common",
     repository = "ignitionrobotics/ign-common",
-    commit = "1466279",
-    sha256 = "d43f3c0057efccd93e6f4794169e8d3b611f1e41327e4d4d64a564588a1ab984",
-    strip_prefix = "ignitionrobotics-ign-common-1466279f7840",
+    commit = "b54a1ff",
+    sha256 = "4c7ec0fbf41f5465adc4d5163436263e3295cb07274b70bf7f974572e17b88bd",
+    strip_prefix = "ignitionrobotics-ign-common-b54a1ff745fa",
     build_file = "tools/ignition_common.BUILD",
 )
 

@@ -31,15 +31,15 @@
 namespace delphyne {
 namespace bridge {
 
-std::map<std::string, RepeaterFactoryFunction>* RepeaterFactory::repeaterMap =
-    NULL;
+static std::map<std::string, RepeaterFactoryFunction>* repeaterMap = nullptr;
 
 /////////////////////////////////////////////////
 void RepeaterFactory::Register(const std::string& messageType,
                                RepeaterFactoryFunction factoryFunction) {
   // Create the repeaterMap if it's null
-  if (!repeaterMap)
+  if (!repeaterMap) {
     repeaterMap = new std::map<std::string, RepeaterFactoryFunction>;
+  }
 
   (*repeaterMap)[messageType] = factoryFunction;
 }

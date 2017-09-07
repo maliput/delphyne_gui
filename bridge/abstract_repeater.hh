@@ -35,7 +35,13 @@ namespace bridge {
 /// \brief This class is the base class for all topic / channel repeaters.
 class AbstractRepeater {
  public:
+  /// \brief Start the repeater, which implies hooking to the desired topic /
+  /// channel and start translating messages
+  /// @throws std::runtime_error if there is a problem while hooking LCM or
+  /// ignition components
   virtual void Start() = 0;
+
+  /// \brief Destructor
   virtual ~AbstractRepeater() {}
 };
 

@@ -61,13 +61,6 @@ class RepeaterFactory {
   static std::shared_ptr<delphyne::bridge::AbstractRepeater> New(
       const std::string& messageType, std::shared_ptr<lcm::LCM> lcm,
       const std::string& topicName);
-
-  /// \brief A list of registered message types
- private:
-  /// \internal
-  /// \brief A map between ignition message types and functions used to
-  /// create repeaters
-  static std::map<std::string, RepeaterFactoryFunction>* repeaterMap;
 };
 
 /// \brief Static message registration macro
@@ -78,19 +71,21 @@ class RepeaterFactory {
 /// \param[in] lcmType Class name for the lcm message.
 /// \param[in] uid A unique id used to define the new function and class.
 #define REGISTER_STATIC_REPEATER(messageType, ignitionType, lcmType, uid)      \
-  std::shared_ptr<delphyne::bridge::AbstractRepeater> New##uid(                \
-      std::shared_ptr<lcm::LCM> lcm, const std::string& topicName) {           \
+  std::shared_ptr<delphyne::bridge::AbstractRepeater>                          \
+      DelpyneStaticRepeaterFactoryNew##uid(std::shared_ptr<lcm::LCM> lcm,      \
+                                           const std::string& topicName) {     \
     return std::make_shared<                                                   \
         delphyne::bridge::IgnTopicRepeater<ignitionType, lcmType>>(lcm,        \
                                                                    topicName); \
   }                                                                            \
-  class Repeater##uid {                                                        \
+  class DelpyneStaticRepeaterClass##uid {                                      \
    public:                                                                     \
-    Repeater##uid() {                                                          \
-      delphyne::bridge::RepeaterFactory::Register(messageType, New##uid);      \
+    DelpyneStaticRepeaterClass##uid() {                                        \
+      delphyne::bridge::RepeaterFactory::Register(                             \
+          messageType, DelpyneStaticRepeaterFactoryNew##uid);                  \
     }                                                                          \
   };                                                                           \
-  static Repeater##uid RepeaterInitializer;
+  static DelpyneStaticRepeaterClass##uid RepeaterInitializer;
 
 }  // namespace bridge
 }  // namespace delphyne

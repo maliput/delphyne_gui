@@ -90,9 +90,9 @@ TEST_F(ServiceConverterTest, TestConversionCalledMultipleTimes) {
   serviceConverter.Start();
 
   // Request the republisher service.
-  for(int i=0; i<3; i++) {
+  for (int i = 0; i < 3; i++) {
     node.Request(notifierServiceName, serviceRequest, serviceTimeout,
-                serviceResponse, serviceResult);
+                 serviceResponse, serviceResult);
     lcm->handleTimeout(100);
   }
 

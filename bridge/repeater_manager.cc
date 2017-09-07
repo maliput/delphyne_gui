@@ -52,6 +52,23 @@ void RepeaterManager::Start() {
 void RepeaterManager::IgnitionRepeaterServiceHandler(
     const ignition::msgs::StringMsg_V& request,
     ignition::msgs::Boolean& response, bool& result) {
+  switch (request.data_size()) {
+    case 0:
+      ignerr << "Couldn't create repeater: missing topic name and "
+             << "message type parameters" << std::endl;
+      return;
+    case 1:
+      ignerr << "Couldn't create repeater for " << request.data(0)
+             << ". Missing message type parameter" << std::endl;
+      return;
+    case 2:
+      break;
+    default:
+      igndbg << "Service called with extra parameters, ignoring them"
+             << std::endl;
+      break;
+  }
+
   std::string topicName = request.data(0);
   std::string messageType = request.data(1);
 

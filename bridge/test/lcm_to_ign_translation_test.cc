@@ -12,8 +12,7 @@ namespace bridge {
 class ViewerDrawTest : public ::testing::Test {
  protected:
   drake::lcmt_viewer_draw drawMsg;
-  ignition::msgs::PosesStamped ignPosesStamped;
-  int lastIndex;
+  ignition::msgs::Model_V models;
 
   virtual void SetUp() override {
     drawMsg.timestamp = 123456;
@@ -32,24 +31,47 @@ class ViewerDrawTest : public ::testing::Test {
     drawMsg.robot_num[1] = 2;
     drawMsg.position[1] = {4.0, 5.0, 6.0};
     drawMsg.quaternion[1] = {8.0, 7.0, 6.0, 5.0};
-    lastIndex = drawMsg.num_links - 1;
   }
 
   //////////////////////////////////////////////////
   /// \brief Checks that all the array-iterable values from
   /// lcmt_viewer_draw are matching their ignition counterpart
-  void checkMsgTranslation(drake::lcmt_viewer_draw* lcmMsg,
-                           ignition::msgs::PosesStamped* ignPoses) {
-    for (int i = 0; i < lcmMsg->num_links; i++) {
-      ASSERT_EQ(ignPoses->pose(i).name(), lcmMsg->link_name[i]);
-      ASSERT_EQ(ignPoses->pose(i).id(), lcmMsg->robot_num[i]);
-      ASSERT_EQ(ignPoses->pose(i).position().x(), lcmMsg->position[i][0]);
-      ASSERT_EQ(ignPoses->pose(i).position().y(), lcmMsg->position[i][1]);
-      ASSERT_EQ(ignPoses->pose(i).position().z(), lcmMsg->position[i][2]);
-      ASSERT_EQ(ignPoses->pose(i).orientation().x(), lcmMsg->quaternion[i][0]);
-      ASSERT_EQ(ignPoses->pose(i).orientation().y(), lcmMsg->quaternion[i][1]);
-      ASSERT_EQ(ignPoses->pose(i).orientation().z(), lcmMsg->quaternion[i][2]);
-      ASSERT_EQ(ignPoses->pose(i).orientation().w(), lcmMsg->quaternion[i][3]);
+  void checkMsgTranslation(const drake::lcmt_viewer_draw& lcmMsg,
+                           const ignition::msgs::Model_V& ignModel) {
+    for (int i = 0; i < lcmMsg.num_links; i++) {
+
+      // Step 1: Check there is a corresponding ignition model for the LCM link
+      ignition::msgs::Model model;
+      for (int j = 0; j < ignModel.models_size(); ++j) {
+        if (ignModel.models(j).id() == (unsigned) lcmMsg.robot_num[i]) {
+          model = ignModel.models(j);
+        }
+      }
+      ASSERT_NE(nullptr, &model);
+
+      // Step 2: Check there is a corresponding ignition link for the LCM link
+      ignition::msgs::Link link;
+      for (int j = 0; j < model.link_size(); ++j) {
+        if (model.link(j).name() == lcmMsg.link_name[i]) {
+          link = model.link(j);
+        }
+      }
+      ASSERT_NE(nullptr, &link);
+
+      // Step 3: Get the pose and compare the values
+      ignition::msgs::Pose pose = link.pose();
+
+      EXPECT_EQ(pose.position().x(), lcmMsg.position[i][0]);
+      EXPECT_EQ(pose.position().y(), lcmMsg.position[i][1]);
+      EXPECT_EQ(pose.position().z(), lcmMsg.position[i][2]);
+      EXPECT_EQ(pose.orientation().x(),
+                lcmMsg.quaternion[i][0]);
+      EXPECT_EQ(pose.orientation().y(),
+                lcmMsg.quaternion[i][1]);
+      EXPECT_EQ(pose.orientation().z(),
+                lcmMsg.quaternion[i][2]);
+      EXPECT_EQ(pose.orientation().w(),
+                lcmMsg.quaternion[i][3]);
     }
   }
 };
@@ -64,9 +86,9 @@ TEST_F(ViewerDrawTest, TestZeroPosesInPosesStamp) {
   drawMsg.robot_num.resize(0);
   drawMsg.position.resize(0);
   drawMsg.quaternion.resize(0);
-  ignition::msgs::PosesStamped ignMsg;
+  ignition::msgs::Model_V ignMsg;
   lcmToIgn(drawMsg, &ignMsg);
-  ASSERT_EQ(ignMsg.pose_size(), 0);
+  ASSERT_EQ(ignMsg.models_size(), 0);
 }
 
 //////////////////////////////////////////////////
@@ -79,9 +101,9 @@ TEST_F(ViewerDrawTest, TestOnePoseInPosesStamp) {
   drawMsg.robot_num.resize(1);
   drawMsg.position.resize(1);
   drawMsg.quaternion.resize(1);
-  ignition::msgs::PosesStamped ignMsg;
+  ignition::msgs::Model_V ignMsg;
   lcmToIgn(drawMsg, &ignMsg);
-  checkMsgTranslation(&drawMsg, &ignMsg);
+  checkMsgTranslation(drawMsg, ignMsg);
 }
 
 //////////////////////////////////////////////////
@@ -99,20 +121,20 @@ TEST_F(ViewerDrawTest, TestThreePosesInPosesStamp) {
   drawMsg.robot_num[2] = 3;
   drawMsg.position[2] = {7.0, 8.0, 9.0};
   drawMsg.quaternion[2] = {12.0, 11.0, 10.0, 9.0};
-  ignition::msgs::PosesStamped ignMsg;
+  ignition::msgs::Model_V ignMsg;
   lcmToIgn(drawMsg, &ignMsg);
-  checkMsgTranslation(&drawMsg, &ignMsg);
+  checkMsgTranslation(drawMsg, ignMsg);
 }
 
 //////////////////////////////////////////////////
 /// \brief Test that a header's sec and nsec were
 /// correctly calculated
 TEST_F(ViewerDrawTest, TestTimeStamp) {
-  lcmToIgn(drawMsg, &ignPosesStamped);
+  lcmToIgn(drawMsg, &models);
   int secs = 123;
   int nsecs = 456000000;
-  ASSERT_EQ(secs, ignPosesStamped.time().sec());
-  ASSERT_EQ(nsecs, ignPosesStamped.time().nsec());
+  ASSERT_EQ(secs, models.header().stamp().sec());
+  ASSERT_EQ(nsecs, models.header().stamp().nsec());
 }
 
 //////////////////////////////////////////////////
@@ -120,7 +142,7 @@ TEST_F(ViewerDrawTest, TestTimeStamp) {
 ///  defined position vectors doesn't have the correct size
 TEST_F(ViewerDrawTest, TestExceptionInPosition) {
   drawMsg.position[1] = {1.0, 2.0, 3.0, 4.0};
-  EXPECT_THROW(lcmToIgn(drawMsg, &ignPosesStamped), TranslateException);
+  EXPECT_THROW(lcmToIgn(drawMsg, &models), TranslateException);
 }
 
 //////////////////////////////////////////////////
@@ -129,7 +151,7 @@ TEST_F(ViewerDrawTest, TestExceptionInPosition) {
 /// have the correct size
 TEST_F(ViewerDrawTest, TestExceptionInOrientation) {
   drawMsg.quaternion[1] = {4.0, 2.0, 1.0};
-  EXPECT_THROW(lcmToIgn(drawMsg, &ignPosesStamped), TranslateException);
+  EXPECT_THROW(lcmToIgn(drawMsg, &models), TranslateException);
 }
 
 //////////////////////////////////////////////////
@@ -137,7 +159,7 @@ TEST_F(ViewerDrawTest, TestExceptionInOrientation) {
 /// link_name vector doesn't have the correct size
 TEST_F(ViewerDrawTest, TestExceptionNumberOfLinkNames) {
   drawMsg.link_name.resize(drawMsg.num_links + 1);
-  EXPECT_THROW(lcmToIgn(drawMsg, &ignPosesStamped), TranslateException);
+  EXPECT_THROW(lcmToIgn(drawMsg, &models), TranslateException);
 }
 
 //////////////////////////////////////////////////
@@ -145,7 +167,7 @@ TEST_F(ViewerDrawTest, TestExceptionNumberOfLinkNames) {
 /// robot_num vector doesn't have the correct size
 TEST_F(ViewerDrawTest, TestExceptionNumberOfRobotNum) {
   drawMsg.robot_num.resize(drawMsg.num_links - 1);
-  EXPECT_THROW(lcmToIgn(drawMsg, &ignPosesStamped), TranslateException);
+  EXPECT_THROW(lcmToIgn(drawMsg, &models), TranslateException);
 }
 
 //////////////////////////////////////////////////
@@ -153,7 +175,7 @@ TEST_F(ViewerDrawTest, TestExceptionNumberOfRobotNum) {
 /// position vector doesn't have the correct size
 TEST_F(ViewerDrawTest, TestExceptionNumberOfPositions) {
   drawMsg.position.resize(drawMsg.num_links - 1);
-  EXPECT_THROW(lcmToIgn(drawMsg, &ignPosesStamped), TranslateException);
+  EXPECT_THROW(lcmToIgn(drawMsg, &models), TranslateException);
 }
 
 //////////////////////////////////////////////////
@@ -161,7 +183,7 @@ TEST_F(ViewerDrawTest, TestExceptionNumberOfPositions) {
 /// quaternion vector doesn't have the correct size
 TEST_F(ViewerDrawTest, TestExceptionNumberOfQuaternions) {
   drawMsg.position.resize(drawMsg.num_links + 1);
-  EXPECT_THROW(lcmToIgn(drawMsg, &ignPosesStamped), TranslateException);
+  EXPECT_THROW(lcmToIgn(drawMsg, &models), TranslateException);
 }
 
 //////////////////////////////////////////////////
@@ -346,7 +368,7 @@ GTEST_TEST(MeshTest, TestMeshTranslationWithoutScale) {
 
 //////////////////////////////////////////////////
 /// \brief Test that an LCM viewer link message describing a link
-/// properly translates the robot_num to an ignition Geometry message.
+/// properly translates the name to an ignition Geometry message.
 GTEST_TEST(MeshTest, TestLinkTranslationWithRobotNum) {
   drake::lcmt_viewer_link_data linkMsg;
   ignition::msgs::Link ignLink;
@@ -357,8 +379,135 @@ GTEST_TEST(MeshTest, TestLinkTranslationWithRobotNum) {
 
   lcmToIgn(linkMsg, &ignLink);
 
-  ASSERT_EQ(1234, ignLink.id());
+  ASSERT_EQ(NULL, ignLink.id());
   ASSERT_EQ("test_link", ignLink.name());
+}
+
+//////////////////////////////////////////////////
+/// \brief Test that the id of a model is properly setup based
+/// on the links ids
+GTEST_TEST(ModelTest, TestModelIdTranslation) {
+  drake::lcmt_viewer_load_robot robotData;
+  drake::lcmt_viewer_link_data boxLink;
+
+  ignition::msgs::Model robotModel;
+
+  boxLink.name = "test_box";
+  boxLink.robot_num = 12;
+  boxLink.num_geom = 0;
+
+  robotData.num_links = 1;
+  robotData.link.resize(1);
+  robotData.link[0] = boxLink;
+
+  lcmToIgn(robotData, &robotModel);
+
+  ASSERT_EQ(12, robotModel.id());
+}
+
+//////////////////////////////////////////////////
+/// \brief Test that the ids of a set of models are properly setup based
+/// on the links ids
+GTEST_TEST(ModelTest, TestModelIdsTranslation) {
+  drake::lcmt_viewer_load_robot robotData;
+  drake::lcmt_viewer_link_data boxLink1;
+  drake::lcmt_viewer_link_data boxLink2;
+  drake::lcmt_viewer_link_data boxLink3;
+
+  ignition::msgs::Model_V robotModels;
+
+  boxLink1.name = "test_box_1";
+  boxLink1.robot_num = 12;
+  boxLink1.num_geom = 0;
+
+  boxLink2.name = "test_box_2";
+  boxLink2.robot_num = 8;
+  boxLink2.num_geom = 0;
+
+  boxLink3.name = "test_box_3";
+  boxLink3.robot_num = 1;
+  boxLink3.num_geom = 0;
+
+  robotData.num_links = 3;
+  robotData.link.resize(3);
+  robotData.link[0] = boxLink1;
+  robotData.link[1] = boxLink2;
+  robotData.link[2] = boxLink3;
+
+  lcmToIgn(robotData, &robotModels);
+
+  EXPECT_EQ(1, robotModels.models(0).id());
+  EXPECT_EQ(8, robotModels.models(1).id());
+  EXPECT_EQ(12, robotModels.models(2).id());
+}
+
+//////////////////////////////////////////////////
+/// \brief Test that the links geometries are properly assigned to the
+/// different models
+GTEST_TEST(ModelTest, TestModelsTranslation) {
+
+  std::vector<float> quaternion = {1.0, 0.0, 0.0, 0.0};
+  std::vector<float> color = {1.0, 1.0, 1.0, 1.0};
+
+  drake::lcmt_viewer_load_robot robotData;
+
+  drake::lcmt_viewer_link_data boxLink;
+  drake::lcmt_viewer_geometry_data boxGeometry;
+
+  drake::lcmt_viewer_link_data sphereLink;
+  drake::lcmt_viewer_geometry_data sphereGeometry;
+
+  ignition::msgs::Model_V robotModels;
+
+  boxGeometry.type = boxGeometry.BOX;
+  boxGeometry.num_float_data = 3;
+  boxGeometry.float_data = {1, 2, 0.5};
+  boxGeometry.position[0] = 0.0;
+  boxGeometry.position[1] = 0.0;
+  boxGeometry.position[2] = 0.0;
+  std::copy(quaternion.begin(), quaternion.end(), boxGeometry.quaternion);
+  std::copy(color.begin(), color.end(), boxGeometry.color);
+
+  boxLink.name = "test_box";
+  boxLink.robot_num = 3;
+  boxLink.num_geom = 1;
+  boxLink.geom.resize(1);
+  boxLink.geom[0] = boxGeometry;
+
+  sphereGeometry.type = sphereGeometry.SPHERE;
+  sphereGeometry.num_float_data = 1;
+  sphereGeometry.float_data.resize(1);
+  sphereGeometry.float_data[0] = 1;
+  sphereGeometry.position[0] = 3;
+  sphereGeometry.position[1] = 3;
+  sphereGeometry.position[2] = 3;
+  std::copy(quaternion.begin(), quaternion.end(), sphereGeometry.quaternion);
+  std::copy(color.begin(), color.end(), sphereGeometry.color);
+
+  sphereLink.name = "test_sphere";
+  sphereLink.robot_num = 5;
+  sphereLink.num_geom = 1;
+  sphereLink.geom.resize(1);
+  sphereLink.geom[0] = sphereGeometry;
+
+  robotData.num_links = 2;
+  robotData.link.resize(2);
+  robotData.link[0] = boxLink;
+  robotData.link[1] = sphereLink;
+
+  lcmToIgn(robotData, &robotModels);
+
+  ASSERT_EQ(2, robotModels.models_size());
+
+  auto boxModel = robotModels.models(0);
+  EXPECT_EQ(3, boxModel.id());
+  ASSERT_EQ(1, boxModel.link_size());
+  EXPECT_EQ("test_box", boxModel.link(0).name());
+
+  auto sphereModel = robotModels.models(1);
+  EXPECT_EQ(5, sphereModel.id());
+  ASSERT_EQ(1, sphereModel.link_size());
+  EXPECT_EQ("test_sphere", sphereModel.link(0).name());
 }
 
 }  // namespace bridge

@@ -54,8 +54,8 @@ void translateMeshGeometry(drake::lcmt_viewer_geometry_data geometryData,
 void checkVectorSize(int vectorSize, int expectedSize, std::string fieldName);
 
 //////////////////////////////////////////////////
-void lcmToIgn(drake::lcmt_viewer_draw robotViewerData,
-              ignition::msgs::PosesStamped* posesStampedModel) {
+void lcmToIgn(drake::lcmt_viewer_draw robotDrawData,
+              ignition::msgs::Model_V* robotModels) {
   // Check the size of each vector on an lcm_viewer_draw message
   // num_links represents the ammount of links declarated and
   // should be matched by the size of each of the following vectors
@@ -69,29 +69,40 @@ void lcmToIgn(drake::lcmt_viewer_draw robotViewerData,
                   "quaternion");
 
   // Convert from milliseconds to seconds
-  int64_t sec = robotViewerData.timestamp / 1000;
+  int64_t sec = robotDrawData.timestamp / 1000;
   // Convert the remainder of division above to nanoseconds
-  int64_t nsec = robotViewerData.timestamp % 1000 * 1000000;
-  // Set timestamp
-  posesStampedModel->mutable_time()->set_sec(sec);
-  posesStampedModel->mutable_time()->set_nsec(nsec);
+  int64_t nsec = robotDrawData.timestamp % 1000 * 1000000;
+
+  robotModels->mutable_header()->mutable_stamp()->set_sec(sec);
+  robotModels->mutable_header()->mutable_stamp()->set_nsec(nsec);
+
+  std::map<int32_t, ignition::msgs::Model*> models;
 
   // Add one pose per link
-  for (int i = 0; i < robotViewerData.num_links; ++i) {
-    ignition::msgs::Pose* currentPose = posesStampedModel->add_pose();
+  for (int i = 0; i < robotDrawData.num_links; ++i) {
 
-    currentPose->set_name(robotViewerData.link_name[i]);
-    currentPose->set_id(robotViewerData.robot_num[i]);
+    int32_t robotId = robotDrawData.robot_num[i];
+    if (models.count(robotId) == 0) {
+      models[robotId] = robotModels->add_models();
+      models[robotId]->set_id(robotId);
+    }
+
+    ignition::msgs::Model* robotModel = models[robotId];
+    ignition::msgs::Link* link = robotModel->add_link();
+    ignition::msgs::Pose* pose = link->mutable_pose();
+
+    link->set_name(robotDrawData.link_name[i]);
+
     // Check position size and translate
-    checkVectorSize(robotViewerData.position[i].size(), 3,
+    checkVectorSize(robotDrawData.position[i].size(), 3,
                     "position[" + std::to_string(i) + "]");
-    lcmToIgn(robotViewerData.position[i].data(),
-             currentPose->mutable_position());
+    lcmToIgn(robotDrawData.position[i].data(), pose->mutable_position());
+
     // Check orientation size and translate
-    checkVectorSize(robotViewerData.quaternion[i].size(), 4,
+    checkVectorSize(robotDrawData.quaternion[i].size(), 4,
                     "quaternion[" + std::to_string(i) + "]");
-    lcmToIgn(robotViewerData.quaternion[i].data(),
-             currentPose->mutable_orientation());
+    lcmToIgn(robotDrawData.quaternion[i].data(),
+             pose->mutable_orientation());
   }
 }
 
@@ -102,18 +113,22 @@ void lcmToIgn(drake::lcmt_viewer_load_robot robotData,
   std::map<int32_t, std::vector<drake::lcmt_viewer_link_data>> groupedLinks;
 
   for (int i = 0; i < robotData.num_links; ++i) {
-    groupedLinks[robotData.link[i].robot_num].push_back(robotData.link[i]);
+    int32_t robotId = robotData.link[i].robot_num;
+    if (groupedLinks.count(robotId) == 0) {
+      groupedLinks[robotId] = {};
+    }
+    groupedLinks[robotId].push_back(robotData.link[i]);
   }
 
   for (auto iterator = groupedLinks.begin(); iterator != groupedLinks.end(); ++iterator) {
     drake::lcmt_viewer_load_robot robot;
-    std::vector<drake::lcmt_viewer_link_data> links;
-
-    links = (*iterator).second;
+    auto links = iterator->second;
 
     robot.num_links = links.size();
     robot.link.resize(robot.num_links);
-    std::copy(links.begin(), links.end(), robot.link);
+    for (int j = 0; j < robot.num_links; ++j) {
+      robot.link[j] = links[j];
+    }
 
     lcmToIgn(robot, robotModels->add_models());
   }

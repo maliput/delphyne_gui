@@ -103,7 +103,7 @@ int main(int argc, char* argv[]) {
   // Generate box link message
   drake::lcmt_viewer_link_data boxLinkMsg;
   boxLinkMsg.name = "box";
-  boxLinkMsg.robot_num = 0;
+  boxLinkMsg.robot_num = 1;
   boxLinkMsg.num_geom = 1;
   boxLinkMsg.geom.resize(boxLinkMsg.num_geom);
   boxLinkMsg.geom[0] = boxMsg;
@@ -127,7 +127,7 @@ int main(int argc, char* argv[]) {
   // Generate sphere link message
   drake::lcmt_viewer_link_data sphereLinkMsg;
   sphereLinkMsg.name = "sphere";
-  sphereLinkMsg.robot_num = 0;
+  sphereLinkMsg.robot_num = 1;
   sphereLinkMsg.num_geom = 1;
   sphereLinkMsg.geom.resize(sphereLinkMsg.num_geom);
   sphereLinkMsg.geom[0] = sphereMsg;
@@ -152,7 +152,7 @@ int main(int argc, char* argv[]) {
   // Generate cylinder link message
   drake::lcmt_viewer_link_data cylinderLinkMsg;
   cylinderLinkMsg.name = "cylinder";
-  cylinderLinkMsg.robot_num = 0;
+  cylinderLinkMsg.robot_num = 18;
   cylinderLinkMsg.num_geom = 1;
   cylinderLinkMsg.geom.resize(cylinderLinkMsg.num_geom);
   cylinderLinkMsg.geom[0] = cylinderMsg;
@@ -181,7 +181,7 @@ int main(int argc, char* argv[]) {
   // Generate mesh-from-url link message
   drake::lcmt_viewer_link_data meshURLLinkMsg;
   meshURLLinkMsg.name = "mesh-from-url";
-  meshURLLinkMsg.robot_num = 0;
+  meshURLLinkMsg.robot_num = 18;
   meshURLLinkMsg.num_geom = 1;
   meshURLLinkMsg.geom.resize(meshURLLinkMsg.num_geom);
   meshURLLinkMsg.geom[0] = meshURLMsg;
@@ -207,7 +207,7 @@ int main(int argc, char* argv[]) {
   // Generate mesh-from-package link message
   drake::lcmt_viewer_link_data meshPackageLinkMsg;
   meshPackageLinkMsg.name = "mesh-from-package";
-  meshPackageLinkMsg.robot_num = 0;
+  meshPackageLinkMsg.robot_num = 18;
   meshPackageLinkMsg.num_geom = 1;
   meshPackageLinkMsg.geom.resize(meshPackageLinkMsg.num_geom);
   meshPackageLinkMsg.geom[0] = meshPackageMsg;
@@ -229,7 +229,7 @@ int main(int argc, char* argv[]) {
   drawMsg.link_name.resize(drawMsg.num_links);
   drawMsg.link_name[0] = "box";
   drawMsg.robot_num.resize(1);
-  drawMsg.robot_num[0] = 0;
+  drawMsg.robot_num[0] = 1;
   drawMsg.position.resize(1);
   drawMsg.position[0].resize(3);
   drawMsg.position[0][0] = 0.0;

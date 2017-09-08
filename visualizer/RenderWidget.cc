@@ -445,11 +445,11 @@ void RenderWidget::UpdateScene(const ignition::msgs::Model_V &_msg)
       // Update all visuals of this link.
       auto &visuals = visualsIt->second;
       for (auto &visual : visuals) {
-        // The setLocalPositionFromPose() assumes an ignition::msgs::Visual
+        // The setPoseFromMessage() assumes an ignition::msgs::Visual
         // message here, so we setup a dummy one to please it.
         ignition::msgs::Visual tmpvis;
         *tmpvis.mutable_pose() = pose;
-        setLocalPositionFromPose(tmpvis, visual);
+        setPoseFromMessage(tmpvis, visual);
       }
     }
   }

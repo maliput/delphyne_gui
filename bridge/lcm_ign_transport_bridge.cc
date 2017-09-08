@@ -29,6 +29,7 @@
 #include <atomic>
 #include <csignal>
 #include <ignition/common/Console.hh>
+#include <ignition/msgs.hh>
 
 // Drake LCM message headers
 #include "drake/lcmt_driving_command_t.hpp"

@@ -39,33 +39,33 @@
 namespace delphyne {
 namespace bridge {
 
-void translateBoxGeometry(drake::lcmt_viewer_geometry_data geometryData,
+void translateBoxGeometry(const drake::lcmt_viewer_geometry_data& geometryData,
                           ignition::msgs::Geometry* geometryModel);
 
-void translateSphereGeometry(drake::lcmt_viewer_geometry_data geometryData,
+void translateSphereGeometry(const drake::lcmt_viewer_geometry_data& geometryData,
                              ignition::msgs::Geometry* geometryModel);
 
-void translateCylinderGeometry(drake::lcmt_viewer_geometry_data geometryData,
+void translateCylinderGeometry(const drake::lcmt_viewer_geometry_data& geometryData,
                                ignition::msgs::Geometry* geometryModel);
 
-void translateMeshGeometry(drake::lcmt_viewer_geometry_data geometryData,
+void translateMeshGeometry(const drake::lcmt_viewer_geometry_data& geometryData,
                            ignition::msgs::Geometry* geometryModel);
 
 void checkVectorSize(int vectorSize, int expectedSize, std::string fieldName);
 
 //////////////////////////////////////////////////
-void lcmToIgn(drake::lcmt_viewer_draw robotDrawData,
+void lcmToIgn(const drake::lcmt_viewer_draw& robotDrawData,
               ignition::msgs::Model_V* robotModels) {
   // Check the size of each vector on an lcm_viewer_draw message
-  // num_links represents the ammount of links declarated and
+  // num_links represents the amount of links declared and
   // should be matched by the size of each of the following vectors
-  checkVectorSize(robotViewerData.link_name.size(), robotViewerData.num_links,
+  checkVectorSize(robotDrawData.link_name.size(), robotDrawData.num_links,
                   "link_name");
-  checkVectorSize(robotViewerData.robot_num.size(), robotViewerData.num_links,
+  checkVectorSize(robotDrawData.robot_num.size(), robotDrawData.num_links,
                   "robot_num");
-  checkVectorSize(robotViewerData.position.size(), robotViewerData.num_links,
+  checkVectorSize(robotDrawData.position.size(), robotDrawData.num_links,
                   "position");
-  checkVectorSize(robotViewerData.quaternion.size(), robotViewerData.num_links,
+  checkVectorSize(robotDrawData.quaternion.size(), robotDrawData.num_links,
                   "quaternion");
 
   // Convert from milliseconds to seconds
@@ -107,7 +107,7 @@ void lcmToIgn(drake::lcmt_viewer_draw robotDrawData,
 }
 
 //////////////////////////////////////////////////
-void lcmToIgn(drake::lcmt_viewer_load_robot robotData,
+void lcmToIgn(const drake::lcmt_viewer_load_robot& robotData,
               ignition::msgs::Model_V* robotModels) {
 
   std::map<int32_t, std::vector<drake::lcmt_viewer_link_data>> groupedLinks;
@@ -135,8 +135,8 @@ void lcmToIgn(drake::lcmt_viewer_load_robot robotData,
 }
 
 //////////////////////////////////////////////////
-void lcmToIgn(drake::lcmt_viewer_load_robot robotData,
-               ignition::msgs::Model* robotModel) {
+void lcmToIgn(const drake::lcmt_viewer_load_robot& robotData,
+              ignition::msgs::Model* robotModel) {
   for (int i = 0; i < robotData.num_links; ++i) {
     lcmToIgn(robotData.link[i], robotModel->add_link());
   }
@@ -147,7 +147,7 @@ void lcmToIgn(drake::lcmt_viewer_load_robot robotData,
 }
 
 //////////////////////////////////////////////////
-void lcmToIgn(drake::lcmt_viewer_link_data linkData,
+void lcmToIgn(const drake::lcmt_viewer_link_data& linkData,
               ignition::msgs::Link* linkModel) {
   linkModel->set_name(linkData.name);
   for (int i = 0; i < linkData.num_geom; ++i) {
@@ -156,7 +156,7 @@ void lcmToIgn(drake::lcmt_viewer_link_data linkData,
 }
 
 //////////////////////////////////////////////////
-void lcmToIgn(drake::lcmt_viewer_geometry_data geometryData,
+void lcmToIgn(const drake::lcmt_viewer_geometry_data& geometryData,
               ignition::msgs::Visual* visualModel) {
   auto* poseMsg = visualModel->mutable_pose();
   auto* materialMsg = visualModel->mutable_material();
@@ -168,14 +168,14 @@ void lcmToIgn(drake::lcmt_viewer_geometry_data geometryData,
 }
 
 //////////////////////////////////////////////////
-void lcmToIgn(float positionData[3], ignition::msgs::Vector3d* positionModel) {
+void lcmToIgn(const float positionData[3], ignition::msgs::Vector3d* positionModel) {
   positionModel->set_x(positionData[0]);
   positionModel->set_y(positionData[1]);
   positionModel->set_z(positionData[2]);
 }
 
 //////////////////////////////////////////////////
-void lcmToIgn(float quaternionData[4],
+void lcmToIgn(const float quaternionData[4],
               ignition::msgs::Quaternion* quaternionModel) {
   quaternionModel->set_x(quaternionData[0]);
   quaternionModel->set_y(quaternionData[1]);
@@ -184,7 +184,7 @@ void lcmToIgn(float quaternionData[4],
 }
 
 //////////////////////////////////////////////////
-void lcmToIgn(float colorData[4], ignition::msgs::Color* colorModel) {
+void lcmToIgn(const float colorData[4], ignition::msgs::Color* colorModel) {
   colorModel->set_r(colorData[0]);
   colorModel->set_g(colorData[1]);
   colorModel->set_b(colorData[2]);
@@ -192,19 +192,19 @@ void lcmToIgn(float colorData[4], ignition::msgs::Color* colorModel) {
 }
 
 //////////////////////////////////////////////////
-void lcmToIgn(drake::lcmt_viewer_geometry_data geometryData,
+void lcmToIgn(const drake::lcmt_viewer_geometry_data& geometryData,
               ignition::msgs::Geometry* geometryModel) {
   switch (geometryData.type) {
-    case geometryData.BOX:
+    case drake::lcmt_viewer_geometry_data::BOX:
       translateBoxGeometry(geometryData, geometryModel);
       break;
-    case geometryData.SPHERE:
+    case drake::lcmt_viewer_geometry_data::SPHERE:
       translateSphereGeometry(geometryData, geometryModel);
       break;
-    case geometryData.CYLINDER:
+    case drake::lcmt_viewer_geometry_data::CYLINDER:
       translateCylinderGeometry(geometryData, geometryModel);
       break;
-    case geometryData.MESH:
+    case drake::lcmt_viewer_geometry_data::MESH:
       translateMeshGeometry(geometryData, geometryModel);
       break;
     default:
@@ -223,7 +223,7 @@ void lcmToIgn(drake::lcmt_viewer_geometry_data geometryData,
 }
 
 //////////////////////////////////////////////////
-void translateBoxGeometry(drake::lcmt_viewer_geometry_data geometryData,
+void translateBoxGeometry(const drake::lcmt_viewer_geometry_data& geometryData,
                           ignition::msgs::Geometry* geometryModel) {
   if (geometryData.num_float_data != 3) {
     std::stringstream message;
@@ -242,7 +242,7 @@ void translateBoxGeometry(drake::lcmt_viewer_geometry_data geometryData,
 }
 
 //////////////////////////////////////////////////
-void translateSphereGeometry(drake::lcmt_viewer_geometry_data geometryData,
+void translateSphereGeometry(const drake::lcmt_viewer_geometry_data& geometryData,
                              ignition::msgs::Geometry* geometryModel) {
   if (geometryData.num_float_data != 1) {
     std::stringstream message;
@@ -259,7 +259,7 @@ void translateSphereGeometry(drake::lcmt_viewer_geometry_data geometryData,
 }
 
 //////////////////////////////////////////////////
-void translateCylinderGeometry(drake::lcmt_viewer_geometry_data geometryData,
+void translateCylinderGeometry(const drake::lcmt_viewer_geometry_data& geometryData,
                                ignition::msgs::Geometry* geometryModel) {
   if (geometryData.num_float_data != 2) {
     std::stringstream message;
@@ -276,7 +276,7 @@ void translateCylinderGeometry(drake::lcmt_viewer_geometry_data geometryData,
 }
 
 //////////////////////////////////////////////////
-void translateMeshGeometry(drake::lcmt_viewer_geometry_data geometryData,
+void translateMeshGeometry(const drake::lcmt_viewer_geometry_data& geometryData,
                            ignition::msgs::Geometry* geometryModel) {
   // If no string_data, we assume MeshMessage, which is unsupported
   if (geometryData.string_data.empty()) {

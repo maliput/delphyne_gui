@@ -185,6 +185,16 @@ py_binary(
     ],
 )
 
+py_binary(
+    name = "demo-launcher",
+    srcs = ["demo_launcher.py"],
+    data = [
+        ":lcm-ign-transport-bridge",
+        "//visualizer:visualizer",
+    ],
+    main = "demo_launcher.py",
+)
+
 drake_cc_googletest(
     name = "lcm_to_ign_translation_test",
     deps = [

@@ -123,8 +123,8 @@ def main():
 
         if args.drake_visualizer:
             launcher.launch([drake_visualizer_path])
-        # wait for the drake_visualizer to be up
-        wait_for_lcm_message_on_channel('DRAKE_VIEWER_STATUS')
+            # wait for the drake_visualizer to be up
+            wait_for_lcm_message_on_channel('DRAKE_VIEWER_STATUS')
         launcher.launch([demo_path, demo_args], cwd=args.drake_path)
 
         launcher.wait(args.duration)

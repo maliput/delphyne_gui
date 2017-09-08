@@ -76,7 +76,8 @@ void lcmToIgn(const drake::lcmt_viewer_geometry_data& geometryData,
 /// \param[in]  positionData  An LCM message containing the position data
 /// \param[out] positionModel The resulting ignition message with the position
 /// model
-void lcmToIgn(const float positionData[3], ignition::msgs::Vector3d* positionModel);
+void lcmToIgn(const float positionData[3],
+              ignition::msgs::Vector3d* positionModel);
 
 /// \brief Translate an orientation definition from LCM to ignition
 /// \param[in]  quaternionData  An LCM message containing the orientation data

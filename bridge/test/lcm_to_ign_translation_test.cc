@@ -39,11 +39,10 @@ class ViewerDrawTest : public ::testing::Test {
   void checkMsgTranslation(const drake::lcmt_viewer_draw& lcmMsg,
                            const ignition::msgs::Model_V& ignModel) {
     for (int i = 0; i < lcmMsg.num_links; i++) {
-
       // Step 1: Check there is a corresponding ignition model for the LCM link
       ignition::msgs::Model model;
       for (int j = 0; j < ignModel.models_size(); ++j) {
-        if (ignModel.models(j).id() == (unsigned) lcmMsg.robot_num[i]) {
+        if (ignModel.models(j).id() == (unsigned)lcmMsg.robot_num[i]) {
           model = ignModel.models(j);
         }
       }
@@ -64,14 +63,10 @@ class ViewerDrawTest : public ::testing::Test {
       EXPECT_EQ(pose.position().x(), lcmMsg.position[i][0]);
       EXPECT_EQ(pose.position().y(), lcmMsg.position[i][1]);
       EXPECT_EQ(pose.position().z(), lcmMsg.position[i][2]);
-      EXPECT_EQ(pose.orientation().x(),
-                lcmMsg.quaternion[i][0]);
-      EXPECT_EQ(pose.orientation().y(),
-                lcmMsg.quaternion[i][1]);
-      EXPECT_EQ(pose.orientation().z(),
-                lcmMsg.quaternion[i][2]);
-      EXPECT_EQ(pose.orientation().w(),
-                lcmMsg.quaternion[i][3]);
+      EXPECT_EQ(pose.orientation().x(), lcmMsg.quaternion[i][0]);
+      EXPECT_EQ(pose.orientation().y(), lcmMsg.quaternion[i][1]);
+      EXPECT_EQ(pose.orientation().z(), lcmMsg.quaternion[i][2]);
+      EXPECT_EQ(pose.orientation().w(), lcmMsg.quaternion[i][3]);
     }
   }
 };
@@ -445,7 +440,6 @@ GTEST_TEST(ModelTest, TestModelIdsTranslation) {
 /// \brief Test that the links geometries are properly assigned to the
 /// different models
 GTEST_TEST(ModelTest, TestModelsTranslation) {
-
   std::vector<float> quaternion = {1.0, 0.0, 0.0, 0.0};
   std::vector<float> color = {1.0, 1.0, 1.0, 1.0};
 

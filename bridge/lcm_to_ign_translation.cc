@@ -42,11 +42,13 @@ namespace bridge {
 void translateBoxGeometry(const drake::lcmt_viewer_geometry_data& geometryData,
                           ignition::msgs::Geometry* geometryModel);
 
-void translateSphereGeometry(const drake::lcmt_viewer_geometry_data& geometryData,
-                             ignition::msgs::Geometry* geometryModel);
+void translateSphereGeometry(
+    const drake::lcmt_viewer_geometry_data& geometryData,
+    ignition::msgs::Geometry* geometryModel);
 
-void translateCylinderGeometry(const drake::lcmt_viewer_geometry_data& geometryData,
-                               ignition::msgs::Geometry* geometryModel);
+void translateCylinderGeometry(
+    const drake::lcmt_viewer_geometry_data& geometryData,
+    ignition::msgs::Geometry* geometryModel);
 
 void translateMeshGeometry(const drake::lcmt_viewer_geometry_data& geometryData,
                            ignition::msgs::Geometry* geometryModel);
@@ -80,7 +82,6 @@ void lcmToIgn(const drake::lcmt_viewer_draw& robotDrawData,
 
   // Add one pose per link
   for (int i = 0; i < robotDrawData.num_links; ++i) {
-
     int32_t robotId = robotDrawData.robot_num[i];
     if (models.count(robotId) == 0) {
       models[robotId] = robotModels->add_models();
@@ -101,15 +102,13 @@ void lcmToIgn(const drake::lcmt_viewer_draw& robotDrawData,
     // Check orientation size and translate
     checkVectorSize(robotDrawData.quaternion[i].size(), 4,
                     "quaternion[" + std::to_string(i) + "]");
-    lcmToIgn(robotDrawData.quaternion[i].data(),
-             pose->mutable_orientation());
+    lcmToIgn(robotDrawData.quaternion[i].data(), pose->mutable_orientation());
   }
 }
 
 //////////////////////////////////////////////////
 void lcmToIgn(const drake::lcmt_viewer_load_robot& robotData,
               ignition::msgs::Model_V* robotModels) {
-
   std::map<int32_t, std::vector<drake::lcmt_viewer_link_data>> groupedLinks;
 
   for (int i = 0; i < robotData.num_links; ++i) {
@@ -120,7 +119,8 @@ void lcmToIgn(const drake::lcmt_viewer_load_robot& robotData,
     groupedLinks[robotId].push_back(robotData.link[i]);
   }
 
-  for (auto iterator = groupedLinks.begin(); iterator != groupedLinks.end(); ++iterator) {
+  for (auto iterator = groupedLinks.begin(); iterator != groupedLinks.end();
+       ++iterator) {
     drake::lcmt_viewer_load_robot robot;
     auto links = iterator->second;
 
@@ -168,7 +168,8 @@ void lcmToIgn(const drake::lcmt_viewer_geometry_data& geometryData,
 }
 
 //////////////////////////////////////////////////
-void lcmToIgn(const float positionData[3], ignition::msgs::Vector3d* positionModel) {
+void lcmToIgn(const float positionData[3],
+              ignition::msgs::Vector3d* positionModel) {
   positionModel->set_x(positionData[0]);
   positionModel->set_y(positionData[1]);
   positionModel->set_z(positionData[2]);
@@ -242,8 +243,9 @@ void translateBoxGeometry(const drake::lcmt_viewer_geometry_data& geometryData,
 }
 
 //////////////////////////////////////////////////
-void translateSphereGeometry(const drake::lcmt_viewer_geometry_data& geometryData,
-                             ignition::msgs::Geometry* geometryModel) {
+void translateSphereGeometry(
+    const drake::lcmt_viewer_geometry_data& geometryData,
+    ignition::msgs::Geometry* geometryModel) {
   if (geometryData.num_float_data != 1) {
     std::stringstream message;
     message << "Wrong float_data information for sphere: "
@@ -259,8 +261,9 @@ void translateSphereGeometry(const drake::lcmt_viewer_geometry_data& geometryDat
 }
 
 //////////////////////////////////////////////////
-void translateCylinderGeometry(const drake::lcmt_viewer_geometry_data& geometryData,
-                               ignition::msgs::Geometry* geometryModel) {
+void translateCylinderGeometry(
+    const drake::lcmt_viewer_geometry_data& geometryData,
+    ignition::msgs::Geometry* geometryModel) {
   if (geometryData.num_float_data != 2) {
     std::stringstream message;
     message << "Wrong float_data information for cylinder: "

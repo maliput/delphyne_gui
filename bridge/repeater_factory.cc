@@ -26,29 +26,33 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <chrono>
-#include <cstdint>
-
-#include "drake/lcmt_driving_command_t.hpp"
-#include "ign_to_lcm_translation.hh"
-#include "protobuf/headers/automotive_driving_command.pb.h"
+#include "repeater_factory.hh"
 
 namespace delphyne {
 namespace bridge {
 
-void ignToLcm(const ignition::msgs::AutomotiveDrivingCommand& ignDrivingCommand,
-              drake::lcmt_driving_command_t* lcmDrivingCommand) {
-  if (ignDrivingCommand.has_time()) {
-    lcmDrivingCommand->timestamp = ignDrivingCommand.time().sec() * 1000 +
-                                   ignDrivingCommand.time().nsec() / 1000000;
-  } else {
-    int64_t milliseconds = std::chrono::system_clock::now().time_since_epoch() /
-                           std::chrono::milliseconds(1);
-    lcmDrivingCommand->timestamp = milliseconds;
+static std::map<std::string, RepeaterFactoryFunction>* repeaterMap = nullptr;
+
+/////////////////////////////////////////////////
+void RepeaterFactory::Register(const std::string& messageType,
+                               RepeaterFactoryFunction factoryFunction) {
+  // Create the repeaterMap if it's null
+  if (!repeaterMap) {
+    repeaterMap = new std::map<std::string, RepeaterFactoryFunction>;
   }
-  lcmDrivingCommand->steering_angle = ignDrivingCommand.theta();
-  lcmDrivingCommand->acceleration = ignDrivingCommand.acceleration();
+
+  (*repeaterMap)[messageType] = factoryFunction;
 }
 
-}  // namespace bridge
-}  // namespace delphyne
+/////////////////////////////////////////////////
+std::shared_ptr<delphyne::bridge::AbstractRepeater> RepeaterFactory::New(
+    const std::string& messageType, std::shared_ptr<lcm::LCM> lcm,
+    const std::string& topicName) {
+  if (repeaterMap && (*repeaterMap).count(messageType) == 1) {
+    return ((*repeaterMap)[messageType])(lcm, topicName);
+  } else {
+    return nullptr;
+  }
+}
+}
+}

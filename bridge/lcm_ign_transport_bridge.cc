@@ -49,13 +49,31 @@
 // LCM entry point
 #include "lcm/lcm-cpp.hpp"
 
+#include "bridge/drake/lcmt_driving_command_t.hpp"
+#include "bridge/ign_to_lcm_translation.hh"
+#include "bridge/protobuf/headers/automotive_driving_command.pb.h"
+
+#include "bridge/repeater_factory.hh"
+#include "bridge/repeater_manager.hh"
+
+// Register custom msg. Note that the name has to include "ign_msgs" at the
+// beginning
+IGN_REGISTER_STATIC_MSG("ign_msgs.AutomotiveDrivingCommand",
+                        AutomotiveDrivingCommand);
+
+// Register a topic repeater for AutomotiveDrivingCommand
+
+REGISTER_STATIC_REPEATER("ign_msgs.AutomotiveDrivingCommand",
+                         ignition::msgs::AutomotiveDrivingCommand,
+                         drake::lcmt_driving_command_t, 1);
+
 /// \brief Flag used to break the LCM loop and terminate the program.
 static std::atomic<bool> terminatePub(false);
 
 //////////////////////////////////////////////////
 /// \brief Function callback executed when a SIGINT or SIGTERM signals are
-/// captured. This is used to break the infinite loop that handles LCM
-/// and exit the program smoothly.
+/// captured. This is used to break the infinite loop that handles LCM and
+/// exit the program smoothly.
 void signalHandler(int signal) {
   if (signal == SIGINT || signal == SIGTERM) {
     terminatePub = true;
@@ -73,27 +91,29 @@ int main(int argc, char* argv[]) {
   ignition::common::Console::SetVerbosity(3);
   ignmsg << "LCM to ignition-transport bridge 0.1.0" << std::endl;
 
-  // Create an lcm object
-  std::shared_ptr<lcm::LCM> lcm = std::make_shared<lcm::LCM>();
+  std::shared_ptr<lcm::LCM> sharedLCM = std::make_shared<lcm::LCM>();
+
+  delphyne::bridge::RepeaterManager manager(sharedLCM);
+
+  try {
+    manager.Start();
+  } catch (const std::runtime_error& error) {
+    ignerr << "Failed to start the repeater manager" << std::endl;
+    ignerr << "Details: " << error.what() << std::endl;
+    exit(1);
+  }
 
   // Create a repeater on DRAKE_VIEWER_LOAD_ROBOT channel, translating
   // from drake::lcmt_viewer_load_robot to ignition::msgs::Model
   delphyne::bridge::LcmChannelRepeater<drake::lcmt_viewer_load_robot,
                                        ignition::msgs::Model>
-      viewerLoadRobotRepeater(lcm, "DRAKE_VIEWER_LOAD_ROBOT");
+      viewerLoadRobotRepeater(sharedLCM, "DRAKE_VIEWER_LOAD_ROBOT");
 
   // Create a repeater on DRAKE_VIEWER_DRAW channel, translating
   // from drake::lcmt_viewer_draw to ignition::msgs::PosesStamped
   delphyne::bridge::LcmChannelRepeater<drake::lcmt_viewer_draw,
                                        ignition::msgs::PosesStamped>
-      viewerDrawRepeater(lcm, "DRAKE_VIEWER_DRAW");
-
-  // Create a repeater on ignition DRIVING_COMMAND_0 topic, translating
-  // from ignition::msgs::AutomotiveDrivingCommand to
-  // drake::lcmt_driving_command_t
-  delphyne::bridge::IgnTopicRepeater<ignition::msgs::AutomotiveDrivingCommand,
-                                     drake::lcmt_driving_command_t>
-      drivingCommandRepeater(lcm, "DRIVING_COMMAND_0");
+      viewerDrawRepeater(sharedLCM, "DRAKE_VIEWER_DRAW");
 
   // Start DRAKE_VIEWER_LOAD_ROBOT repeater
   try {
@@ -114,16 +134,6 @@ int main(int argc, char* argv[]) {
     exit(1);
   }
 
-  // Start DRIVING_COMMAND_0 repeater
-  try {
-    drivingCommandRepeater.Start();
-  } catch (const std::runtime_error& error) {
-    ignerr << "Failed to start ignition channel repeater for "
-           << "DRIVING_COMMAND_0" << std::endl;
-    ignerr << "Details: " << error.what() << std::endl;
-    exit(1);
-  }
-
   // Service name
   std::string notifierServiceName = "/visualizer_start_notifier";
   std::string channelName = "DRAKE_VIEWER_STATUS";
@@ -131,11 +141,11 @@ int main(int argc, char* argv[]) {
   // Start ignition service to lcm channel converter
   delphyne::bridge::IgnitionServiceConverter<ignition::msgs::Empty,
                                              drake::lcmt_viewer_command>
-      ignToLcmRepublisher(lcm, notifierServiceName, channelName);
+      ignToLcmRepublisher(sharedLCM, notifierServiceName, channelName);
   ignToLcmRepublisher.Start();
 
   while (!terminatePub) {
-    lcm->handleTimeout(100);
+    sharedLCM->handleTimeout(100);
   }
 
   return 0;

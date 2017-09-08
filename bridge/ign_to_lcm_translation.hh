@@ -31,12 +31,12 @@
 
 namespace ignition {
 namespace msgs {
-  class AutomotiveDrivingCommand;
+class AutomotiveDrivingCommand;
 }
 }
 
 namespace drake {
-  class lcmt_driving_command_t;
+class lcmt_driving_command_t;
 }
 
 namespace delphyne {
@@ -46,9 +46,8 @@ namespace bridge {
 /// \param[in]  ignDrivingCommand An ignition message containing the driving
 /// command
 /// \param[out] lcmDrivingCommand The resulting LCM command
-void ignToLcm(
-    const ignition::msgs::AutomotiveDrivingCommand& ignDrivingCommand,
-    drake::lcmt_driving_command_t* lcmDrivingCommand);
+void ignToLcm(const ignition::msgs::AutomotiveDrivingCommand& ignDrivingCommand,
+              drake::lcmt_driving_command_t* lcmDrivingCommand);
 
 }  // namespace bridge
 }  // namespace delphyne

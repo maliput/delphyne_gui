@@ -46,14 +46,10 @@ class ViewerDrawTest : public ::testing::Test {
       ASSERT_EQ(ignPoses->pose(i).position().x(), lcmMsg->position[i][0]);
       ASSERT_EQ(ignPoses->pose(i).position().y(), lcmMsg->position[i][1]);
       ASSERT_EQ(ignPoses->pose(i).position().z(), lcmMsg->position[i][2]);
-      ASSERT_EQ(ignPoses->pose(i).orientation().x(),
-                lcmMsg->quaternion[i][0]);
-      ASSERT_EQ(ignPoses->pose(i).orientation().y(),
-                lcmMsg->quaternion[i][1]);
-      ASSERT_EQ(ignPoses->pose(i).orientation().z(),
-                lcmMsg->quaternion[i][2]);
-      ASSERT_EQ(ignPoses->pose(i).orientation().w(),
-                lcmMsg->quaternion[i][3]);
+      ASSERT_EQ(ignPoses->pose(i).orientation().x(), lcmMsg->quaternion[i][0]);
+      ASSERT_EQ(ignPoses->pose(i).orientation().y(), lcmMsg->quaternion[i][1]);
+      ASSERT_EQ(ignPoses->pose(i).orientation().z(), lcmMsg->quaternion[i][2]);
+      ASSERT_EQ(ignPoses->pose(i).orientation().w(), lcmMsg->quaternion[i][3]);
     }
   }
 };
@@ -234,10 +230,8 @@ GTEST_TEST(CylinderTest, TestCylinderTranslation) {
   // Verify generated ignition geometry
   ASSERT_EQ(true, ignCylinderGeometry.has_cylinder());
   ASSERT_EQ(ignition::msgs::Geometry::CYLINDER, ignCylinderGeometry.type());
-  ASSERT_EQ(cylinderMsg.float_data[0],
-            ignCylinderGeometry.cylinder().radius());
-  ASSERT_EQ(cylinderMsg.float_data[1],
-            ignCylinderGeometry.cylinder().length());
+  ASSERT_EQ(cylinderMsg.float_data[0], ignCylinderGeometry.cylinder().radius());
+  ASSERT_EQ(cylinderMsg.float_data[1], ignCylinderGeometry.cylinder().length());
 }
 
 //////////////////////////////////////////////////
@@ -254,8 +248,7 @@ GTEST_TEST(CylinderTest, TestExceptionInCylinderTranslation) {
   cylinderMsg.float_data.resize(cylinderMsg.num_float_data);
   cylinderMsg.float_data[0] = 1.368;  // radius
 
-  EXPECT_THROW(lcmToIgn(cylinderMsg, &ignCylinderGeometry),
-               TranslateException);
+  EXPECT_THROW(lcmToIgn(cylinderMsg, &ignCylinderGeometry), TranslateException);
 }
 
 //////////////////////////////////////////////////

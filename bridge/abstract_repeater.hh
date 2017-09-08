@@ -26,29 +26,26 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <chrono>
-#include <cstdint>
-
-#include "drake/lcmt_driving_command_t.hpp"
-#include "ign_to_lcm_translation.hh"
-#include "protobuf/headers/automotive_driving_command.pb.h"
+#ifndef DELPHYNE_BRIDGE_ABSTRACTREPEATER_HH_
+#define DELPHYNE_BRIDGE_ABSTRACTREPEATER_HH_
 
 namespace delphyne {
 namespace bridge {
 
-void ignToLcm(const ignition::msgs::AutomotiveDrivingCommand& ignDrivingCommand,
-              drake::lcmt_driving_command_t* lcmDrivingCommand) {
-  if (ignDrivingCommand.has_time()) {
-    lcmDrivingCommand->timestamp = ignDrivingCommand.time().sec() * 1000 +
-                                   ignDrivingCommand.time().nsec() / 1000000;
-  } else {
-    int64_t milliseconds = std::chrono::system_clock::now().time_since_epoch() /
-                           std::chrono::milliseconds(1);
-    lcmDrivingCommand->timestamp = milliseconds;
-  }
-  lcmDrivingCommand->steering_angle = ignDrivingCommand.theta();
-  lcmDrivingCommand->acceleration = ignDrivingCommand.acceleration();
-}
+/// \brief This class is the base class for all topic / channel repeaters.
+class AbstractRepeater {
+ public:
+  /// \brief Start the repeater, which implies hooking to the desired topic /
+  /// channel and start translating messages
+  /// @throws std::runtime_error if there is a problem while hooking LCM or
+  /// ignition components
+  virtual void Start() = 0;
+
+  /// \brief Destructor
+  virtual ~AbstractRepeater() {}
+};
 
 }  // namespace bridge
 }  // namespace delphyne
+
+#endif

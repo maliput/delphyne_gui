@@ -59,14 +59,14 @@ void lcmToIgn(drake::lcmt_viewer_draw robotViewerData,
   // Check the size of each vector on an lcm_viewer_draw message
   // num_links represents the ammount of links declarated and
   // should be matched by the size of each of the following vectors
-  checkVectorSize(robotViewerData.link_name.size(),
-                  robotViewerData.num_links, "link_name");
-  checkVectorSize(robotViewerData.robot_num.size(),
-                  robotViewerData.num_links, "robot_num");
-  checkVectorSize(robotViewerData.position.size(),
-                  robotViewerData.num_links, "position");
-  checkVectorSize(robotViewerData.quaternion.size(),
-                  robotViewerData.num_links, "quaternion");
+  checkVectorSize(robotViewerData.link_name.size(), robotViewerData.num_links,
+                  "link_name");
+  checkVectorSize(robotViewerData.robot_num.size(), robotViewerData.num_links,
+                  "robot_num");
+  checkVectorSize(robotViewerData.position.size(), robotViewerData.num_links,
+                  "position");
+  checkVectorSize(robotViewerData.quaternion.size(), robotViewerData.num_links,
+                  "quaternion");
 
   // Convert from milliseconds to seconds
   int64_t sec = robotViewerData.timestamp / 1000;
@@ -85,7 +85,8 @@ void lcmToIgn(drake::lcmt_viewer_draw robotViewerData,
     // Check position size and translate
     checkVectorSize(robotViewerData.position[i].size(), 3,
                     "position[" + std::to_string(i) + "]");
-    lcmToIgn(robotViewerData.position[i].data(), currentPose->mutable_position());
+    lcmToIgn(robotViewerData.position[i].data(),
+             currentPose->mutable_position());
     // Check orientation size and translate
     checkVectorSize(robotViewerData.quaternion[i].size(), 4,
                     "quaternion[" + std::to_string(i) + "]");
@@ -96,7 +97,7 @@ void lcmToIgn(drake::lcmt_viewer_draw robotViewerData,
 
 //////////////////////////////////////////////////
 void lcmToIgn(drake::lcmt_viewer_load_robot robotData,
-               ignition::msgs::Model* robotModel) {
+              ignition::msgs::Model* robotModel) {
   for (int i = 0; i < robotData.num_links; ++i) {
     lcmToIgn(robotData.link[i], robotModel->add_link());
   }
@@ -104,7 +105,7 @@ void lcmToIgn(drake::lcmt_viewer_load_robot robotData,
 
 //////////////////////////////////////////////////
 void lcmToIgn(drake::lcmt_viewer_link_data linkData,
-               ignition::msgs::Link* linkModel) {
+              ignition::msgs::Link* linkModel) {
   linkModel->set_name(linkData.name);
   linkModel->set_id(linkData.robot_num);
   for (int i = 0; i < linkData.num_geom; ++i) {
@@ -114,7 +115,7 @@ void lcmToIgn(drake::lcmt_viewer_link_data linkData,
 
 //////////////////////////////////////////////////
 void lcmToIgn(drake::lcmt_viewer_geometry_data geometryData,
-               ignition::msgs::Visual* visualModel) {
+              ignition::msgs::Visual* visualModel) {
   auto* poseMsg = visualModel->mutable_pose();
   auto* materialMsg = visualModel->mutable_material();
 
@@ -125,8 +126,7 @@ void lcmToIgn(drake::lcmt_viewer_geometry_data geometryData,
 }
 
 //////////////////////////////////////////////////
-void lcmToIgn(float positionData[3],
-               ignition::msgs::Vector3d* positionModel) {
+void lcmToIgn(float positionData[3], ignition::msgs::Vector3d* positionModel) {
   positionModel->set_x(positionData[0]);
   positionModel->set_y(positionData[1]);
   positionModel->set_z(positionData[2]);
@@ -134,7 +134,7 @@ void lcmToIgn(float positionData[3],
 
 //////////////////////////////////////////////////
 void lcmToIgn(float quaternionData[4],
-               ignition::msgs::Quaternion* quaternionModel) {
+              ignition::msgs::Quaternion* quaternionModel) {
   quaternionModel->set_x(quaternionData[0]);
   quaternionModel->set_y(quaternionData[1]);
   quaternionModel->set_z(quaternionData[2]);
@@ -151,7 +151,7 @@ void lcmToIgn(float colorData[4], ignition::msgs::Color* colorModel) {
 
 //////////////////////////////////////////////////
 void lcmToIgn(drake::lcmt_viewer_geometry_data geometryData,
-               ignition::msgs::Geometry* geometryModel) {
+              ignition::msgs::Geometry* geometryModel) {
   switch (geometryData.type) {
     case geometryData.BOX:
       translateBoxGeometry(geometryData, geometryModel);
@@ -255,12 +255,11 @@ void translateMeshGeometry(drake::lcmt_viewer_geometry_data geometryData,
   }
 }
 
-void checkVectorSize(int vectorSize, int expectedSize,
-                     std::string fieldName) {
+void checkVectorSize(int vectorSize, int expectedSize, std::string fieldName) {
   if (vectorSize != expectedSize) {
     std::stringstream message;
-    message << "Wrong size for " << fieldName << ": expecting "
-            << expectedSize << " elements but " << vectorSize << " given.";
+    message << "Wrong size for " << fieldName << ": expecting " << expectedSize
+            << " elements but " << vectorSize << " given.";
     throw TranslateException(message.str());
   }
 }

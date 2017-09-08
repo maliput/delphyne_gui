@@ -29,12 +29,15 @@
 #ifndef DELPHYNE_BRIDGE_IGNTOPICREPEATER_HH_
 #define DELPHYNE_BRIDGE_IGNTOPICREPEATER_HH_
 
+#include <memory>
+#include <string>
+
 #include <ignition/common/Console.hh>
 #include <ignition/msgs.hh>
 #include <ignition/transport.hh>
 #include <lcm/lcm-cpp.hpp>
-#include <memory>
-#include <string>
+
+#include "abstract_repeater.hh"
 
 #include "drake/lcmt_viewer_geometry_data.hpp"
 #include "drake/lcmt_viewer_load_robot.hpp"
@@ -50,10 +53,9 @@ namespace bridge {
 // to an ignition topic, translates them into their lcm message counterpart
 // and re-publishes them into an lcm channel of the same name.
 // IGN_TYPE is the type of the ignition message that we want to consume
-// whereas LCM_TYPE is the type of the LCM message that we will
-// be generating
+// whereas LCM_TYPE is the type of the LCM message that we will be generating.
 template <class IGN_TYPE, class LCM_TYPE>
-class IgnTopicRepeater {
+class IgnTopicRepeater : public AbstractRepeater {
  public:
   IgnTopicRepeater(std::shared_ptr<lcm::LCM> lcm, const std::string& topicName)
       : lcm_(lcm), topicName_(topicName) {}

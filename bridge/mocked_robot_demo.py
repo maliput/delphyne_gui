@@ -65,7 +65,7 @@ class Launcher(object):
         self.returncode = None  # First one to exit wins.
         self.name = os.path.basename(__file__)
 
-    def launch(self, command, label=None):
+    def launch(self, command, label=None, cwd=None):
         """Launch a process to be managed with the group. If no label is
         supplied, a label is synthesized from the supplied command line.
         """
@@ -77,10 +77,17 @@ class Launcher(object):
             sys.stdout.flush()
             subprocess.call(["/usr/bin/find", "-L", "."])
             raise RuntimeError(command[0] + " not found")
-        process = subprocess.Popen(
-            command,
-            stdin=self.devnull,
-            stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        if not cwd:
+            process = subprocess.Popen(
+                command,
+                stdin=self.devnull,
+                stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        else:
+            process = subprocess.Popen(
+                command,
+                stdin=self.devnull,
+                stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                cwd=cwd)
         flags = fcntl.fcntl(process.stdout, fcntl.F_GETFL)
         fcntl.fcntl(process.stdout, fcntl.F_SETFL, flags | os.O_NONBLOCK)
         self.children.append(TrackedProcess(label, process))

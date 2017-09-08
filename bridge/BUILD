@@ -187,7 +187,9 @@ py_binary(
 
 py_binary(
     name = "demo-launcher",
-    srcs = ["demo_launcher.py"],
+    srcs = ["demo_launcher.py",
+            "mocked_robot_demo.py",
+    ],
     data = [
         ":lcm-ign-transport-bridge",
         "//visualizer:visualizer",

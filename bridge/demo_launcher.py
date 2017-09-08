@@ -187,36 +187,44 @@ def main():
     Docstring
     """
     launcher = Launcher()
-    home_dir = os.environ['HOME']
     parser = argparse.ArgumentParser()
-    parser.add_argument("--drake-path", action='store', dest='drake_path',
-                        default=home_dir + "/drake_distro-2/", help="path to drake's directory")
+
+    # Required argument
+    parser.add_argument(dest='drake_path', nargs='?', action='store',
+                        help="path to drake's directory")
+    # Optional arguments
     parser.add_argument("--no-drake-visualizer", action='store_false',
                         default=True, dest='drake_visualizer',
                         help="don't launch drake-visualizer")
     parser.add_argument("--no-lcm-spy", action='store_false',
                         default=True, dest='lcm_spy',
-                        help="don't launch drake-visualizer")
+                        help="don't launch lcm-spy")
     parser.add_argument("--no-lcm-logger", action='store_false',
                         default=True, dest='lcm_logger',
-                        help="don't launch drake-visualizer")
+                        help="don't launch lcm-logger")
     parser.add_argument("--duration", type=float, default=float('Inf'),
                         help="demo run duration in seconds") 
     args, tail = parser.parse_known_args()
 
+    if args.drake_path is None or not os.path.exists(args.drake_path):
+        print "You must specify a valid drake_path argument."
+        parser.print_help()
+        sys.exit(1)
+
 
     drake_bazel_bin_path = os.path.normpath(args.drake_path) + '/bazel-bin/'
 
-    # drake's binaries
+    # drake's binaries path
     demo_path = drake_bazel_bin_path + "drake/automotive/automotive_demo"
     steering_command_driver_path = drake_bazel_bin_path + "drake/automotive/steering_command_driver"
     drake_visualizer_path = drake_bazel_bin_path + "tools/drake_visualizer"
     lcm_spy_path = drake_bazel_bin_path + "drake/automotive/lcm-spy"
     lcm_logger_path = drake_bazel_bin_path + "external/lcm/lcm-logger"
 
+    # arguments for drake's automotive_demo
     demo_args = "--num_trajectory_car=1"
 
-    # delphyne's binaries
+    # delphyne's binaries path
     lcm_ign_bridge = "bridge/lcm-ign-transport-bridge"
     ign_visualizer = "visualizer/visualizer"
 
@@ -225,15 +233,18 @@ def main():
             launcher.launch([lcm_spy_path])
         if args.lcm_logger:
             launcher.launch([lcm_logger_path])
-
         launcher.launch([steering_command_driver_path])
+
         launcher.launch([lcm_ign_bridge])
         launcher.launch([ign_visualizer])
-        # TODO: replace this delay
+
+        # TODO: replace this delay with a
+        # feedback from the ignition visualizer
         time.sleep(1)
 
         if args.drake_visualizer:
             launcher.launch([drake_visualizer_path])
+        # wait for the drake_visualizer to be up
         wait_for_lcm_message_on_channel('DRAKE_VIEWER_STATUS')
         launcher.launch([demo_path, demo_args], cwd=args.drake_path)
 

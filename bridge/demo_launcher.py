@@ -82,7 +82,6 @@ def main():
         parser.print_help()
         sys.exit(1)
 
-
     drake_bazel_bin_path = os.path.normpath(args.drake_path) + '/bazel-bin/'
 
     # drake's binaries path

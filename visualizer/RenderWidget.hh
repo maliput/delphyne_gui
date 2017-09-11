@@ -46,7 +46,7 @@
 namespace ignition {
   namespace msgs {
     class Model;
-    class PosesStamped;
+    class Model_V;
     class Visual;
   }
 }
@@ -72,21 +72,22 @@ class RenderWidget: public ignition::gui::Plugin
     /// \brief Default Destructor.
     virtual ~RenderWidget();
 
-  /// \brief Callback to set a model for the first time.
+  /// \brief Callback to set collection of models for the first time to populate
+  /// the scene.
   /// \param[in] _msg The new model.
-  public slots: void SetInitialModel(const ignition::msgs::Model &_msg);
+  public slots: void SetInitialModels(const ignition::msgs::Model_V &_msg);
 
   /// \brief Callback to update the scene.
   /// \param[in] _msg Message containing an update.
-  public slots: void UpdateScene(const ignition::msgs::PosesStamped &_msg);
+  public slots: void UpdateScene(const ignition::msgs::Model_V &_msg);
 
   /// \brief Notify that there's a new model.
   /// \param[in] _msg The new model.
-  signals: void NewInitialModel(const ignition::msgs::Model &_msg);
+  signals: void NewInitialModel(const ignition::msgs::Model_V &_msg);
 
   /// \brief Notify that there's a new draw update.
   /// \param[in] _msg Message contining the update.
-  signals: void NewDraw(const ignition::msgs::PosesStamped &_msg);
+  signals: void NewDraw(const ignition::msgs::Model_V &_msg);
 
   protected:
     /// \brief Overridden method to receive Qt paint event.
@@ -131,13 +132,17 @@ class RenderWidget: public ignition::gui::Plugin
     /// RenderWidget::showEvent is called.
     void CreateRenderWindow();
 
+    /// \brief Load an entire model in the scene
+    /// \param[in] _msg The new model.
+    void LoadModel(const ignition::msgs::Model &_msg);
+
     /// \brief Load a new model.
     /// \param[in] _msg The message containing the model.
-    void OnInitialModel(const ignition::msgs::Model &_msg);
+    void OnInitialModel(const ignition::msgs::Model_V &_msg);
 
     /// \brief Update an existing visual.
     /// \param[in] _msg The pose of the new visual.
-    void OnUpdateScene(const ignition::msgs::PosesStamped &_msg);
+    void OnUpdateScene(const ignition::msgs::Model_V &_msg);
 
     /// \brief Create a visual and material before rendering.
     /// \param[in] _vis The input message containing the visual specs.

@@ -51,8 +51,7 @@
 
 #include "RenderWidget.hh"
 
-Q_DECLARE_METATYPE(ignition::msgs::Model)
-Q_DECLARE_METATYPE(ignition::msgs::PosesStamped)
+Q_DECLARE_METATYPE(ignition::msgs::Model_V)
 
 using namespace delphyne;
 using namespace gui;
@@ -96,8 +95,7 @@ static void setPoseFromMessage(const ignition::msgs::Visual &_vis,
 RenderWidget::RenderWidget(QWidget *parent)
   : Plugin(), initializedScene(false)
 {
-  qRegisterMetaType<ignition::msgs::Model>();
-  qRegisterMetaType<ignition::msgs::PosesStamped>();
+  qRegisterMetaType<ignition::msgs::Model_V>();
 
   this->setAttribute(Qt::WA_OpaquePaintEvent, true);
   this->setAttribute(Qt::WA_PaintOnScreen, true);
@@ -115,11 +113,11 @@ RenderWidget::RenderWidget(QWidget *parent)
   // first time that showEvent() is called.
   this->updateTimer = new QTimer(this);
   QObject::connect(this->updateTimer, SIGNAL(timeout()), this, SLOT(update()));
-  QObject::connect(this, SIGNAL(NewInitialModel(const ignition::msgs::Model &)),
-    this, SLOT(SetInitialModel(const ignition::msgs::Model &)));
+  QObject::connect(this, SIGNAL(NewInitialModel(const ignition::msgs::Model_V &)),
+    this, SLOT(SetInitialModels(const ignition::msgs::Model_V &)));
   QObject::connect(this,
-    SIGNAL(NewDraw(const ignition::msgs::PosesStamped &)), this,
-    SLOT(UpdateScene(const ignition::msgs::PosesStamped &)));
+    SIGNAL(NewDraw(const ignition::msgs::Model_V &)), this,
+    SLOT(UpdateScene(const ignition::msgs::Model_V &)));
 
   this->node.Subscribe("/DRAKE_VIEWER_LOAD_ROBOT",
     &RenderWidget::OnInitialModel, this);
@@ -135,13 +133,13 @@ RenderWidget::~RenderWidget()
 }
 
 /////////////////////////////////////////////////
-void RenderWidget::OnInitialModel(const ignition::msgs::Model &_msg)
+void RenderWidget::OnInitialModel(const ignition::msgs::Model_V &_msg)
 {
   emit this->NewInitialModel(_msg);
 }
 
 /////////////////////////////////////////////////
-void RenderWidget::OnUpdateScene(const ignition::msgs::PosesStamped &_msg)
+void RenderWidget::OnUpdateScene(const ignition::msgs::Model_V &_msg)
 {
   emit this->NewDraw(_msg);
 }
@@ -308,22 +306,30 @@ ignition::rendering::VisualPtr RenderWidget::RenderMesh(
   return mesh;
 }
 
+
 /////////////////////////////////////////////////
-void RenderWidget::SetInitialModel(const ignition::msgs::Model &_msg)
+void RenderWidget::SetInitialModels(const ignition::msgs::Model_V &_msg)
 {
   if (this->initializedScene) {
     return;
   }
 
+  for (int i = 0; i < _msg.models_size(); ++i) {
+    LoadModel(_msg.models(i));
+  }
+}
+
+/////////////////////////////////////////////////
+void RenderWidget::LoadModel(const ignition::msgs::Model &_msg)
+{
+  // Sanity check: It's required to have a model Id.
+  if (!_msg.has_id()) {
+    ignerr << "Skipping model without id" << std::endl;
+    return;
+  }
+
   for (int i = 0; i < _msg.link_size(); ++i) {
     auto link = _msg.link(i);
-
-    // Sanity check: Verify that the model contains the required Id.
-    if (!link.has_id()) {
-      ignerr << "No model Id on link [" << link.name() << "]. Skipping"
-             << std::endl;
-      continue;
-    }
 
     // Sanity check: Verify that the link contains the required name.
     if (!link.has_name()) {
@@ -332,11 +338,11 @@ void RenderWidget::SetInitialModel(const ignition::msgs::Model &_msg)
     }
 
     // Sanity check: Verify that the visual doesn't exist already.
-    const auto &modelIt = this->allVisuals.find(link.id());
+    const auto &modelIt = this->allVisuals.find(_msg.id());
     if (modelIt != this->allVisuals.end()) {
       if (modelIt->second.find(link.name()) != modelIt->second.end()) {
         ignerr << "Duplicated link [" << link.name() << "] for model "
-               << link.id() << ". Skipping" << std::endl;
+               << _msg.id() << ". Skipping" << std::endl;
         continue;
       }
     }
@@ -346,7 +352,7 @@ void RenderWidget::SetInitialModel(const ignition::msgs::Model &_msg)
       continue;
     }
 
-    igndbg << "Rendering: [" << link.name() << "] (" << link.id() << ")"
+    igndbg << "Rendering: [" << link.name() << "] (" << _msg.id() << ")"
            << std::endl;
 
     // Iterate through all the visuals of the link and store them.
@@ -390,7 +396,7 @@ void RenderWidget::SetInitialModel(const ignition::msgs::Model &_msg)
     }
 
     // Update the collection of visuals.
-    auto &links = this->allVisuals[link.id()];
+    auto &links = this->allVisuals[_msg.id()];
     links.insert(std::make_pair(link.name(), visuals));
   }
 
@@ -398,47 +404,53 @@ void RenderWidget::SetInitialModel(const ignition::msgs::Model &_msg)
 }
 
 /////////////////////////////////////////////////
-void RenderWidget::UpdateScene(const ignition::msgs::PosesStamped &_msg)
+void RenderWidget::UpdateScene(const ignition::msgs::Model_V &_msg)
 {
-  for (int i = 0; i < _msg.pose_size(); ++i) {
-    auto pose = _msg.pose(i);
+  for (int j = 0; j < _msg.models_size(); ++j) {
+    auto model = _msg.models(j);
 
     // Sanity check: It's required to have a model Id.
-    if (!pose.has_id()) {
-      ignerr << "Skipping pose " << pose.name() << " without id" << std::endl;
+    if (!model.has_id()) {
+      ignerr << "Skipping model without id" << std::endl;
       continue;
     }
 
-    // Sanity check: Make sure that the model Id exists.
-    auto robotIt = this->allVisuals.find(pose.id());
-    if (robotIt == this->allVisuals.end()) {
-      ignerr << "Could not find model Id [" << pose.id() << "]. Skipping"
-             << std::endl;
-      continue;
-    }
+    for (int i = 0; i < model.link_size(); ++i) {
+      auto link = model.link(i);
 
-    // Sanity check: It's required to have a link name.
-    if (!pose.has_name()) {
-      ignerr << "Skipping pose without name" << std::endl;
-      continue;
-    }
+      // Sanity check: It's required to have a link name.
+      if (!link.has_name()) {
+        ignerr << "Skipping link without name" << std::endl;
+        continue;
+      }
 
-    // Sanity check: Make sure that the link name exists.
-    auto visualsIt = robotIt->second.find(pose.name());
-    if (visualsIt == robotIt->second.end()) {
-      ignerr << "Could not find link name [" << pose.name() << "]. Skipping"
-             << std::endl;
-      continue;
-    }
+      // Sanity check: Make sure that the model Id exists.
+      auto robotIt = this->allVisuals.find(model.id());
+      if (robotIt == this->allVisuals.end()) {
+        ignerr << "Could not find model Id [" << model.id() << "]. Skipping"
+               << std::endl;
+        continue;
+      }
 
-    // Update all visuals of this link.
-    auto &visuals = visualsIt->second;
-    for (auto &visual : visuals) {
-      // The setPoseFromMessage() assumes an ignition::msgs::Visual
-      // message here, so we setup a dummy one to please it.
-      ignition::msgs::Visual tmpvis;
-      *tmpvis.mutable_pose() = pose;
-      setPoseFromMessage(tmpvis, visual);
+      // Sanity check: Make sure that the link name exists.
+      auto visualsIt = robotIt->second.find(link.name());
+      if (visualsIt == robotIt->second.end()) {
+        ignerr << "Could not find link name [" << link.name() << "]. Skipping"
+               << std::endl;
+        continue;
+      }
+
+      auto pose = link.pose();
+
+      // Update all visuals of this link.
+      auto &visuals = visualsIt->second;
+      for (auto &visual : visuals) {
+        // The setPoseFromMessage() assumes an ignition::msgs::Visual
+        // message here, so we setup a dummy one to please it.
+        ignition::msgs::Visual tmpvis;
+        *tmpvis.mutable_pose() = pose;
+        setPoseFromMessage(tmpvis, visual);
+      }
     }
   }
 }

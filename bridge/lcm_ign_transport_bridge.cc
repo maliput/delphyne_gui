@@ -29,6 +29,7 @@
 #include <atomic>
 #include <csignal>
 #include <ignition/common/Console.hh>
+#include <ignition/msgs.hh>
 
 // Drake LCM message headers
 #include "drake/lcmt_driving_command_t.hpp"
@@ -106,13 +107,13 @@ int main(int argc, char* argv[]) {
   // Create a repeater on DRAKE_VIEWER_LOAD_ROBOT channel, translating
   // from drake::lcmt_viewer_load_robot to ignition::msgs::Model
   delphyne::bridge::LcmChannelRepeater<drake::lcmt_viewer_load_robot,
-                                       ignition::msgs::Model>
+                                       ignition::msgs::Model_V>
       viewerLoadRobotRepeater(sharedLCM, "DRAKE_VIEWER_LOAD_ROBOT");
 
   // Create a repeater on DRAKE_VIEWER_DRAW channel, translating
   // from drake::lcmt_viewer_draw to ignition::msgs::PosesStamped
   delphyne::bridge::LcmChannelRepeater<drake::lcmt_viewer_draw,
-                                       ignition::msgs::PosesStamped>
+                                       ignition::msgs::Model_V>
       viewerDrawRepeater(sharedLCM, "DRAKE_VIEWER_DRAW");
 
   // Start DRAKE_VIEWER_LOAD_ROBOT repeater

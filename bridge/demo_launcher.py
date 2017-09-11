@@ -32,7 +32,7 @@ import os
 import select
 import sys
 import time
-from mocked_robot_demo import Launcher
+from launcher import Launcher
 
 
 def wait_for_lcm_message_on_channel(channel):
@@ -75,14 +75,6 @@ def main():
     parser.add_argument("--no-drake-visualizer", action='store_false',
                         default=True, dest='drake_visualizer',
                         help="don't launch drake-visualizer")
-    parser.add_argument("--no-lcm-spy", action='store_false',
-                        default=True, dest='lcm_spy',
-                        help="don't launch lcm-spy")
-    parser.add_argument("--no-lcm-logger", action='store_false',
-                        default=True, dest='lcm_logger',
-                        help="don't launch lcm-logger")
-    parser.add_argument("--duration", type=float, default=float('Inf'),
-                        help="demo run duration in seconds") 
     args, tail = parser.parse_known_args()
 
     if args.drake_path is None or not os.path.exists(args.drake_path):
@@ -101,6 +93,7 @@ def main():
     lcm_logger_path = drake_bazel_bin_path + "external/lcm/lcm-logger"
 
     # arguments for drake's automotive_demo
+    # this is transitory and will be replaced by a parameter
     demo_args = "--num_trajectory_car=1"
 
     # delphyne's binaries path
@@ -108,12 +101,7 @@ def main():
     ign_visualizer = "visualizer/visualizer"
 
     try:
-        if args.lcm_spy:
-            launcher.launch([lcm_spy_path])
-        if args.lcm_logger:
-            launcher.launch([lcm_logger_path])
         launcher.launch([steering_command_driver_path])
-
         launcher.launch([lcm_ign_bridge])
         launcher.launch([ign_visualizer])
 
@@ -122,12 +110,15 @@ def main():
         time.sleep(1)
 
         if args.drake_visualizer:
+            launcher.launch([lcm_spy_path])
+            launcher.launch([lcm_logger_path])
             launcher.launch([drake_visualizer_path])
             # wait for the drake_visualizer to be up
             wait_for_lcm_message_on_channel('DRAKE_VIEWER_STATUS')
-        launcher.launch([demo_path, demo_args], cwd=args.drake_path)
 
-        launcher.wait(args.duration)
+        launcher.launch([demo_path, demo_args], cwd=args.drake_path)
+        duration = float('Inf') # infinite duration
+        launcher.wait(duration)
 
     finally:
         launcher.kill()

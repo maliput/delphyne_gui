@@ -169,6 +169,11 @@ cc_binary(
     ],
 )
 
+py_library(
+    name = "launcher",
+    srcs = ["launcher.py"],
+)
+
 py_binary(
     name = "mocked-robot-demo",
     srcs = ["mocked_robot_demo.py"],
@@ -177,6 +182,7 @@ py_binary(
         ":lcm-ign-transport-bridge",
         "//visualizer:visualizer",
     ],
+    deps = ["//bridge:launcher"],
     main = "mocked_robot_demo.py",
     args = [
         "$(location :lcm-mock-robot-publisher)",
@@ -187,9 +193,8 @@ py_binary(
 
 py_binary(
     name = "demo-launcher",
-    srcs = ["demo_launcher.py",
-            "mocked_robot_demo.py",
-    ],
+    srcs = ["demo_launcher.py"],
+    deps = ["//bridge:launcher"],
     data = [
         ":lcm-ign-transport-bridge",
         "//visualizer:visualizer",

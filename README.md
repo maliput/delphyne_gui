@@ -62,6 +62,13 @@ To run the visualizer & bridge bundle, run:
 $ bazel run //bridge:mocked-robot-demo
 ```
 
+To run the demo-launcher, run:
+```
+$ export DELPHYNE_PACKAGE_PATH=</path/to/drake-distro/drake/automotive/models>
+$ bazel run //bridge:demo-launcher </path/to/drake-distro>
+```
+Aditionally, you can append the `--no-drake-visualizer` argument option to the command, which will disable the drake visualizer, as well as the lcm-spy and lcm-logger.
+
 # Instructions for the clang-format tool
 In order to get all the C++ code in the project compliant with a single style, we strongly recommend you using the auto-formatting tool called clang-format.
 

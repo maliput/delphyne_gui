@@ -46,9 +46,9 @@ $ bazel run //bridge:lcm-to-ign-trans-bridge
 
 Set the DELPHYNE_PACKAGE_PATH environment variable to the path containing your
 resources (e.g.:meshes). Normally, you should at least add your `<drake-distro>`
-path.
+path. You can add multiple directories separated with `:`.
 ```
-$ export DELPHYNE_PACKAGE_PATH=/home/caguero/workspace/drake-distro
+$ export DELPHYNE_PACKAGE_PATH=/home/caguero/workspace/drake-distro:/home/caguero/media
 ```
 
 To run the visualizer, run:

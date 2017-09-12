@@ -178,10 +178,10 @@ void lcmToIgn(const float positionData[3],
 //////////////////////////////////////////////////
 void lcmToIgn(const float quaternionData[4],
               ignition::msgs::Quaternion* quaternionModel) {
-  quaternionModel->set_x(quaternionData[0]);
-  quaternionModel->set_y(quaternionData[1]);
-  quaternionModel->set_z(quaternionData[2]);
-  quaternionModel->set_w(quaternionData[3]);
+  quaternionModel->set_w(quaternionData[0]);
+  quaternionModel->set_x(quaternionData[1]);
+  quaternionModel->set_y(quaternionData[2]);
+  quaternionModel->set_z(quaternionData[3]);
 }
 
 //////////////////////////////////////////////////

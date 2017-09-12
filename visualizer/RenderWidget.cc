@@ -60,7 +60,7 @@ using namespace gui;
 static void setPoseFromMessage(const ignition::msgs::Visual &_vis,
   ignition::rendering::VisualPtr _shape)
 {
-  double x = 2.0;
+  double x = 0.0;
   double y = 0.0;
   double z = 0.0;
   double qw = 1.0;
@@ -70,13 +70,9 @@ static void setPoseFromMessage(const ignition::msgs::Visual &_vis,
 
   if (_vis.has_pose()) {
     if (_vis.pose().has_position()) {
-      // The default Ogre coordinate system is X left/right, Y up/down,
-      // and Z in/out (of the screen).  However, ignition-rendering switches that
-      // to be consistent with Gazebo.  Thus, the coordinate system is X in/out,
-      // Y left/right, and Z up/down.
-      x += _vis.pose().position().z();
-      y += -_vis.pose().position().x();
-      z += _vis.pose().position().y();
+      x += _vis.pose().position().x();
+      y += _vis.pose().position().y();
+      z += _vis.pose().position().z();
     }
     if (_vis.pose().has_orientation()) {
       qw = _vis.pose().orientation().w();
@@ -208,9 +204,9 @@ ignition::rendering::VisualPtr RenderWidget::RenderBox(
   ignition::math::Vector3d scale = ignition::math::Vector3d::One;
   auto geomBox = _vis.geometry().box();
   if (geomBox.has_size()) {
-    scale.X() = geomBox.size().z();
-    scale.Y() = geomBox.size().x();
-    scale.Z() = geomBox.size().y();
+    scale.X() = geomBox.size().x();
+    scale.Y() = geomBox.size().y();
+    scale.Z() = geomBox.size().z();
   }
 
   _visual->AddGeometry(scene->CreateBox());

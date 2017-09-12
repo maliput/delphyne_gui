@@ -63,10 +63,10 @@ class ViewerDrawTest : public ::testing::Test {
       EXPECT_EQ(pose.position().x(), lcmMsg.position[i][0]);
       EXPECT_EQ(pose.position().y(), lcmMsg.position[i][1]);
       EXPECT_EQ(pose.position().z(), lcmMsg.position[i][2]);
-      EXPECT_EQ(pose.orientation().x(), lcmMsg.quaternion[i][0]);
-      EXPECT_EQ(pose.orientation().y(), lcmMsg.quaternion[i][1]);
-      EXPECT_EQ(pose.orientation().z(), lcmMsg.quaternion[i][2]);
-      EXPECT_EQ(pose.orientation().w(), lcmMsg.quaternion[i][3]);
+      EXPECT_EQ(pose.orientation().w(), lcmMsg.quaternion[i][0]);
+      EXPECT_EQ(pose.orientation().x(), lcmMsg.quaternion[i][1]);
+      EXPECT_EQ(pose.orientation().y(), lcmMsg.quaternion[i][2]);
+      EXPECT_EQ(pose.orientation().z(), lcmMsg.quaternion[i][3]);
     }
   }
 };

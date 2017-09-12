@@ -493,8 +493,10 @@ void RenderWidget::CreateRenderWindow()
     ignerr << "Failed to create camera" << std::endl;
     return;
   }
-  this->camera->SetLocalPosition(0.0, 0.0, 0.0);
-  this->camera->SetLocalRotation(0.0, 0.0, 0.0);
+  // Rotate 135 deg on the Z axis
+  this->camera->SetLocalRotation(0.0, 0.0, -2.35619);
+  // Step away from the center of the scene
+  this->camera->SetLocalPosition(4.0, 4.0, 1.0);
   this->camera->SetAspectRatio(1.333);
   this->camera->SetHFOV(M_PI / 2.0);
   root->AddChild(this->camera);

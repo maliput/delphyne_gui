@@ -91,6 +91,13 @@ pkg_config_package(
     modname = "uuid",
 )
 
+load("//tools:python.bzl", "python_repository")
+
+python_repository(
+    name = "python",
+    version = "2.7",
+)
+
 bitbucket_archive(
     name = "ignition_common",
     repository = "ignitionrobotics/ign-common",

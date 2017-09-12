@@ -48,7 +48,7 @@ Set the DELPHYNE_PACKAGE_PATH environment variable to the path containing your
 resources (e.g.:meshes). Normally, you should at least add your `<drake-distro>`
 path. You can add multiple directories separated with `:`.
 ```
-$ export DELPHYNE_PACKAGE_PATH=/home/caguero/workspace/drake-distro:/home/caguero/media
+$ export DELPHYNE_PACKAGE_PATH=/home/caguero/workspace/drake-distro:/home/caguero/workspace/delphyne/media
 ```
 
 To run the visualizer, run:

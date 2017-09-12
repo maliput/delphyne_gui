@@ -194,7 +194,10 @@ py_binary(
 py_binary(
     name = "demo-launcher",
     srcs = ["demo_launcher.py"],
-    deps = ["//bridge:launcher"],
+    deps = [
+        "//bridge:launcher",
+        "@lcm//:lcm-python",
+    ],
     data = [
         ":lcm-ign-transport-bridge",
         "//visualizer:visualizer",

@@ -321,11 +321,17 @@ ignition::rendering::VisualPtr RenderWidget::RenderMesh(
   auto filename = _vis.geometry().mesh().filename();
   ignition::rendering::MeshDescriptor descriptor;
   descriptor.meshName = this->FindFile(filename);
+  if (descriptor.meshName.empty()) {
+    ignerr << "Unable to locate mesh [" << filename << "]"
+           << std::endl;
+    return nullptr;
+  }
   ignition::common::MeshManager *meshManager =
     ignition::common::MeshManager::Instance();
   descriptor.mesh = meshManager->Load(descriptor.meshName);
-  if (!descriptor.mesh)
+  if (!descriptor.mesh) {
     return nullptr;
+  }
 
   ignition::rendering::MeshPtr meshGeom = this->scene->CreateMesh(descriptor);
   mesh->AddGeometry(meshGeom);

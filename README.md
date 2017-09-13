@@ -44,10 +44,11 @@ To run the bridge, run:
 $ bazel run //bridge:lcm-to-ign-trans-bridge
 ```
 
-Set the DELPHYNE_MEDIA_PATH environment variable to the path containing the
-`media` directory. E.g.:
+Set the DELPHYNE_PACKAGE_PATH environment variable to the path containing your
+resources (e.g.:meshes). Normally, you should at least add your `<drake-distro>`
+path. You can add multiple directories separated with `:`.
 ```
-$ export DELPHYNE_MEDIA_PATH=/home/caguero/workspace/delphyne/media
+$ export DELPHYNE_PACKAGE_PATH=/home/caguero/workspace/drake-distro:/home/caguero/workspace/delphyne/media
 ```
 
 To run the visualizer, run:

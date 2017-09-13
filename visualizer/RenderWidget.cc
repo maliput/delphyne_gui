@@ -27,13 +27,14 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <cstdlib>
-#include <functional>
-#include <map>
+#include <iterator>
 #include <string>
 #include <utility>
 
 #include <ignition/common/Console.hh>
 #include <ignition/common/MeshManager.hh>
+#include <ignition/common/StringUtils.hh>
+#include <ignition/common/SystemPaths.hh>
 #include <ignition/common/PluginMacros.hh>
 #include <ignition/gui/Iface.hh>
 #include <ignition/gui/Plugin.hh>
@@ -88,6 +89,32 @@ static void setPoseFromMessage(const ignition::msgs::Visual &_vis,
 }
 
 /////////////////////////////////////////////////
+std::string RenderWidget::FindFile(const std::string &_path) const
+{
+  std::string res = "";
+  // Case 1: Absolute path. E.g,: "/tmp/my_mesh.dae"
+  if (ignition::common::StartsWith(_path, "/")) {
+    if (ignition::common::exists(_path)) {
+      res = _path;
+    }
+    return res;
+  }
+
+  int index = _path.find("://");
+  std::string path = _path;
+
+  // Case 2: Contains a prefix. E.g.: "package://meshes/my_mesh.dae"
+  if (index != std::string::npos) {
+    // Remove the prefix.
+    path = _path.substr(index + 3, _path.size() - index - 3);
+  }
+
+  // Case 3: Relative path. E.g.: "meshes/my_mesh.dae"
+  return ignition::common::SystemPaths::LocateLocalFile(
+    path, this->packagePaths);
+}
+
+/////////////////////////////////////////////////
 RenderWidget::RenderWidget(QWidget *parent)
   : Plugin(), initializedScene(false)
 {
@@ -114,6 +141,14 @@ RenderWidget::RenderWidget(QWidget *parent)
   QObject::connect(this,
     SIGNAL(NewDraw(const ignition::msgs::Model_V &)), this,
     SLOT(UpdateScene(const ignition::msgs::Model_V &)));
+
+  auto paths =
+    ignition::common::SystemPaths::PathsFromEnv("DELPHYNE_PACKAGE_PATH");
+  if (paths.empty()) {
+    ignerr << "DELPHYNE_PACKAGE_PATH environment variable is not set"
+           << std::endl;
+  }
+  std::copy(paths.begin(), paths.end(), std::back_inserter(this->packagePaths));
 
   this->node.Subscribe("/DRAKE_VIEWER_LOAD_ROBOT",
     &RenderWidget::OnInitialModel, this);
@@ -258,15 +293,18 @@ ignition::rendering::VisualPtr RenderWidget::RenderCylinder(
 ignition::rendering::VisualPtr RenderWidget::RenderMesh(
   const ignition::msgs::Visual &_vis)
 {
-  ignition::rendering::VisualPtr root = this->scene->RootVisual();
+  // Sanity check: Make sure that the message contains all required fields.
+  if (!_vis.has_geometry()) {
+    ignerr << "Unable to find geometry in message" << std::endl;
+  }
 
-  // Create directional light
-  ignition::rendering::DirectionalLightPtr light0 =
-    this->scene->CreateDirectionalLight();
-  light0->SetDirection(0.5, 0.5, -1);
-  light0->SetDiffuseColor(0.8, 0.8, 0.8);
-  light0->SetSpecularColor(0.5, 0.5, 0.5);
-  root->AddChild(light0);
+  if (!_vis.geometry().has_mesh()) {
+    ignerr << "Unable to find mesh in message" << std::endl;
+  }
+
+  if (!_vis.geometry().mesh().has_filename()) {
+    ignerr << "Unable to find filename in message" << std::endl;
+  }
 
   ignition::rendering::VisualPtr mesh = this->scene->CreateVisual();
   if (!mesh) {
@@ -274,29 +312,27 @@ ignition::rendering::VisualPtr RenderWidget::RenderMesh(
     return nullptr;
   }
 
-  // ToDo: Add support for multiple paths.
-  // ToDo: Figure out how to use bazel for generating paths from this project
-  //   E.g.: the "media/" directory.
-  std::string mediaPath;
-  char *pathCStr = std::getenv("DELPHYNE_MEDIA_PATH");
-  if (!pathCStr || *pathCStr == '\0')
-  {
-    ignerr << "DELPHYNE_MEDIA_PATH environmet variable not set. Meshes will not"
-           << " work" << std::endl;
+  auto filename = _vis.geometry().mesh().filename();
+  ignition::rendering::MeshDescriptor descriptor;
+  descriptor.meshName = this->FindFile(filename);
+  if (descriptor.meshName.empty()) {
+    ignerr << "Unable to locate mesh [" << filename << "]"
+           << std::endl;
     return nullptr;
   }
-  mediaPath = pathCStr;
-
-  ignition::rendering::MeshDescriptor descriptor;
-  descriptor.meshName = ignition::common::joinPaths(mediaPath, "duck.dae");
   ignition::common::MeshManager *meshManager =
     ignition::common::MeshManager::Instance();
   descriptor.mesh = meshManager->Load(descriptor.meshName);
+  if (!descriptor.mesh) {
+    return nullptr;
+  }
+
   ignition::rendering::MeshPtr meshGeom = this->scene->CreateMesh(descriptor);
   mesh->AddGeometry(meshGeom);
 
   setPoseFromMessage(_vis, mesh);
 
+  ignition::rendering::VisualPtr root = this->scene->RootVisual();
   root->AddChild(mesh);
 
   return mesh;

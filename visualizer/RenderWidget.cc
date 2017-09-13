@@ -506,22 +506,32 @@ void RenderWidget::CreateRenderWindow()
     return;
   }
 
+  // Lights.
   this->scene->SetAmbientLight(0.3, 0.3, 0.3);
   ignition::rendering::VisualPtr root = this->scene->RootVisual();
   if (!root) {
     ignerr << "Failed to find the root visual" << std::endl;
     return;
   }
-  ignition::rendering::DirectionalLightPtr light0 =
-      this->scene->CreateDirectionalLight();
-  if (!light0) {
+  auto directionalLight = this->scene->CreateDirectionalLight();
+  if (!directionalLight) {
     ignerr << "Failed to create a directional light" << std::endl;
     return;
   }
-  light0->SetDirection(-0.5, -0.5, -1);
-  light0->SetDiffuseColor(0.5, 0.5, 0.5);
-  light0->SetSpecularColor(0.5, 0.5, 0.5);
-  root->AddChild(light0);
+  directionalLight->SetDirection(-0.5, -0.5, -1);
+  directionalLight->SetDiffuseColor(0.9, 0.9, 0.9);
+  directionalLight->SetSpecularColor(0.9, 0.9, 0.9);
+  root->AddChild(directionalLight);
+
+  auto pointLight = this->scene->CreatePointLight();
+  if (!pointLight) {
+    ignerr << "Failed to create a point light" << std::endl;
+    return;
+  }
+  pointLight->SetLocalPosition(5.5, -2.0, 4.75);
+  pointLight->SetDiffuseColor(1.0, 1.0, 1.0);
+  pointLight->SetSpecularColor(1.0, 1.0, 1.0);
+  root->AddChild(pointLight);
 
   // create user camera
   this->camera = this->scene->CreateCamera("user_camera");

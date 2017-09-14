@@ -94,7 +94,7 @@ def main():
 
     drake_bazel_bin_path = os.path.normpath(args.drake_path) + "/bazel-bin/"
 
-    # drake"s binaries path
+    # drake's binaries path
     demo_path = drake_bazel_bin_path + "drake/automotive/automotive_demo"
     steering_command_driver_path = drake_bazel_bin_path + "drake/automotive/steering_command_driver"
     drake_visualizer_path = drake_bazel_bin_path + "tools/drake_visualizer"

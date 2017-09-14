@@ -67,14 +67,24 @@ def main():
     """
     launcher = Launcher()
     parser = argparse.ArgumentParser()
+    demo_arguments = {
+        "simple": ["--num_simple_car=2"],
+        "trajectory": ["--num_trajectory_car=1"],
+        "dragway":  ["--num_dragway_lanes=3", "--num_trajectory_car=12"],
+    }
 
     # Required argument
-    parser.add_argument(dest='drake_path', nargs='?', action='store',
+    parser.add_argument(dest="drake_path", nargs="?", action="store",
                         help="path to drake's directory")
     # Optional arguments
-    parser.add_argument("--no-drake-visualizer", action='store_false',
-                        default=True, dest='drake_visualizer',
+    parser.add_argument("--demo", default="simple", dest="demo_name",
+                        action="store", choices=demo_arguments.keys(),
+                        help="the specific demo to launch")
+
+    parser.add_argument("--no-drake-visualizer", action="store_false",
+                        default=True, dest="drake_visualizer",
                         help="don't launch drake-visualizer")
+
     args, tail = parser.parse_known_args()
 
     if args.drake_path is None or not os.path.exists(args.drake_path):
@@ -82,7 +92,7 @@ def main():
         parser.print_help()
         sys.exit(1)
 
-    drake_bazel_bin_path = os.path.normpath(args.drake_path) + '/bazel-bin/'
+    drake_bazel_bin_path = os.path.normpath(args.drake_path) + "/bazel-bin/"
 
     # drake's binaries path
     demo_path = drake_bazel_bin_path + "drake/automotive/automotive_demo"
@@ -91,16 +101,12 @@ def main():
     lcm_spy_path = drake_bazel_bin_path + "drake/automotive/lcm-spy"
     lcm_logger_path = drake_bazel_bin_path + "external/lcm/lcm-logger"
 
-    # arguments for drake's automotive_demo
-    # this is transitory and will be replaced by a parameter
-    demo_args = "--num_trajectory_car=1"
 
     # delphyne's binaries path
     lcm_ign_bridge = "bridge/lcm-ign-transport-bridge"
     ign_visualizer = "visualizer/visualizer"
 
     try:
-        launcher.launch([steering_command_driver_path])
         launcher.launch([lcm_ign_bridge])
         launcher.launch([ign_visualizer])
 
@@ -108,19 +114,27 @@ def main():
         # feedback from the ignition visualizer
         time.sleep(1)
 
+        # TODO: Once we have teleop support in the visualizer, move
+        # these inside the `if args.drake_visualizer`
+        if args.demo_name == "simple":
+            launcher.launch([steering_command_driver_path, "--lcm_tag=DRIVING_COMMAND_0"])
+            launcher.launch([steering_command_driver_path, "--lcm_tag=DRIVING_COMMAND_1"])
+
         if args.drake_visualizer:
             launcher.launch([lcm_spy_path])
             launcher.launch([lcm_logger_path])
             launcher.launch([drake_visualizer_path])
             # wait for the drake_visualizer to be up
-            wait_for_lcm_message_on_channel('DRAKE_VIEWER_STATUS')
+            wait_for_lcm_message_on_channel("DRAKE_VIEWER_STATUS")
 
-        launcher.launch([demo_path, demo_args], cwd=args.drake_path)
-        duration = float('Inf') # infinite duration
+        launch_arguments = [demo_path] + demo_arguments[args.demo_name]
+
+        launcher.launch(launch_arguments, cwd=args.drake_path)
+        duration = float("Inf") # infinite duration
         launcher.wait(duration)
 
     finally:
         launcher.kill()
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

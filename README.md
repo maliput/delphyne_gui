@@ -71,7 +71,7 @@ $ bazel run //bridge:demo-launcher </path/to/drake-distro>
 
 The launcher includes three predefined demos that you can specify using the `--demo` parameter, like:
 ```
-$ bazel run //bridge:demo-launcher  -- --demo=simple </path/to/drake-distro>
+$ bazel run //bridge:demo-launcher -- --demo=simple </path/to/drake-distro>
 ```
 
 the possible values for the predefined demos are: simple, trajectory and dragway.
@@ -79,7 +79,7 @@ the possible values for the predefined demos are: simple, trajectory and dragway
 Finally, you can append the `--no-drake-visualizer` argument option to the command, which will disable the drake visualizer, as well as the lcm-spy and lcm-logger:
 
 ```
-$ bazel run //bridge:demo-launcher  -- --demo=simple --no-drake-visualizer </path/to/drake-distro>
+$ bazel run //bridge:demo-launcher -- --demo=simple --no-drake-visualizer </path/to/drake-distro>
 ```
 
 # Instructions for the clang-format tool

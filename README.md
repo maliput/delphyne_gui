@@ -68,7 +68,19 @@ To run the demo-launcher, run:
 $ export DELPHYNE_PACKAGE_PATH=</path/to/drake-distro/drake/automotive/models>
 $ bazel run //bridge:demo-launcher </path/to/drake-distro>
 ```
-Aditionally, you can append the `--no-drake-visualizer` argument option to the command, which will disable the drake visualizer, as well as the lcm-spy and lcm-logger.
+
+The launcher includes three predefined demos that you can specify using the `--demo` parameter, like:
+```
+$ bazel run //bridge:demo-launcher  -- --demo=simple </path/to/drake-distro>
+```
+
+the possible values for the predefined demos are: simple, trajectory and dragway.
+
+Finally, you can append the `--no-drake-visualizer` argument option to the command, which will disable the drake visualizer, as well as the lcm-spy and lcm-logger:
+
+```
+$ bazel run //bridge:demo-launcher  -- --demo=simple --no-drake-visualizer </path/to/drake-distro>
+```
 
 # Instructions for the clang-format tool
 In order to get all the C++ code in the project compliant with a single style, we strongly recommend you using the auto-formatting tool called clang-format.

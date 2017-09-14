@@ -277,8 +277,8 @@ ignition::rendering::VisualPtr RenderWidget::RenderCylinder(
   ignition::math::Vector3d scale = ignition::math::Vector3d::One;
   auto geomCylinder = _vis.geometry().cylinder();
   if (geomCylinder.has_radius()) {
-    scale.X() *= geomCylinder.radius();
-    scale.Y() *= geomCylinder.radius();
+    scale.X() *= 2 * geomCylinder.radius();
+    scale.Y() *= 2 * geomCylinder.radius();
   }
   if (geomCylinder.has_length()) {
     scale.Z() = geomCylinder.length();

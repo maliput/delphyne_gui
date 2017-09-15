@@ -231,7 +231,6 @@ ignition::rendering::VisualPtr RenderWidget::Render(
   setPoseFromMessage(_vis, _visual);
   _visual->SetLocalScale(_scale.X(), _scale.Y(), _scale.Z());
   _visual->SetMaterial(_material);
-  this->scene->RootVisual()->AddChild(_visual);
   return _visual;
 }
 
@@ -400,7 +399,6 @@ ignition::rendering::VisualPtr RenderWidget::RenderMesh(
   setPoseFromMessage(_vis, mesh);
 
   ignition::rendering::VisualPtr root = this->scene->RootVisual();
-  root->AddChild(mesh);
 
   return mesh;
 }
@@ -416,6 +414,24 @@ void RenderWidget::SetInitialModels(const ignition::msgs::Model_V &_msg)
   for (int i = 0; i < _msg.models_size(); ++i) {
     LoadModel(_msg.models(i));
   }
+}
+
+/////////////////////////////////////////////////
+ignition::rendering::VisualPtr RenderWidget::CreateLinkRootVisual(
+    ignition::msgs::Link &_link, uint32_t _robotID) {
+
+  ignition::rendering::VisualPtr linkRootVisual = this->scene->CreateVisual();
+  // The visual's root pose is initialized to zero because the load message
+  // from LCM doesn't include the link pose but only the poses of the inner visuals.
+  // This value will be updated on each new draw message received.
+  ignition::math::Pose3d newpose(0, 0, 0, 1, 0, 0, 0);
+  linkRootVisual->SetLocalPose(newpose);
+  this->scene->RootVisual()->AddChild(linkRootVisual);
+
+  // Assign the visual created above as the root visual of the link
+  auto &links = this->allVisuals[_robotID];
+  links.insert(std::make_pair(_link.name(), linkRootVisual));
+  return linkRootVisual;
 }
 
 /////////////////////////////////////////////////
@@ -454,8 +470,14 @@ void RenderWidget::LoadModel(const ignition::msgs::Model &_msg)
     igndbg << "Rendering: [" << link.name() << "] (" << _msg.id() << ")"
            << std::endl;
 
-    // Iterate through all the visuals of the link and store them.
-    VisualPtr_V visuals;
+    // Create a single root visual per link which will serve only
+    // for hierarchical purposes, so that it can become the parent
+    // of each of the "real" visuals of the link.
+    ignition::rendering::VisualPtr linkRootVisual = 
+        RenderWidget::CreateLinkRootVisual(link, _msg.id());
+
+    // Iterate through all the visuals of the link and add
+    // them as childs of the link's root visual
     for (int j = 0; j < link.visual_size(); ++j) {
 
       const auto &vis = link.visual(j);
@@ -471,6 +493,8 @@ void RenderWidget::LoadModel(const ignition::msgs::Model &_msg)
         continue;
       }
 
+      // A real visual that is going to become
+      // one of the link's root-visual childs
       ignition::rendering::VisualPtr ignvis;
 
       if (vis.geometry().has_box()) {
@@ -491,12 +515,8 @@ void RenderWidget::LoadModel(const ignition::msgs::Model &_msg)
         continue;
       }
 
-      visuals.push_back(ignvis);
+      linkRootVisual->AddChild(ignvis);
     }
-
-    // Update the collection of visuals.
-    auto &links = this->allVisuals[_msg.id()];
-    links.insert(std::make_pair(link.name(), visuals));
   }
 
   this->initializedScene = true;
@@ -541,15 +561,15 @@ void RenderWidget::UpdateScene(const ignition::msgs::Model_V &_msg)
 
       auto pose = link.pose();
 
-      // Update all visuals of this link.
-      auto &visuals = visualsIt->second;
-      for (auto &visual : visuals) {
-        // The setPoseFromMessage() assumes an ignition::msgs::Visual
-        // message here, so we setup a dummy one to please it.
-        ignition::msgs::Visual tmpvis;
-        *tmpvis.mutable_pose() = pose;
-        setPoseFromMessage(tmpvis, visual);
-      }
+      // Update the pose of the root visual only;
+      // the relative poses of the children remain the same
+      auto &visual = visualsIt->second;
+      // The setPoseFromMessage() assumes an ignition::msgs::Visual
+      // message here, so we setup a dummy one to please it.
+      ignition::msgs::Visual tmpvis;
+      *tmpvis.mutable_pose() = pose;
+      setPoseFromMessage(tmpvis, visual);
+      
     }
   }
 }

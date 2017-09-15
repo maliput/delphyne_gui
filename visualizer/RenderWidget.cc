@@ -494,6 +494,8 @@ void RenderWidget::UpdateScene(const ignition::msgs::Model_V &_msg)
 
       auto pose = link.pose();
 
+      // Update the pose of the root visual only;
+      // the relative poses of the children remain the same
       auto &visual = visualsIt->second;
       // The setPoseFromMessage() assumes an ignition::msgs::Visual
       // message here, so we setup a dummy one to please it.

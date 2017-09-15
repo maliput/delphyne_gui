@@ -152,11 +152,11 @@ class RenderWidget: public ignition::gui::Plugin
                       ignition::rendering::VisualPtr &_visual,
                       ignition::rendering::MaterialPtr &_material) const;
 
-    /// \brief Creates a dummy visual for a given link 
-    /// and adds it as a child of the root visual of the scene
+    /// \brief Creates a root visual for a given link
+    /// and adds it as a child of the scene 
     /// \param[in] _link The robot link
     /// \param[in] _robotID The robot uuid
-    /// \return A dummy visual
+    /// \return The root visual
     ignition::rendering::VisualPtr CreateLinkRootVisual(
       ignition::msgs::Link &_link,
       const uint32_t _robotID);
@@ -247,7 +247,7 @@ class RenderWidget: public ignition::gui::Plugin
     /// \brief This the data structure that stores the pointers to all visuals.
     /// The key is the model Id.
     /// The value is another map, where the key is the link name, and the
-    /// value is a dummy visual of which all the link's visuals are childs
+    /// value is a root visual of which all the link's visuals are childs
     std::map<uint32_t, std::map<std::string, ignition::rendering::VisualPtr>> allVisuals;
 };
 

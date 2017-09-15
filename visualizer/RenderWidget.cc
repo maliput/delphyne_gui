@@ -354,14 +354,14 @@ ignition::rendering::VisualPtr RenderWidget::CreateLinkRootVisual(
     ignition::msgs::Link &_link, uint32_t _robotID) {
 
   ignition::rendering::VisualPtr linkRootVisual = this->scene->CreateVisual();
-  // The visual's dummy pose is initialized to zero because the load message
-  // from LCM doesn't include poses but only the definition of the visuals.
+  // The visual's root pose is initialized to zero because the load message
+  // from LCM doesn't include the link pose but only the poses of the inner visuals.
   // This value will be updated on each new draw message received.
   ignition::math::Pose3d newpose(0, 0, 0, 1, 0, 0, 0);
   linkRootVisual->SetLocalPose(newpose);
   this->scene->RootVisual()->AddChild(linkRootVisual);
 
-  // Assign the visual created above as the unique visual of the link
+  // Assign the visual created above as the root visual of the link
   auto &links = this->allVisuals[_robotID];
   links.insert(std::make_pair(_link.name(), linkRootVisual));
   return linkRootVisual;
@@ -403,14 +403,14 @@ void RenderWidget::LoadModel(const ignition::msgs::Model &_msg)
     igndbg << "Rendering: [" << link.name() << "] (" << _msg.id() << ")"
            << std::endl;
 
-    // Create a single dummy visual per link which will serve only
+    // Create a single root visual per link which will serve only
     // for hierarchical purposes, so that it can become the parent
     // of each of the "real" visuals of the link.
     ignition::rendering::VisualPtr linkRootVisual = 
         RenderWidget::CreateLinkRootVisual(link, _msg.id());
 
     // Iterate through all the visuals of the link and add
-    // them as childs of the link's dummy visual
+    // them as childs of the link's root visual
     for (int j = 0; j < link.visual_size(); ++j) {
 
       const auto &vis = link.visual(j);
@@ -427,7 +427,7 @@ void RenderWidget::LoadModel(const ignition::msgs::Model &_msg)
       }
 
       // A real visual that is going to become
-      // one of the link's dummy-visual childs
+      // one of the link's root-visual childs
       ignition::rendering::VisualPtr ignvis;
 
       if (vis.geometry().has_box()) {

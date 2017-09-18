@@ -45,6 +45,9 @@ int main(int argc, char* argv[]) {
   // Initialize app
   ignition::gui::initApp();
 
+  // Set QT style to system's default
+  ignition::gui::setStyleFromString("");
+
   // Look for all plugins in the same place
   ignition::gui::setPluginPathEnv("VISUALIZER_PLUGIN_PATH");
 

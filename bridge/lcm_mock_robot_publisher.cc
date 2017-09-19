@@ -165,8 +165,8 @@ int main(int argc, char* argv[]) {
   drake::lcmt_viewer_geometry_data meshURLMsg;
   meshURLMsg.type = meshURLMsg.MESH;
   meshURLMsg.string_data =
-      "drake/automotive/models/prius/prius.dae";  // Relative to drake's package
-                                                  // path or absolute.
+      "prius/prius.dae";  // Relative to DELPHYNE_PACKAGE_PATH
+                          // or an absolute path.
   meshURLMsg.num_float_data = 3;
   meshURLMsg.float_data.resize(meshURLMsg.num_float_data);
   meshURLMsg.float_data[0] = 1.0;  // scale

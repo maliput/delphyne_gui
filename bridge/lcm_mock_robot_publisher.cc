@@ -191,8 +191,8 @@ int main(int argc, char* argv[]) {
   meshPackageMsg.type = meshPackageMsg.MESH;
   // The following path gets solved by drake's resolvePackageFilename. Requires
   // a package.xml file on each named directory and to append the root dir to
-  // DRAKE_PACKAGE_PATH
-  meshPackageMsg.string_data = "package://drake/car/car.vtp";
+  // DRAKE_PACKAGE_PATH, in this case, must be relative to drake's models dir
+  meshPackageMsg.string_data = "package://prius/prius.dae";
   meshPackageMsg.num_float_data = 3;
   meshPackageMsg.float_data.resize(meshPackageMsg.num_float_data);
   meshPackageMsg.float_data[0] = 1.0;  // scale

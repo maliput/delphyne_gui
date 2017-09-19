@@ -149,11 +149,6 @@ cc_binary(
         "//bridge:repeater-factory",
         "//bridge:repeater-manager",
     ],
-    data = [
-        "drake/car/car.vtp",
-        "drake/package.xml",
-        "drake/car/package.xml",
-    ],
 )
 
 cc_binary(

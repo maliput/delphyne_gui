@@ -67,5 +67,6 @@ cc_binary(
         ":libRenderWidget.so",
         ign_gui_plugin_dep_name("TopicsStats"),
         ign_gui_plugin_dep_name("TopicViewer"),
+        ":layout.config",
     ],
 )

@@ -45,9 +45,6 @@ int main(int argc, char* argv[]) {
   // Initialize app
   ignition::gui::initApp();
 
-  // Set QT style to system's default
-  ignition::gui::setStyleFromString("");
-
   // Look for all plugins in the same place
   ignition::gui::setPluginPathEnv("VISUALIZER_PLUGIN_PATH");
 
@@ -56,15 +53,19 @@ int main(int argc, char* argv[]) {
   ignition::gui::addPluginPath(PLUGIN_INSTALL_PATH);
   ignition::gui::addPluginPath(IGN_GUI_DEFAULT_PLUGIN_PATH);
 
-  ignition::gui::loadPlugin("RenderWidget");
-  ignition::gui::loadPlugin("TopicsStats");
-  ignition::gui::loadPlugin("TopicViewer");
+  // Load window layout from config file
+  ignition::gui::loadConfig("visualizer/layout.config");
+
+
+  //ignition::gui::loadPlugin("RenderWidget");
+  //ignition::gui::loadPlugin("TopicsStats");
+  //ignition::gui::loadPlugin("TopicViewer");
 
   // Create main window
   ignition::gui::createMainWindow();
 
-  auto win = ignition::gui::mainWindow();
-  win->setWindowTitle(version_str);
+  //auto win = ignition::gui::mainWindow();
+  //win->setWindowTitle(version_str);
 
   ignition::gui::runMainWindow();
 

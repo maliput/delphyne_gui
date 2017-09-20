@@ -59,6 +59,9 @@ int main(int argc, char* argv[]) {
   // Create main window
   ignition::gui::createMainWindow();
 
+  auto win = ignition::gui::mainWindow();
+  win->setWindowTitle(version_str);
+
   ignition::gui::runMainWindow();
 
   ignition::gui::stop();

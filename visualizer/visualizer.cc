@@ -56,16 +56,8 @@ int main(int argc, char* argv[]) {
   // Load window layout from config file
   ignition::gui::loadConfig("visualizer/layout.config");
 
-
-  //ignition::gui::loadPlugin("RenderWidget");
-  //ignition::gui::loadPlugin("TopicsStats");
-  //ignition::gui::loadPlugin("TopicViewer");
-
   // Create main window
   ignition::gui::createMainWindow();
-
-  //auto win = ignition::gui::mainWindow();
-  //win->setWindowTitle(version_str);
 
   ignition::gui::runMainWindow();
 

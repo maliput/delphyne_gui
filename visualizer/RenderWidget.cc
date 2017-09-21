@@ -319,6 +319,26 @@ void RenderWidget::RenderGroundPlane()
 }
 
 /////////////////////////////////////////////////
+void RenderWidget::RenderGrid()
+{
+  ignition::msgs::Visual gridVisual;
+  auto* gridGeometry = gridVisual.mutable_geometry();
+  gridGeometry->set_type(ignition::msgs::Geometry::MESH);
+
+  auto* gridMesh = gridGeometry->mutable_mesh();
+  gridMesh->set_filename("/home/alexis/drakaina/media/duck.dae");
+  
+  ignition::rendering::VisualPtr gridVisualPtr;
+  ignition::rendering::MaterialPtr gridVisualMaterial;
+  this->CreateVisual(gridVisual, gridVisualPtr, gridVisualMaterial);
+  gridVisualPtr = this->RenderMesh(gridVisual);
+
+  ignition::math::Pose3d newpose(0, 0, 0, 1, 0, 0, 0);
+  gridVisualPtr->SetLocalPose(newpose);
+  this->scene->RootVisual()->AddChild(gridVisualPtr);
+}
+
+/////////////////////////////////////////////////
 void RenderWidget::RenderOrigin()
 {
   const double kAxisRadius = 0.02;
@@ -640,7 +660,8 @@ void RenderWidget::CreateRenderWindow()
   this->camera->Update();
 
   // Render the ground plane and the origin reference frame.
-  this->RenderGroundPlane();
+  //this->RenderGroundPlane();
+  this->RenderGrid();
   this->RenderOrigin();
 
   this->orbitViewControl.reset(new OrbitViewControl(this->camera));

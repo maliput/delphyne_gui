@@ -204,6 +204,9 @@ class RenderWidget: public ignition::gui::Plugin
     /// \brief Render the ground plane.
     void RenderGroundPlane();
 
+    /// \brief Render a 100x100 grid from a mesh.
+    void RenderGrid();
+
     /// \brief Render the origin reference frame.
     void RenderOrigin();
 

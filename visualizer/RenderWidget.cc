@@ -326,15 +326,10 @@ void RenderWidget::RenderGrid()
   gridGeometry->set_type(ignition::msgs::Geometry::MESH);
 
   auto* gridMesh = gridGeometry->mutable_mesh();
-  gridMesh->set_filename("/home/alexis/drakaina/media/duck.dae");
+  gridMesh->set_filename("media/grid.obj");
   
   ignition::rendering::VisualPtr gridVisualPtr;
-  ignition::rendering::MaterialPtr gridVisualMaterial;
-  this->CreateVisual(gridVisual, gridVisualPtr, gridVisualMaterial);
   gridVisualPtr = this->RenderMesh(gridVisual);
-
-  ignition::math::Pose3d newpose(0, 0, 0, 1, 0, 0, 0);
-  gridVisualPtr->SetLocalPose(newpose);
   this->scene->RootVisual()->AddChild(gridVisualPtr);
 }
 

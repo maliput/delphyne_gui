@@ -106,6 +106,7 @@ $ pushd src/delphyne
 $ bazel run //bridge:demo-launcher </path/to/drake-distro>
 $ popd
 ```
+
 The launcher includes three predefined demos that you can specify using the `--demo` parameter, like:
 ```
 $ bazel run //bridge:demo-launcher -- --demo=simple </path/to/drake-distro>

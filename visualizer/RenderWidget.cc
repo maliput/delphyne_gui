@@ -319,6 +319,21 @@ void RenderWidget::RenderGroundPlane()
 }
 
 /////////////////////////////////////////////////
+void RenderWidget::RenderGrid()
+{
+  ignition::msgs::Visual gridVisual;
+  auto* gridGeometry = gridVisual.mutable_geometry();
+  gridGeometry->set_type(ignition::msgs::Geometry::MESH);
+
+  auto* gridMesh = gridGeometry->mutable_mesh();
+  gridMesh->set_filename("media/grid.obj");
+  
+  ignition::rendering::VisualPtr gridVisualPtr;
+  gridVisualPtr = this->RenderMesh(gridVisual);
+  this->scene->RootVisual()->AddChild(gridVisualPtr);
+}
+
+/////////////////////////////////////////////////
 void RenderWidget::RenderOrigin()
 {
   const double kAxisRadius = 0.02;
@@ -639,8 +654,8 @@ void RenderWidget::CreateRenderWindow()
   // render once to create the window.
   this->camera->Update();
 
-  // Render the ground plane and the origin reference frame.
-  this->RenderGroundPlane();
+  // Render the grid and the origin reference frame.
+  this->RenderGrid();
   this->RenderOrigin();
 
   this->orbitViewControl.reset(new OrbitViewControl(this->camera));

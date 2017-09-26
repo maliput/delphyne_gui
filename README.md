@@ -106,7 +106,6 @@ $ pushd src/delphyne
 $ bazel run //bridge:demo-launcher </path/to/drake-distro>
 $ popd
 ```
-Please note that the export paths used here and for the mocked-robot-demo are the same, and should point to drake's "models" directory.
 
 The launcher includes three predefined demos that you can specify using the `--demo` parameter, like:
 ```

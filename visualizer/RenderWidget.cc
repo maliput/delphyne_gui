@@ -327,7 +327,7 @@ void RenderWidget::RenderGrid()
 
   auto* gridMesh = gridGeometry->mutable_mesh();
   gridMesh->set_filename("media/grid.obj");
-  
+
   ignition::rendering::VisualPtr gridVisualPtr;
   gridVisualPtr = this->RenderMesh(gridVisual);
   this->scene->RootVisual()->AddChild(gridVisualPtr);
@@ -634,8 +634,9 @@ void RenderWidget::CreateRenderWindow()
   this->camera->SetLocalRotation(0.0, 0.0, -2.35619);
   // Step away from the center of the scene
   this->camera->SetLocalPosition(4.0, 4.0, 1.0);
-  this->camera->SetAspectRatio(1.333);
-  this->camera->SetHFOV(M_PI / 2.0);
+  this->camera->SetAspectRatio(
+      static_cast<double>(this->width()) / this->height());
+  this->camera->SetHFOV(IGN_DTOR(60));
   root->AddChild(this->camera);
 
   this->scene->SetBackgroundColor(0.9, 0.9, 0.9);
@@ -696,6 +697,11 @@ void RenderWidget::resizeEvent(QResizeEvent* _e) {
     return;
   }
   this->renderWindow->OnResize(_e->size().width(), _e->size().height());
+  this->camera->SetAspectRatio(
+      static_cast<double>(this->width()) / this->height());
+  // This is a bit janky. We need to update ign-rendering so that the
+  // vertical FOV is auto updated when the aspect ratio is changed
+  this->camera->SetHFOV(IGN_DTOR(60));
 }
 
 /////////////////////////////////////////////////

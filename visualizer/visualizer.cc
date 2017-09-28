@@ -26,15 +26,33 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <iostream>
+#include <string>
 
 #include <ignition/common/Console.hh>
+#include <ignition/common/Filesystem.hh>
+#include <ignition/common/Util.hh>
 
 #ifndef Q_MOC_RUN
 #include <ignition/gui/Iface.hh>
 #endif
 
 static const char version_str[] = "Visualizer 0.1.0";
+static const std::string initial_config_file = "visualizer/layout.config";
+
+/// \bief ToDo.
+std::string defaultConfigPath()
+{
+  std::string homePath;
+#ifndef _WIN32
+  ignition::common::env("HOME", homePath);
+#else
+  ignition::common::env("HOMEPATH", homePath);
+#endif
+  std::string defaultConfigPath =
+    ignition::common::joinPaths(homePath, ".delphyne", "delphyne.config");
+
+  return defaultConfigPath;
+}
 
 int main(int argc, char* argv[]) {
   ignition::common::Console::SetVerbosity(3);
@@ -45,7 +63,8 @@ int main(int argc, char* argv[]) {
   // Initialize app
   ignition::gui::initApp();
 
-  ignition::gui::setDefaultConfigPath("~/.delphyne/visualizer/layout.config");
+  // Set the default location for saving user settings.
+  ignition::gui::setDefaultConfigPath(defaultConfigPath());
 
   // Look for all plugins in the same place
   ignition::gui::setPluginPathEnv("VISUALIZER_PLUGIN_PATH");
@@ -56,7 +75,13 @@ int main(int argc, char* argv[]) {
 
   // Load window layout from config file
   if (!ignition::gui::loadDefaultConfig())
-    ignition::gui::loadConfig("visualizer/layout.config");
+  {
+    if (!ignition::gui::loadConfig(initial_config_file))
+    {
+      ignerr << "Failed to load file [" << initial_config_file << "]"
+             << std::endl;
+    }
+  }
 
   // Create main window
   ignition::gui::createMainWindow();

@@ -28,8 +28,10 @@
 
 #include <cstdlib>
 #include <iterator>
+#include <sstream>
 #include <string>
 #include <utility>
+#include <tinyxml2.h>
 
 #include <ignition/common/Console.hh>
 #include <ignition/common/MeshManager.hh>
@@ -39,6 +41,7 @@
 #include <ignition/gui/Iface.hh>
 #include <ignition/gui/Plugin.hh>
 #include <ignition/math/Helpers.hh>
+#include <ignition/math/Pose3.hh>
 #include <ignition/math/Vector3.hh>
 #include <ignition/msgs.hh>
 #include <ignition/rendering/Camera.hh>
@@ -162,6 +165,68 @@ RenderWidget::RenderWidget(QWidget *parent)
 /////////////////////////////////////////////////
 RenderWidget::~RenderWidget()
 {
+}
+
+/////////////////////////////////////////////////
+void RenderWidget::LoadConfig(const tinyxml2::XMLElement *_pluginElem)
+{
+  tinyxml2::XMLPrinter printer;
+  if (!_pluginElem->Accept(&printer))
+  {
+    ignwarn << "There was an error parsing the plugin element for ["
+            << this->title << "]." << std::endl;
+    return;
+  }
+
+  // Load the user camera options.
+  auto userCameraXML = _pluginElem->FirstChildElement("camera");
+  while (userCameraXML) {
+    std::string cameraName;
+    if (userCameraXML->Attribute("name", "user_camera"))
+    {
+      auto poseXML = userCameraXML->FirstChildElement("pose");
+      if (poseXML) {
+        auto poseStr = poseXML->GetText();
+        std::istringstream stream(poseStr);
+        stream >> this->userSettings.userCameraPose;
+      } else {
+        ignerr << "Unable to parse <pose> element within <camera>" << std::endl;
+      }
+      break;
+    }
+
+    // Not a user camera, skip to the next camera.
+    userCameraXML = userCameraXML->NextSiblingElement("camera");
+  }
+}
+
+/////////////////////////////////////////////////
+std::string RenderWidget::ConfigStr() const
+{
+  tinyxml2::XMLDocument xmlDoc;
+
+  // Create the plugin element.
+  tinyxml2::XMLElement *pluginXML = xmlDoc.NewElement("plugin");
+  pluginXML->SetAttribute("filename", "RenderWidget");
+  xmlDoc.InsertFirstChild(pluginXML);
+
+  // User camera options.
+  tinyxml2::XMLElement *userCameraXML = xmlDoc.NewElement("camera");
+  userCameraXML->SetAttribute("name", "user_camera");
+  pluginXML->InsertEndChild(userCameraXML);
+  tinyxml2::XMLElement *poseXML = xmlDoc.NewElement("pose");
+  auto pos = this->camera->LocalPose().Pos();
+  auto rot = this->camera->LocalPose().Rot().Euler();
+  std::stringstream stream;
+  stream << pos.X() << " " << pos.Y() << " " << pos.Z() << " "
+         << rot.X() << " " << rot.Y() << " " << rot.Z();
+  poseXML->SetText(stream.str().c_str());
+  userCameraXML->InsertEndChild(poseXML);
+
+  tinyxml2::XMLPrinter printer;
+  xmlDoc.Print(&printer);
+
+  return printer.CStr();
 }
 
 /////////////////////////////////////////////////
@@ -631,9 +696,11 @@ void RenderWidget::CreateRenderWindow()
     return;
   }
   // Rotate 135 deg on the Z axis
-  this->camera->SetLocalRotation(0.0, 0.0, -2.35619);
+  auto rotation = this->userSettings.userCameraPose.Rot().Euler();
+  this->camera->SetLocalRotation(rotation.X(), rotation.Y(), rotation.Z());
   // Step away from the center of the scene
-  this->camera->SetLocalPosition(4.0, 4.0, 1.0);
+  auto position = this->userSettings.userCameraPose.Pos();
+  this->camera->SetLocalPosition(position.X(), position.Y(), position.Z());
   this->camera->SetAspectRatio(
       static_cast<double>(this->width()) / this->height());
   this->camera->SetHFOV(IGN_DTOR(60));

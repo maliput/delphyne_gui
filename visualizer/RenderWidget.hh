@@ -65,12 +65,27 @@ class RenderWidget: public ignition::gui::Plugin
   /// \brief A vector of visual pointers.
   using VisualPtr_V = std::vector<ignition::rendering::VisualPtr>;
 
+  /// \brief All user options that can be configured.
+  class UserSettings {
+    /// \brief Default user camera pose.
+    public: ignition::math::Pose3d userCameraPose =
+      {4.0, 4.0, 1.0, 0.0, 0.0, -2.35619};
+  };
+
   public:
     /// \brief Default constructor.
     explicit RenderWidget(QWidget *parent = 0);
 
     /// \brief Default Destructor.
     virtual ~RenderWidget();
+
+    /// \brief Overridden method to load user configuration.
+    /// \param[in] _pluginElem The data containing the configuration.
+    virtual void LoadConfig(const tinyxml2::XMLElement *_pluginElem);
+
+    /// \brief Overridden method to get the configuration XML as a string.
+    /// \return Config element.
+    virtual std::string ConfigStr() const;
 
   /// \brief Callback to set collection of models for the first time to populate
   /// the scene.
@@ -153,7 +168,7 @@ class RenderWidget: public ignition::gui::Plugin
                       ignition::rendering::MaterialPtr &_material) const;
 
     /// \brief Creates a root visual for a given link
-    /// and adds it as a child of the scene 
+    /// and adds it as a child of the scene
     /// \param[in] _link The robot link
     /// \param[in] _robotID The robot uuid
     /// \return The root visual
@@ -258,6 +273,9 @@ class RenderWidget: public ignition::gui::Plugin
     /// The value is another map, where the key is the link name, and the
     /// value is a root visual of which all the link's visuals are childs
     std::map<uint32_t, std::map<std::string, ignition::rendering::VisualPtr>> allVisuals;
+
+    /// \brief Store all the user settings.
+    UserSettings userSettings;
 };
 
 }

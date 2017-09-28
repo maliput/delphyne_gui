@@ -45,6 +45,8 @@ int main(int argc, char* argv[]) {
   // Initialize app
   ignition::gui::initApp();
 
+  ignition::gui::setDefaultConfigPath("~/.delphyne/visualizer/layout.config");
+
   // Look for all plugins in the same place
   ignition::gui::setPluginPathEnv("VISUALIZER_PLUGIN_PATH");
 
@@ -53,7 +55,8 @@ int main(int argc, char* argv[]) {
   ignition::gui::addPluginPath(PLUGIN_INSTALL_PATH);
 
   // Load window layout from config file
-  ignition::gui::loadConfig("visualizer/layout.config");
+  if (!ignition::gui::loadDefaultConfig())
+    ignition::gui::loadConfig("visualizer/layout.config");
 
   // Create main window
   ignition::gui::createMainWindow();

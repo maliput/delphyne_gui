@@ -43,11 +43,7 @@ static const std::string initial_config_file = "visualizer/layout.config";
 /// \return The default configuration path.
 std::string defaultConfigPath() {
   std::string homePath;
-#ifndef _WIN32
   ignition::common::env("HOME", homePath);
-#else
-  ignition::common::env("HOMEPATH", homePath);
-#endif
   std::string defaultConfigPath =
     ignition::common::joinPaths(homePath, ".delphyne", "delphyne.config");
 

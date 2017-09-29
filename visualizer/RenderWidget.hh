@@ -36,6 +36,7 @@
 #include <vector>
 
 #include <ignition/gui/Plugin.hh>
+#include <ignition/math/Pose3.hh>
 #include <ignition/rendering/RenderTypes.hh>
 #include <ignition/rendering/RenderingIface.hh>
 #include <ignition/transport.hh>
@@ -43,6 +44,9 @@
 #include "OrbitViewControl.hh"
 
 // Forward declarations.
+namespace tinyxml2 {
+class XMLElement;
+}
 namespace ignition {
 namespace msgs {
 class Model;
@@ -64,12 +68,27 @@ class RenderWidget : public ignition::gui::Plugin {
   /// \brief A vector of visual pointers.
   using VisualPtr_V = std::vector<ignition::rendering::VisualPtr>;
 
+  /// \brief All user options that can be configured.
+  class UserSettings {
+    /// \brief Default user camera pose.
+    public: ignition::math::Pose3d userCameraPose =
+      {4.0, 4.0, 1.0, 0.0, 0.0, -2.35619};
+  };
+
  public:
   /// \brief Default constructor.
   explicit RenderWidget(QWidget* parent = 0);
 
   /// \brief Default Destructor.
   virtual ~RenderWidget();
+
+  /// \brief Overridden method to load user configuration.
+  /// \param[in] _pluginElem The data containing the configuration.
+  virtual void LoadConfig(const tinyxml2::XMLElement* _pluginElem);
+
+    /// \brief Overridden method to get the configuration XML as a string.
+    /// \return Config element.
+    virtual std::string ConfigStr() const;
 
   /// \brief Callback to set collection of models for the first time to populate
   /// the scene.
@@ -260,6 +279,9 @@ class RenderWidget : public ignition::gui::Plugin {
   /// value is a root visual of which all the link's visuals are childs
   std::map<uint32_t, std::map<std::string, ignition::rendering::VisualPtr>>
       allVisuals;
+
+  /// \brief Store all the user settings.
+  UserSettings userSettings;
 };
 }
 }

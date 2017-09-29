@@ -39,7 +39,8 @@
 static const char version_str[] = "Visualizer 0.1.0";
 static const std::string initial_config_file = "visualizer/layout.config";
 
-/// \bief ToDo.
+/// \brief Get the path of the default configuration file for Delphyne.
+/// \return The default configuration path.
 std::string defaultConfigPath()
 {
   std::string homePath;

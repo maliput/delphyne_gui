@@ -36,6 +36,7 @@
 #include <vector>
 
 #include <ignition/gui/Plugin.hh>
+#include <ignition/math/Pose3.hh>
 #include <ignition/rendering/RenderTypes.hh>
 #include <ignition/rendering/RenderingIface.hh>
 #include <ignition/transport.hh>
@@ -43,6 +44,9 @@
 #include "OrbitViewControl.hh"
 
 // Forward declarations.
+namespace tinyxml2 {
+class XMLElement;
+}
 namespace ignition {
 namespace msgs {
 class Model;

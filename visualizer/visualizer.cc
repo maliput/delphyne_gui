@@ -75,10 +75,7 @@ int main(int argc, char* argv[]) {
 
   // Load window layout from config file
   if (!ignition::gui::loadDefaultConfig()) {
-    if (!ignition::gui::loadConfig(initial_config_file)) {
-      ignerr << "Failed to load file [" << initial_config_file << "]"
-             << std::endl;
-    }
+    ignition::gui::loadConfig(initial_config_file);
   }
 
   // Create main window

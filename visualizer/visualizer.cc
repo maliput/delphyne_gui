@@ -41,8 +41,7 @@ static const std::string initial_config_file = "visualizer/layout.config";
 
 /// \brief Get the path of the default configuration file for Delphyne.
 /// \return The default configuration path.
-std::string defaultConfigPath()
-{
+std::string defaultConfigPath() {
   std::string homePath;
 #ifndef _WIN32
   ignition::common::env("HOME", homePath);
@@ -75,10 +74,8 @@ int main(int argc, char* argv[]) {
   ignition::gui::addPluginPath(PLUGIN_INSTALL_PATH);
 
   // Load window layout from config file
-  if (!ignition::gui::loadDefaultConfig())
-  {
-    if (!ignition::gui::loadConfig(initial_config_file))
-    {
+  if (!ignition::gui::loadDefaultConfig()) {
+    if (!ignition::gui::loadConfig(initial_config_file)) {
       ignerr << "Failed to load file [" << initial_config_file << "]"
              << std::endl;
     }

@@ -118,7 +118,7 @@ std::string RenderWidget::FindFile(const std::string& _path) const {
 
 /////////////////////////////////////////////////
 RenderWidget::RenderWidget(QWidget* parent)
-    : Plugin(), initializedScene(false) {
+    : Plugin(), initializedScene(false), engine(nullptr) {
   qRegisterMetaType<ignition::msgs::Model_V>();
 
   this->setAttribute(Qt::WA_OpaquePaintEvent, true);
@@ -160,7 +160,11 @@ RenderWidget::RenderWidget(QWidget* parent)
 }
 
 /////////////////////////////////////////////////
-RenderWidget::~RenderWidget() {}
+RenderWidget::~RenderWidget() {
+  if (this->engine != nullptr) {
+    this->engine->Fini();
+  }
+}
 
 /////////////////////////////////////////////////
 void RenderWidget::LoadConfig(const tinyxml2::XMLElement* _pluginElem) {
@@ -197,20 +201,20 @@ std::string RenderWidget::ConfigStr() const {
   tinyxml2::XMLDocument xmlDoc;
 
   // Create the plugin element.
-  tinyxml2::XMLElement *pluginXML = xmlDoc.NewElement("plugin");
+  tinyxml2::XMLElement* pluginXML = xmlDoc.NewElement("plugin");
   pluginXML->SetAttribute("filename", "RenderWidget");
   xmlDoc.InsertFirstChild(pluginXML);
 
   // User camera options.
-  tinyxml2::XMLElement *userCameraXML = xmlDoc.NewElement("camera");
+  tinyxml2::XMLElement* userCameraXML = xmlDoc.NewElement("camera");
   userCameraXML->SetAttribute("name", "user_camera");
   pluginXML->InsertEndChild(userCameraXML);
-  tinyxml2::XMLElement *poseXML = xmlDoc.NewElement("pose");
+  tinyxml2::XMLElement* poseXML = xmlDoc.NewElement("pose");
   auto pos = this->camera->LocalPose().Pos();
   auto rot = this->camera->LocalPose().Rot().Euler();
   std::stringstream stream;
-  stream << pos.X() << " " << pos.Y() << " " << pos.Z() << " "
-         << rot.X() << " " << rot.Y() << " " << rot.Z();
+  stream << pos.X() << " " << pos.Y() << " " << pos.Z() << " " << rot.X() << " "
+         << rot.Y() << " " << rot.Z();
   poseXML->SetText(stream.str().c_str());
   userCameraXML->InsertEndChild(poseXML);
 
@@ -297,7 +301,7 @@ ignition::rendering::VisualPtr RenderWidget::RenderBox(
     scale.Z() = geomBox.size().z();
   }
 
-  _visual->AddGeometry(scene->CreateBox());
+  _visual->AddGeometry(this->scene->CreateBox());
   this->Render(_vis, scale, _material, _visual);
   return _visual;
 }
@@ -314,7 +318,7 @@ ignition::rendering::VisualPtr RenderWidget::RenderSphere(
     scale.Z() *= geomSphere.radius();
   }
 
-  _visual->AddGeometry(scene->CreateSphere());
+  _visual->AddGeometry(this->scene->CreateSphere());
   this->Render(_vis, scale, _material, _visual);
   return _visual;
 }
@@ -333,7 +337,7 @@ ignition::rendering::VisualPtr RenderWidget::RenderCylinder(
     scale.Z() = geomCylinder.length();
   }
 
-  _visual->AddGeometry(scene->CreateCylinder());
+  _visual->AddGeometry(this->scene->CreateCylinder());
   this->Render(_vis, scale, _material, _visual);
   return _visual;
 }
@@ -623,8 +627,8 @@ void RenderWidget::CreateRenderWindow() {
   std::string engineName = "ogre";
   ignition::rendering::RenderEngineManager* manager =
       ignition::rendering::RenderEngineManager::Instance();
-  ignition::rendering::RenderEngine* engine = manager->Engine(engineName);
-  if (!engine) {
+  this->engine = manager->Engine(engineName);
+  if (!this->engine) {
     ignerr << "Engine '" << engineName << "' is not supported" << std::endl;
     return;
   }

@@ -4,9 +4,11 @@ cc_library(
     name = "ignition-custom-messages",
     srcs = [
         "protobuf/headers/automotive_driving_command.pb.cc",
+        "protobuf/headers/viewer_command.pb.cc",
     ],
     hdrs = [
         "protobuf/headers/automotive_driving_command.pb.h",
+        "protobuf/headers/viewer_command.pb.h",
     ],
     deps = [
         "@ignition-transport3",

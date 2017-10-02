@@ -31,12 +31,20 @@
 
 #include <ignition/msgs.hh>
 #include "drake/lcmt_viewer_draw.hpp"
+#include "drake/lcmt_viewer_command.hpp"
 #include "drake/lcmt_viewer_geometry_data.hpp"
 #include "drake/lcmt_viewer_load_robot.hpp"
+#include "protobuf/headers/viewer_command.pb.h"
 #include "translate_exception.hh"
 
 namespace delphyne {
 namespace bridge {
+
+/// \brief
+/// \param[in]
+/// \param[out]
+void lcmToIgn(const drake::lcmt_viewer_command& lcmData,
+              ignition::msgs::ViewerCommand* ignData);
 
 /// \brief Translate a whole robot model definition from LCM to a vector
 /// of ignition model

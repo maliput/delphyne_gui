@@ -31,6 +31,7 @@ cc_library(
         "@ignition-transport3",
         "@lcm",
         "//bridge:drake-lcmt-headers",
+        "//bridge:ignition-custom-messages"
     ],
 )
 

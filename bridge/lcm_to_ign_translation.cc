@@ -56,6 +56,13 @@ void translateMeshGeometry(const drake::lcmt_viewer_geometry_data& geometryData,
 void checkVectorSize(int vectorSize, int expectedSize, std::string fieldName);
 
 //////////////////////////////////////////////////
+void lcmToIgn(const drake::lcmt_viewer_command& lcmData,
+              ignition::msgs::ViewerCommand* ignData) {
+    ignData->set_command_type(lcmData.command_type);
+    ignData->set_command_data(lcmData.command_data);
+}
+
+//////////////////////////////////////////////////
 void lcmToIgn(const drake::lcmt_viewer_draw& robotDrawData,
               ignition::msgs::Model_V* robotModels) {
   // Check the size of each vector on an lcm_viewer_draw message

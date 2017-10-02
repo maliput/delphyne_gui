@@ -4,10 +4,12 @@ cc_library(
     name = "ignition-custom-messages",
     srcs = [
         "protobuf/headers/automotive_driving_command.pb.cc",
+        "protobuf/headers/simple_car_state.pb.cc",
         "protobuf/headers/viewer_command.pb.cc",
     ],
     hdrs = [
         "protobuf/headers/automotive_driving_command.pb.h",
+        "protobuf/headers/simple_car_state.pb.h",
         "protobuf/headers/viewer_command.pb.h",
     ],
     deps = [
@@ -132,6 +134,7 @@ cc_library(
         "drake/lcmt_viewer_link_data.hpp",
         "drake/lcmt_viewer_load_robot.hpp",
         "drake/lcmt_driving_command_t.hpp",
+        "drake/lcmt_simple_car_state_t.hpp",
     ],
 )
 

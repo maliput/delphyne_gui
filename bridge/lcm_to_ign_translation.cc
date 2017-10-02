@@ -55,6 +55,26 @@ void translateMeshGeometry(const drake::lcmt_viewer_geometry_data& geometryData,
 
 void checkVectorSize(int vectorSize, int expectedSize, std::string fieldName);
 
+int64_t secsFromMillis(int64_t millis) {
+  return millis / 1000;
+}
+
+int64_t nsecsFromMillis(int64_t millis) {
+  return millis % 1000 * 1000000;
+}
+
+//////////////////////////////////////////////////
+void lcmToIgn(const drake::lcmt_simple_car_state_t& lcmData,
+              ignition::msgs::SimpleCarState* ignData) {
+    ignData->set_x(lcmData.x);
+    ignData->set_y(lcmData.y);
+    ignData->mutable_time()->set_sec(secsFromMillis(lcmData.timestamp));
+    ignData->mutable_time()->set_nsec(nsecsFromMillis(lcmData.timestamp));
+    ignData->set_heading(lcmData.heading);
+    ignData->set_velocity(lcmData.velocity);
+}
+
+
 //////////////////////////////////////////////////
 void lcmToIgn(const drake::lcmt_viewer_command& lcmData,
               ignition::msgs::ViewerCommand* ignData) {
@@ -78,9 +98,9 @@ void lcmToIgn(const drake::lcmt_viewer_draw& robotDrawData,
                   "quaternion");
 
   // Convert from milliseconds to seconds
-  int64_t sec = robotDrawData.timestamp / 1000;
+  int64_t sec = secsFromMillis(robotDrawData.timestamp);
   // Convert the remainder of division above to nanoseconds
-  int64_t nsec = robotDrawData.timestamp % 1000 * 1000000;
+  int64_t nsec = nsecsFromMillis(robotDrawData.timestamp);
 
   robotModels->mutable_header()->mutable_stamp()->set_sec(sec);
   robotModels->mutable_header()->mutable_stamp()->set_nsec(nsec);

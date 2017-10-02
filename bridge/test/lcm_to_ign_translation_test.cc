@@ -504,5 +504,20 @@ GTEST_TEST(ModelTest, TestModelsTranslation) {
   EXPECT_EQ("test_sphere", sphereModel.link(0).name());
 }
 
+GTEST_TEST(ViewerCommandTest, TestViewerCommandTranslation) {
+  drake::lcmt_viewer_command lcmViewerCommand;
+  ignition::msgs::ViewerCommand ignViewerCommand;
+  std::string testString = "test string";
+
+  lcmViewerCommand.command_type = lcmViewerCommand.STATUS;
+  lcmViewerCommand.command_data = testString; 
+
+  lcmToIgn(lcmViewerCommand, &ignViewerCommand);
+
+  EXPECT_EQ(ignViewerCommand.STATUS, ignViewerCommand.command_type());
+  EXPECT_EQ(testString, ignViewerCommand.command_data());
+}
+
+
 }  // namespace bridge
 }  // namespace delphyne

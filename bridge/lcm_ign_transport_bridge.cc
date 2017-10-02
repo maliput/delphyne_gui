@@ -116,6 +116,12 @@ int main(int argc, char* argv[]) {
                                        ignition::msgs::Model_V>
       viewerDrawRepeater(sharedLCM, "DRAKE_VIEWER_DRAW");
 
+  // Create a repeater on DRAKE_VIEWER_STATUS channel, translating
+  // from drake::lcmt_viewer_command to ignition::msgs::ViewerCommand
+  delphyne::bridge::LcmChannelRepeater<drake::lcmt_viewer_command,
+                                       ignition::msgs::ViewerCommand>
+      viewerCommandRepeater(sharedLCM, "DRAKE_VIEWER_STATUS");
+
   // Start DRAKE_VIEWER_LOAD_ROBOT repeater
   try {
     viewerLoadRobotRepeater.Start();
@@ -131,6 +137,15 @@ int main(int argc, char* argv[]) {
   } catch (const std::runtime_error& error) {
     ignerr << "Failed to start LCM channel repeater for "
            << "DRAKE_VIEWER_DRAW" << std::endl;
+    ignerr << "Details: " << error.what() << std::endl;
+    exit(1);
+  }
+  // Start DRAKE_VIEWER_STATUS repeater
+  try {
+    viewerCommandRepeater.Start();
+  } catch (const std::runtime_error& error) {
+    ignerr << "Failed to start LCM channel repeater for "
+           << "DRAKE_VIEWER_STATUS" << std::endl;
     ignerr << "Details: " << error.what() << std::endl;
     exit(1);
   }

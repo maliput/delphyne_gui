@@ -40,9 +40,9 @@
 namespace delphyne {
 namespace bridge {
 
-/// \brief
-/// \param[in]
-/// \param[out]
+/// \brief Translate a viewer status message from LCM to ignition
+/// \param[in] lcmData An LCM message containing the viewer status
+/// \param[out] ignData The resulting ignition message with the translation
 void lcmToIgn(const drake::lcmt_viewer_command& lcmData,
               ignition::msgs::ViewerCommand* ignData);
 

@@ -72,6 +72,7 @@ def main():
         "trajectory": ["--num_trajectory_car=1"],
         "dragway":  ["--num_dragway_lanes=3", "--num_trajectory_car=12"],
     }
+    # Number of cars on each demo, passed as arguments to the bridge
     num_cars = {"simple": "2", "trajectory": "1", "dragway": "12"}
 
     # Required argument

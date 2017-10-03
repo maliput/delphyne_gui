@@ -89,11 +89,12 @@ int main(int argc, char* argv[]) {
   std::signal(SIGINT, signalHandler);
   std::signal(SIGTERM, signalHandler);
 
+  // Number of cars passed as argument defines
+  // the number of simple_car_state translators
   int num_cars = 2;
   if (argc >= 2) {
     std::istringstream iss(argv[1]);
     int val;
-
     if (iss >> val) {
       num_cars = val;
     }

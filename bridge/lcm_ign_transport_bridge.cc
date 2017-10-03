@@ -91,12 +91,12 @@ int main(int argc, char* argv[]) {
 
   // Number of cars passed as argument defines
   // the number of simple_car_state translators
-  int num_cars = 2;
+  int numCars = 2;
   if (argc >= 2) {
     std::istringstream iss(argv[1]);
     int val;
     if (iss >> val) {
-      num_cars = val;
+      numCars = val;
     }
   }
 
@@ -139,7 +139,7 @@ int main(int argc, char* argv[]) {
                                                ignition::msgs::SimpleCarState>
       simpleCarRepeater_t;
   std::vector<std::shared_ptr<simpleCarRepeater_t> > simpleCarRepeaterVector;
-  for (int i = 0; i < num_cars; i++) {
+  for (int i = 0; i < numCars; i++) {
     simpleCarRepeaterVector.push_back(std::make_shared<simpleCarRepeater_t>(
         sharedLCM, std::to_string(i) + "_SIMPLE_CAR_STATE"));
   }

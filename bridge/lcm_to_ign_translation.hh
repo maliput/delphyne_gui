@@ -42,9 +42,9 @@
 namespace delphyne {
 namespace bridge {
 
-/// \brief
-/// \param[in]
-/// \param[out]
+/// \brief Translate a car status messa from LCM to ignition
+/// \param[in] lcmData An LCM message containing the the car state
+/// \param[out] ignData The resuting ignition message with the car state
 void lcmToIgn(const drake::lcmt_simple_car_state_t& lcmData,
               ignition::msgs::SimpleCarState* ignData);
 

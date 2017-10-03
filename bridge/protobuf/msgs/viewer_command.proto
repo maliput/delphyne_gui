@@ -21,7 +21,7 @@ option java_outer_classname = "SimpleCarStateProtos";
 
 /// \ingroup ignition.msgs
 /// \interface ViewerCommand
-/// \brief 
+/// \brief The ignition equivalent of the LCM lcmt_viewer_command type
 
 import "ignition/msgs/header.proto";
 

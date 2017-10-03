@@ -72,6 +72,7 @@ def main():
         "trajectory": ["--num_trajectory_car=1"],
         "dragway":  ["--num_dragway_lanes=3", "--num_trajectory_car=12"],
     }
+    num_cars = {"simple": "2", "trajectory": "1", "dragway": "12"}
 
     # Required argument
     parser.add_argument(dest="drake_path", nargs="?", action="store",
@@ -107,7 +108,7 @@ def main():
     ign_visualizer = "visualizer/visualizer"
 
     try:
-        launcher.launch([lcm_ign_bridge])
+        launcher.launch([lcm_ign_bridge, num_cars[args.demo_name]])
         launcher.launch([ign_visualizer])
 
         # TODO: replace this delay with a

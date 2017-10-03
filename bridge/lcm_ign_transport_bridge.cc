@@ -28,11 +28,13 @@
 
 #include <atomic>
 #include <csignal>
+#include <sstream>
 #include <ignition/common/Console.hh>
 #include <ignition/msgs.hh>
 
 // Drake LCM message headers
 #include "drake/lcmt_driving_command_t.hpp"
+#include "drake/lcmt_simple_car_state_t.hpp"
 #include "drake/lcmt_viewer_command.hpp"
 #include "drake/lcmt_viewer_draw.hpp"
 #include "drake/lcmt_viewer_geometry_data.hpp"
@@ -41,6 +43,7 @@
 // Custom ignition message headers
 #include "protobuf/headers/automotive_driving_command.pb.h"
 #include "protobuf/headers/viewer_command.pb.h"
+#include "protobuf/headers/simple_car_state.pb.h"
 
 // Repeater classes
 #include "ign_service_converter.hh"
@@ -87,6 +90,18 @@ int main(int argc, char* argv[]) {
   std::signal(SIGINT, signalHandler);
   std::signal(SIGTERM, signalHandler);
 
+  int num_cars = 2;
+  if (argc >= 2)
+  {
+      std::istringstream iss( argv[1] );
+      int val;
+
+      if (iss >> val)
+      {
+        num_cars = val;
+      }
+  }
+
   ignition::common::Console::SetVerbosity(3);
   ignmsg << "LCM to ignition-transport bridge 0.1.0" << std::endl;
 
@@ -120,6 +135,14 @@ int main(int argc, char* argv[]) {
                                        ignition::msgs::ViewerCommand>
       viewerCommandRepeater(sharedLCM, "DRAKE_VIEWER_STATUS");
 
+  // Create a vector of repeaters on X_SIMPLE_CAR_STATE translating
+  // from drake::lcmt_simple_car_state_t to ignition::msgs::SimpleCarState
+  typedef delphyne::bridge::LcmChannelRepeater < drake::lcmt_simple_car_state_t, ignition::msgs::SimpleCarState > simpleCarRepeater_t;
+  std::vector< std::shared_ptr <simpleCarRepeater_t> > simpleCarRepeaterVector;
+  for(int i=0; i<num_cars; i++) {
+    simpleCarRepeaterVector.push_back(std::make_shared<simpleCarRepeater_t>(sharedLCM, std::to_string(i) + "_SIMPLE_CAR_STATE"));
+  }
+
   // Start DRAKE_VIEWER_LOAD_ROBOT repeater
   try {
     viewerLoadRobotRepeater.Start();
@@ -147,6 +170,20 @@ int main(int argc, char* argv[]) {
     ignerr << "Details: " << error.what() << std::endl;
     exit(1);
   }
+  // Start all the X_SIMPLE_CAR_STATE repeaters
+  for(int i=0; i<simpleCarRepeaterVector.size(); i++) {
+    try {
+      simpleCarRepeaterVector[i]->Start();
+    } catch (const std::runtime_error& error) {
+      ignerr << "Failed to start LCM channel repeater for "
+            << std::to_string(i) + "_SIMPLE_CAR_STATE" << std::endl;
+      ignerr << "Details: " << error.what() << std::endl;
+      exit(1);
+    }
+  }
+
+
+
 
   // Service name
   std::string notifierServiceName = "/visualizer_start_notifier";

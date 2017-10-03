@@ -31,8 +31,8 @@
 
 #include <ignition/msgs.hh>
 #include "drake/lcmt_simple_car_state_t.hpp"
-#include "drake/lcmt_viewer_draw.hpp"
 #include "drake/lcmt_viewer_command.hpp"
+#include "drake/lcmt_viewer_draw.hpp"
 #include "drake/lcmt_viewer_geometry_data.hpp"
 #include "drake/lcmt_viewer_load_robot.hpp"
 #include "protobuf/headers/simple_car_state.pb.h"

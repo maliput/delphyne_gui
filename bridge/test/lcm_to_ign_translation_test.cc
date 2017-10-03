@@ -510,7 +510,7 @@ GTEST_TEST(ViewerCommandTest, TestViewerCommandTranslation) {
   std::string testString = "test string";
 
   lcmViewerCommand.command_type = lcmViewerCommand.STATUS;
-  lcmViewerCommand.command_data = testString; 
+  lcmViewerCommand.command_data = testString;
 
   lcmToIgn(lcmViewerCommand, &ignViewerCommand);
 

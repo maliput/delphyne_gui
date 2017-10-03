@@ -12,7 +12,7 @@
 #include <string>
 #include <vector>
 
-namespace robotlocomotion
+namespace drake
 {
 
 class viewer2_comms_t

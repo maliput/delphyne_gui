@@ -78,6 +78,20 @@ void lcmToIgn(const drake::lcmt_viewer_command& lcmData,
 }
 
 //////////////////////////////////////////////////
+void lcmToIgn(const drake::viewer2_comms_t& lcmViewer2Data,
+              ignition::msgs::Viewer2Comms* ignViewer2Data) {
+  ignViewer2Data->set_utime(lcmViewer2Data.utime);
+  ignViewer2Data->set_format(lcmViewer2Data.format);
+  ignViewer2Data->set_format_version_major(lcmViewer2Data.format_version_major);
+  ignViewer2Data->set_format_version_minor(lcmViewer2Data.format_version_minor);
+  ignViewer2Data->set_num_bytes(lcmViewer2Data.num_bytes);
+  const std::string lcmData(lcmViewer2Data.data.begin(), lcmViewer2Data.data.end());
+  for (int i = 0; i < lcmViewer2Data.num_bytes; ++i) {
+    ignViewer2Data->add_data(&lcmData[i]);
+  }
+}
+
+//////////////////////////////////////////////////
 void lcmToIgn(const drake::lcmt_viewer_draw& robotDrawData,
               ignition::msgs::Model_V* robotModels) {
   // Check the size of each vector on an lcm_viewer_draw message

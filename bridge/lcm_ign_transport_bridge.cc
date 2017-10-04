@@ -39,11 +39,13 @@
 #include "drake/lcmt_viewer_draw.hpp"
 #include "drake/lcmt_viewer_geometry_data.hpp"
 #include "drake/lcmt_viewer_load_robot.hpp"
+#include "drake/viewer2_comms_t.hpp"
 
 // Custom ignition message headers
 #include "protobuf/headers/automotive_driving_command.pb.h"
 #include "protobuf/headers/simple_car_state.pb.h"
 #include "protobuf/headers/viewer_command.pb.h"
+#include "protobuf/headers/viewer2_comms.pb.h"
 
 // Repeater classes
 #include "ign_service_converter.hh"
@@ -147,6 +149,12 @@ int main(int argc, char* argv[]) {
         sharedLCM, std::to_string(i) + "_SIMPLE_CAR_STATE"));
   }
 
+  // Create a repeater on DIRECTOR_TREE_VIEWER_RESPONSE channel, translating
+  // from drake::viewer2_comms to ignition::msgs::Viewer2Comms
+  delphyne::bridge::LcmChannelRepeater<drake::viewer2_comms_t,
+                                       ignition::msgs::Viewer2Comms>
+      viewer2CommsRepeater(sharedLCM, "DIRECTOR_TREE_VIEWER_RESPONSE");
+
   // Start DRAKE_VIEWER_LOAD_ROBOT repeater
   try {
     viewerLoadRobotRepeater.Start();
@@ -184,6 +192,15 @@ int main(int argc, char* argv[]) {
       ignerr << "Details: " << error.what() << std::endl;
       exit(1);
     }
+  }
+  // Start DIRECTOR_TREE_VIEWER_RESPONSE repeater
+  try {
+    viewer2CommsRepeater.Start();
+  } catch (const std::runtime_error& error) {
+    ignerr << "Failed to start LCM channel repeater for "
+           << "DIRECTOR_TREE_VIEWER_RESPONSE" << std::endl;
+    ignerr << "Details: " << error.what() << std::endl;
+    exit(1);
   }
 
   // Service name

@@ -14,7 +14,6 @@ cc_library(
         "protobuf/headers/viewer_command.pb.h",
         "protobuf/headers/viewer2_comms.pb.h",
     ],
-    ],
     deps = [
         "@ignition-transport3",
     ],
@@ -138,7 +137,7 @@ cc_library(
         "drake/lcmt_viewer_load_robot.hpp",
         "drake/lcmt_driving_command_t.hpp",
         "drake/lcmt_simple_car_state_t.hpp",
-        "drake/viewer2_comms.hpp",
+        "drake/viewer2_comms_t.hpp",
     ],
 )
 

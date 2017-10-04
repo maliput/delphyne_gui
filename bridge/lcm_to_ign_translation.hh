@@ -30,13 +30,29 @@
 #define DELPHYNE_BRIDGE_LCMTOIGNTRANSLATION_HH_
 
 #include <ignition/msgs.hh>
+#include "drake/lcmt_simple_car_state_t.hpp"
+#include "drake/lcmt_viewer_command.hpp"
 #include "drake/lcmt_viewer_draw.hpp"
 #include "drake/lcmt_viewer_geometry_data.hpp"
 #include "drake/lcmt_viewer_load_robot.hpp"
+#include "protobuf/headers/simple_car_state.pb.h"
+#include "protobuf/headers/viewer_command.pb.h"
 #include "translate_exception.hh"
 
 namespace delphyne {
 namespace bridge {
+
+/// \brief Translate a car status message from LCM to ignition
+/// \param[in] lcmData An LCM message containing the the car state
+/// \param[out] ignData The resuting ignition message with the car state
+void lcmToIgn(const drake::lcmt_simple_car_state_t& lcmData,
+              ignition::msgs::SimpleCarState* ignData);
+
+/// \brief Translate a viewer status message from LCM to ignition
+/// \param[in] lcmData An LCM message containing the viewer status
+/// \param[out] ignData The resulting ignition message with the translation
+void lcmToIgn(const drake::lcmt_viewer_command& lcmData,
+              ignition::msgs::ViewerCommand* ignData);
 
 /// \brief Translate a whole robot model definition from LCM to a vector
 /// of ignition model

@@ -504,5 +504,35 @@ GTEST_TEST(ModelTest, TestModelsTranslation) {
   EXPECT_EQ("test_sphere", sphereModel.link(0).name());
 }
 
+GTEST_TEST(ViewerCommandTest, TestViewerCommandTranslation) {
+  drake::lcmt_viewer_command lcmViewerCommand;
+  ignition::msgs::ViewerCommand ignViewerCommand;
+  std::string testString = "test string";
+
+  lcmViewerCommand.command_type = lcmViewerCommand.STATUS;
+  lcmViewerCommand.command_data = testString;
+
+  lcmToIgn(lcmViewerCommand, &ignViewerCommand);
+
+  EXPECT_EQ(ignViewerCommand.STATUS, ignViewerCommand.command_type());
+  EXPECT_EQ(testString, ignViewerCommand.command_data());
+}
+
+GTEST_TEST(SimpleCarStateTest, TestSimpleCarStateTranslation) {
+  drake::lcmt_simple_car_state_t lcmSimpleCarState;
+  ignition::msgs::SimpleCarState ignSimpleCarState;
+
+  lcmSimpleCarState.x = 2.56;
+  lcmSimpleCarState.y = 8.39;
+  lcmSimpleCarState.timestamp = 123456;
+
+  lcmToIgn(lcmSimpleCarState, &ignSimpleCarState);
+
+  EXPECT_EQ(2.56, ignSimpleCarState.x());
+  EXPECT_EQ(8.39, ignSimpleCarState.y());
+  EXPECT_EQ(123, ignSimpleCarState.mutable_time()->sec());
+  EXPECT_EQ(456000000, ignSimpleCarState.mutable_time()->nsec());
+}
+
 }  // namespace bridge
 }  // namespace delphyne

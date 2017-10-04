@@ -28,11 +28,13 @@
 
 #include <atomic>
 #include <csignal>
+#include <sstream>
 #include <ignition/common/Console.hh>
 #include <ignition/msgs.hh>
 
 // Drake LCM message headers
 #include "drake/lcmt_driving_command_t.hpp"
+#include "drake/lcmt_simple_car_state_t.hpp"
 #include "drake/lcmt_viewer_command.hpp"
 #include "drake/lcmt_viewer_draw.hpp"
 #include "drake/lcmt_viewer_geometry_data.hpp"
@@ -40,22 +42,20 @@
 
 // Custom ignition message headers
 #include "protobuf/headers/automotive_driving_command.pb.h"
+#include "protobuf/headers/simple_car_state.pb.h"
+#include "protobuf/headers/viewer_command.pb.h"
 
 // Repeater classes
 #include "ign_service_converter.hh"
+#include "ign_to_lcm_translation.hh"
 #include "ign_topic_repeater.hh"
 #include "lcm_channel_repeater.hh"
+#include "repeater_factory.hh"
+#include "repeater_manager.hh"
 #include "service_to_channel_translation.hh"
 
 // LCM entry point
 #include "lcm/lcm-cpp.hpp"
-
-#include "bridge/drake/lcmt_driving_command_t.hpp"
-#include "bridge/ign_to_lcm_translation.hh"
-#include "bridge/protobuf/headers/automotive_driving_command.pb.h"
-
-#include "bridge/repeater_factory.hh"
-#include "bridge/repeater_manager.hh"
 
 // Register custom msg. Note that the name has to include "ign_msgs" at the
 // beginning
@@ -89,6 +89,20 @@ int main(int argc, char* argv[]) {
   std::signal(SIGINT, signalHandler);
   std::signal(SIGTERM, signalHandler);
 
+
+  // Number of cars passed as argument defines the number of
+  // simple_car_state translators.
+  // This approach is temporal, and will be removed as soon as the
+  // dynamic creation of lcm-to-ign repeaters is ready
+  int numCars = 2;
+  if (argc >= 2) {
+    std::istringstream iss(argv[1]);
+    int val;
+    if (iss >> val) {
+      numCars = val;
+    }
+  }
+
   ignition::common::Console::SetVerbosity(3);
   ignmsg << "LCM to ignition-transport bridge 0.1.0" << std::endl;
 
@@ -116,6 +130,23 @@ int main(int argc, char* argv[]) {
                                        ignition::msgs::Model_V>
       viewerDrawRepeater(sharedLCM, "DRAKE_VIEWER_DRAW");
 
+  // Create a repeater on DRAKE_VIEWER_STATUS channel, translating
+  // from drake::lcmt_viewer_command to ignition::msgs::ViewerCommand
+  delphyne::bridge::LcmChannelRepeater<drake::lcmt_viewer_command,
+                                       ignition::msgs::ViewerCommand>
+      viewerCommandRepeater(sharedLCM, "DRAKE_VIEWER_STATUS");
+
+  // Create a vector of repeaters on X_SIMPLE_CAR_STATE translating
+  // from drake::lcmt_simple_car_state_t to ignition::msgs::SimpleCarState
+  typedef delphyne::bridge::LcmChannelRepeater<drake::lcmt_simple_car_state_t,
+                                               ignition::msgs::SimpleCarState>
+      simpleCarRepeater_t;
+  std::vector<std::shared_ptr<simpleCarRepeater_t> > simpleCarRepeaterVector;
+  for (int i = 0; i < numCars; i++) {
+    simpleCarRepeaterVector.push_back(std::make_shared<simpleCarRepeater_t>(
+        sharedLCM, std::to_string(i) + "_SIMPLE_CAR_STATE"));
+  }
+
   // Start DRAKE_VIEWER_LOAD_ROBOT repeater
   try {
     viewerLoadRobotRepeater.Start();
@@ -133,6 +164,26 @@ int main(int argc, char* argv[]) {
            << "DRAKE_VIEWER_DRAW" << std::endl;
     ignerr << "Details: " << error.what() << std::endl;
     exit(1);
+  }
+  // Start DRAKE_VIEWER_STATUS repeater
+  try {
+    viewerCommandRepeater.Start();
+  } catch (const std::runtime_error& error) {
+    ignerr << "Failed to start LCM channel repeater for "
+           << "DRAKE_VIEWER_STATUS" << std::endl;
+    ignerr << "Details: " << error.what() << std::endl;
+    exit(1);
+  }
+  // Start all the X_SIMPLE_CAR_STATE repeaters
+  for (int i = 0; i < simpleCarRepeaterVector.size(); i++) {
+    try {
+      simpleCarRepeaterVector[i]->Start();
+    } catch (const std::runtime_error& error) {
+      ignerr << "Failed to start LCM channel repeater for "
+             << std::to_string(i) + "_SIMPLE_CAR_STATE" << std::endl;
+      ignerr << "Details: " << error.what() << std::endl;
+      exit(1);
+    }
   }
 
   // Service name

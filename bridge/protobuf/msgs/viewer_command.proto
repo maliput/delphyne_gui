@@ -41,9 +41,12 @@ message ViewerCommand
   }
 
   /// \brief Optional header data
-  optional Header header    = 1;
+  optional Header header       = 1;
 
-  optional int32 command_type = 2 [default = 0];
-  optional string command_data = 3 [default = ""];
+  /// \brief Command number from the enum list above
+  optional int32 command_type  = 2;
+
+  /// \brief String with the content of the command
+  optional string command_data = 3;
 
 }

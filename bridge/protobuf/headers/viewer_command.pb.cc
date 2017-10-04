@@ -85,15 +85,15 @@ void protobuf_AddDesc_viewer_5fcommand_2eproto() {
   ::ignition::msgs::protobuf_AddDesc_ignition_2fmsgs_2fheader_2eproto();
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
     "\n\024viewer_command.proto\022\rignition.msgs\032\032i"
-    "gnition/msgs/header.proto\"\203\002\n\rViewerComm"
+    "gnition/msgs/header.proto\"\376\001\n\rViewerComm"
     "and\022%\n\006header\030\001 \001(\0132\025.ignition.msgs.Head"
-    "er\022\027\n\014command_type\030\002 \001(\005:\0010\022\026\n\014command_d"
-    "ata\030\003 \001(\t:\000\"\231\001\n\004Type\022\n\n\006STATUS\020\000\022\016\n\nLOAD"
-    "_MODEL\020\001\022\021\n\rLOAD_RENDERER\020\002\022\014\n\010SHUTDOWN\020"
-    "\003\022\023\n\017START_RECORDING\020\004\022\022\n\016STOP_RECORDING"
-    "\020\005\022\020\n\014LOAD_TERRAIN\020\006\022\031\n\025SET_TERRAIN_TRAN"
-    "SFORM\020\007B)\n\021com.ignition.msgsB\024SimpleCarS"
-    "tateProtos", 370);
+    "er\022\024\n\014command_type\030\002 \001(\005\022\024\n\014command_data"
+    "\030\003 \001(\t\"\231\001\n\004Type\022\n\n\006STATUS\020\000\022\016\n\nLOAD_MODE"
+    "L\020\001\022\021\n\rLOAD_RENDERER\020\002\022\014\n\010SHUTDOWN\020\003\022\023\n\017"
+    "START_RECORDING\020\004\022\022\n\016STOP_RECORDING\020\005\022\020\n"
+    "\014LOAD_TERRAIN\020\006\022\031\n\025SET_TERRAIN_TRANSFORM"
+    "\020\007B)\n\021com.ignition.msgsB\024SimpleCarStateP"
+    "rotos", 365);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "viewer_command.proto", &protobuf_RegisterTypes);
   ViewerCommand::default_instance_ = new ViewerCommand();
@@ -248,7 +248,7 @@ bool ViewerCommand::MergePartialFromCodedStream(
         break;
       }
 
-      // optional int32 command_type = 2 [default = 0];
+      // optional int32 command_type = 2;
       case 2: {
         if (tag == 16) {
          parse_command_type:
@@ -263,7 +263,7 @@ bool ViewerCommand::MergePartialFromCodedStream(
         break;
       }
 
-      // optional string command_data = 3 [default = ""];
+      // optional string command_data = 3;
       case 3: {
         if (tag == 26) {
          parse_command_data:
@@ -311,12 +311,12 @@ void ViewerCommand::SerializeWithCachedSizes(
       1, this->header(), output);
   }
 
-  // optional int32 command_type = 2 [default = 0];
+  // optional int32 command_type = 2;
   if (has_command_type()) {
     ::google::protobuf::internal::WireFormatLite::WriteInt32(2, this->command_type(), output);
   }
 
-  // optional string command_data = 3 [default = ""];
+  // optional string command_data = 3;
   if (has_command_data()) {
     ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
       this->command_data().data(), this->command_data().length(),
@@ -343,12 +343,12 @@ void ViewerCommand::SerializeWithCachedSizes(
         1, this->header(), target);
   }
 
-  // optional int32 command_type = 2 [default = 0];
+  // optional int32 command_type = 2;
   if (has_command_type()) {
     target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(2, this->command_type(), target);
   }
 
-  // optional string command_data = 3 [default = ""];
+  // optional string command_data = 3;
   if (has_command_data()) {
     ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
       this->command_data().data(), this->command_data().length(),
@@ -378,14 +378,14 @@ int ViewerCommand::ByteSize() const {
           this->header());
     }
 
-    // optional int32 command_type = 2 [default = 0];
+    // optional int32 command_type = 2;
     if (has_command_type()) {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::Int32Size(
           this->command_type());
     }
 
-    // optional string command_data = 3 [default = ""];
+    // optional string command_data = 3;
     if (has_command_data()) {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::StringSize(

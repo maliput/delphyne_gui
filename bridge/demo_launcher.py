@@ -73,6 +73,8 @@ def main():
         "dragway":  ["--num_dragway_lanes=3", "--num_trajectory_car=12"],
     }
     # Number of cars on each demo, passed as arguments to the bridge
+    # this approach is temporal, and will be removed as soon as the
+    # dynamic creation of lcm-to-ign repeaters is ready
     num_cars = {"simple": "2", "trajectory": "1", "dragway": "12"}
 
     # Required argument

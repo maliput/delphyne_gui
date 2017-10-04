@@ -111,28 +111,28 @@ class SimpleCarState : public ::google::protobuf::Message {
   inline ::ignition::msgs::Time* release_time();
   inline void set_allocated_time(::ignition::msgs::Time* time);
 
-  // optional double x = 3 [default = 0];
+  // optional double x = 3;
   inline bool has_x() const;
   inline void clear_x();
   static const int kXFieldNumber = 3;
   inline double x() const;
   inline void set_x(double value);
 
-  // optional double y = 4 [default = 0];
+  // optional double y = 4;
   inline bool has_y() const;
   inline void clear_y();
   static const int kYFieldNumber = 4;
   inline double y() const;
   inline void set_y(double value);
 
-  // optional double heading = 5 [default = 0];
+  // optional double heading = 5;
   inline bool has_heading() const;
   inline void clear_heading();
   static const int kHeadingFieldNumber = 5;
   inline double heading() const;
   inline void set_heading(double value);
 
-  // optional double velocity = 6 [default = 0];
+  // optional double velocity = 6;
   inline bool has_velocity() const;
   inline void clear_velocity();
   static const int kVelocityFieldNumber = 6;
@@ -260,7 +260,7 @@ inline void SimpleCarState::set_allocated_time(::ignition::msgs::Time* time) {
   // @@protoc_insertion_point(field_set_allocated:ignition.msgs.SimpleCarState.time)
 }
 
-// optional double x = 3 [default = 0];
+// optional double x = 3;
 inline bool SimpleCarState::has_x() const {
   return (_has_bits_[0] & 0x00000004u) != 0;
 }
@@ -284,7 +284,7 @@ inline void SimpleCarState::set_x(double value) {
   // @@protoc_insertion_point(field_set:ignition.msgs.SimpleCarState.x)
 }
 
-// optional double y = 4 [default = 0];
+// optional double y = 4;
 inline bool SimpleCarState::has_y() const {
   return (_has_bits_[0] & 0x00000008u) != 0;
 }
@@ -308,7 +308,7 @@ inline void SimpleCarState::set_y(double value) {
   // @@protoc_insertion_point(field_set:ignition.msgs.SimpleCarState.y)
 }
 
-// optional double heading = 5 [default = 0];
+// optional double heading = 5;
 inline bool SimpleCarState::has_heading() const {
   return (_has_bits_[0] & 0x00000010u) != 0;
 }
@@ -332,7 +332,7 @@ inline void SimpleCarState::set_heading(double value) {
   // @@protoc_insertion_point(field_set:ignition.msgs.SimpleCarState.heading)
 }
 
-// optional double velocity = 6 [default = 0];
+// optional double velocity = 6;
 inline bool SimpleCarState::has_velocity() const {
   return (_has_bits_[0] & 0x00000020u) != 0;
 }

@@ -88,12 +88,12 @@ void protobuf_AddDesc_simple_5fcar_5fstate_2eproto() {
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
     "\n\026simple_car_state.proto\022\rignition.msgs\032"
     "\032ignition/msgs/header.proto\032\030ignition/ms"
-    "gs/time.proto\"\237\001\n\016SimpleCarState\022%\n\006head"
+    "gs/time.proto\"\223\001\n\016SimpleCarState\022%\n\006head"
     "er\030\001 \001(\0132\025.ignition.msgs.Header\022!\n\004time\030"
-    "\002 \001(\0132\023.ignition.msgs.Time\022\014\n\001x\030\003 \001(\001:\0010"
-    "\022\014\n\001y\030\004 \001(\001:\0010\022\022\n\007heading\030\005 \001(\001:\0010\022\023\n\010ve"
-    "locity\030\006 \001(\001:\0010B)\n\021com.ignition.msgsB\024Si"
-    "mpleCarStateProtos", 298);
+    "\002 \001(\0132\023.ignition.msgs.Time\022\t\n\001x\030\003 \001(\001\022\t\n"
+    "\001y\030\004 \001(\001\022\017\n\007heading\030\005 \001(\001\022\020\n\010velocity\030\006 "
+    "\001(\001B)\n\021com.ignition.msgsB\024SimpleCarState"
+    "Protos", 286);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "simple_car_state.proto", &protobuf_RegisterTypes);
   SimpleCarState::default_instance_ = new SimpleCarState();
@@ -244,7 +244,7 @@ bool SimpleCarState::MergePartialFromCodedStream(
         break;
       }
 
-      // optional double x = 3 [default = 0];
+      // optional double x = 3;
       case 3: {
         if (tag == 25) {
          parse_x:
@@ -259,7 +259,7 @@ bool SimpleCarState::MergePartialFromCodedStream(
         break;
       }
 
-      // optional double y = 4 [default = 0];
+      // optional double y = 4;
       case 4: {
         if (tag == 33) {
          parse_y:
@@ -274,7 +274,7 @@ bool SimpleCarState::MergePartialFromCodedStream(
         break;
       }
 
-      // optional double heading = 5 [default = 0];
+      // optional double heading = 5;
       case 5: {
         if (tag == 41) {
          parse_heading:
@@ -289,7 +289,7 @@ bool SimpleCarState::MergePartialFromCodedStream(
         break;
       }
 
-      // optional double velocity = 6 [default = 0];
+      // optional double velocity = 6;
       case 6: {
         if (tag == 49) {
          parse_velocity:
@@ -341,22 +341,22 @@ void SimpleCarState::SerializeWithCachedSizes(
       2, this->time(), output);
   }
 
-  // optional double x = 3 [default = 0];
+  // optional double x = 3;
   if (has_x()) {
     ::google::protobuf::internal::WireFormatLite::WriteDouble(3, this->x(), output);
   }
 
-  // optional double y = 4 [default = 0];
+  // optional double y = 4;
   if (has_y()) {
     ::google::protobuf::internal::WireFormatLite::WriteDouble(4, this->y(), output);
   }
 
-  // optional double heading = 5 [default = 0];
+  // optional double heading = 5;
   if (has_heading()) {
     ::google::protobuf::internal::WireFormatLite::WriteDouble(5, this->heading(), output);
   }
 
-  // optional double velocity = 6 [default = 0];
+  // optional double velocity = 6;
   if (has_velocity()) {
     ::google::protobuf::internal::WireFormatLite::WriteDouble(6, this->velocity(), output);
   }
@@ -385,22 +385,22 @@ void SimpleCarState::SerializeWithCachedSizes(
         2, this->time(), target);
   }
 
-  // optional double x = 3 [default = 0];
+  // optional double x = 3;
   if (has_x()) {
     target = ::google::protobuf::internal::WireFormatLite::WriteDoubleToArray(3, this->x(), target);
   }
 
-  // optional double y = 4 [default = 0];
+  // optional double y = 4;
   if (has_y()) {
     target = ::google::protobuf::internal::WireFormatLite::WriteDoubleToArray(4, this->y(), target);
   }
 
-  // optional double heading = 5 [default = 0];
+  // optional double heading = 5;
   if (has_heading()) {
     target = ::google::protobuf::internal::WireFormatLite::WriteDoubleToArray(5, this->heading(), target);
   }
 
-  // optional double velocity = 6 [default = 0];
+  // optional double velocity = 6;
   if (has_velocity()) {
     target = ::google::protobuf::internal::WireFormatLite::WriteDoubleToArray(6, this->velocity(), target);
   }
@@ -431,22 +431,22 @@ int SimpleCarState::ByteSize() const {
           this->time());
     }
 
-    // optional double x = 3 [default = 0];
+    // optional double x = 3;
     if (has_x()) {
       total_size += 1 + 8;
     }
 
-    // optional double y = 4 [default = 0];
+    // optional double y = 4;
     if (has_y()) {
       total_size += 1 + 8;
     }
 
-    // optional double heading = 5 [default = 0];
+    // optional double heading = 5;
     if (has_heading()) {
       total_size += 1 + 8;
     }
 
-    // optional double velocity = 6 [default = 0];
+    // optional double velocity = 6;
     if (has_velocity()) {
       total_size += 1 + 8;
     }

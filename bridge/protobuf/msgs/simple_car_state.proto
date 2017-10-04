@@ -32,10 +32,21 @@ message SimpleCarState
   /// \brief Optional header data
   optional Header header   = 1;
 
+  /// \brief The timestamp in milliseconds.
   optional Time time       = 2;
-  optional double x        = 3 [default = 0];
-  optional double y        = 4 [default = 0];
-  optional double heading  = 5 [default = 0];
-  optional double velocity = 6 [default = 0];
+
+  /// \brief Current position of the car in x
+  /// relative to the coordinate origin
+  optional double x        = 3;
+
+  /// \brief Current position of the car in y
+  /// relative to the coordinate origin
+  optional double y        = 4;
+
+  /// \brief Current heading of the car in radians
+  optional double heading  = 5;
+
+  /// \brief Current speed module of the car in radians
+  optional double velocity = 6;
 }
 

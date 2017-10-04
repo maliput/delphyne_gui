@@ -157,14 +157,14 @@ class ViewerCommand : public ::google::protobuf::Message {
   inline ::ignition::msgs::Header* release_header();
   inline void set_allocated_header(::ignition::msgs::Header* header);
 
-  // optional int32 command_type = 2 [default = 0];
+  // optional int32 command_type = 2;
   inline bool has_command_type() const;
   inline void clear_command_type();
   static const int kCommandTypeFieldNumber = 2;
   inline ::google::protobuf::int32 command_type() const;
   inline void set_command_type(::google::protobuf::int32 value);
 
-  // optional string command_data = 3 [default = ""];
+  // optional string command_data = 3;
   inline bool has_command_data() const;
   inline void clear_command_data();
   static const int kCommandDataFieldNumber = 3;
@@ -247,7 +247,7 @@ inline void ViewerCommand::set_allocated_header(::ignition::msgs::Header* header
   // @@protoc_insertion_point(field_set_allocated:ignition.msgs.ViewerCommand.header)
 }
 
-// optional int32 command_type = 2 [default = 0];
+// optional int32 command_type = 2;
 inline bool ViewerCommand::has_command_type() const {
   return (_has_bits_[0] & 0x00000002u) != 0;
 }
@@ -271,7 +271,7 @@ inline void ViewerCommand::set_command_type(::google::protobuf::int32 value) {
   // @@protoc_insertion_point(field_set:ignition.msgs.ViewerCommand.command_type)
 }
 
-// optional string command_data = 3 [default = ""];
+// optional string command_data = 3;
 inline bool ViewerCommand::has_command_data() const {
   return (_has_bits_[0] & 0x00000004u) != 0;
 }

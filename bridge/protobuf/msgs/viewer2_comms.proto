@@ -17,36 +17,31 @@
 
 package ignition.msgs;
 option java_package = "com.ignition.msgs";
-option java_outer_classname = "SimpleCarStateProtos";
+option java_outer_classname = "Viewer2CommsProtos";
 
 /// \ingroup ignition.msgs
-/// \interface SimpleCarState
-/// \brief The ignition equivalent of the LCM command used to show the
-/// current status of each of the Prius in Drake's automotive demo.
+/// \interface Viewer2Comms
+/// \brief The ignition equivalent of the viewer2_comms_t data LCM type
 
 import "ignition/msgs/header.proto";
 import "ignition/msgs/time.proto";
 
-message SimpleCarState
+message Viewer2Comms
 {
   /// \brief Optional header data
-  optional Header header   = 1;
+  optional Header header               = 1;
 
   /// \brief The timestamp in sec and nsec
-  optional Time time       = 2;
+  optional Time time                   = 2;
 
-  /// \brief Current position of the car in x
-  /// relative to the coordinate origin
-  optional double x        = 3;
+  // \brief The format name and version determines how
+  // the message data field should be interpreted.
+  optional string format               = 3;
+  optional int32 format_version_major  = 4;
+  optional int32 format_version_minor  = 5;
 
-  /// \brief Current position of the car in y
-  /// relative to the coordinate origin
-  optional double y        = 4;
+  // \brief The viewer data
+  optional bytes data                  = 7;
 
-  /// \brief Current heading of the car in radians
-  optional double heading  = 5;
-
-  /// \brief Current speed module of the car in radians
-  optional double velocity = 6;
 }
 

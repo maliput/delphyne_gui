@@ -504,6 +504,9 @@ GTEST_TEST(ModelTest, TestModelsTranslation) {
   EXPECT_EQ("test_sphere", sphereModel.link(0).name());
 }
 
+//////////////////////////////////////////////////
+/// \brief Test that an LCM lcmt_viewer_command is
+/// properly translated into an ignition ViewerCommand message
 GTEST_TEST(ViewerCommandTest, TestViewerCommandTranslation) {
   drake::lcmt_viewer_command lcmViewerCommand;
   ignition::msgs::ViewerCommand ignViewerCommand;
@@ -518,6 +521,9 @@ GTEST_TEST(ViewerCommandTest, TestViewerCommandTranslation) {
   EXPECT_EQ(testString, ignViewerCommand.command_data());
 }
 
+//////////////////////////////////////////////////
+/// \brief Test that an LCM lcmt_simple_car_state_t message is
+/// properly translated to a custom ignition SimpleCarState message.
 GTEST_TEST(SimpleCarStateTest, TestSimpleCarStateTranslation) {
   drake::lcmt_simple_car_state_t lcmSimpleCarState;
   ignition::msgs::SimpleCarState ignSimpleCarState;
@@ -532,6 +538,31 @@ GTEST_TEST(SimpleCarStateTest, TestSimpleCarStateTranslation) {
   EXPECT_EQ(8.39, ignSimpleCarState.y());
   EXPECT_EQ(123, ignSimpleCarState.mutable_time()->sec());
   EXPECT_EQ(456000000, ignSimpleCarState.mutable_time()->nsec());
+}
+
+//////////////////////////////////////////////////
+/// \brief Test that an LCM viewer2_comm message describing the visualizer's
+/// tree viewer response was properly translated to a custom ignition message.
+GTEST_TEST(Viewer2CommsTest, TestViewer2CommsTranslation) {
+  drake::viewer2_comms_t lcmViewer2Comms;
+  ignition::msgs::Viewer2Comms ignViewer2Comms;
+
+  lcmViewer2Comms.utime = 123456789;
+  lcmViewer2Comms.format = "format_string";
+  lcmViewer2Comms.format_version_major = 5;
+  lcmViewer2Comms.format_version_minor = 2;
+  lcmViewer2Comms.num_bytes = 6;
+  lcmViewer2Comms.data.resize(lcmViewer2Comms.num_bytes);
+  lcmViewer2Comms.data = {'e', 'a', 'c', 0x14, 0x1e, 0x5d};
+
+  lcmToIgn(lcmViewer2Comms, &ignViewer2Comms);
+
+  EXPECT_EQ(123, ignViewer2Comms.mutable_time()->sec());
+  EXPECT_EQ(456789000, ignViewer2Comms.mutable_time()->nsec());
+  EXPECT_EQ("format_string", ignViewer2Comms.format());
+  EXPECT_EQ(5, ignViewer2Comms.format_version_major());
+  EXPECT_EQ(2, ignViewer2Comms.format_version_minor());
+  EXPECT_EQ("eac\x14\x1e\x5d", ignViewer2Comms.data());
 }
 
 }  // namespace bridge

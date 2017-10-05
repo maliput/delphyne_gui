@@ -59,6 +59,10 @@ int64_t secsFromMillis(int64_t millis) { return millis / 1000; }
 
 int64_t nsecsFromMillis(int64_t millis) { return millis % 1000 * 1000000; }
 
+int64_t secsFromMicros(int64_t micros) { return micros / 1000000; }
+
+int64_t nsecsFromMicros(int64_t micros) { return micros % 1000000 * 1000; }
+
 //////////////////////////////////////////////////
 void lcmToIgn(const drake::lcmt_simple_car_state_t& lcmData,
               ignition::msgs::SimpleCarState* ignData) {
@@ -80,15 +84,13 @@ void lcmToIgn(const drake::lcmt_viewer_command& lcmData,
 //////////////////////////////////////////////////
 void lcmToIgn(const drake::viewer2_comms_t& lcmViewer2Data,
               ignition::msgs::Viewer2Comms* ignViewer2Data) {
-  ignViewer2Data->set_utime(lcmViewer2Data.utime);
+  ignViewer2Data->mutable_time()->set_sec(secsFromMicros(lcmViewer2Data.utime));
+  ignViewer2Data->mutable_time()->set_nsec(nsecsFromMicros(lcmViewer2Data.utime));
   ignViewer2Data->set_format(lcmViewer2Data.format);
   ignViewer2Data->set_format_version_major(lcmViewer2Data.format_version_major);
   ignViewer2Data->set_format_version_minor(lcmViewer2Data.format_version_minor);
-  ignViewer2Data->set_num_bytes(lcmViewer2Data.num_bytes);
-  const std::string lcmData(lcmViewer2Data.data.begin(), lcmViewer2Data.data.end());
-  for (int i = 0; i < lcmViewer2Data.num_bytes; ++i) {
-    ignViewer2Data->add_data(&lcmData[i]);
-  }
+  std::string lcmData(lcmViewer2Data.data.begin(), lcmViewer2Data.data.end());
+  ignViewer2Data->set_data(lcmData);
 }
 
 //////////////////////////////////////////////////

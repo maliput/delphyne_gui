@@ -547,26 +547,24 @@ GTEST_TEST(Viewer2CommsTest, TestViewer2CommsTranslation) {
   drake::viewer2_comms_t lcmViewer2Comms;
   ignition::msgs::Viewer2Comms ignViewer2Comms;
 
-  lcmViewer2Comms.utime = 123456;
+  lcmViewer2Comms.utime = 123456789;
   lcmViewer2Comms.format = "format_string";
   lcmViewer2Comms.format_version_major = 5;
   lcmViewer2Comms.format_version_minor = 2;
-  lcmViewer2Comms.num_bytes = 10;
+  lcmViewer2Comms.num_bytes = 6;
   lcmViewer2Comms.data.resize(lcmViewer2Comms.num_bytes);
-  for(uint8_t i=0; i<lcmViewer2Comms.num_bytes; i++) {
-    lcmViewer2Comms.data[i] = 'a' + i;
-  }
+  lcmViewer2Comms.data = {'a', 'b', 'c', 'd', 'e', 'f'};
 
   lcmToIgn(lcmViewer2Comms, &ignViewer2Comms);
 
-  EXPECT_EQ(123456, ignViewer2Comms.utime());
+  EXPECT_EQ(123, ignViewer2Comms.mutable_time()->sec());
+  EXPECT_EQ(456789000, ignViewer2Comms.mutable_time()->nsec());
   EXPECT_EQ("format_string", ignViewer2Comms.format());
   EXPECT_EQ(5, ignViewer2Comms.format_version_major());
   EXPECT_EQ(2, ignViewer2Comms.format_version_minor());
-  EXPECT_EQ(10, ignViewer2Comms.num_bytes());
-  EXPECT_EQ('a', ignViewer2Comms.data(0)[0]); // item 0 from "abcdefgh"
-  EXPECT_EQ('e', ignViewer2Comms.data(4)[0]); // item 0 from "efgh"
-  EXPECT_EQ('h', ignViewer2Comms.data(7)[0]); // item 0 from "h"
+  EXPECT_EQ('a', ignViewer2Comms.data()[0]);
+  EXPECT_EQ('d', ignViewer2Comms.data()[3]);
+  EXPECT_EQ('f', ignViewer2Comms.data()[5]);
 }
 
 }  // namespace bridge

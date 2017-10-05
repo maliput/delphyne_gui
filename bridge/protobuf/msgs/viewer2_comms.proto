@@ -24,14 +24,15 @@ option java_outer_classname = "Viewer2CommsProtos";
 /// \brief The ignition equivalent of the viewer2_comms_t data LCM type
 
 import "ignition/msgs/header.proto";
+import "ignition/msgs/time.proto";
 
 message Viewer2Comms
 {
   /// \brief Optional header data
   optional Header header               = 1;
 
-  // \brief The timestamp in microseconds
-  optional int64 utime                 = 2;
+  /// \brief The timestamp in sec and nsec
+  optional Time time                   = 2;
 
   // \brief The format name and version determines how
   // the message data field should be interpreted.
@@ -40,8 +41,7 @@ message Viewer2Comms
   optional int32 format_version_minor  = 5;
 
   // \brief The viewer data
-  optional int32 num_bytes             = 6;
-  repeated bytes data                  = 7;
+  optional bytes data                  = 7;
 
 }
 

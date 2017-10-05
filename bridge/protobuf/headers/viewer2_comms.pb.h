@@ -25,6 +25,7 @@
 #include <google/protobuf/extension_set.h>
 #include <google/protobuf/unknown_field_set.h>
 #include "ignition/msgs/header.pb.h"
+#include "ignition/msgs/time.pb.h"
 // @@protoc_insertion_point(includes)
 
 namespace ignition {
@@ -101,12 +102,14 @@ class Viewer2Comms : public ::google::protobuf::Message {
   inline ::ignition::msgs::Header* release_header();
   inline void set_allocated_header(::ignition::msgs::Header* header);
 
-  // optional int64 utime = 2;
-  inline bool has_utime() const;
-  inline void clear_utime();
-  static const int kUtimeFieldNumber = 2;
-  inline ::google::protobuf::int64 utime() const;
-  inline void set_utime(::google::protobuf::int64 value);
+  // optional .ignition.msgs.Time time = 2;
+  inline bool has_time() const;
+  inline void clear_time();
+  static const int kTimeFieldNumber = 2;
+  inline const ::ignition::msgs::Time& time() const;
+  inline ::ignition::msgs::Time* mutable_time();
+  inline ::ignition::msgs::Time* release_time();
+  inline void set_allocated_time(::ignition::msgs::Time* time);
 
   // optional string format = 3;
   inline bool has_format() const;
@@ -134,55 +137,43 @@ class Viewer2Comms : public ::google::protobuf::Message {
   inline ::google::protobuf::int32 format_version_minor() const;
   inline void set_format_version_minor(::google::protobuf::int32 value);
 
-  // optional int32 num_bytes = 6;
-  inline bool has_num_bytes() const;
-  inline void clear_num_bytes();
-  static const int kNumBytesFieldNumber = 6;
-  inline ::google::protobuf::int32 num_bytes() const;
-  inline void set_num_bytes(::google::protobuf::int32 value);
-
-  // repeated bytes data = 7;
-  inline int data_size() const;
+  // optional bytes data = 7;
+  inline bool has_data() const;
   inline void clear_data();
   static const int kDataFieldNumber = 7;
-  inline const ::std::string& data(int index) const;
-  inline ::std::string* mutable_data(int index);
-  inline void set_data(int index, const ::std::string& value);
-  inline void set_data(int index, const char* value);
-  inline void set_data(int index, const void* value, size_t size);
-  inline ::std::string* add_data();
-  inline void add_data(const ::std::string& value);
-  inline void add_data(const char* value);
-  inline void add_data(const void* value, size_t size);
-  inline const ::google::protobuf::RepeatedPtrField< ::std::string>& data() const;
-  inline ::google::protobuf::RepeatedPtrField< ::std::string>* mutable_data();
+  inline const ::std::string& data() const;
+  inline void set_data(const ::std::string& value);
+  inline void set_data(const char* value);
+  inline void set_data(const void* value, size_t size);
+  inline ::std::string* mutable_data();
+  inline ::std::string* release_data();
+  inline void set_allocated_data(::std::string* data);
 
   // @@protoc_insertion_point(class_scope:ignition.msgs.Viewer2Comms)
  private:
   inline void set_has_header();
   inline void clear_has_header();
-  inline void set_has_utime();
-  inline void clear_has_utime();
+  inline void set_has_time();
+  inline void clear_has_time();
   inline void set_has_format();
   inline void clear_has_format();
   inline void set_has_format_version_major();
   inline void clear_has_format_version_major();
   inline void set_has_format_version_minor();
   inline void clear_has_format_version_minor();
-  inline void set_has_num_bytes();
-  inline void clear_has_num_bytes();
+  inline void set_has_data();
+  inline void clear_has_data();
 
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
 
   ::google::protobuf::uint32 _has_bits_[1];
   mutable int _cached_size_;
   ::ignition::msgs::Header* header_;
-  ::google::protobuf::int64 utime_;
+  ::ignition::msgs::Time* time_;
   ::std::string* format_;
   ::google::protobuf::int32 format_version_major_;
   ::google::protobuf::int32 format_version_minor_;
-  ::google::protobuf::RepeatedPtrField< ::std::string> data_;
-  ::google::protobuf::int32 num_bytes_;
+  ::std::string* data_;
   friend void  protobuf_AddDesc_viewer2_5fcomms_2eproto();
   friend void protobuf_AssignDesc_viewer2_5fcomms_2eproto();
   friend void protobuf_ShutdownFile_viewer2_5fcomms_2eproto();
@@ -238,28 +229,45 @@ inline void Viewer2Comms::set_allocated_header(::ignition::msgs::Header* header)
   // @@protoc_insertion_point(field_set_allocated:ignition.msgs.Viewer2Comms.header)
 }
 
-// optional int64 utime = 2;
-inline bool Viewer2Comms::has_utime() const {
+// optional .ignition.msgs.Time time = 2;
+inline bool Viewer2Comms::has_time() const {
   return (_has_bits_[0] & 0x00000002u) != 0;
 }
-inline void Viewer2Comms::set_has_utime() {
+inline void Viewer2Comms::set_has_time() {
   _has_bits_[0] |= 0x00000002u;
 }
-inline void Viewer2Comms::clear_has_utime() {
+inline void Viewer2Comms::clear_has_time() {
   _has_bits_[0] &= ~0x00000002u;
 }
-inline void Viewer2Comms::clear_utime() {
-  utime_ = GOOGLE_LONGLONG(0);
-  clear_has_utime();
+inline void Viewer2Comms::clear_time() {
+  if (time_ != NULL) time_->::ignition::msgs::Time::Clear();
+  clear_has_time();
 }
-inline ::google::protobuf::int64 Viewer2Comms::utime() const {
-  // @@protoc_insertion_point(field_get:ignition.msgs.Viewer2Comms.utime)
-  return utime_;
+inline const ::ignition::msgs::Time& Viewer2Comms::time() const {
+  // @@protoc_insertion_point(field_get:ignition.msgs.Viewer2Comms.time)
+  return time_ != NULL ? *time_ : *default_instance_->time_;
 }
-inline void Viewer2Comms::set_utime(::google::protobuf::int64 value) {
-  set_has_utime();
-  utime_ = value;
-  // @@protoc_insertion_point(field_set:ignition.msgs.Viewer2Comms.utime)
+inline ::ignition::msgs::Time* Viewer2Comms::mutable_time() {
+  set_has_time();
+  if (time_ == NULL) time_ = new ::ignition::msgs::Time;
+  // @@protoc_insertion_point(field_mutable:ignition.msgs.Viewer2Comms.time)
+  return time_;
+}
+inline ::ignition::msgs::Time* Viewer2Comms::release_time() {
+  clear_has_time();
+  ::ignition::msgs::Time* temp = time_;
+  time_ = NULL;
+  return temp;
+}
+inline void Viewer2Comms::set_allocated_time(::ignition::msgs::Time* time) {
+  delete time_;
+  time_ = time;
+  if (time) {
+    set_has_time();
+  } else {
+    clear_has_time();
+  }
+  // @@protoc_insertion_point(field_set_allocated:ignition.msgs.Viewer2Comms.time)
 }
 
 // optional string format = 3;
@@ -386,82 +394,80 @@ inline void Viewer2Comms::set_format_version_minor(::google::protobuf::int32 val
   // @@protoc_insertion_point(field_set:ignition.msgs.Viewer2Comms.format_version_minor)
 }
 
-// optional int32 num_bytes = 6;
-inline bool Viewer2Comms::has_num_bytes() const {
+// optional bytes data = 7;
+inline bool Viewer2Comms::has_data() const {
   return (_has_bits_[0] & 0x00000020u) != 0;
 }
-inline void Viewer2Comms::set_has_num_bytes() {
+inline void Viewer2Comms::set_has_data() {
   _has_bits_[0] |= 0x00000020u;
 }
-inline void Viewer2Comms::clear_has_num_bytes() {
+inline void Viewer2Comms::clear_has_data() {
   _has_bits_[0] &= ~0x00000020u;
 }
-inline void Viewer2Comms::clear_num_bytes() {
-  num_bytes_ = 0;
-  clear_has_num_bytes();
-}
-inline ::google::protobuf::int32 Viewer2Comms::num_bytes() const {
-  // @@protoc_insertion_point(field_get:ignition.msgs.Viewer2Comms.num_bytes)
-  return num_bytes_;
-}
-inline void Viewer2Comms::set_num_bytes(::google::protobuf::int32 value) {
-  set_has_num_bytes();
-  num_bytes_ = value;
-  // @@protoc_insertion_point(field_set:ignition.msgs.Viewer2Comms.num_bytes)
-}
-
-// repeated bytes data = 7;
-inline int Viewer2Comms::data_size() const {
-  return data_.size();
-}
 inline void Viewer2Comms::clear_data() {
-  data_.Clear();
+  if (data_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    data_->clear();
+  }
+  clear_has_data();
 }
-inline const ::std::string& Viewer2Comms::data(int index) const {
+inline const ::std::string& Viewer2Comms::data() const {
   // @@protoc_insertion_point(field_get:ignition.msgs.Viewer2Comms.data)
-  return data_.Get(index);
+  return *data_;
 }
-inline ::std::string* Viewer2Comms::mutable_data(int index) {
-  // @@protoc_insertion_point(field_mutable:ignition.msgs.Viewer2Comms.data)
-  return data_.Mutable(index);
-}
-inline void Viewer2Comms::set_data(int index, const ::std::string& value) {
+inline void Viewer2Comms::set_data(const ::std::string& value) {
+  set_has_data();
+  if (data_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    data_ = new ::std::string;
+  }
+  data_->assign(value);
   // @@protoc_insertion_point(field_set:ignition.msgs.Viewer2Comms.data)
-  data_.Mutable(index)->assign(value);
 }
-inline void Viewer2Comms::set_data(int index, const char* value) {
-  data_.Mutable(index)->assign(value);
+inline void Viewer2Comms::set_data(const char* value) {
+  set_has_data();
+  if (data_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    data_ = new ::std::string;
+  }
+  data_->assign(value);
   // @@protoc_insertion_point(field_set_char:ignition.msgs.Viewer2Comms.data)
 }
-inline void Viewer2Comms::set_data(int index, const void* value, size_t size) {
-  data_.Mutable(index)->assign(
-    reinterpret_cast<const char*>(value), size);
+inline void Viewer2Comms::set_data(const void* value, size_t size) {
+  set_has_data();
+  if (data_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    data_ = new ::std::string;
+  }
+  data_->assign(reinterpret_cast<const char*>(value), size);
   // @@protoc_insertion_point(field_set_pointer:ignition.msgs.Viewer2Comms.data)
 }
-inline ::std::string* Viewer2Comms::add_data() {
-  return data_.Add();
-}
-inline void Viewer2Comms::add_data(const ::std::string& value) {
-  data_.Add()->assign(value);
-  // @@protoc_insertion_point(field_add:ignition.msgs.Viewer2Comms.data)
-}
-inline void Viewer2Comms::add_data(const char* value) {
-  data_.Add()->assign(value);
-  // @@protoc_insertion_point(field_add_char:ignition.msgs.Viewer2Comms.data)
-}
-inline void Viewer2Comms::add_data(const void* value, size_t size) {
-  data_.Add()->assign(reinterpret_cast<const char*>(value), size);
-  // @@protoc_insertion_point(field_add_pointer:ignition.msgs.Viewer2Comms.data)
-}
-inline const ::google::protobuf::RepeatedPtrField< ::std::string>&
-Viewer2Comms::data() const {
-  // @@protoc_insertion_point(field_list:ignition.msgs.Viewer2Comms.data)
+inline ::std::string* Viewer2Comms::mutable_data() {
+  set_has_data();
+  if (data_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    data_ = new ::std::string;
+  }
+  // @@protoc_insertion_point(field_mutable:ignition.msgs.Viewer2Comms.data)
   return data_;
 }
-inline ::google::protobuf::RepeatedPtrField< ::std::string>*
-Viewer2Comms::mutable_data() {
-  // @@protoc_insertion_point(field_mutable_list:ignition.msgs.Viewer2Comms.data)
-  return &data_;
+inline ::std::string* Viewer2Comms::release_data() {
+  clear_has_data();
+  if (data_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    return NULL;
+  } else {
+    ::std::string* temp = data_;
+    data_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+    return temp;
+  }
+}
+inline void Viewer2Comms::set_allocated_data(::std::string* data) {
+  if (data_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    delete data_;
+  }
+  if (data) {
+    set_has_data();
+    data_ = data;
+  } else {
+    clear_has_data();
+    data_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  }
+  // @@protoc_insertion_point(field_set_allocated:ignition.msgs.Viewer2Comms.data)
 }
 
 

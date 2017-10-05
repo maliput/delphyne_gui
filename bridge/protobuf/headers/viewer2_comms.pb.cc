@@ -35,13 +35,12 @@ void protobuf_AssignDesc_viewer2_5fcomms_2eproto() {
       "viewer2_comms.proto");
   GOOGLE_CHECK(file != NULL);
   Viewer2Comms_descriptor_ = file->message_type(0);
-  static const int Viewer2Comms_offsets_[7] = {
+  static const int Viewer2Comms_offsets_[6] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Viewer2Comms, header_),
-    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Viewer2Comms, utime_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Viewer2Comms, time_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Viewer2Comms, format_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Viewer2Comms, format_version_major_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Viewer2Comms, format_version_minor_),
-    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Viewer2Comms, num_bytes_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Viewer2Comms, data_),
   };
   Viewer2Comms_reflection_ =
@@ -85,15 +84,16 @@ void protobuf_AddDesc_viewer2_5fcomms_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
   ::ignition::msgs::protobuf_AddDesc_ignition_2fmsgs_2fheader_2eproto();
+  ::ignition::msgs::protobuf_AddDesc_ignition_2fmsgs_2ftime_2eproto();
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
     "\n\023viewer2_comms.proto\022\rignition.msgs\032\032ig"
-    "nition/msgs/header.proto\"\261\001\n\014Viewer2Comm"
-    "s\022%\n\006header\030\001 \001(\0132\025.ignition.msgs.Header"
-    "\022\r\n\005utime\030\002 \001(\003\022\016\n\006format\030\003 \001(\t\022\034\n\024forma"
-    "t_version_major\030\004 \001(\005\022\034\n\024format_version_"
-    "minor\030\005 \001(\005\022\021\n\tnum_bytes\030\006 \001(\005\022\014\n\004data\030\007"
-    " \003(\014B\'\n\021com.ignition.msgsB\022Viewer2CommsP"
-    "rotos", 285);
+    "nition/msgs/header.proto\032\030ignition/msgs/"
+    "time.proto\"\262\001\n\014Viewer2Comms\022%\n\006header\030\001 "
+    "\001(\0132\025.ignition.msgs.Header\022!\n\004time\030\002 \001(\013"
+    "2\023.ignition.msgs.Time\022\016\n\006format\030\003 \001(\t\022\034\n"
+    "\024format_version_major\030\004 \001(\005\022\034\n\024format_ve"
+    "rsion_minor\030\005 \001(\005\022\014\n\004data\030\007 \001(\014B\'\n\021com.i"
+    "gnition.msgsB\022Viewer2CommsProtos", 312);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "viewer2_comms.proto", &protobuf_RegisterTypes);
   Viewer2Comms::default_instance_ = new Viewer2Comms();
@@ -112,11 +112,10 @@ struct StaticDescriptorInitializer_viewer2_5fcomms_2eproto {
 
 #ifndef _MSC_VER
 const int Viewer2Comms::kHeaderFieldNumber;
-const int Viewer2Comms::kUtimeFieldNumber;
+const int Viewer2Comms::kTimeFieldNumber;
 const int Viewer2Comms::kFormatFieldNumber;
 const int Viewer2Comms::kFormatVersionMajorFieldNumber;
 const int Viewer2Comms::kFormatVersionMinorFieldNumber;
-const int Viewer2Comms::kNumBytesFieldNumber;
 const int Viewer2Comms::kDataFieldNumber;
 #endif  // !_MSC_VER
 
@@ -128,6 +127,7 @@ Viewer2Comms::Viewer2Comms()
 
 void Viewer2Comms::InitAsDefaultInstance() {
   header_ = const_cast< ::ignition::msgs::Header*>(&::ignition::msgs::Header::default_instance());
+  time_ = const_cast< ::ignition::msgs::Time*>(&::ignition::msgs::Time::default_instance());
 }
 
 Viewer2Comms::Viewer2Comms(const Viewer2Comms& from)
@@ -141,11 +141,11 @@ void Viewer2Comms::SharedCtor() {
   ::google::protobuf::internal::GetEmptyString();
   _cached_size_ = 0;
   header_ = NULL;
-  utime_ = GOOGLE_LONGLONG(0);
+  time_ = NULL;
   format_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   format_version_major_ = 0;
   format_version_minor_ = 0;
-  num_bytes_ = 0;
+  data_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
@@ -158,8 +158,12 @@ void Viewer2Comms::SharedDtor() {
   if (format_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
     delete format_;
   }
+  if (data_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    delete data_;
+  }
   if (this != default_instance_) {
     delete header_;
+    delete time_;
   }
 }
 
@@ -200,19 +204,24 @@ void Viewer2Comms::Clear() {
     if (has_header()) {
       if (header_ != NULL) header_->::ignition::msgs::Header::Clear();
     }
-    utime_ = GOOGLE_LONGLONG(0);
+    if (has_time()) {
+      if (time_ != NULL) time_->::ignition::msgs::Time::Clear();
+    }
     if (has_format()) {
       if (format_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
         format_->clear();
       }
     }
-    num_bytes_ = 0;
+    if (has_data()) {
+      if (data_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+        data_->clear();
+      }
+    }
   }
 
 #undef OFFSET_OF_FIELD_
 #undef ZR_
 
-  data_.Clear();
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
   mutable_unknown_fields()->Clear();
 }
@@ -235,18 +244,16 @@ bool Viewer2Comms::MergePartialFromCodedStream(
         } else {
           goto handle_unusual;
         }
-        if (input->ExpectTag(16)) goto parse_utime;
+        if (input->ExpectTag(18)) goto parse_time;
         break;
       }
 
-      // optional int64 utime = 2;
+      // optional .ignition.msgs.Time time = 2;
       case 2: {
-        if (tag == 16) {
-         parse_utime:
-          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
-                   ::google::protobuf::int64, ::google::protobuf::internal::WireFormatLite::TYPE_INT64>(
-                 input, &utime_)));
-          set_has_utime();
+        if (tag == 18) {
+         parse_time:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
+               input, mutable_time()));
         } else {
           goto handle_unusual;
         }
@@ -297,35 +304,19 @@ bool Viewer2Comms::MergePartialFromCodedStream(
         } else {
           goto handle_unusual;
         }
-        if (input->ExpectTag(48)) goto parse_num_bytes;
-        break;
-      }
-
-      // optional int32 num_bytes = 6;
-      case 6: {
-        if (tag == 48) {
-         parse_num_bytes:
-          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
-                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
-                 input, &num_bytes_)));
-          set_has_num_bytes();
-        } else {
-          goto handle_unusual;
-        }
         if (input->ExpectTag(58)) goto parse_data;
         break;
       }
 
-      // repeated bytes data = 7;
+      // optional bytes data = 7;
       case 7: {
         if (tag == 58) {
          parse_data:
           DO_(::google::protobuf::internal::WireFormatLite::ReadBytes(
-                input, this->add_data()));
+                input, this->mutable_data()));
         } else {
           goto handle_unusual;
         }
-        if (input->ExpectTag(58)) goto parse_data;
         if (input->ExpectAtEnd()) goto success;
         break;
       }
@@ -361,9 +352,10 @@ void Viewer2Comms::SerializeWithCachedSizes(
       1, this->header(), output);
   }
 
-  // optional int64 utime = 2;
-  if (has_utime()) {
-    ::google::protobuf::internal::WireFormatLite::WriteInt64(2, this->utime(), output);
+  // optional .ignition.msgs.Time time = 2;
+  if (has_time()) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
+      2, this->time(), output);
   }
 
   // optional string format = 3;
@@ -386,15 +378,10 @@ void Viewer2Comms::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteInt32(5, this->format_version_minor(), output);
   }
 
-  // optional int32 num_bytes = 6;
-  if (has_num_bytes()) {
-    ::google::protobuf::internal::WireFormatLite::WriteInt32(6, this->num_bytes(), output);
-  }
-
-  // repeated bytes data = 7;
-  for (int i = 0; i < this->data_size(); i++) {
-    ::google::protobuf::internal::WireFormatLite::WriteBytes(
-      7, this->data(i), output);
+  // optional bytes data = 7;
+  if (has_data()) {
+    ::google::protobuf::internal::WireFormatLite::WriteBytesMaybeAliased(
+      7, this->data(), output);
   }
 
   if (!unknown_fields().empty()) {
@@ -414,9 +401,11 @@ void Viewer2Comms::SerializeWithCachedSizes(
         1, this->header(), target);
   }
 
-  // optional int64 utime = 2;
-  if (has_utime()) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteInt64ToArray(2, this->utime(), target);
+  // optional .ignition.msgs.Time time = 2;
+  if (has_time()) {
+    target = ::google::protobuf::internal::WireFormatLite::
+      WriteMessageNoVirtualToArray(
+        2, this->time(), target);
   }
 
   // optional string format = 3;
@@ -440,15 +429,11 @@ void Viewer2Comms::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(5, this->format_version_minor(), target);
   }
 
-  // optional int32 num_bytes = 6;
-  if (has_num_bytes()) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(6, this->num_bytes(), target);
-  }
-
-  // repeated bytes data = 7;
-  for (int i = 0; i < this->data_size(); i++) {
-    target = ::google::protobuf::internal::WireFormatLite::
-      WriteBytesToArray(7, this->data(i), target);
+  // optional bytes data = 7;
+  if (has_data()) {
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteBytesToArray(
+        7, this->data(), target);
   }
 
   if (!unknown_fields().empty()) {
@@ -470,11 +455,11 @@ int Viewer2Comms::ByteSize() const {
           this->header());
     }
 
-    // optional int64 utime = 2;
-    if (has_utime()) {
+    // optional .ignition.msgs.Time time = 2;
+    if (has_time()) {
       total_size += 1 +
-        ::google::protobuf::internal::WireFormatLite::Int64Size(
-          this->utime());
+        ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
+          this->time());
     }
 
     // optional string format = 3;
@@ -498,21 +483,14 @@ int Viewer2Comms::ByteSize() const {
           this->format_version_minor());
     }
 
-    // optional int32 num_bytes = 6;
-    if (has_num_bytes()) {
+    // optional bytes data = 7;
+    if (has_data()) {
       total_size += 1 +
-        ::google::protobuf::internal::WireFormatLite::Int32Size(
-          this->num_bytes());
+        ::google::protobuf::internal::WireFormatLite::BytesSize(
+          this->data());
     }
 
   }
-  // repeated bytes data = 7;
-  total_size += 1 * this->data_size();
-  for (int i = 0; i < this->data_size(); i++) {
-    total_size += ::google::protobuf::internal::WireFormatLite::BytesSize(
-      this->data(i));
-  }
-
   if (!unknown_fields().empty()) {
     total_size +=
       ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
@@ -538,13 +516,12 @@ void Viewer2Comms::MergeFrom(const ::google::protobuf::Message& from) {
 
 void Viewer2Comms::MergeFrom(const Viewer2Comms& from) {
   GOOGLE_CHECK_NE(&from, this);
-  data_.MergeFrom(from.data_);
   if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
     if (from.has_header()) {
       mutable_header()->::ignition::msgs::Header::MergeFrom(from.header());
     }
-    if (from.has_utime()) {
-      set_utime(from.utime());
+    if (from.has_time()) {
+      mutable_time()->::ignition::msgs::Time::MergeFrom(from.time());
     }
     if (from.has_format()) {
       set_format(from.format());
@@ -555,8 +532,8 @@ void Viewer2Comms::MergeFrom(const Viewer2Comms& from) {
     if (from.has_format_version_minor()) {
       set_format_version_minor(from.format_version_minor());
     }
-    if (from.has_num_bytes()) {
-      set_num_bytes(from.num_bytes());
+    if (from.has_data()) {
+      set_data(from.data());
     }
   }
   mutable_unknown_fields()->MergeFrom(from.unknown_fields());
@@ -582,12 +559,11 @@ bool Viewer2Comms::IsInitialized() const {
 void Viewer2Comms::Swap(Viewer2Comms* other) {
   if (other != this) {
     std::swap(header_, other->header_);
-    std::swap(utime_, other->utime_);
+    std::swap(time_, other->time_);
     std::swap(format_, other->format_);
     std::swap(format_version_major_, other->format_version_major_);
     std::swap(format_version_minor_, other->format_version_minor_);
-    std::swap(num_bytes_, other->num_bytes_);
-    data_.Swap(&other->data_);
+    std::swap(data_, other->data_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
     _unknown_fields_.Swap(&other->_unknown_fields_);
     std::swap(_cached_size_, other->_cached_size_);

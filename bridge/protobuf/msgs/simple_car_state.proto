@@ -32,7 +32,7 @@ message SimpleCarState
   /// \brief Optional header data
   optional Header header   = 1;
 
-  /// \brief The timestamp in milliseconds.
+  /// \brief The timestamp in sec and nsec
   optional Time time       = 2;
 
   /// \brief Current position of the car in x

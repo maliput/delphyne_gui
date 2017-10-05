@@ -36,8 +36,8 @@
 #include <ignition/gui/Iface.hh>
 #endif
 
-static const char version_str[] = "Visualizer 0.1.0";
-static const std::string initial_config_file = "visualizer/layout.config";
+static const char versionStr[] = "Visualizer 0.1.0";
+static const std::string initialConfigFile = "visualizer/layout.config";
 
 /// \brief Get the path of the default configuration file for Delphyne.
 /// \return The default configuration path.
@@ -52,7 +52,13 @@ std::string defaultConfigPath() {
 
 int main(int argc, char* argv[]) {
   ignition::common::Console::SetVerbosity(3);
-  ignmsg << version_str << std::endl;
+  ignmsg << versionStr << std::endl;
+
+  // Parse custom config file from args
+  std::string configFile = initialConfigFile;
+  if (argc > 1) {
+    configFile = argv[1];
+  }
 
   Q_INIT_RESOURCE(resources);
 
@@ -69,16 +75,21 @@ int main(int argc, char* argv[]) {
   // Plugins installed by gazebo end up here
   ignition::gui::addPluginPath(PLUGIN_INSTALL_PATH);
 
-  // Load window layout from config file
+  // Load window layout from config file.
+  // If configFile parsed from args is not
+  // a valid path, use initialConfigFile.
   if (!ignition::gui::loadDefaultConfig()) {
-    ignition::gui::loadConfig(initial_config_file);
+    if(!ignition::gui::loadConfig(configFile)) {
+      ignwarn << "Loading initial config file [" << initialConfigFile << "]";
+      ignition::gui::loadConfig(initialConfigFile);
+    }
   }
 
   // Create main window
   ignition::gui::createMainWindow();
 
   auto win = ignition::gui::mainWindow();
-  win->setWindowTitle(version_str);
+  win->setWindowTitle(versionStr);
 
   ignition::gui::runMainWindow();
 

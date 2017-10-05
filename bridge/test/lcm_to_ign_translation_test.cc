@@ -553,7 +553,7 @@ GTEST_TEST(Viewer2CommsTest, TestViewer2CommsTranslation) {
   lcmViewer2Comms.format_version_minor = 2;
   lcmViewer2Comms.num_bytes = 6;
   lcmViewer2Comms.data.resize(lcmViewer2Comms.num_bytes);
-  lcmViewer2Comms.data = {'a', 'b', 'c', 'd', 'e', 'f'};
+  lcmViewer2Comms.data = {0x14, 0x1e, 0x28, 0x3c, 0x46, 0x5a};
 
   lcmToIgn(lcmViewer2Comms, &ignViewer2Comms);
 
@@ -562,9 +562,9 @@ GTEST_TEST(Viewer2CommsTest, TestViewer2CommsTranslation) {
   EXPECT_EQ("format_string", ignViewer2Comms.format());
   EXPECT_EQ(5, ignViewer2Comms.format_version_major());
   EXPECT_EQ(2, ignViewer2Comms.format_version_minor());
-  EXPECT_EQ('a', ignViewer2Comms.data()[0]);
-  EXPECT_EQ('d', ignViewer2Comms.data()[3]);
-  EXPECT_EQ('f', ignViewer2Comms.data()[5]);
+  for(int i=0; i<6; i++) {
+    EXPECT_EQ(lcmViewer2Comms.data[i], ignViewer2Comms.data()[i]);
+  }
 }
 
 }  // namespace bridge

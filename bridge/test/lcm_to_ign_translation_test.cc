@@ -562,9 +562,7 @@ GTEST_TEST(Viewer2CommsTest, TestViewer2CommsTranslation) {
   EXPECT_EQ("format_string", ignViewer2Comms.format());
   EXPECT_EQ(5, ignViewer2Comms.format_version_major());
   EXPECT_EQ(2, ignViewer2Comms.format_version_minor());
-  for(int i=0; i<6; i++) {
-    EXPECT_EQ(lcmViewer2Comms.data[i], ignViewer2Comms.data()[i]);
-  }
+  EXPECT_EQ("\x14\x1e\x28\x3c\x46\x5a", ignViewer2Comms.data());
 }
 
 }  // namespace bridge

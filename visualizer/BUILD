@@ -100,5 +100,6 @@ cc_binary(
         ":libRenderWidget.so",
         ":libTeleopWidget.so",
         ":layout.config",
+        ":layoutWithTeleop.config",
     ],
 )

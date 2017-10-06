@@ -75,13 +75,13 @@ int main(int argc, char* argv[]) {
   // Plugins installed by gazebo end up here
   ignition::gui::addPluginPath(PLUGIN_INSTALL_PATH);
 
-  // Load window layout from config file.
-  // If configFile parsed from args is not
-  // a valid path, use initialConfigFile.
+  // Attempt to load window layout from default config file.
+  // If it's not availeble, load it from configFile.
   if (!ignition::gui::loadDefaultConfig()) {
+    // If config file parsed from args is not
+    // a valid path, exit the application.
     if(!ignition::gui::loadConfig(configFile)) {
-      ignwarn << "Loading initial config file [" << initialConfigFile << "]";
-      ignition::gui::loadConfig(initialConfigFile);
+      return 1;
     }
   }
 

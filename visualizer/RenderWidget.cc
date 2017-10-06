@@ -45,7 +45,9 @@
 #include <ignition/math/Vector3.hh>
 #include <ignition/msgs.hh>
 #include <ignition/rendering/Camera.hh>
+#include <ignition/rendering/Grid.hh>
 #include <ignition/rendering/Light.hh>
+#include <ignition/rendering/Material.hh>
 #include <ignition/rendering/MeshDescriptor.hh>
 #include <ignition/rendering/RenderEngine.hh>
 #include <ignition/rendering/RenderEngineManager.hh>
@@ -371,17 +373,50 @@ void RenderWidget::RenderGroundPlane() {
 }
 
 /////////////////////////////////////////////////
-void RenderWidget::RenderGrid() {
-  ignition::msgs::Visual gridVisual;
-  auto* gridGeometry = gridVisual.mutable_geometry();
-  gridGeometry->set_type(ignition::msgs::Geometry::MESH);
+void RenderWidget::RenderGrid(
+      const unsigned int _cellCount,
+      const double _cellLength,
+      const unsigned int _verticalCellCount,
+      const ignition::rendering::MaterialPtr& _material,
+      const ignition::math::Pose3d& _pose) {
+  auto gridGeom = this->scene->CreateGrid();
+  if (!gridGeom) {
+    ignerr << "Inable to create grid geometry" << std::endl;
+    return;
+  }
+  gridGeom->SetCellCount(_cellCount);
+  gridGeom->SetCellLength(_cellLength);
+  gridGeom->SetVerticalCellCount(_verticalCellCount);
 
-  auto* gridMesh = gridGeometry->mutable_mesh();
-  gridMesh->set_filename("media/grid.obj");
+  auto grid = this->scene->CreateVisual();
+  if (!grid) {
+    ignerr << "Unable to create grid visual" << std::endl;
+    return;
+  }
 
-  ignition::rendering::VisualPtr gridVisualPtr;
-  gridVisualPtr = this->RenderMesh(gridVisual);
-  this->scene->RootVisual()->AddChild(gridVisualPtr);
+  grid->AddGeometry(gridGeom);
+  grid->SetLocalPose(_pose);
+  grid->SetMaterial(_material);
+  this->scene->RootVisual()->AddChild(grid);
+}
+
+/////////////////////////////////////////////////
+void RenderWidget::RenderGroundPlaneGrid() {
+  auto gray = this->scene->CreateMaterial();
+  if (gray) {
+    gray->SetAmbient(0.7, 0.7, 0.7);
+    gray->SetDiffuse(0.7, 0.7, 0.7);
+    gray->SetSpecular(0.7, 0.7, 0.7);
+
+    const unsigned int kCellCount = 50u;
+    const double       kCellLength = 1;
+    const unsigned int kVerticalCellCount = 0u;
+
+    this->RenderGrid(kCellCount, kCellLength, kVerticalCellCount,
+      gray, ignition::math::Pose3d::Zero);
+  } else {
+    ignerr << "Failed to create material for the grid" << std::endl;
+  }
 }
 
 /////////////////////////////////////////////////
@@ -694,8 +729,13 @@ void RenderWidget::CreateRenderWindow() {
   // render once to create the window.
   this->camera->Update();
 
-  // Render the grid and the origin reference frame.
-  this->RenderGrid();
+  // Render the ground plane.
+  this->RenderGroundPlane();
+
+  // Render the grid over the ground plane.
+  this->RenderGroundPlaneGrid();
+
+  // Render the origin reference frame.
   this->RenderOrigin();
 
   this->orbitViewControl.reset(new OrbitViewControl(this->camera));

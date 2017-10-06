@@ -381,7 +381,7 @@ void RenderWidget::RenderGrid(
       const ignition::math::Pose3d& _pose) {
   auto gridGeom = this->scene->CreateGrid();
   if (!gridGeom) {
-    ignerr << "Inable to create grid geometry" << std::endl;
+    ignerr << "Unable to create grid geometry" << std::endl;
     return;
   }
   gridGeom->SetCellCount(_cellCount);

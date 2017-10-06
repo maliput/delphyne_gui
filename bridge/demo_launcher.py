@@ -112,19 +112,22 @@ def main():
 
     try:
         launcher.launch([lcm_ign_bridge, num_cars[args.demo_name]])
-        launcher.launch([ign_visualizer])
 
         # TODO: replace this delay with a
         # feedback from the ignition visualizer
         time.sleep(1)
 
-        # TODO: Once we have teleop support in the visualizer, move
-        # these inside the `if args.drake_visualizer`
         if args.demo_name == "simple":
-            launcher.launch([steering_command_driver_path, "--lcm_tag=DRIVING_COMMAND_0"])
-            launcher.launch([steering_command_driver_path, "--lcm_tag=DRIVING_COMMAND_1"])
+            # Load custom layout with two TeleopWidgets
+            launcher.launch([ign_visualizer, "visualizer/layoutWithTeleop.config"])
+        else:
+            launcher.launch([ign_visualizer])
 
         if args.drake_visualizer:
+            if args.demo_name == "simple":
+                # Launch two instances of the drake steering_command app
+                launcher.launch([steering_command_driver_path, "--lcm_tag=DRIVING_COMMAND_0"])
+                launcher.launch([steering_command_driver_path, "--lcm_tag=DRIVING_COMMAND_1"])
             launcher.launch([lcm_spy_path])
             launcher.launch([lcm_logger_path])
             launcher.launch([drake_visualizer_path])

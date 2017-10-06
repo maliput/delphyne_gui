@@ -99,6 +99,7 @@ cc_binary(
     data = [
         ":libRenderWidget.so",
         ":libTeleopWidget.so",
-        ":layout.config",
+        ":initialLayout.config",
+        ":layoutWithTeleop.config",
     ],
 )

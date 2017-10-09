@@ -62,6 +62,5 @@ std::shared_ptr<delphyne::bridge::AbstractRepeater> RepeaterFactory::New(
     return nullptr;
   }
 }
-
 }
 }

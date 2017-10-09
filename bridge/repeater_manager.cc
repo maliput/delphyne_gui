@@ -48,11 +48,10 @@ void RepeaterManager::Start() {
   }
 
   if (!node_.Advertise(lcmRepeaterServiceName_,
-                       &RepeaterManager::LCMRepeaterServiceHandler,
-                       this)) {
+                       &RepeaterManager::LCMRepeaterServiceHandler, this)) {
     std::stringstream message;
-    message << "Error while advertising service ["
-            << lcmRepeaterServiceName_ << "]";
+    message << "Error while advertising service [" << lcmRepeaterServiceName_
+            << "]";
     throw std::runtime_error(message.str());
   }
 }
@@ -67,12 +66,11 @@ void RepeaterManager::EnableLCMAutodiscovery() {
 
 /////////////////////////////////////////////////
 void RepeaterManager::IgnitionRepeaterServiceHandler(
-    const ignition::msgs::StringMsg& request,
-    ignition::msgs::Boolean& response, bool& result) {
-
+    const ignition::msgs::StringMsg& request, ignition::msgs::Boolean& response,
+    bool& result) {
   if (!request.has_data()) {
-      ignerr << "Couldn't create repeater: missing topic name" << std::endl;
-      return;
+    ignerr << "Couldn't create repeater: missing topic name" << std::endl;
+    return;
   }
 
   // We are handling the message. If this fails or not will be recorded in the
@@ -86,12 +84,11 @@ void RepeaterManager::IgnitionRepeaterServiceHandler(
 
 /////////////////////////////////////////////////
 void RepeaterManager::LCMRepeaterServiceHandler(
-    const ignition::msgs::StringMsg& request,
-    ignition::msgs::Boolean& response, bool& result) {
-
+    const ignition::msgs::StringMsg& request, ignition::msgs::Boolean& response,
+    bool& result) {
   if (!request.has_data()) {
-      ignerr << "Couldn't create repeater: missing channel name" << std::endl;
-      return;
+    ignerr << "Couldn't create repeater: missing channel name" << std::endl;
+    return;
   }
 
   // We are handling the message. If this fails or not will be recorded in the
@@ -104,8 +101,9 @@ void RepeaterManager::LCMRepeaterServiceHandler(
 }
 
 /////////////////////////////////////////////////
-void RepeaterManager::LCMMessageHandler(const lcm::ReceiveBuffer* rbuf, const std::string& channel) {
-  if (!IsRepeating(channel) && blacklistedChannels_.count(channel)==0) {
+void RepeaterManager::LCMMessageHandler(const lcm::ReceiveBuffer* rbuf,
+                                        const std::string& channel) {
+  if (!IsRepeating(channel) && blacklistedChannels_.count(channel) == 0) {
     if (!StartRepeater(channel)) {
       blacklistedChannels_.insert(channel);
     }
@@ -119,7 +117,6 @@ bool RepeaterManager::IsRepeating(const std::string& channelOrTopic) {
 
 /////////////////////////////////////////////////
 bool RepeaterManager::StartRepeater(const std::string& channelOrTopic) {
-
   // If we are already repeating this topic, do nothing
   if (IsRepeating(channelOrTopic)) {
     igndbg << "Already repeating " << channelOrTopic << ". Nothing to do here."
@@ -140,8 +137,8 @@ bool RepeaterManager::StartRepeater(const std::string& channelOrTopic) {
       igndbg << "Repeater for " << channelOrTopic << " started." << std::endl;
       return true;
     } catch (const std::runtime_error& error) {
-      ignerr << "Failed to start ignition channel repeater for " << channelOrTopic
-             << std::endl;
+      ignerr << "Failed to start ignition channel repeater for "
+             << channelOrTopic << std::endl;
       ignerr << "Details: " << error.what() << std::endl;
       return false;
     }

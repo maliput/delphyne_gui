@@ -168,7 +168,7 @@ RenderWidget::~RenderWidget() {
     // some engine resources, but this sometimes causes a hang on quit.
     // For right now, disable this, but we should debug this and re-enable this
     // cleanup.
-    //this->engine->Fini();
+    // this->engine->Fini();
   }
 }
 

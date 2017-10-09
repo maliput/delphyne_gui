@@ -52,9 +52,10 @@ class RepeaterManager {
       std::shared_ptr<lcm::LCM> lcm,
       std::string ignitionRepeaterServiceName = "/repeat_ignition_topic",
       std::string lcmRepeaterServiceName = "/repeat_lcm_channel")
-      : lcm_(lcm), ignitionRepeaterServiceName_(ignitionRepeaterServiceName),
-      lcmRepeaterServiceName_(lcmRepeaterServiceName),
-      lcmAutodiscoveryEnabled_(false) {}
+      : lcm_(lcm),
+        ignitionRepeaterServiceName_(ignitionRepeaterServiceName),
+        lcmRepeaterServiceName_(lcmRepeaterServiceName),
+        lcmAutodiscoveryEnabled_(false) {}
 
   /// \brief Start the manager by registering the ignition service
   /// @throws std::runtime_error if there is a problem while advertising the
@@ -88,9 +89,9 @@ class RepeaterManager {
   /// \param[out] response A boolean indicating if the manager was able to
   /// properly setup the repeater or not.
   /// \param[out] result Always true
-  void IgnitionRepeaterServiceHandler(
-      const ignition::msgs::StringMsg& request,
-      ignition::msgs::Boolean& response, bool& result);
+  void IgnitionRepeaterServiceHandler(const ignition::msgs::StringMsg& request,
+                                      ignition::msgs::Boolean& response,
+                                      bool& result);
 
   /// \brief This method is set as a callback of the published service to
   /// start a new LCM to ignition repeater.
@@ -100,16 +101,17 @@ class RepeaterManager {
   /// \param[out] response A boolean indicating if the manager was able to
   /// properly setup the repeater or not.
   /// \param[out] result Always true
-  void LCMRepeaterServiceHandler(
-      const ignition::msgs::StringMsg& request,
-      ignition::msgs::Boolean& response, bool& result);
+  void LCMRepeaterServiceHandler(const ignition::msgs::StringMsg& request,
+                                 ignition::msgs::Boolean& response,
+                                 bool& result);
 
   /// \brief This method is set as a callback for all LCM channels. Each time
   /// a new message is received we verify if we are repeating that channel. If
   /// not, we setup a new repeater.
   /// \param[in] rbuf The buffer with the channel raw data.
   /// \param[in] channel The name of the channel the message was posted to.
-  void LCMMessageHandler(const lcm::ReceiveBuffer* rbuf, const std::string& channel);
+  void LCMMessageHandler(const lcm::ReceiveBuffer* rbuf,
+                         const std::string& channel);
 
   /// \internal
   /// \brief The LCM manager
@@ -142,7 +144,6 @@ class RepeaterManager {
   /// \brief The set of LCM channels that we tried to automatically create a
   /// repeater for but failed.
   std::set<std::string> blacklistedChannels_;
-
 };
 
 }  // namespace bridge

@@ -44,8 +44,8 @@
 // Custom ignition message headers
 #include "protobuf/headers/automotive_driving_command.pb.h"
 #include "protobuf/headers/simple_car_state.pb.h"
-#include "protobuf/headers/viewer_command.pb.h"
 #include "protobuf/headers/viewer2_comms.pb.h"
+#include "protobuf/headers/viewer_command.pb.h"
 
 // Repeater classes
 #include "ign_service_converter.hh"
@@ -78,18 +78,15 @@ REGISTER_STATIC_LCM_REPEATER("DRAKE_VIEWER_LOAD_ROBOT",
 
 // Register a repeater, translating from drake::lcmt_viewer_draw
 // to ignition::msgs::Model_V
-REGISTER_STATIC_LCM_REPEATER("DRAKE_VIEWER_DRAW",
-                             drake::lcmt_viewer_draw,
+REGISTER_STATIC_LCM_REPEATER("DRAKE_VIEWER_DRAW", drake::lcmt_viewer_draw,
                              ignition::msgs::Model_V);
 
-REGISTER_STATIC_LCM_REPEATER("DRAKE_VIEWER_STATUS",
-                             drake::lcmt_viewer_command,
+REGISTER_STATIC_LCM_REPEATER("DRAKE_VIEWER_STATUS", drake::lcmt_viewer_command,
                              ignition::msgs::ViewerCommand);
 
 REGISTER_STATIC_LCM_REPEATER("(.*)_SIMPLE_CAR_STATE",
                              drake::lcmt_simple_car_state_t,
                              ignition::msgs::SimpleCarState);
-
 
 REGISTER_STATIC_LCM_REPEATER("DIRECTOR_TREE_VIEWER_RESPONSE",
                              drake::viewer2_comms_t,

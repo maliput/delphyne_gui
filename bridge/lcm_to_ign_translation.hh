@@ -37,8 +37,8 @@
 #include "drake/lcmt_viewer_load_robot.hpp"
 #include "drake/viewer2_comms_t.hpp"
 #include "protobuf/headers/simple_car_state.pb.h"
-#include "protobuf/headers/viewer_command.pb.h"
 #include "protobuf/headers/viewer2_comms.pb.h"
+#include "protobuf/headers/viewer_command.pb.h"
 #include "translate_exception.hh"
 
 namespace delphyne {
@@ -57,8 +57,10 @@ void lcmToIgn(const drake::lcmt_viewer_command& lcmData,
               ignition::msgs::ViewerCommand* ignData);
 
 /// \brief Translate a viewer2_comms message from LCM to ignition
-/// \param[in]  lcmViewer2Data An LCM message containing information about Director
-/// \param[out] ignViewer2Data The resulting ignition message with the translation
+/// \param[in]  lcmViewer2Data An LCM message containing information about
+/// Director
+/// \param[out] ignViewer2Data The resulting ignition message with the
+/// translation
 void lcmToIgn(const drake::viewer2_comms_t& lcmViewer2Data,
               ignition::msgs::Viewer2Comms* ignViewer2Data);
 

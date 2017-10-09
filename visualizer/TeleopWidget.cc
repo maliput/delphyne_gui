@@ -111,9 +111,8 @@ void TeleopWidget::StartDriving() {
     auto lcmChannel = this->lineedit->text().toStdString();
 
     // Ask the bridge to start repeating this channel
-    ignition::msgs::StringMsg_V request;
-    request.add_data(lcmChannel);
-    request.add_data("ign_msgs.AutomotiveDrivingCommand");
+    ignition::msgs::StringMsg request;
+    request.set_data(lcmChannel);
 
     this->node_.Request("/repeat_ignition_topic", request,
                         &TeleopWidget::OnRepeatIgnitionTopic, this);

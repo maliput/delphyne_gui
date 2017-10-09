@@ -26,6 +26,8 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+#include <regex>
+
 #include "repeater_factory.hh"
 
 namespace delphyne {
@@ -34,25 +36,32 @@ namespace bridge {
 static std::map<std::string, RepeaterFactoryFunction>* repeaterMap = nullptr;
 
 /////////////////////////////////////////////////
-void RepeaterFactory::Register(const std::string& messageType,
+void RepeaterFactory::Register(const std::string& namePattern,
                                RepeaterFactoryFunction factoryFunction) {
   // Create the repeaterMap if it's null
   if (!repeaterMap) {
     repeaterMap = new std::map<std::string, RepeaterFactoryFunction>;
   }
 
-  (*repeaterMap)[messageType] = factoryFunction;
+  (*repeaterMap)[namePattern] = factoryFunction;
 }
 
 /////////////////////////////////////////////////
 std::shared_ptr<delphyne::bridge::AbstractRepeater> RepeaterFactory::New(
-    const std::string& messageType, std::shared_ptr<lcm::LCM> lcm,
-    const std::string& topicName) {
-  if (repeaterMap && (*repeaterMap).count(messageType) == 1) {
-    return ((*repeaterMap)[messageType])(lcm, topicName);
+    const std::string& topicOrChannelName, std::shared_ptr<lcm::LCM> lcm) {
+  if (repeaterMap) {
+    for (const auto& pair : *repeaterMap) {
+      std::string namePattern = pair.first;
+      if (std::regex_match(topicOrChannelName, std::regex(namePattern))) {
+        RepeaterFactoryFunction factoryFunction = pair.second;
+        return factoryFunction(lcm, topicOrChannelName);
+      }
+    }
+    return nullptr;
   } else {
     return nullptr;
   }
 }
+
 }
 }

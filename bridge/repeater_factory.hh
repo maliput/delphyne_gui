@@ -48,19 +48,18 @@ typedef std::shared_ptr<delphyne::bridge::AbstractRepeater> (
 class RepeaterFactory {
  public:
   /// \brief Register a new repeater.
-  /// \param[in] messageType Type of message to register.
+  /// \param[in] namePattern The topic or channel name. May be a regular
+  /// expression that is later used to match against a topic or channel name
   /// \param[in] factoryFunction Function that creates a new repeater.
-  static void Register(const std::string& messageType,
+  static void Register(const std::string& namePattern,
                        RepeaterFactoryFunction factoryFunction);
 
   /// \brief Create a new repeater.
-  /// \param[in] messageType Type of message this repeater will be translating.
+    /// \param[in] topicOrChannelName The name of the topic / channel to repeat
   /// \param[in] lcm The LCM instance we are using to dispatch messages
-  /// \param[in] topicName The name of the topic to repeat
   /// \return Pointer to a repeater. Null if the mapping can't be found.
   static std::shared_ptr<delphyne::bridge::AbstractRepeater> New(
-      const std::string& messageType, std::shared_ptr<lcm::LCM> lcm,
-      const std::string& topicName);
+    const std::string& topicOrChannelName, std::shared_ptr<lcm::LCM> lcm);
 };
 
 /// \brief Actual static message registration macro. We need to do the
@@ -68,11 +67,11 @@ class RepeaterFactory {
 /// expanded (see e.g.
 /// https://stackoverflow.com/questions/19343205/c-concatenating-file-and-line-macros)
 ///
-/// \param[in] messageType Message type name.
+/// \param[in] namePattern Topic name. May be a regular expression.
 /// \param[in] ignitionType Class name for the ignition message.
 /// \param[in] lcmType Class name for the lcm message.
 /// \param[in] uid A unique id used to define the new function and class.
-#define REGISTER_STATIC_IGN_REPEATER_LEVEL_2(messageType, ignitionType, lcmType, uid) \
+#define REGISTER_STATIC_IGN_REPEATER_LEVEL_2(namePattern, ignitionType, lcmType, uid) \
   std::shared_ptr<delphyne::bridge::AbstractRepeater>                          \
       DelpyneStaticRepeaterFactoryNew##uid(std::shared_ptr<lcm::LCM> lcm,      \
                                            const std::string& topicName) {     \
@@ -84,24 +83,64 @@ class RepeaterFactory {
    public:                                                                     \
     DelpyneStaticRepeaterClass##uid() {                                        \
       delphyne::bridge::RepeaterFactory::Register(                             \
-          messageType, DelpyneStaticRepeaterFactoryNew##uid);                  \
+          namePattern, DelpyneStaticRepeaterFactoryNew##uid);                  \
     }                                                                          \
   };                                                                           \
   static DelpyneStaticRepeaterClass##uid RepeaterInitializer##uid;
 
 /// \brief A macro used to generate a level of indirection. See
 /// REGISTER_STATIC_IGN_REPEATER_LEVEL_2 comment
-#define REGISTER_STATIC_IGN_REPEATER_LEVEL_1(messageType, ignitionType, lcmType, uid) \
-  REGISTER_STATIC_IGN_REPEATER_LEVEL_2(messageType, ignitionType, lcmType, uid)
+#define REGISTER_STATIC_IGN_REPEATER_LEVEL_1(namePattern, ignitionType, lcmType, uid) \
+  REGISTER_STATIC_IGN_REPEATER_LEVEL_2(namePattern, ignitionType, lcmType, uid)
 
 /// \brief Static message registration macro
 ///
 /// Use this macro to register messages.
-/// \param[in] messageType Message type name.
+/// \param[in] namePattern Topic name. May be a regular expression.
 /// \param[in] ignitionType Class name for the ignition message.
 /// \param[in] lcmType Class name for the lcm message.
-#define REGISTER_STATIC_IGN_REPEATER(messageType, ignitionType, lcmType) \
-  REGISTER_STATIC_IGN_REPEATER_LEVEL_1(messageType, ignitionType, lcmType, __LINE__)
+#define REGISTER_STATIC_IGN_REPEATER(namePattern, ignitionType, lcmType) \
+  REGISTER_STATIC_IGN_REPEATER_LEVEL_1(namePattern, ignitionType, lcmType, __LINE__)
+
+/// \brief Actual static message registration macro. We need to do the
+/// two-level-of-indirection trick here to have the __LINE__ macro properly
+/// expanded (see e.g.
+/// https://stackoverflow.com/questions/19343205/c-concatenating-file-and-line-macros)
+///
+/// \param[in] namePattern Channel name. May be a regular expression.
+/// \param[in] lcmType Class name for the lcm message.
+/// \param[in] ignitionType Class name for the ignition message.
+/// \param[in] uid A unique id used to define the new function and class.
+#define REGISTER_STATIC_LCM_REPEATER_LEVEL_2(namePattern, lcmType, ignitionType, uid) \
+  std::shared_ptr<delphyne::bridge::AbstractRepeater>                          \
+      DelpyneStaticRepeaterFactoryNew##uid(std::shared_ptr<lcm::LCM> lcm,      \
+                                           const std::string& topicName) {     \
+    return std::make_shared<                                                   \
+        delphyne::bridge::LcmChannelRepeater<lcmType, ignitionType>>(lcm,      \
+                                                                   topicName); \
+  }                                                                            \
+  class DelpyneStaticRepeaterClass##uid {                                      \
+   public:                                                                     \
+    DelpyneStaticRepeaterClass##uid() {                                        \
+      delphyne::bridge::RepeaterFactory::Register(                             \
+          namePattern, DelpyneStaticRepeaterFactoryNew##uid);                  \
+    }                                                                          \
+  };                                                                           \
+  static DelpyneStaticRepeaterClass##uid RepeaterInitializer##uid;
+
+/// \brief A macro used to generate a level of indirection. See
+/// REGISTER_STATIC_LCM_REPEATER_LEVEL_2 comment
+#define REGISTER_STATIC_LCM_REPEATER_LEVEL_1(namePattern, lcmType, ignitionType, uid) \
+  REGISTER_STATIC_LCM_REPEATER_LEVEL_2(namePattern, lcmType, ignitionType, uid)
+
+/// \brief Static message registration macro
+///
+/// Use this macro to register messages.
+/// \param[in] Channel name. May be a regular expression.
+/// \param[in] ignitionType Class name for the ignition message.
+/// \param[in] lcmType Class name for the lcm message.
+#define REGISTER_STATIC_LCM_REPEATER(namePattern, lcmType, ignitionType) \
+  REGISTER_STATIC_LCM_REPEATER_LEVEL_1(namePattern, lcmType,  ignitionType, __LINE__)
 
 }  // namespace bridge
 }  // namespace delphyne

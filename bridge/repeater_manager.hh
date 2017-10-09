@@ -50,26 +50,66 @@ class RepeaterManager {
   /// that the manager will expose.
   RepeaterManager(
       std::shared_ptr<lcm::LCM> lcm,
-      std::string ignitionRepeaterServiceName = "/repeat_ignition_topic")
-      : lcm_(lcm), ignitionRepeaterServiceName_(ignitionRepeaterServiceName) {}
+      std::string ignitionRepeaterServiceName = "/repeat_ignition_topic",
+      std::string lcmRepeaterServiceName = "/repeat_lcm_channel")
+      : lcm_(lcm), ignitionRepeaterServiceName_(ignitionRepeaterServiceName),
+      lcmRepeaterServiceName_(lcmRepeaterServiceName),
+      lcmAutodiscoveryEnabled_(false) {}
 
   /// \brief Start the manager by registering the ignition service
   /// @throws std::runtime_error if there is a problem while advertising the
   /// ignition service.
   void Start();
 
+  /// \brief Start a repeater for the provided channel or topic name. If we are
+  /// already repeating this topic/channel do nothing. Otherwise look in the
+  /// registered repeater descriptions and try to spawn a new repeater.
+  /// \param[in] channelOrTopic The LCM channel or ignition topic name we want
+  /// to start repeating.
+  /// \return true if the repeater was successfully started, false otherwise
+  bool StartRepeater(const std::string& channelOrTopic);
+
+  /// \brief Answers if we are already repeating a given topic or channel.
+  /// \param[in] channelOrTopic The LCM channel or ignition topic name we want
+  /// to start repeating.
+  /// \return true if the repeater is already being repeated, false otherwise
+  bool IsRepeating(const std::string& channelOrTopic);
+
+  /// \brief Instruct the repeater manager to subscribe to all LCM channels
+  /// and dynamically setup repeaters as new channels appear.
+  void EnableLCMAutodiscovery();
+
  private:
   /// \brief This method is set as a callback of the published service to
-  /// start a new repeater.
+  /// start a new ignition to LCM repeater.
   /// \param[in] request An array of two strings. The first string dictates the
   /// ignition topic name to repeat and the second one the ignition type that
-  /// will be delivered in that topic
+  /// will be received in that topic
   /// \param[out] response A boolean indicating if the manager was able to
   /// properly setup the repeater or not.
   /// \param[out] result Always true
   void IgnitionRepeaterServiceHandler(
-      const ignition::msgs::StringMsg_V& request,
+      const ignition::msgs::StringMsg& request,
       ignition::msgs::Boolean& response, bool& result);
+
+  /// \brief This method is set as a callback of the published service to
+  /// start a new LCM to ignition repeater.
+  /// \param[in] request An array of two strings. The first string dictates the
+  /// LCM channel name to repeat and the second one the LCM type that
+  /// will be received in that topic
+  /// \param[out] response A boolean indicating if the manager was able to
+  /// properly setup the repeater or not.
+  /// \param[out] result Always true
+  void LCMRepeaterServiceHandler(
+      const ignition::msgs::StringMsg& request,
+      ignition::msgs::Boolean& response, bool& result);
+
+  /// \brief This method is set as a callback for all LCM channels. Each time
+  /// a new message is received we verify if we are repeating that channel. If
+  /// not, we setup a new repeater.
+  /// \param[in] rbuf The buffer with the channel raw data.
+  /// \param[in] channel The name of the channel the message was posted to.
+  void LCMMessageHandler(const lcm::ReceiveBuffer* rbuf, const std::string& channel);
 
   /// \internal
   /// \brief The LCM manager
@@ -88,6 +128,21 @@ class RepeaterManager {
   /// \brief The name of the service used to create a new ignition topic
   /// repeater
   std::string ignitionRepeaterServiceName_;
+
+  /// \internal
+  /// \brief The name of the service used to create a new lcm channel
+  /// repeater
+  std::string lcmRepeaterServiceName_;
+
+  /// \internal
+  /// \brief Are we creating LCM -> ign repeaters as new LCM channels appear?
+  bool lcmAutodiscoveryEnabled_;
+
+  /// \internal
+  /// \brief The set of LCM channels that we tried to automatically create a
+  /// repeater for but failed.
+  std::set<std::string> blacklistedChannels_;
+
 };
 
 }  // namespace bridge

@@ -64,10 +64,36 @@
 IGN_REGISTER_STATIC_MSG("ign_msgs.AutomotiveDrivingCommand",
                         AutomotiveDrivingCommand);
 
-// Register a topic repeater for AutomotiveDrivingCommand
-REGISTER_STATIC_IGN_REPEATER("ign_msgs.AutomotiveDrivingCommand",
+// Register a repeater translating from ignition::msgs::AutomotiveDrivingCommand
+// to drake::lcmt_driving_command_t
+REGISTER_STATIC_IGN_REPEATER("DRIVING_COMMAND_(.*)",
                              ignition::msgs::AutomotiveDrivingCommand,
                              drake::lcmt_driving_command_t);
+
+// Register a repeater, translating from drake::lcmt_viewer_load_robot
+// to ignition::msgs::Model_V
+REGISTER_STATIC_LCM_REPEATER("DRAKE_VIEWER_LOAD_ROBOT",
+                             drake::lcmt_viewer_load_robot,
+                             ignition::msgs::Model_V);
+
+// Register a repeater, translating from drake::lcmt_viewer_draw
+// to ignition::msgs::Model_V
+REGISTER_STATIC_LCM_REPEATER("DRAKE_VIEWER_DRAW",
+                             drake::lcmt_viewer_draw,
+                             ignition::msgs::Model_V);
+
+REGISTER_STATIC_LCM_REPEATER("DRAKE_VIEWER_STATUS",
+                             drake::lcmt_viewer_command,
+                             ignition::msgs::ViewerCommand);
+
+REGISTER_STATIC_LCM_REPEATER("(.*)_SIMPLE_CAR_STATE",
+                             drake::lcmt_simple_car_state_t,
+                             ignition::msgs::SimpleCarState);
+
+
+REGISTER_STATIC_LCM_REPEATER("DIRECTOR_TREE_VIEWER_RESPONSE",
+                             drake::viewer2_comms_t,
+                             ignition::msgs::Viewer2Comms);
 
 /// \brief Flag used to break the LCM loop and terminate the program.
 static std::atomic<bool> terminatePub(false);
@@ -90,20 +116,6 @@ int main(int argc, char* argv[]) {
   std::signal(SIGINT, signalHandler);
   std::signal(SIGTERM, signalHandler);
 
-
-  // Number of cars passed as argument defines the number of
-  // simple_car_state translators.
-  // This approach is temporal, and will be removed as soon as the
-  // dynamic creation of lcm-to-ign repeaters is ready
-  int numCars = 2;
-  if (argc >= 2) {
-    std::istringstream iss(argv[1]);
-    int val;
-    if (iss >> val) {
-      numCars = val;
-    }
-  }
-
   ignition::common::Console::SetVerbosity(3);
   ignmsg << "LCM to ignition-transport bridge 0.1.0" << std::endl;
 
@@ -119,88 +131,19 @@ int main(int argc, char* argv[]) {
     exit(1);
   }
 
-  // Create a repeater on DRAKE_VIEWER_LOAD_ROBOT channel, translating
-  // from drake::lcmt_viewer_load_robot to ignition::msgs::Model
-  delphyne::bridge::LcmChannelRepeater<drake::lcmt_viewer_load_robot,
-                                       ignition::msgs::Model_V>
-      viewerLoadRobotRepeater(sharedLCM, "DRAKE_VIEWER_LOAD_ROBOT");
-
-  // Create a repeater on DRAKE_VIEWER_DRAW channel, translating
-  // from drake::lcmt_viewer_draw to ignition::msgs::PosesStamped
-  delphyne::bridge::LcmChannelRepeater<drake::lcmt_viewer_draw,
-                                       ignition::msgs::Model_V>
-      viewerDrawRepeater(sharedLCM, "DRAKE_VIEWER_DRAW");
-
-  // Create a repeater on DRAKE_VIEWER_STATUS channel, translating
-  // from drake::lcmt_viewer_command to ignition::msgs::ViewerCommand
-  delphyne::bridge::LcmChannelRepeater<drake::lcmt_viewer_command,
-                                       ignition::msgs::ViewerCommand>
-      viewerCommandRepeater(sharedLCM, "DRAKE_VIEWER_STATUS");
-
-  // Create a vector of repeaters on X_SIMPLE_CAR_STATE translating
-  // from drake::lcmt_simple_car_state_t to ignition::msgs::SimpleCarState
-  typedef delphyne::bridge::LcmChannelRepeater<drake::lcmt_simple_car_state_t,
-                                               ignition::msgs::SimpleCarState>
-      simpleCarRepeater_t;
-  std::vector<std::shared_ptr<simpleCarRepeater_t> > simpleCarRepeaterVector;
-  for (int i = 0; i < numCars; i++) {
-    simpleCarRepeaterVector.push_back(std::make_shared<simpleCarRepeater_t>(
-        sharedLCM, std::to_string(i) + "_SIMPLE_CAR_STATE"));
-  }
-
-  // Create a repeater on DIRECTOR_TREE_VIEWER_RESPONSE channel, translating
-  // from drake::viewer2_comms to ignition::msgs::Viewer2Comms
-  delphyne::bridge::LcmChannelRepeater<drake::viewer2_comms_t,
-                                       ignition::msgs::Viewer2Comms>
-      viewer2CommsRepeater(sharedLCM, "DIRECTOR_TREE_VIEWER_RESPONSE");
-
-  // Start DRAKE_VIEWER_LOAD_ROBOT repeater
-  try {
-    viewerLoadRobotRepeater.Start();
-  } catch (const std::runtime_error& error) {
-    ignerr << "Failed to start LCM channel repeater for "
-           << "DRAKE_VIEWER_LOAD_ROBOT" << std::endl;
-    ignerr << "Details: " << error.what() << std::endl;
+  // Start DRAKE_VIEWER_LOAD_ROBOT repeater. Since having this repeater running
+  // is a must, exit if the creation fails
+  if (!manager.StartRepeater("DRAKE_VIEWER_LOAD_ROBOT")) {
     exit(1);
   }
-  // Start DRAKE_VIEWER_DRAW repeater
-  try {
-    viewerDrawRepeater.Start();
-  } catch (const std::runtime_error& error) {
-    ignerr << "Failed to start LCM channel repeater for "
-           << "DRAKE_VIEWER_DRAW" << std::endl;
-    ignerr << "Details: " << error.what() << std::endl;
+
+  // Start DRAKE_VIEWER_DRAW repeater. Since having this repeater running
+  // is a must, exit if the creation fails
+  if (!manager.StartRepeater("DRAKE_VIEWER_DRAW")) {
     exit(1);
   }
-  // Start DRAKE_VIEWER_STATUS repeater
-  try {
-    viewerCommandRepeater.Start();
-  } catch (const std::runtime_error& error) {
-    ignerr << "Failed to start LCM channel repeater for "
-           << "DRAKE_VIEWER_STATUS" << std::endl;
-    ignerr << "Details: " << error.what() << std::endl;
-    exit(1);
-  }
-  // Start all the X_SIMPLE_CAR_STATE repeaters
-  for (int i = 0; i < simpleCarRepeaterVector.size(); i++) {
-    try {
-      simpleCarRepeaterVector[i]->Start();
-    } catch (const std::runtime_error& error) {
-      ignerr << "Failed to start LCM channel repeater for "
-             << std::to_string(i) + "_SIMPLE_CAR_STATE" << std::endl;
-      ignerr << "Details: " << error.what() << std::endl;
-      exit(1);
-    }
-  }
-  // Start DIRECTOR_TREE_VIEWER_RESPONSE repeater
-  try {
-    viewer2CommsRepeater.Start();
-  } catch (const std::runtime_error& error) {
-    ignerr << "Failed to start LCM channel repeater for "
-           << "DIRECTOR_TREE_VIEWER_RESPONSE" << std::endl;
-    ignerr << "Details: " << error.what() << std::endl;
-    exit(1);
-  }
+
+  manager.EnableLCMAutodiscovery();
 
   // Service name
   std::string notifierServiceName = "/visualizer_start_notifier";

@@ -133,6 +133,8 @@ RenderWidget::RenderWidget(QWidget* parent)
 
   this->title = "RenderWidget";
 
+  this->hasTitlebar = false;
+
   // The below block means that every time the updateTime expires, we do an
   // update on the widget. Later on, we call the start() method to start this
   // time at a fixed frequency.  Note that we do not start this timer until the
@@ -174,6 +176,11 @@ RenderWidget::~RenderWidget() {
 
 /////////////////////////////////////////////////
 void RenderWidget::LoadConfig(const tinyxml2::XMLElement* _pluginElem) {
+  // We need to do this here too (even though we already flagged this
+  // when we created the widget) because the base LoadConfig implementation
+  // sets this to true again
+  this->hasTitlebar = false;
+
   tinyxml2::XMLPrinter printer;
   if (!_pluginElem->Accept(&printer)) {
     ignwarn << "There was an error parsing the plugin element for ["
@@ -758,6 +765,12 @@ void RenderWidget::showEvent(QShowEvent* _e) {
 
 /////////////////////////////////////////////////
 QPaintEngine* RenderWidget::paintEngine() const { return nullptr; }
+
+/////////////////////////////////////////////////
+// Replace inherited implementation with a do-nothing one, so that the
+// context menu doesn't appear and we get back the zoom in/out using the
+// right mouse button.
+void RenderWidget::ShowContextMenu(const QPoint &_pos) {}
 
 /////////////////////////////////////////////////
 void RenderWidget::paintEvent(QPaintEvent* _e) {

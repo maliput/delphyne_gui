@@ -149,6 +149,9 @@ class RenderWidget : public ignition::gui::Plugin {
   /// \return NULL.
   virtual QPaintEngine* paintEngine() const;
 
+  // Documentation inherited
+  protected slots: void ShowContextMenu(const QPoint &_pos);
+
  private:
   /// \brief Internal method to create the render window the first time
   /// RenderWidget::showEvent is called.

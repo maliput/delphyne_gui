@@ -17,6 +17,8 @@ target_link_libraries(${render_widget}
   ${Qt5Core_LIBRARIES}
   ${Qt5Widgets_LIBRARIES})
 
+delphyne_install_library(${render_widget})
+
 include_directories(
   ${Qt5Core_INCLUDE_DIRS}
   ${CMAKE_BINARY_DIR}/include
@@ -36,3 +38,5 @@ target_link_libraries(visualizer
   ${Qt5Widgets_LIBRARIES}
   ${render_widget}
 )
+
+install (TARGETS visualizer DESTINATION ${BIN_INSTALL_DIR})

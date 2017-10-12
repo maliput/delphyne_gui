@@ -6,7 +6,7 @@ string (TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
 string (TOUPPER ${PROJECT_NAME} PROJECT_NAME_UPPER)
 
 set (PROJECT_MAJOR_VERSION 0)
-set (PROJECT_MINOR_VERSION 0)
+set (PROJECT_MINOR_VERSION 1)
 set (PROJECT_PATCH_VERSION 1)
 
 set (PROJECT_VERSION ${PROJECT_MAJOR_VERSION}.${PROJECT_MINOR_VERSION})
@@ -261,12 +261,9 @@ else (build_errors)
   message (STATUS "Build Type: ${CMAKE_BUILD_TYPE}")
   message (STATUS "Install path: ${CMAKE_INSTALL_PREFIX}")
 
-  #if (BUILD_IGNITION)
-    set(TEST_TYPE "UNIT")
-    #add_subdirectory(bridge)
-    add_subdirectory(visualizer)
-    add_subdirectory(test)
-  #endif (BUILD_IGNITION)
+  set(TEST_TYPE "UNIT")
+  add_subdirectory(visualizer)
+  add_subdirectory(test)
 
   ########################################
   # Make the package config files

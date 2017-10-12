@@ -152,4 +152,45 @@ There is also an automated script that looks for all the C++ src/header files an
 ./tools/reformat_code.sh
 ```
 
-This script must be run from the top-level of the repository in order to find all of the files. It is recommended to run this before opening any pull request.
+This script must be run from the top-level of the repository in order to find
+all of the files. It is recommended to run this before opening any pull request.
+
+# Instructions for building the Visualizer using CMake (experimental)
+
+The Visualizer can now be built with CMake:
+
+```
+$ pushd src/delphyne
+$ mkdir build
+$ pushd build
+$ cmake -DCMAKE_INSTALL_PREFIX=/usr ..
+$ make
+$ sudo make install
+```
+
+The Visualizer will be installed in `/usr/bin`. Alternatively, you can install
+the Visualizer in a different directory. E.g.:
+
+```
+$ cmake -DCMAKE_INSTALL_PREFIX=../install ..
+$ make
+$ sudo make install
+```
+
+## Running the Visualizer standalone:
+
+To run just the visualizer standalone, type:
+
+```
+visualizer
+```
+
+## Uninstall the Visualizer
+
+The Visualizer can be uninstall by typing:
+
+```
+$ pushd src/delphyne
+$ pushd build
+$ sudo make uninstall
+```

@@ -104,7 +104,7 @@ std::string RenderWidget::FindFile(const std::string& _path) const {
     return res;
   }
 
-  int index = _path.find("://");
+  auto index = _path.find("://");
   std::string path = _path;
 
   // Case 2: Contains a prefix. E.g.: "package://meshes/my_mesh.dae"

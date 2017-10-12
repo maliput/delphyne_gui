@@ -263,7 +263,7 @@ else (build_errors)
 
   #if (BUILD_IGNITION)
     set(TEST_TYPE "UNIT")
-    add_subdirectory(bridge)
+    #add_subdirectory(bridge)
     add_subdirectory(visualizer)
     add_subdirectory(test)
   #endif (BUILD_IGNITION)

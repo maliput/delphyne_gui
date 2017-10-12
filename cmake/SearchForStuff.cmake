@@ -102,15 +102,15 @@ endif()
 ########################################
 # Find lcm in unix platforms
 # In Windows we expect a call from configure.bat script with the paths
-if (NOT WIN32)
-  find_package(lcm REQUIRED)
-  if (NOT lcm_FOUND)
-    message(STATUS "Looking for lcmConfig.cmake - not found")
-    BUILD_ERROR ("Missing: lcm library.")
-  else()
-    message(STATUS "Looking for lcmConfig.cmake - found")
-  endif()
-endif()
+#if (NOT WIN32)
+#  find_package(lcm REQUIRED)
+#  if (NOT lcm_FOUND)
+#    message(STATUS "Looking for lcmConfig.cmake - not found")
+#    BUILD_ERROR ("Missing: lcm library.")
+#  else()
+#    message(STATUS "Looking for lcmConfig.cmake - found")
+#  endif()
+#endif()
 
 ########################################
 # Find lcm

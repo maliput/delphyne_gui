@@ -77,7 +77,7 @@ static std::atomic<bool> terminatePub(false);
 /// \brief Function callback executed when a SIGINT or SIGTERM signals are
 /// captured. This is used to break the infinite loop that handles LCM and
 /// exit the program smoothly.
-static void signalHandler(int signal) {
+void signalHandler(int signal) {
   if (signal == SIGINT || signal == SIGTERM) {
     terminatePub = true;
   }

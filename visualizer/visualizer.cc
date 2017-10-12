@@ -36,7 +36,9 @@
 #include <ignition/gui/Iface.hh>
 #endif
 
+#ifdef BUILDING_WITH_CMAKE
 #include "delphyne/config.hh"
+#endif
 
 static const char versionStr[] = "Visualizer 0.1.0";
 static const std::string initialConfigFile = "visualizer/initialLayout.config";

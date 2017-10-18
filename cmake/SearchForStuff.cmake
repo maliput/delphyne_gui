@@ -27,12 +27,12 @@ endif()
 # Find ignition math in unix platforms
 # In Windows we expect a call from configure.bat script with the paths
 if (NOT WIN32)
-  find_package(ignition-math4 REQUIRED)
-  if (NOT ignition-math4_FOUND)
-    message(STATUS "Looking for ignition-math4-config.cmake - not found")
-    BUILD_ERROR ("Missing: Ignition math4 library (libignition-math4-dev).")
+  find_package(ignition-math3 REQUIRED)
+  if (NOT ignition-math3_FOUND)
+    message(STATUS "Looking for ignition-math3-config.cmake - not found")
+    BUILD_ERROR ("Missing: Ignition math3 library (libignition-math4-dev).")
   else()
-    message(STATUS "Looking for ignition-math4-config.cmake - found")
+    message(STATUS "Looking for ignition-math3-config.cmake - found")
     include_directories(${IGNITION-MATH_INCLUDE_DIRS})
     link_directories(${IGNITION-MATH_LIBRARY_DIRS})
   endif()
@@ -98,32 +98,6 @@ if (NOT WIN32)
     link_directories(${IGNITION-TRANSPORT_LIBRARY_DIRS})
   endif()
 endif()
-
-########################################
-# Find lcm in unix platforms
-# In Windows we expect a call from configure.bat script with the paths
-#if (NOT WIN32)
-#  find_package(lcm REQUIRED)
-#  if (NOT lcm_FOUND)
-#    message(STATUS "Looking for lcmConfig.cmake - not found")
-#    BUILD_ERROR ("Missing: lcm library.")
-#  else()
-#    message(STATUS "Looking for lcmConfig.cmake - found")
-#  endif()
-#endif()
-
-########################################
-# Find lcm
-
-#pkg_check_modules(lcm lcm)
-#if (NOT lcm_FOUND)
-#  message(STATUS "Looking for lcm.pc - not found")
-#  BUILD_ERROR ("Missing: lcm library (liblcm-dev).")
-#else()
-#  message(STATUS "Looking for lcm.pc - found")
-#  include_directories(${lcm_INCLUDEDIR})
-#  link_directories(${lcm_LIBDIR})
-#endif ()
 
 ########################################
 # Find QT

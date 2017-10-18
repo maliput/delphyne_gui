@@ -160,22 +160,15 @@ all of the files. It is recommended to run this before opening any pull request.
 The Visualizer can now be built with CMake:
 
 ```
-$ pushd src/delphyne
-$ mkdir build
 $ pushd build
-$ cmake -DCMAKE_INSTALL_PREFIX=/usr ..
-$ make
-$ sudo make install
+$ mkdir delphyne
+$ pushd delphyne
+$ cmake ../../src/delphyne/ -DCMAKE_INSTALL_PREFIX=../../install
+$ make -j8
+$ make -j8 install
 ```
 
-The Visualizer will be installed in `/usr/bin`. Alternatively, you can install
-the Visualizer in a different directory. E.g.:
-
-```
-$ cmake -DCMAKE_INSTALL_PREFIX=../install ..
-$ make
-$ sudo make install
-```
+The Visualizer will be installed in `<delphyne_ws>/install/bin`.
 
 ## Running the Visualizer standalone:
 
@@ -190,7 +183,6 @@ visualizer
 The Visualizer can be uninstall by typing:
 
 ```
-$ pushd src/delphyne
-$ pushd build
-$ sudo make uninstall
+$ pushd build/delphyne
+$ make uninstall
 ```

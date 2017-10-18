@@ -33,7 +33,6 @@ target_link_libraries(visualizer
   ${IGNITION-COMMON_LIBRARIES}
   ${IGNITION-GUI_LIBRARIES}
   ${IGNITION-MATH_LIBRARIES}
-  ${IGNITION-RENDERING_LIBRARIES}
   ${Qt5Core_LIBRARIES}
   ${Qt5Widgets_LIBRARIES}
   ${render_widget}

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
 
 project (delphyne)
 
@@ -21,12 +21,6 @@ include (${project_cmake_dir}/Utils.cmake)
 
 ##########
 # Package Creation:
-
-# If on windows, generate a file called version which host the current
-# version to be used by releasing scripts
-if (MSVC)
-  file(WRITE ${PROJECT_BINARY_DIR}/VERSION ${PROJECT_VERSION_FULL})
-endif()
 
 include (${project_cmake_dir}/cpack.cmake)
 set (CPACK_PACKAGE_VERSION "${PROJECT_VERSION_FULL}")
@@ -59,15 +53,15 @@ include(GNUInstallDirs)
 # with -fPIC
 if(UNIX AND NOT WIN32)
   set (CMAKE_INSTALL_PREFIX "/usr" CACHE STRING "Install Prefix")
- find_program(CMAKE_UNAME uname /bin /usr/bin /usr/local/bin )
- if(CMAKE_UNAME)
-   exec_program(uname ARGS -m OUTPUT_VARIABLE CMAKE_SYSTEM_PROCESSOR)
-   set(CMAKE_SYSTEM_PROCESSOR ${CMAKE_SYSTEM_PROCESSOR} CACHE INTERNAL
-     "processor type (i386 and x86_64)")
-   if(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64")
-     ADD_DEFINITIONS(-fPIC)
-   endif(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64")
- endif(CMAKE_UNAME)
+  find_program(CMAKE_UNAME uname /bin /usr/bin /usr/local/bin )
+  if(CMAKE_UNAME)
+    exec_program(uname ARGS -m OUTPUT_VARIABLE CMAKE_SYSTEM_PROCESSOR)
+    set(CMAKE_SYSTEM_PROCESSOR ${CMAKE_SYSTEM_PROCESSOR} CACHE INTERNAL
+      "processor type (i386 and x86_64)")
+    if(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64")
+      ADD_DEFINITIONS(-fPIC)
+    endif(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64")
+  endif(CMAKE_UNAME)
 endif()
 
 set (CMAKE_INCLUDE_DIRECTORIES_PROJECT_BEFORE ON)
@@ -172,25 +166,15 @@ if(NOT DEFINED USE_UPSTREAM_CFLAGS OR USE_UPSTREAM_CFLAGS)
 endif()
 
 # Check if warning options are avaliable for the compiler and return WARNING_CXX_FLAGS variable
-if (MSVC)
-  set(WARN_LEVEL "/W4")
-
-  # Unable to be filtered flags (failing due to limitations in filter_valid_compiler_warnings)
-  # Handling exceptions rightly and ignore unknown pragmas
-  set(UNFILTERED_FLAGS "/EHsc /wd4068")
-else()
-  # Equivalent to Wall (according to man gcc) but removed the unknown pragmas since we use
-  # MSVC only pragmas all over the code
-  list(APPEND WARN_LEVEL -Waddress -Warray-bounds -Wcomment -Wformat -Wnonnull)
-  list(APPEND WARN_LEVEL -Wparentheses -Wreorder -Wreturn-type)
-  list(APPEND WARN_LEVEL -Wsequence-point -Wsign-compare -Wstrict-aliasing)
-  list(APPEND WARN_LEVEL -Wstrict-overflow=1 -Wswitch -Wtrigraphs -Wuninitialized)
-  list(APPEND WARN_LEVEL -Wunused-function -Wunused-label -Wunused-value)
-  list(APPEND WARN_LEVEL -Wunused-variable -Wvolatile-register-var)
+list(APPEND WARN_LEVEL -Waddress -Warray-bounds -Wcomment -Wformat -Wnonnull)
+list(APPEND WARN_LEVEL -Wparentheses -Wreorder -Wreturn-type)
+list(APPEND WARN_LEVEL -Wsequence-point -Wsign-compare -Wstrict-aliasing)
+list(APPEND WARN_LEVEL -Wstrict-overflow=1 -Wswitch -Wtrigraphs -Wuninitialized)
+list(APPEND WARN_LEVEL -Wunused-function -Wunused-label -Wunused-value)
+list(APPEND WARN_LEVEL -Wunused-variable -Wvolatile-register-var)
 
   # Unable to be filtered flags (failing due to limitations in filter_valid_compiler_warnings)
   set(UNFILTERED_FLAGS "-Wc++11-compat")
-endif()
 
 filter_valid_compiler_warnings(${WARN_LEVEL} -Wextra -Wno-long-long
   -Wno-unused-value -Wno-unused-value -Wno-unused-value -Wno-unused-value
@@ -219,6 +203,8 @@ if ( build_warnings )
   endforeach ()
   message(STATUS "END BUILD WARNINGS\n")
 endif (build_warnings)
+
+add_definitions(-DBUILDING_WITH_CMAKE)
 
 ########### Add uninstall target ###############
 configure_file(

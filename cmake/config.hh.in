@@ -16,5 +16,3 @@
 #cmakedefine BUILD_TYPE_PROFILE 1
 #cmakedefine BUILD_TYPE_DEBUG 1
 #cmakedefine BUILD_TYPE_RELEASE 1
-
-#cmakedefine BUILDING_WITH_CMAKE 1

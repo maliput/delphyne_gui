@@ -35,7 +35,6 @@ target_link_libraries(visualizer
   ${IGNITION-MATH_LIBRARIES}
   ${Qt5Core_LIBRARIES}
   ${Qt5Widgets_LIBRARIES}
-  ${render_widget}
 )
 
 install (TARGETS visualizer DESTINATION ${BIN_INSTALL_DIR})

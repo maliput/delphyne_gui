@@ -28,9 +28,9 @@ cc_library(
         "lcm_to_ign_translation.cc",
     ],
     hdrs = [
+        "abstract_repeater.hh",
         "lcm_to_ign_translation.hh",
         "translate_exception.hh",
-        "abstract_repeater.hh",
     ],
     deps = [
         "@ignition-transport3",

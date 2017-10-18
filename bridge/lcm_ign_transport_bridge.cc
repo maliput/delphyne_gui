@@ -62,7 +62,7 @@
 // Register custom msg. Note that the name has to include "ign_msgs" at the
 // beginning
 IGN_REGISTER_STATIC_MSG("ign_msgs.AutomotiveDrivingCommand",
-                        AutomotiveDrivingCommand)
+                        AutomotiveDrivingCommand);
 
 // Register a topic repeater for AutomotiveDrivingCommand
 

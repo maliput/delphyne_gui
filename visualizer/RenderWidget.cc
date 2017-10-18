@@ -204,12 +204,27 @@ void RenderWidget::LoadConfig(const tinyxml2::XMLElement* _pluginElem) {
 
 /////////////////////////////////////////////////
 std::string RenderWidget::ConfigStr() const {
+
+  tinyxml2::XMLElement* pluginXML;
   tinyxml2::XMLDocument xmlDoc;
 
-  // Create the plugin element.
-  tinyxml2::XMLElement* pluginXML = xmlDoc.NewElement("plugin");
-  pluginXML->SetAttribute("filename", "RenderWidget");
-  xmlDoc.InsertFirstChild(pluginXML);
+  if (configStr.empty()) {
+    // If we have no defined plugin configuration, create the XML doc with the
+    // plugin element and initialize it with the basic properties.
+    pluginXML = xmlDoc.NewElement("plugin");
+    pluginXML->SetAttribute("filename", "RenderWidget");
+    xmlDoc.InsertFirstChild(pluginXML);
+  } else {
+    // In case we do have an existing config, parse it.
+    xmlDoc.Parse(configStr.c_str());
+    pluginXML = xmlDoc.FirstChildElement("plugin");
+
+    // If there is a camera element, remove it as we will be overriding it below
+    auto cameraXML = pluginXML->FirstChildElement("camera");
+    if (cameraXML) {
+      pluginXML->DeleteChild(cameraXML);
+    }
+  }
 
   // User camera options.
   tinyxml2::XMLElement* userCameraXML = xmlDoc.NewElement("camera");
@@ -758,6 +773,12 @@ void RenderWidget::showEvent(QShowEvent* _e) {
 
 /////////////////////////////////////////////////
 QPaintEngine* RenderWidget::paintEngine() const { return nullptr; }
+
+/////////////////////////////////////////////////
+// Replace inherited implementation with a do-nothing one, so that the
+// context menu doesn't appear and we get back the zoom in/out using the
+// right mouse button.
+void RenderWidget::ShowContextMenu(const QPoint &_pos) {}
 
 /////////////////////////////////////////////////
 void RenderWidget::paintEvent(QPaintEvent* _e) {

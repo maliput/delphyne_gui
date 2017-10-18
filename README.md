@@ -161,11 +161,10 @@ The Visualizer can now be built with CMake:
 
 ```
 $ pushd build
-$ mkdir delphyne
+$ mkdir -p delphyne
 $ pushd delphyne
 $ cmake ../../src/delphyne/ -DCMAKE_INSTALL_PREFIX=../../install
-$ make -j8
-$ make -j8 install
+$ make -j$( getconf _NPROCESSORS_ONLN ) install
 ```
 
 The Visualizer will be installed in `<delphyne_ws>/install/bin`.
@@ -180,7 +179,7 @@ visualizer
 
 ## Uninstall the Visualizer
 
-The Visualizer can be uninstall by typing:
+The Visualizer can be uninstalled by typing:
 
 ```
 $ pushd build/delphyne

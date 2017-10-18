@@ -38,3 +38,7 @@ target_link_libraries(visualizer
 )
 
 install (TARGETS visualizer DESTINATION ${BIN_INSTALL_DIR})
+
+# Install initialLayout.config
+install (FILES initialLayout.config DESTINATION
+  ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/delphyne/)

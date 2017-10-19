@@ -46,61 +46,101 @@ void RepeaterManager::Start() {
             << ignitionRepeaterServiceName_ << "]";
     throw std::runtime_error(message.str());
   }
+
+  if (!node_.Advertise(lcmRepeaterServiceName_,
+                       &RepeaterManager::LCMRepeaterServiceHandler, this)) {
+    std::stringstream message;
+    message << "Error while advertising service [" << lcmRepeaterServiceName_
+            << "]";
+    throw std::runtime_error(message.str());
+  }
+}
+
+/////////////////////////////////////////////////
+void RepeaterManager::EnableLCMAutodiscovery() {
+  if (!lcmAutodiscoveryEnabled_) {
+    lcmAutodiscoveryEnabled_ = true;
+    lcm_->subscribe(".*", &RepeaterManager::LCMMessageHandler, this);
+  }
 }
 
 /////////////////////////////////////////////////
 void RepeaterManager::IgnitionRepeaterServiceHandler(
-    const ignition::msgs::StringMsg_V& request,
-    ignition::msgs::Boolean& response, bool& result) {
-  switch (request.data_size()) {
-    case 0:
-      ignerr << "Couldn't create repeater: missing topic name and "
-             << "message type parameters" << std::endl;
-      return;
-    case 1:
-      ignerr << "Couldn't create repeater for " << request.data(0)
-             << ". Missing message type parameter" << std::endl;
-      return;
-    case 2:
-      break;
-    default:
-      igndbg << "Service called with extra parameters, ignoring them"
-             << std::endl;
-      break;
+    const ignition::msgs::StringMsg& request, ignition::msgs::Boolean& response,
+    bool& result) {
+  if (!request.has_data()) {
+    ignerr << "Couldn't create repeater: missing topic name" << std::endl;
+    return;
   }
 
   // We are handling the message. If this fails or not will be recorded in the
   // response
   result = true;
 
-  std::string topicName = request.data(0);
-  std::string messageType = request.data(1);
+  const std::string topicName = request.data();
 
-  // If we are already repeating this topic, do nothing
-  if (repeaters_.count(topicName)) {
-    igndbg << "Already repeating " << topicName << ". Nothing to do here."
-           << std::endl;
-    response.set_data(true);
+  response.set_data(StartRepeater(topicName));
+}
+
+/////////////////////////////////////////////////
+void RepeaterManager::LCMRepeaterServiceHandler(
+    const ignition::msgs::StringMsg& request, ignition::msgs::Boolean& response,
+    bool& result) {
+  if (!request.has_data()) {
+    ignerr << "Couldn't create repeater: missing channel name" << std::endl;
     return;
   }
 
+  // We are handling the message. If this fails or not will be recorded in the
+  // response
+  result = true;
+
+  const std::string channelName = request.data();
+
+  response.set_data(StartRepeater(channelName));
+}
+
+/////////////////////////////////////////////////
+void RepeaterManager::LCMMessageHandler(const lcm::ReceiveBuffer* rbuf,
+                                        const std::string& channel) {
+  if (!IsRepeating(channel) && blacklistedChannels_.count(channel) == 0) {
+    if (!StartRepeater(channel)) {
+      blacklistedChannels_.insert(channel);
+    }
+  }
+}
+
+/////////////////////////////////////////////////
+bool RepeaterManager::IsRepeating(const std::string& channelOrTopic) {
+  return repeaters_.count(channelOrTopic) > 0;
+}
+
+/////////////////////////////////////////////////
+bool RepeaterManager::StartRepeater(const std::string& channelOrTopic) {
+  // If we are already repeating this topic, do nothing
+  if (IsRepeating(channelOrTopic)) {
+    igndbg << "Already repeating " << channelOrTopic << ". Nothing to do here."
+           << std::endl;
+    return true;
+  }
+
   std::shared_ptr<delphyne::bridge::AbstractRepeater> repeater =
-      delphyne::bridge::RepeaterFactory::New(messageType, lcm_, topicName);
+      delphyne::bridge::RepeaterFactory::New(channelOrTopic, lcm_);
 
   if (!repeater) {
-    ignerr << "Couldn't create repeater for " << messageType << std::endl;
-    response.set_data(false);
+    ignerr << "Couldn't create repeater for " << channelOrTopic << std::endl;
+    return false;
   } else {
     try {
       repeater->Start();
-      repeaters_[topicName] = repeater;
-      igndbg << "Repeater for " << topicName << " started." << std::endl;
-      response.set_data(true);
+      repeaters_[channelOrTopic] = repeater;
+      igndbg << "Repeater for " << channelOrTopic << " started." << std::endl;
+      return true;
     } catch (const std::runtime_error& error) {
-      ignerr << "Failed to start ignition channel repeater for " << topicName
-             << std::endl;
+      ignerr << "Failed to start ignition channel repeater for "
+             << channelOrTopic << std::endl;
       ignerr << "Details: " << error.what() << std::endl;
-      response.set_data(false);
+      return false;
     }
   }
 }

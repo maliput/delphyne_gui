@@ -28,6 +28,7 @@ cc_library(
         "lcm_to_ign_translation.cc",
     ],
     hdrs = [
+        "abstract_repeater.hh",
         "lcm_to_ign_translation.hh",
         "translate_exception.hh",
     ],
@@ -155,9 +156,9 @@ cc_library(
 )
 
 cc_binary(
-    name = "lcm-ign-transport-bridge",
+    name = "duplex-ign-lcm-bridge",
     srcs = [
-        "lcm_ign_transport_bridge.cc",
+        "duplex_ign_lcm_bridge.cc",
     ],
     deps = [
         "@ignition-transport3",
@@ -199,14 +200,14 @@ py_binary(
     ],
     data = [
         ":lcm-mock-robot-publisher",
-        ":lcm-ign-transport-bridge",
+        ":duplex-ign-lcm-bridge",
         "//visualizer:visualizer",
     ],
     deps = ["//bridge:launcher"],
     main = "mocked_robot_demo.py",
     args = [
         "$(location :lcm-mock-robot-publisher)",
-        "$(location :lcm-ign-transport-bridge)",
+        "$(location :duplex-ign-lcm-bridge)",
         "$(location //visualizer:visualizer)",
     ],
 )
@@ -219,7 +220,7 @@ py_binary(
         "@lcm//:lcm-python",
     ],
     data = [
-        ":lcm-ign-transport-bridge",
+        ":duplex-ign-lcm-bridge",
         "//visualizer:visualizer",
     ],
     main = "demo_launcher.py",

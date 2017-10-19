@@ -36,9 +36,8 @@ GTEST_TEST(RepeaterManager, TestReturnFalseOnFailure) {
   // Perform the service request and check the response
   ignition::transport::Node node;
 
-  ignition::msgs::StringMsg_V request;
-  request.add_data("nonExistentType");
-  request.add_data("SomeTopic");
+  ignition::msgs::StringMsg request;
+  request.set_data("nonExistentTopic");
 
   ignition::msgs::Boolean response;
   bool result;
@@ -58,7 +57,7 @@ GTEST_TEST(RepeaterManager, TestReturnTrueOnRegistration) {
   std::shared_ptr<lcm::LCM> lcm = std::make_shared<lcm::LCM>();
 
   // Register a fake factory
-  RepeaterFactory::Register("fakeType", fakeFactoryFunction);
+  RepeaterFactory::Register("SomeTopic", fakeFactoryFunction);
 
   // Service name
   std::string serviceName = "/repeat_topic";
@@ -71,13 +70,56 @@ GTEST_TEST(RepeaterManager, TestReturnTrueOnRegistration) {
   // Perform the service request and check the response
   ignition::transport::Node node;
 
-  ignition::msgs::StringMsg_V request;
-  request.add_data("SomeTopic");
-  request.add_data("fakeType");
+  ignition::msgs::StringMsg request;
+  request.set_data("SomeTopic");
 
   ignition::msgs::Boolean response;
   bool result;
   unsigned int timeout = 500;
+
+  node.Request(serviceName, request, timeout, response, result);
+
+  ASSERT_TRUE(result);
+  ASSERT_TRUE(response.data());
+}
+
+//////////////////////////////////////////////////
+/// \brief Test that the manager can successfully start repeaters on many topics
+/// based on a regexp registration
+GTEST_TEST(RepeaterManager, TestRegexpRegistration) {
+  // Setup LCM
+  std::shared_ptr<lcm::LCM> lcm = std::make_shared<lcm::LCM>();
+
+  // Register a fake factory
+  RepeaterFactory::Register("SomeTopic(.*)", fakeFactoryFunction);
+
+  // Service name
+  std::string serviceName = "/repeat_topic";
+
+  // Define and start the manager
+  delphyne::bridge::RepeaterManager manager(lcm, serviceName);
+
+  manager.Start();
+
+  // Perform the service request and check the response
+  ignition::transport::Node node;
+
+  ignition::msgs::Boolean response;
+  bool result;
+  unsigned int timeout = 500;
+
+
+  ignition::msgs::StringMsg request;
+  request.set_data("SomeTopicA");
+  response.set_data(false);
+
+  node.Request(serviceName, request, timeout, response, result);
+
+  ASSERT_TRUE(result);
+  ASSERT_TRUE(response.data());
+
+  request.set_data("SomeTopicB");
+  response.set_data(false);
 
   node.Request(serviceName, request, timeout, response, result);
 

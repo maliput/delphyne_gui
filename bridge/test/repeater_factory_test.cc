@@ -23,7 +23,7 @@ GTEST_TEST(RepeaterFactory, TestNewFailsOnNoAvailableMapping) {
   // Setup LCM
   std::shared_ptr<lcm::LCM> lcm = std::make_shared<lcm::LCM>();
 
-  ASSERT_EQ(nullptr, RepeaterFactory::New("nonExistentType", lcm, "SomeTopic"));
+  ASSERT_EQ(nullptr, RepeaterFactory::New("nonExistentType", lcm));
 }
 
 //////////////////////////////////////////////////
@@ -35,7 +35,7 @@ GTEST_TEST(RepeaterFactory, TestNewCreatesRepeater) {
 
   RepeaterFactory::Register("fakeType", fakeFactoryFunction);
 
-  ASSERT_NE(nullptr, RepeaterFactory::New("fakeType", lcm, "SomeTopic"));
+  ASSERT_NE(nullptr, RepeaterFactory::New("fakeType", lcm));
 }
 
 //////////////////////////////////////////////////
@@ -47,8 +47,8 @@ GTEST_TEST(RepeaterFactory, TestNewCreatesMultipleRepeaters) {
 
   RepeaterFactory::Register("fakeType", fakeFactoryFunction);
 
-  auto repeater1 = RepeaterFactory::New("fakeType", lcm, "SomeTopic1");
-  auto repeater2 = RepeaterFactory::New("fakeType", lcm, "SomeTopic2");
+  auto repeater1 = RepeaterFactory::New("fakeType", lcm);
+  auto repeater2 = RepeaterFactory::New("fakeType", lcm);
 
   ASSERT_NE(nullptr, repeater1);
   ASSERT_NE(nullptr, repeater2);

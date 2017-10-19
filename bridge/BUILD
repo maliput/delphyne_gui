@@ -156,9 +156,9 @@ cc_library(
 )
 
 cc_binary(
-    name = "transport-bridge",
+    name = "duplex-ign-lcm-bridge",
     srcs = [
-        "transport_bridge.cc",
+        "duplex_ign_lcm_bridge.cc",
     ],
     deps = [
         "@ignition-transport3",
@@ -200,14 +200,14 @@ py_binary(
     ],
     data = [
         ":lcm-mock-robot-publisher",
-        ":transport-bridge",
+        ":duplex-ign-lcm-bridge",
         "//visualizer:visualizer",
     ],
     deps = ["//bridge:launcher"],
     main = "mocked_robot_demo.py",
     args = [
         "$(location :lcm-mock-robot-publisher)",
-        "$(location :transport-bridge)",
+        "$(location :duplex-ign-lcm-bridge)",
         "$(location //visualizer:visualizer)",
     ],
 )
@@ -220,7 +220,7 @@ py_binary(
         "@lcm//:lcm-python",
     ],
     data = [
-        ":transport-bridge",
+        ":duplex-ign-lcm-bridge",
         "//visualizer:visualizer",
     ],
     main = "demo_launcher.py",

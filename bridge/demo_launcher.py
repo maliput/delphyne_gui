@@ -107,7 +107,7 @@ def main():
 
 
     # delphyne's binaries path
-    lcm_ign_bridge = "bridge/transport-bridge"
+    lcm_ign_bridge = "bridge/duplex-ign-lcm-bridge"
     ign_visualizer = "visualizer/visualizer"
 
     try:

@@ -19,9 +19,27 @@ target_link_libraries(${render_widget}
 
 delphyne_install_library(${render_widget})
 
+# TeleopWidget GUI plugin.
+set(teleop_widget TeleopWidget)
+QT5_WRAP_CPP(${teleop_widget}_MOC ${teleop_widget}.hh)
+add_library(${teleop_widget} SHARED
+  ${CMAKE_CURRENT_SOURCE_DIR}/${teleop_widget}.cc
+  ${${teleop_widget}_MOC}
+)
+target_link_libraries(${teleop_widget}
+  ${IGNITION-COMMON_LIBRARIES}
+  ${IGNITION-GUI_LIBRARIES}
+  ${IGNITION-MSGS_LIBRARIES}
+  ${IGNITION-TRANSPORT_LIBRARIES}
+  ${Qt5Core_LIBRARIES}
+  ${Qt5Widgets_LIBRARIES})
+
+delphyne_install_library(${teleop_widget})
+
 include_directories(
   ${Qt5Core_INCLUDE_DIRS}
   ${CMAKE_BINARY_DIR}/include
+  ${CMAKE_SOURCE_DIR}
 )
 
 # Visualizer
@@ -41,4 +59,8 @@ install (TARGETS visualizer DESTINATION ${BIN_INSTALL_DIR})
 
 # Install initialLayout.config
 install (FILES initialLayout.config DESTINATION
+  ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/delphyne/)
+
+# Install layoutWithTeleop.config
+install (FILES layoutWithTeleop.config DESTINATION
   ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/delphyne/)

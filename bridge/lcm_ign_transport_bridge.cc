@@ -68,7 +68,7 @@ IGN_REGISTER_STATIC_MSG("ign_msgs.AutomotiveDrivingCommand",
 
 REGISTER_STATIC_REPEATER("ign_msgs.AutomotiveDrivingCommand",
                          ignition::msgs::AutomotiveDrivingCommand,
-                         drake::lcmt_driving_command_t, 1)
+                         drake::lcmt_driving_command_t, 1);
 
 /// \brief Flag used to break the LCM loop and terminate the program.
 static std::atomic<bool> terminatePub(false);
@@ -183,7 +183,7 @@ int main(int argc, char* argv[]) {
     exit(1);
   }
   // Start all the X_SIMPLE_CAR_STATE repeaters
-  for (auto i = 0u; i < simpleCarRepeaterVector.size(); i++) {
+  for (int i = 0; i < simpleCarRepeaterVector.size(); i++) {
     try {
       simpleCarRepeaterVector[i]->Start();
     } catch (const std::runtime_error& error) {

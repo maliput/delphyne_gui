@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
 
-project (delphyne)
+project (delphyne-gui)
 
 string (TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
 string (TOUPPER ${PROJECT_NAME} PROJECT_NAME_UPPER)
@@ -104,7 +104,7 @@ if (USE_FULL_RPATH)
 endif()
 
 set (BUILD_DELPHYNE ON CACHE INTERNAL
-  "Build Delphyne" FORCE)
+  "Build Delphyne GUI" FORCE)
 set (build_errors "" CACHE INTERNAL "build errors" FORCE)
 set (build_warnings "" CACHE INTERNAL "build warnings" FORCE)
 
@@ -270,7 +270,7 @@ else (build_errors)
   set(cmake_conf_version_file "${PROJECT_NAME_LOWER}${PROJECT_MAJOR_VERSION}-config-version.cmake")
 
   configure_file(
-    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/delphyne-config.cmake.in"
+    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/delphyne-gui-config.cmake.in"
     "${CMAKE_CURRENT_BINARY_DIR}/${cmake_conf_file}" @ONLY)
 
   # Use write_basic_package_version_file to generate a ConfigVersion file that

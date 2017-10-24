@@ -15,16 +15,15 @@ Ubuntu 16.04 amd64.
     $ sudo apt-get install mercurial cmake pkg-config python ruby-ronn libprotoc-dev libprotobuf-dev protobuf-compiler uuid-dev libzmq3-dev git libogre-1.9-dev libglew-dev qtbase5-dev libicu-dev libboost-filesystem-dev libfreeimage-dev libtinyxml2-dev libgts-dev libavdevice-dev python3-vcstool mesa-utils
     ```
 
-1.  Now build a workspace for Delphyne GUI. If you are familiar with ROS catkin
+1.  Now build a workspace for Delphyne. If you are familiar with ROS catkin
 workspaces, this is a similar concept. The steps to setup the workspace are:
 
     ```
-    $ mkdir -p delphyne-gui_ws/src
-    $ cd delphyne-gui_ws
+    $ mkdir -p delphyne_ws/src
+    $ cd delphyne_ws
     ```
 
-1.  Download the delphyne-gui.repos file from [delphyne-gui.repos](https://github.com/ToyotaResearchInstitute/delphyne-gui/blob/master/delphyne-gui.repos) into `delphyne-gui_ws` (we can't automate this because it is
-a private repository).
+1.  Download the delphyne-gui.repos file from [delphyne-gui.repos](https://github.com/ToyotaResearchInstitute/delphyne-gui/blob/master/delphyne-gui.repos) into `delphyne_ws` (we can't automate this because it is a private repository).
 
 1.  Import the repositories from delphyne-gui.repos:
 
@@ -39,7 +38,7 @@ this for you; for this to work correctly, you must be in the root of your
 delphyne GUI workspace:
 
 ```
-$ . src/delphyne-gui/setup.bash
+$ . src/delphyne/setup.bash
 ```
 
 Next we can go on and build the components.
@@ -74,7 +73,7 @@ $ cmake ../../src/delphyne-gui/ -DCMAKE_INSTALL_PREFIX=../../install
 $ make -j$( getconf _NPROCESSORS_ONLN ) install
 ```
 
-The Visualizer will be installed in `<delphyne-gui_ws>/install/bin`.
+The Visualizer will be installed in `<delphyne_ws>/install/bin`.
 
 # Running the Visualizer standalone:
 

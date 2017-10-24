@@ -36,8 +36,19 @@
 #include <ignition/gui/Iface.hh>
 #endif
 
+#ifdef BUILDING_WITH_CMAKE
+#include "delphyne/config.hh"
+#endif
+
 static const char versionStr[] = "Visualizer 0.1.0";
-static const std::string initialConfigFile = "visualizer/initialLayout.config";
+
+#ifdef BUILDING_WITH_CMAKE
+  static const std::string initialConfigFile = ignition::common::joinPaths(
+    DELPHYNE_INITIAL_CONFIG_PATH, "initialLayout.config");
+#else
+  static const std::string initialConfigFile = ignition::common::joinPaths(
+    "visualizer", "initialLayout.config");
+#endif
 
 /// \brief Get the path of the default configuration file for Delphyne.
 /// \return The default configuration path.

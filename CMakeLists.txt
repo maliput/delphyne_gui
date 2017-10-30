@@ -204,8 +204,6 @@ if ( build_warnings )
   message(STATUS "END BUILD WARNINGS\n")
 endif (build_warnings)
 
-add_definitions(-DBUILDING_WITH_CMAKE)
-
 ########### Add uninstall target ###############
 configure_file(
   "${CMAKE_CURRENT_SOURCE_DIR}/cmake/cmake_uninstall.cmake.in"

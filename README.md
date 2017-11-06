@@ -112,6 +112,17 @@ $ make -j$( getconf _NPROCESSORS_ONLN ) install
 
 The Visualizer will be installed in `<delphyne_ws>/install/bin`.
 
+# Running the Delphyne visualizer
+
+The visualizer is a new front-end visualizer for the drake simulator.
+
+## Running the Visualizer standalone:
+
+To run just the visualizer standalone, type:
+
+```
+visualizer
+```
 
 # Running the Delphyne back-end
 
@@ -138,32 +149,45 @@ To run the mock demo, type:
 $ lcm-mock-robot-publisher
 ```
 
-## Uninstall the back-end
+## Running the automotive-demo using CMake (experimental)
 
-All executables can be uninstalled by typing:
-
-```
-$ pushd build/delphyne
-$ make uninstall
-```
-
-# Running the Delphyne visualizer
-
-The visualizer is a new front-end visualizer for the drake simulator.
-
-## Running the Visualizer standalone:
-
-To run just the visualizer standalone, type:
+In order to run the automotive-demo, we make use of drake installed as a library.
+So let's install drake by executing this commant from drake's project root:
 
 ```
-visualizer
+$ bazel run install </path/to/delphyne_ws>/install_drake
+```
+Note:
+
+- The directory `install_drake` will be created automatically by bazel.
+
+After that, you'll be ready to compile and run the project.
+
+Please follow the steps defined on the [build instructions](#instructions-for-building-the-visualizer-using-cmake-experimental).
+
+When you reach this step:
+```
+$ cmake ../../src/delphyne/ -DCMAKE_INSTALL_PREFIX=../../install
 ```
 
-## Uninstall the Visualizer
+You'll be able to pass a different path for the DRAKE_INSTALL_PREFIX by appending `DDRAKE_INSTALL_PREFIX=<path/to/drake-install>` to it.
 
-The Visualizer can be uninstalled by typing:
+After the build finishes, open three terminal emulators and execute one of the following commands on each of them, in the following order:
 
 ```
-$ pushd build/delphyne-gui
-$ make uninstall
+$ cd <path/to/delphyne_ws>/install/bin && ./duplex-ign-lcm-bridge
 ```
+
+```
+$ cd <path/to/delphyne_ws>/install/bin && ./visualizer
+```
+
+```
+$ cd <path/to/delphyne_ws>/install/bin && ./automotive-demo
+```
+
+By running those commands, you should be able to see a single prius car standing in the middle of an empty world.
+
+
+# Instructions for the clang-format tool
+In order to get all the C++ code in the project compliant with a single style, we strongly recommend you using the auto-formatting tool called clang-format.

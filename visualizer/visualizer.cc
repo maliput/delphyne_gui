@@ -36,20 +36,14 @@
 #include <ignition/gui/Iface.hh>
 #endif
 
-#ifdef BUILDING_WITH_CMAKE
-#include "delphyne/config.hh"
-#endif
+#include "delphyne-gui/config.hh"
 
+/// Constants.
 static const char versionStr[] = "Visualizer 0.1.0";
-
-#ifdef BUILDING_WITH_CMAKE
-  static const std::string initialConfigFile = ignition::common::joinPaths(
+static const std::string initialConfigFile = ignition::common::joinPaths(
     DELPHYNE_INITIAL_CONFIG_PATH, "initialLayout.config");
-#else
-  static const std::string initialConfigFile = ignition::common::joinPaths(
-    "visualizer", "initialLayout.config");
-#endif
 
+/////////////////////////////////////////////////
 /// \brief Get the path of the default configuration file for Delphyne.
 /// \return The default configuration path.
 std::string defaultConfigPath() {
@@ -61,6 +55,7 @@ std::string defaultConfigPath() {
   return defaultConfigPath;
 }
 
+/////////////////////////////////////////////////
 int main(int argc, char* argv[]) {
   ignition::common::Console::SetVerbosity(3);
   ignmsg << versionStr << std::endl;

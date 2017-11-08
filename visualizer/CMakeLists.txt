@@ -17,7 +17,7 @@ target_link_libraries(${render_widget}
   ${Qt5Core_LIBRARIES}
   ${Qt5Widgets_LIBRARIES})
 
-delphyne_install_library(${render_widget})
+install(TARGETS ${render_widget} DESTINATION ${LIB_INSTALL_DIR} COMPONENT shlib)
 
 # TeleopWidget GUI plugin.
 set(teleop_widget TeleopWidget)
@@ -34,7 +34,7 @@ target_link_libraries(${teleop_widget}
   ${Qt5Core_LIBRARIES}
   ${Qt5Widgets_LIBRARIES})
 
-delphyne_install_library(${teleop_widget})
+install(TARGETS ${teleop_widget} DESTINATION ${LIB_INSTALL_DIR} COMPONENT shlib)
 
 include_directories(
   ${Qt5Core_INCLUDE_DIRS}

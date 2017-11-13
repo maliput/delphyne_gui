@@ -24,6 +24,7 @@ set(teleop_widget TeleopWidget)
 QT5_WRAP_CPP(${teleop_widget}_MOC ${teleop_widget}.hh)
 add_library(${teleop_widget} SHARED
   ${CMAKE_CURRENT_SOURCE_DIR}/${teleop_widget}.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/../protobuf/headers/automotive_driving_command.pb.cc
   ${${teleop_widget}_MOC}
 )
 target_link_libraries(${teleop_widget}

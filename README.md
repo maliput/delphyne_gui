@@ -49,7 +49,7 @@ to do this for you; for this to work correctly, you must be in the root of your
 delphyne workspace:
 
 ```
-$ . src/delphyne-gui/setup.bash
+$ . src/delphyne_gui/setup.bash
 ```
 
 Next we can go on and build the components.
@@ -104,9 +104,9 @@ The Visualizer can now be built with CMake:
 
 ```
 $ pushd build
-$ mkdir -p delphyne-gui
-$ pushd delphyne-gui
-$ cmake ../../src/delphyne-gui/ -DCMAKE_INSTALL_PREFIX=../../install
+$ mkdir -p delphyne_gui
+$ pushd delphyne_gui
+$ cmake ../../src/delphyne_gui/ -DCMAKE_INSTALL_PREFIX=../../install
 $ make -j$( getconf _NPROCESSORS_ONLN ) install
 ```
 

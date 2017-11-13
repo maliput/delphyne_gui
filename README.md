@@ -72,14 +72,14 @@ This may take a little while to build the dependencies. At the end of the build,
 a new subdirectory called `install` will be at the top level of your
 delphyne workspace.
 
-# Build drake
+# Build and install drake
 
 Drake must be built using the Bazel build tool. To build drake, do the
 following:
 
 ```
 $ pushd src/drake
-$ bazel build //...
+$ bazel run //:install </path/to/delphyne_ws>/install_drake
 $ popd
 ```
 
@@ -93,7 +93,7 @@ The Delphyne back-end can now be built with CMake:
 $ pushd build
 $ mkdir -p delphyne
 $ pushd delphyne
-$ cmake ../../src/delphyne/ -DCMAKE_INSTALL_PREFIX=../../install
+$ cmake ../../src/delphyne/ -DCMAKE_INSTALL_PREFIX=../../install -DDRAKE_INSTALL_PREFIX=</path/to/delphyne_ws/install_drake
 $ make -j$( getconf _NPROCESSORS_ONLN ) install
 $ popd
 ```
@@ -118,7 +118,7 @@ The visualizer is a new front-end visualizer for the drake simulator.
 
 ## Running the Visualizer standalone:
 
-To run just the visualizer standalone, type:
+To run just the visualizer standalone, run:
 
 ```
 visualizer
@@ -149,30 +149,9 @@ To run the mock demo, type:
 $ lcm-mock-robot-publisher
 ```
 
-## Running the automotive-demo using CMake (experimental)
+## Running the automotive-demo
 
-In order to run the automotive-demo, we make use of drake installed as a library.
-So let's install drake by executing this commant from drake's project root:
-
-```
-$ bazel run install </path/to/delphyne_ws>/install_drake
-```
-Note:
-
-- The directory `install_drake` will be created automatically by bazel.
-
-After that, you'll be ready to compile and run the project.
-
-Please follow the steps defined on the [build instructions](#instructions-for-building-the-visualizer-using-cmake-experimental).
-
-When you reach this step:
-```
-$ cmake ../../src/delphyne/ -DCMAKE_INSTALL_PREFIX=../../install
-```
-
-You'll be able to pass a different path for the DRAKE_INSTALL_PREFIX by appending `DDRAKE_INSTALL_PREFIX=<path/to/drake-install>` to it.
-
-After the build finishes, open three terminal emulators and execute one of the following commands on each of them, in the following order:
+Open three terminal emulators and execute one of the following commands on each of them, in the following order:
 
 ```
 $ cd <path/to/delphyne_ws>/install/bin && ./duplex-ign-lcm-bridge
@@ -191,3 +170,18 @@ By running those commands, you should be able to see a single prius car standing
 
 # Instructions for the clang-format tool
 In order to get all the C++ code in the project compliant with a single style, we strongly recommend you using the auto-formatting tool called clang-format.
+
+You can execute it against your source code by doing:
+```
+/usr/bin/clang-format-3.9 -i -style=file <path/to/file.cpp>
+```
+This will automatically apply the code conventions specified in the .clang-format file, found on the root of the repository.
+
+There is also an automated script that looks for all the C++ src/header files and then calls clang-format accordingly. You can invoque it by doing:
+
+```
+./tools/reformat_code.sh
+```
+
+This script must be run from the top-level of the repository in order to find
+all of the files. It is recommended to run this before opening any pull request.

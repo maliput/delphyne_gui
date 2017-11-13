@@ -112,26 +112,31 @@ $ make -j$( getconf _NPROCESSORS_ONLN ) install
 
 The Visualizer will be installed in `<delphyne_ws>/install/bin`.
 
-# Running the Delphyne visualizer
+# Running the binaries
+
+There are a few different binaries that currently work from delphyne.
+
+## Running the mock bridge demo
+
+This is a demo to show off the bridging aspects of delphyne along with the new
+visualizer.  The visualizer, the bidirectional lcm-to-ign-transport bridge, and
+a mock" backend that publishes LCM messages are all launched.  The mock backend
+continually publishes some LCM messages, which are accepted by the bridge and
+translated into ign-transport messages.  These messages are then sent to the
+visualizer for display.  To run this demo, do the following:
+
+```
+$ mocked_robot_demo.py
+```
+
+## Running the Visualizer standalone
 
 The visualizer is a new front-end visualizer for the drake simulator.
-
-## Running the Visualizer standalone:
-
 To run just the visualizer standalone, run:
 
 ```
-visualizer
+$ visualizer
 ```
-
-# Running the Delphyne back-end
-
-Two different applications can be executed right now; the bridge
-and the mock demo. The bridge is a bi-directional LCM-to-ignition-transport to
-take messages from/to Drake and translate them to/from ignition-transport
-messages that Delphyne understands. The mock demo runs the bridge,
-the visualizer, and a "mock" backend that simulates the messages that Drake
-would send.
 
 ## Running the bridge standalone
 
@@ -141,28 +146,25 @@ To run just the bridge, run:
 $ duplex-ign-lcm-bridge
 ```
 
-## Running the mock demo
+## Running the backend automotive-demo
 
-To run the mock demo, type:
-
-```
-$ lcm-mock-robot-publisher
-```
-
-## Running the automotive-demo
-
-Open three terminal emulators and execute one of the following commands on each of them, in the following order:
+The backend automotive demo aims to show off the new delphyne backend that does
+not depend on a bridge for converting LCM messages to ign-transport messages.
+Instead, the backend is linked to drake, and directly publishes ign-transport
+messages for visualization.  To run the backend automotive demo, open three
+terminal emulators and execute one of the following commands on each of them,
+in the following order:
 
 ```
-$ cd <path/to/delphyne_ws>/install/bin && ./duplex-ign-lcm-bridge
+$ duplex-ign-lcm-bridge
 ```
 
 ```
-$ cd <path/to/delphyne_ws>/install/bin && ./visualizer
+$ visualizer
 ```
 
 ```
-$ cd <path/to/delphyne_ws>/install/bin && ./automotive-demo
+$ automotive-demo
 ```
 
 By running those commands, you should be able to see a single prius car standing in the middle of an empty world.

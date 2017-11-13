@@ -44,6 +44,7 @@ add_if_not_in_var() {
      fi
 }
 
+add_if_not_in_var PATH $WS_DIR/install/bin
 add_if_not_in_var PKG_CONFIG_PATH $WS_DIR/install/lib/pkgconfig
 add_if_not_in_var DRAKE_INSTALL_PATH $WS_DIR/install_drake
 add_if_not_in_var LD_LIBRARY_PATH $DRAKE_INSTALL_PATH/lib

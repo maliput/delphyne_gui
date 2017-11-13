@@ -49,7 +49,7 @@ to do this for you; for this to work correctly, you must be in the root of your
 delphyne workspace:
 
 ```
-$ . src/delphyne/setup.bash
+$ . src/delphyne-gui/setup.bash
 ```
 
 Next we can go on and build the components.

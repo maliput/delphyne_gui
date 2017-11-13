@@ -64,7 +64,7 @@ commands:
 ```
 $ mkdir -p build
 $ pushd build
-$ for igndep in ign_tools ign_math ign_common ign_msgs ign_transport ign_gui ign_rendering lcm; do mkdir -p $igndep ; pushd $igndep ; cmake ../../src/$igndep -DCMAKE_INSTALL_PREFIX=../../install ; make -j$( getconf _NPROCESSORS_ONLN ) install ; popd ; done
+$ for igndep in ign_tools ign_math ign_common ign_msgs ign_transport ign_gui ign_rendering; do mkdir -p $igndep ; pushd $igndep ; cmake ../../src/$igndep -DCMAKE_INSTALL_PREFIX=../../install ; make -j$( getconf _NPROCESSORS_ONLN ) install ; popd ; done
 $ popd
 ```
 

@@ -40,7 +40,11 @@ add_if_not_in_var() {
 
      # If we didn't find the needle in the list, add it here.
      if [ $found -eq 0 ]; then
-         export $var=$needle:$( eval echo \$$var)
+         if [ "$current" == "" ]; then
+             export $var=$needle
+         else
+             export $var=$( eval echo \$$var ):$needle
+         fi
      fi
 }
 

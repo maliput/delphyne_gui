@@ -44,9 +44,9 @@ but in brief:
 
 # Setup the environment
 In order to successfully build and use Delphyne, Drake, or the ignition tools
-here, a few environment variables must be setup. Delphyne GIO provides a script
-to do this for you; for this to work correctly, you must be in the root of your
-delphyne workspace:
+here, a few environment variables must be setup. Delphyne GUI provides a script
+to do this for you; for this to work correctly, your current working directory
+must be somewhere within the delphyne workspace:
 
 ```
 $ . src/delphyne_gui/setup.bash
@@ -93,8 +93,9 @@ The Delphyne back-end can now be built with CMake:
 $ pushd build
 $ mkdir -p delphyne
 $ pushd delphyne
-$ cmake ../../src/delphyne/ -DCMAKE_INSTALL_PREFIX=../../install -DDRAKE_INSTALL_PREFIX=</path/to/delphyne_ws/install_drake
+$ cmake ../../src/delphyne/ -DCMAKE_INSTALL_PREFIX=../../install -DDRAKE_INSTALL_PREFIX=../../install_drake
 $ make -j$( getconf _NPROCESSORS_ONLN ) install
+$ popd
 $ popd
 ```
 
@@ -108,6 +109,8 @@ $ mkdir -p delphyne_gui
 $ pushd delphyne_gui
 $ cmake ../../src/delphyne_gui/ -DCMAKE_INSTALL_PREFIX=../../install
 $ make -j$( getconf _NPROCESSORS_ONLN ) install
+$ popd
+$ popd
 ```
 
 The Visualizer will be installed in `<delphyne_ws>/install/bin`.

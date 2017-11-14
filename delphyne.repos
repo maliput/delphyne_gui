@@ -1,11 +1,11 @@
 repositories:
-  ign_common      : { type: 'hg', url:  'https://bitbucket.org/ignitionrobotics/ign-common.git',        version: 'default' }
-  ign_transport   : { type: 'hg', url:  'https://bitbucket.org/ignitionrobotics/ign-transport.git',     version: 'default' }
-  ign_tools       : { type: 'hg', url:  'https://bitbucket.org/ignitionrobotics/ign-tools.git',         version: 'default' }
-  ign_gui         : { type: 'hg', url:  'https://bitbucket.org/ignitionrobotics/ign-gui.git',           version: 'default' }
-  ign_rendering   : { type: 'hg', url:  'https://bitbucket.org/ignitionrobotics/ign-rendering.git',     version: 'default' }
-  ign_math        : { type: 'hg', url:  'https://bitbucket.org/ignitionrobotics/ign-math.git',          version: 'ign-math3' }
-  ign_msgs        : { type: 'hg', url:  'https://bitbucket.org/ignitionrobotics/ign-msgs.git',          version: 'default' }
+  ign_common      : { type: 'hg', url:  'https://bitbucket.org/ignitionrobotics/ign-common.git',        version: '76d416addd2f' }
+  ign_transport   : { type: 'hg', url:  'https://bitbucket.org/ignitionrobotics/ign-transport.git',     version: '1a9c29ac2b91' }
+  ign_tools       : { type: 'hg', url:  'https://bitbucket.org/ignitionrobotics/ign-tools.git',         version: '22d5bada1e36' }
+  ign_gui         : { type: 'hg', url:  'https://bitbucket.org/ignitionrobotics/ign-gui.git',           version: '709d1e3dc7b1' }
+  ign_rendering   : { type: 'hg', url:  'https://bitbucket.org/ignitionrobotics/ign-rendering.git',     version: 'c1582502bc2e' }
+  ign_math        : { type: 'hg', url:  'https://bitbucket.org/ignitionrobotics/ign-math.git',          version: 'c65a11981d87' }
+  ign_msgs        : { type: 'hg', url:  'https://bitbucket.org/ignitionrobotics/ign-msgs.git',          version: '1bad2f95d538' }
   drake           : { type: 'git', url: 'https://github.com/osrf/drake.git',                            version: 'delphyne-use-libprotobuf' }
   delphyne        : { type: 'git', url: 'git@github.com:ToyotaResearchInstitute/delphyne.git',          version: 'master' }
-  delphyne-gui    : { type: 'git', url: 'git@github.com:ToyotaResearchInstitute/delphyne-gui.git',      version: 'master' }
+  delphyne_gui    : { type: 'git', url: 'git@github.com:ToyotaResearchInstitute/delphyne-gui.git',      version: 'master' }

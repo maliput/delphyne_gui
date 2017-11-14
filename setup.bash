@@ -44,9 +44,9 @@ add_if_not_in_var() {
      fi
 }
 
+export DRAKE_INSTALL_PATH=$WS_DIR/install_drake
 add_if_not_in_var PATH $WS_DIR/install/bin
 add_if_not_in_var PKG_CONFIG_PATH $WS_DIR/install/lib/pkgconfig
-add_if_not_in_var DRAKE_INSTALL_PATH $WS_DIR/install_drake
 add_if_not_in_var LD_LIBRARY_PATH $WS_DIR/install_drake/lib
 add_if_not_in_var LD_LIBRARY_PATH $WS_DIR/install/lib
 add_if_not_in_var DELPHYNE_PACKAGE_PATH $WS_DIR/src/drake/drake/automotive/models

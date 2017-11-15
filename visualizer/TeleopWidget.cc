@@ -30,7 +30,7 @@
 #include <cmath>
 #include <string>
 
-#include "protobuf/headers/automotive_driving_command.pb.h"
+#include "protobuf/automotive_driving_command.pb.h"
 
 #include "TeleopWidget.hh"
 

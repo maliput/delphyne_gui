@@ -6,6 +6,6 @@ repositories:
   ign_rendering   : { type: 'hg', url:  'https://bitbucket.org/ignitionrobotics/ign-rendering.git',     version: 'c1582502bc2e' }
   ign_math        : { type: 'hg', url:  'https://bitbucket.org/ignitionrobotics/ign-math.git',          version: 'c65a11981d87' }
   ign_msgs        : { type: 'hg', url:  'https://bitbucket.org/ignitionrobotics/ign-msgs.git',          version: '1bad2f95d538' }
-  drake           : { type: 'git', url: 'https://github.com/osrf/drake.git',                            version: '9231a9ec02407c0314a8ccd2eb52ff129ae9c66c' }
-  delphyne        : { type: 'git', url: 'git@github.com:ToyotaResearchInstitute/delphyne.git',          version: 'v0.2.0' }
-  delphyne_gui    : { type: 'git', url: 'git@github.com:ToyotaResearchInstitute/delphyne-gui.git',      version: 'v0.2.0' }
+  drake           : { type: 'git', url: 'https://github.com/osrf/drake.git',                            version: 'delphyne-use-libprotobuf' }
+  delphyne        : { type: 'git', url: 'git@github.com:ToyotaResearchInstitute/delphyne.git',          version: 'master' }
+  delphyne_gui    : { type: 'git', url: 'git@github.com:ToyotaResearchInstitute/delphyne-gui.git',      version: 'master' }

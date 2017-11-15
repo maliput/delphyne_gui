@@ -149,6 +149,21 @@ To run just the bridge, run:
 $ duplex-ign-lcm-bridge
 ```
 
+## Running the automotive-demo from Drake
+
+In order to ease launching the demos, a `demo_launcher` command is provided inside 
+`<delphyne_ws>/install/bin`, along with the other generated binaries. The launcher
+takes a single parameter (the demo name) and can be one of `simple`, `trajectory`
+or `dragway`. To use it, just run:
+
+```
+$ demo_launcher.py --demo=dragway
+```
+
+Note that currently this launcher is using Drake's automotive demo implementation 
+and we are in the process of migrating this to the delphyne's backend (see next
+section).
+
 ## Running the backend automotive-demo
 
 The backend automotive demo aims to show off the new delphyne backend that does

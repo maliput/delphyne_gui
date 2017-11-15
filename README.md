@@ -13,7 +13,7 @@ Delphyne back-end and the front-end.
     $ sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
     $ sudo apt-key adv --keyserver hkp://ha.pool.sks-keyservers.net:80 --recv-key 421C365BD9FF1F717815A3895523BAEEB01FA116
     $ sudo apt-get update
-    $ sudo apt-get install mercurial cmake pkg-config python ruby-ronn libprotoc-dev libprotobuf-dev protobuf-compiler uuid-dev libzmq3-dev git libogre-1.9-dev libglew-dev qtbase5-dev libicu-dev libboost-filesystem-dev libfreeimage-dev libtinyxml2-dev libgts-dev libavdevice-dev python3-vcstool mesa-utils lcov gcovr
+    $ sudo apt-get install mercurial cmake pkg-config python ruby-ronn libprotoc-dev libprotobuf-dev protobuf-compiler uuid-dev libzmq3-dev git libogre-1.9-dev libglew-dev qtbase5-dev libicu-dev libboost-filesystem-dev libfreeimage-dev libtinyxml2-dev libgts-dev libavdevice-dev python3-vcstool mesa-utils lcov gcovr libqt5multimedia5
     ```
 
 1.  Now build a workspace for Delphyne. If you are familiar with ROS catkin
@@ -79,7 +79,7 @@ following:
 
 ```
 $ pushd src/drake
-$ bazel run //:install </path/to/delphyne_ws>/install_drake
+$ bazel run //:install `pwd`/../../install_drake
 $ bazel build //drake/automotive:*
 $ popd
 ```
@@ -91,12 +91,10 @@ Note that this will take a long time to compile.
 The Delphyne back-end can now be built with CMake:
 
 ```
-$ pushd build
-$ mkdir -p delphyne
-$ pushd delphyne
+$ mkdir -p build/delphyne
+$ pushd build/delphyne
 $ cmake ../../src/delphyne/ -DCMAKE_INSTALL_PREFIX=../../install -DDRAKE_INSTALL_PREFIX=../../install_drake
 $ make -j$( getconf _NPROCESSORS_ONLN ) install
-$ popd
 $ popd
 ```
 
@@ -105,12 +103,10 @@ $ popd
 The Visualizer can now be built with CMake:
 
 ```
-$ pushd build
-$ mkdir -p delphyne_gui
-$ pushd delphyne_gui
+$ mkdir -p build/delphyne_gui
+$ pushd build/delphyne_gui
 $ cmake ../../src/delphyne_gui/ -DCMAKE_INSTALL_PREFIX=../../install
 $ make -j$( getconf _NPROCESSORS_ONLN ) install
-$ popd
 $ popd
 ```
 
@@ -152,7 +148,7 @@ $ duplex-ign-lcm-bridge
 
 ## Running the automotive-demo from Drake
 
-In order to ease launching the demos, a `demo_launcher` command is provided inside 
+In order to ease launching the demos, a `demo_launcher` command is provided inside
 `<delphyne_ws>/install/bin`, along with the other generated binaries. The launcher
 takes a single parameter (the demo name) and can be one of `simple`, `trajectory`
 or `dragway`. To use it, just run:
@@ -161,7 +157,7 @@ or `dragway`. To use it, just run:
 $ demo_launcher.py --demo=dragway
 ```
 
-Note that currently this launcher is using Drake's automotive demo implementation 
+Note that currently this launcher is using Drake's automotive demo implementation
 and we are in the process of migrating this to the delphyne's backend (see next
 section).
 

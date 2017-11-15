@@ -80,6 +80,7 @@ following:
 ```
 $ pushd src/drake
 $ bazel run //:install </path/to/delphyne_ws>/install_drake
+$ bazel build //drake/automotive:*
 $ popd
 ```
 

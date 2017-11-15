@@ -230,6 +230,7 @@ else (build_errors)
 
   include_directories(
     ${PROJECT_BINARY_DIR}/include
+    ${PROJECT_BINARY_DIR}/visualizer
   )
   link_directories(${PROJECT_BINARY_DIR}/src)
 

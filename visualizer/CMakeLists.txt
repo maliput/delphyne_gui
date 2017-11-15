@@ -1,5 +1,12 @@
 include (${project_cmake_dir}/Utils.cmake)
 
+# ----------------------------------------
+# Generate protobuf headers
+add_subdirectory(protobuf)
+
+set_source_files_properties(${PROTO_SRC} ${PROTO_HEADER}
+  PROPERTIES GENERATED TRUE)
+
 # RenderWidget GUI plugin.
 set(render_widget RenderWidget)
 QT5_WRAP_CPP(${render_widget}_MOC ${render_widget}.hh)
@@ -24,7 +31,6 @@ set(teleop_widget TeleopWidget)
 QT5_WRAP_CPP(${teleop_widget}_MOC ${teleop_widget}.hh)
 add_library(${teleop_widget} SHARED
   ${CMAKE_CURRENT_SOURCE_DIR}/${teleop_widget}.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/../protobuf/headers/automotive_driving_command.pb.cc
   ${${teleop_widget}_MOC}
 )
 target_link_libraries(${teleop_widget}
@@ -33,7 +39,9 @@ target_link_libraries(${teleop_widget}
   ${IGNITION-MSGS_LIBRARIES}
   ${IGNITION-TRANSPORT_LIBRARIES}
   ${Qt5Core_LIBRARIES}
-  ${Qt5Widgets_LIBRARIES})
+  ${Qt5Widgets_LIBRARIES}
+  delphyne_gui_protobuf_msgs
+)
 
 install(TARGETS ${teleop_widget} DESTINATION ${LIB_INSTALL_DIR} COMPONENT shlib)
 

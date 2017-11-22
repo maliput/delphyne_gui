@@ -163,7 +163,7 @@ class RenderWidget : public ignition::gui::Plugin {
 
   /// \brief Load a new model.
   /// \param[in] _msg The message containing the model.
-  void OnInitialModel(const ignition::msgs::Model_V& _msg);
+  void OnInitialModel(const ignition::msgs::Model_V& _msg, const bool _result);
 
   /// \brief Update an existing visual.
   /// \param[in] _msg The pose of the new visual.

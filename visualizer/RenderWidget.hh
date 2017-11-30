@@ -42,6 +42,7 @@
 #include <ignition/transport.hh>
 
 #include "OrbitViewControl.hh"
+#include "protobuf/robot_model_request.pb.h"
 
 // Forward declarations.
 namespace tinyxml2 {

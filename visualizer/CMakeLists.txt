@@ -22,7 +22,8 @@ target_link_libraries(${render_widget}
   ${IGNITION-RENDERING_LIBRARIES}
   ${IGNITION-TRANSPORT_LIBRARIES}
   ${Qt5Core_LIBRARIES}
-  ${Qt5Widgets_LIBRARIES})
+  ${Qt5Widgets_LIBRARIES}
+  delphyne_gui_protobuf_msgs)
 
 install(TARGETS ${render_widget} DESTINATION ${LIB_INSTALL_DIR} COMPONENT shlib)
 

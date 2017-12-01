@@ -153,12 +153,17 @@ RenderWidget::RenderWidget(QWidget* parent)
   }
   std::copy(paths.begin(), paths.end(), std::back_inserter(this->packagePaths));
 
-  ignition::msgs::Empty req;
+  if (!node.Advertise(robotModelServiceName, &RenderWidget::OnSetRobotModel,
+                      this)) {
+    std::cerr << "Error advertising service [" << robotModelServiceName << "]"
+              << std::endl;
+  }
 
-  this->node.Request("/GetRobotModel", req, &RenderWidget::OnInitialModel,
-                     this);
-
-  this->setMinimumHeight(100);
+  robotModelRequestMsg.set_response_topic(robotModelServiceName);
+  ignition::msgs::Boolean response;
+  unsigned int timeout = 100;
+  bool result;
+  node.Request("/GetRobotModel", robotModelRequestMsg, timeout, response, result);
 }
 
 /////////////////////////////////////////////////
@@ -204,7 +209,6 @@ void RenderWidget::LoadConfig(const tinyxml2::XMLElement* _pluginElem) {
 
 /////////////////////////////////////////////////
 std::string RenderWidget::ConfigStr() const {
-
   tinyxml2::XMLElement* pluginXML;
   tinyxml2::XMLDocument xmlDoc;
 
@@ -245,9 +249,17 @@ std::string RenderWidget::ConfigStr() const {
   return printer.CStr();
 }
 
-/////////////////////////////////////////////////
-void RenderWidget::OnInitialModel(const ignition::msgs::Model_V& _msg, const bool _result) {
-  emit this->NewInitialModel(_msg);
+void RenderWidget::OnSetRobotModel(
+    const ignition::msgs::Model_V& request,
+    // NOLINTNEXTLINE(runtime/references) due to ign-transport API
+    ignition::msgs::Boolean& response,
+    // NOLINTNEXTLINE(runtime/references) due to ign-transport API
+    bool& result) {
+  {
+    //this->SetInitialModels(request);
+    emit this->NewInitialModel(request);
+  }
+  result = true;
 }
 
 /////////////////////////////////////////////////
@@ -388,12 +400,11 @@ void RenderWidget::RenderGroundPlane() {
 }
 
 /////////////////////////////////////////////////
-void RenderWidget::RenderGrid(
-      const unsigned int _cellCount,
-      const double _cellLength,
-      const unsigned int _verticalCellCount,
-      const ignition::rendering::MaterialPtr& _material,
-      const ignition::math::Pose3d& _pose) {
+void RenderWidget::RenderGrid(const unsigned int _cellCount,
+                              const double _cellLength,
+                              const unsigned int _verticalCellCount,
+                              const ignition::rendering::MaterialPtr& _material,
+                              const ignition::math::Pose3d& _pose) {
   auto gridGeom = this->scene->CreateGrid();
   if (!gridGeom) {
     ignerr << "Unable to create grid geometry" << std::endl;
@@ -424,11 +435,11 @@ void RenderWidget::RenderGroundPlaneGrid() {
     gray->SetSpecular(0.7, 0.7, 0.7);
 
     const unsigned int kCellCount = 50u;
-    const double       kCellLength = 1;
+    const double kCellLength = 1;
     const unsigned int kVerticalCellCount = 0u;
 
-    this->RenderGrid(kCellCount, kCellLength, kVerticalCellCount,
-      gray, ignition::math::Pose3d::Zero);
+    this->RenderGrid(kCellCount, kCellLength, kVerticalCellCount, gray,
+                     ignition::math::Pose3d::Zero);
   } else {
     ignerr << "Failed to create material for the grid" << std::endl;
   }
@@ -781,7 +792,7 @@ QPaintEngine* RenderWidget::paintEngine() const { return nullptr; }
 // Replace inherited implementation with a do-nothing one, so that the
 // context menu doesn't appear and we get back the zoom in/out using the
 // right mouse button.
-void RenderWidget::ShowContextMenu(const QPoint &_pos) {}
+void RenderWidget::ShowContextMenu(const QPoint& _pos) {}
 
 /////////////////////////////////////////////////
 void RenderWidget::paintEvent(QPaintEvent* _e) {

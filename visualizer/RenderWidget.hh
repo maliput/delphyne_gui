@@ -37,6 +37,7 @@
 
 #include <ignition/gui/Plugin.hh>
 #include <ignition/math/Pose3.hh>
+#include <ignition/math/Rand.hh>
 #include <ignition/rendering/RenderTypes.hh>
 #include <ignition/rendering/RenderingIface.hh>
 #include <ignition/transport.hh>
@@ -285,7 +286,7 @@ class RenderWidget : public ignition::gui::Plugin {
   bool initializedScene;
 
   /// \brief The name of the response topic for RobotModelRequest
-  const std::string robotModelServiceName = "RobotModel";
+  std::string robotModelServiceName = "RobotModel";
 
   /// \brief The name of the response topic for RobotModelRequest
   ignition::msgs::RobotModelRequest robotModelRequestMsg;

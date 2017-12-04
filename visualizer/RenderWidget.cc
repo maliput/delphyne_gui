@@ -153,17 +153,26 @@ RenderWidget::RenderWidget(QWidget* parent)
   }
   std::copy(paths.begin(), paths.end(), std::back_inserter(this->packagePaths));
 
+  // Setting up a unique-named service name
+  // i.e: RobotModel_8493201843;
+  robotModelServiceName +=
+      "_" + std::to_string(
+                ignition::math::Rand::IntUniform(1, ignition::math::MAX_I32));
+  robotModelRequestMsg.set_response_topic(robotModelServiceName);
+
+  // Advertise the service with the unique name generated above
   if (!node.Advertise(robotModelServiceName, &RenderWidget::OnSetRobotModel,
                       this)) {
     std::cerr << "Error advertising service [" << robotModelServiceName << "]"
               << std::endl;
   }
 
-  robotModelRequestMsg.set_response_topic(robotModelServiceName);
   ignition::msgs::Boolean response;
   unsigned int timeout = 100;
   bool result;
-  node.Request("/GetRobotModel", robotModelRequestMsg, timeout, response, result);
+  // Request a robot model to be published to the unique-named channel
+  node.Request("/GetRobotModel", robotModelRequestMsg, timeout, response,
+               result);
 }
 
 /////////////////////////////////////////////////
@@ -255,10 +264,7 @@ void RenderWidget::OnSetRobotModel(
     ignition::msgs::Boolean& response,
     // NOLINTNEXTLINE(runtime/references) due to ign-transport API
     bool& result) {
-  {
-    //this->SetInitialModels(request);
-    emit this->NewInitialModel(request);
-  }
+  emit this->NewInitialModel(request);
   result = true;
 }
 

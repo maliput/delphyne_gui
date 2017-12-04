@@ -7,5 +7,5 @@ repositories:
   ign_math        : { type: 'hg', url:  'https://bitbucket.org/ignitionrobotics/ign-math.git',          version: 'c65a11981d87' }
   ign_msgs        : { type: 'hg', url:  'https://bitbucket.org/ignitionrobotics/ign-msgs.git',          version: '1bad2f95d538' }
   drake           : { type: 'git', url: 'https://github.com/osrf/drake.git',                            version: 'delphyne-use-libprotobuf2' }
-  delphyne        : { type: 'git', url: 'git@github.com:ToyotaResearchInstitute/delphyne.git',          version: 'master' }
-  delphyne_gui    : { type: 'git', url: 'git@github.com:ToyotaResearchInstitute/delphyne-gui.git',      version: 'master' }
+  delphyne        : { type: 'git', url: 'git@github.com:ToyotaResearchInstitute/delphyne.git',          version: 'AutomotiveSimulatorPort' }
+  delphyne_gui    : { type: 'git', url: 'git@github.com:ToyotaResearchInstitute/delphyne-gui.git',      version: 'AutomotiveSimulatorPort' }

@@ -155,24 +155,28 @@ RenderWidget::RenderWidget(QWidget* parent)
 
   // Setting up a unique-named service name
   // i.e: RobotModel_8493201843;
-  robotModelServiceName +=
+  robotModelTopicName +=
       "_" + std::to_string(
                 ignition::math::Rand::IntUniform(1, ignition::math::MAX_I32));
-  robotModelRequestMsg.set_response_topic(robotModelServiceName);
+  robotModelRequestMsg.set_response_topic(robotModelTopicName);
 
-  // Advertise the service with the unique name generated above
-  if (!this->node.Subscribe(robotModelServiceName, &RenderWidget::OnSetRobotModel,
+  // Subscribe to the topic with the unique name generated above
+  if (!this->node.Subscribe(robotModelTopicName, &RenderWidget::OnSetRobotModel,
                       this)) {
-    std::cerr << "Error advertising service [" << robotModelServiceName << "]"
+    ignerr << "Error subscribing to topic [" << robotModelTopicName << "]"
               << std::endl;
   }
 
   ignition::msgs::Boolean response;
   unsigned int timeout = 100;
   bool result;
-  // Request a robot model to be published to the unique-named channel
-  node.Request("/GetRobotModel", robotModelRequestMsg, timeout, response,
-               result);
+
+  // Request a robot model to be published into the unique-named channel
+  if(!this->node.Request("/GetRobotModel", robotModelRequestMsg, timeout, response,
+               result)) {
+    ignerr << "Error advertising service [" << robotModelTopicName << "]"
+              << std::endl;
+  }
 }
 
 /////////////////////////////////////////////////
@@ -258,6 +262,7 @@ std::string RenderWidget::ConfigStr() const {
   return printer.CStr();
 }
 
+/////////////////////////////////////////////////
 void RenderWidget::OnSetRobotModel(
     const ignition::msgs::Model_V& request) {
   emit this->NewInitialModel(request);

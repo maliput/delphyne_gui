@@ -157,11 +157,7 @@ class RenderWidget : public ignition::gui::Plugin {
 
  private:
   void OnSetRobotModel(
-      const ignition::msgs::Model_V& request,
-      // NOLINTNEXTLINE(runtime/references) due to ign-transport API
-      ignition::msgs::Boolean& response,
-      // NOLINTNEXTLINE(runtime/references) due to ign-transport API
-      bool& result);
+      const ignition::msgs::Model_V& request);
 
   /// \brief Internal method to create the render window the first time
   /// RenderWidget::showEvent is called.

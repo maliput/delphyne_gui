@@ -161,7 +161,7 @@ RenderWidget::RenderWidget(QWidget* parent)
   robotModelRequestMsg.set_response_topic(robotModelServiceName);
 
   // Advertise the service with the unique name generated above
-  if (!node.Advertise(robotModelServiceName, &RenderWidget::OnSetRobotModel,
+  if (!this->node.Subscribe(robotModelServiceName, &RenderWidget::OnSetRobotModel,
                       this)) {
     std::cerr << "Error advertising service [" << robotModelServiceName << "]"
               << std::endl;
@@ -259,13 +259,8 @@ std::string RenderWidget::ConfigStr() const {
 }
 
 void RenderWidget::OnSetRobotModel(
-    const ignition::msgs::Model_V& request,
-    // NOLINTNEXTLINE(runtime/references) due to ign-transport API
-    ignition::msgs::Boolean& response,
-    // NOLINTNEXTLINE(runtime/references) due to ign-transport API
-    bool& result) {
+    const ignition::msgs::Model_V& request) {
   emit this->NewInitialModel(request);
-  result = true;
 }
 
 /////////////////////////////////////////////////

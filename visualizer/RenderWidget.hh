@@ -156,6 +156,8 @@ class RenderWidget : public ignition::gui::Plugin {
   void ShowContextMenu(const QPoint& _pos);
 
  private:
+  /// \brief Set the initial robot model
+  /// \param[in] request The robot model to be loaded
   void OnSetRobotModel(
       const ignition::msgs::Model_V& request);
 
@@ -282,9 +284,9 @@ class RenderWidget : public ignition::gui::Plugin {
   bool initializedScene;
 
   /// \brief The name of the response topic for RobotModelRequest
-  std::string robotModelServiceName = "RobotModel";
+  std::string robotModelTopicName = "RobotModel";
 
-  /// \brief The name of the response topic for RobotModelRequest
+  /// \brief The robot request message to be sent to the backend
   ignition::msgs::RobotModelRequest robotModelRequestMsg;
 
   /// \brief Controls the view of the scene.

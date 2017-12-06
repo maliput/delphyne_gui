@@ -48,6 +48,7 @@ add_if_not_in_var() {
     fi
 }
 
+export DRAKE_INSTALL_PATH=$WS_DIR/install
 export DELPHYNE_WS_DIR=$WS_DIR
 export DRAKE_SRC_DIR=$WS_DIR/src/drake
 add_if_not_in_var PATH $WS_DIR/install/bin

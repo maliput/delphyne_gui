@@ -174,7 +174,7 @@ RenderWidget::RenderWidget(QWidget* parent)
   // Request a robot model to be published into the unique-named channel
   if(!this->node.Request("/GetRobotModel", robotModelRequestMsg, timeout, response,
                result)) {
-    ignerr << "Error advertising service [" << robotModelTopicName << "]"
+    ignerr << "Error requesting to service [" << robotModelTopicName << "]"
               << std::endl;
   }
 }

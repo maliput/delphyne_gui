@@ -34,6 +34,7 @@
 
 #ifndef Q_MOC_RUN
 #include <ignition/gui/Iface.hh>
+#include <ignition/gui/MainWindow.hh>
 #endif
 
 #include "delphyne-gui/config.hh"
@@ -66,6 +67,7 @@ int main(int argc, char* argv[]) {
     configFile = argv[1];
   }
 
+  // Uncomment if using custom style resources.
   Q_INIT_RESOURCE(resources);
 
   // Initialize app

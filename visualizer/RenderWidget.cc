@@ -247,6 +247,10 @@ std::string RenderWidget::ConfigStr() const {
 
 /////////////////////////////////////////////////
 void RenderWidget::OnInitialModel(const ignition::msgs::Model_V& _msg, const bool _result) {
+  if (!_result) {
+    ignerr << "Service call to request initial model failed" << std::endl;
+    return;
+  }
   emit this->NewInitialModel(_msg);
 }
 

@@ -153,10 +153,10 @@ RenderWidget::RenderWidget(QWidget* parent)
   }
   std::copy(paths.begin(), paths.end(), std::back_inserter(this->packagePaths));
 
-  this->node.Subscribe("/DRAKE_VIEWER_LOAD_ROBOT",
-                       &RenderWidget::OnInitialModel, this);
-  this->node.Subscribe("/DRAKE_VIEWER_DRAW", &RenderWidget::OnUpdateScene,
-                       this);
+  ignition::msgs::Empty req;
+
+  this->node.Request("/GetRobotModel", req, &RenderWidget::OnInitialModel,
+                     this);
 
   this->setMinimumHeight(100);
 }
@@ -246,7 +246,11 @@ std::string RenderWidget::ConfigStr() const {
 }
 
 /////////////////////////////////////////////////
-void RenderWidget::OnInitialModel(const ignition::msgs::Model_V& _msg) {
+void RenderWidget::OnInitialModel(const ignition::msgs::Model_V& _msg, const bool _result) {
+  if (!_result) {
+    ignerr << "Service call to request initial model failed" << std::endl;
+    return;
+  }
   emit this->NewInitialModel(_msg);
 }
 
@@ -524,6 +528,9 @@ void RenderWidget::SetInitialModels(const ignition::msgs::Model_V& _msg) {
   for (int i = 0; i < _msg.models_size(); ++i) {
     LoadModel(_msg.models(i));
   }
+
+  this->node.Subscribe("/DRAKE_VIEWER_DRAW", &RenderWidget::OnUpdateScene,
+                       this);
 }
 
 /////////////////////////////////////////////////

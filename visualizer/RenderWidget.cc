@@ -155,15 +155,15 @@ RenderWidget::RenderWidget(QWidget* parent)
 
   // Setting up a unique-named service name
   // i.e: RobotModel_8493201843;
-  robotModelTopicName +=
+  robotModelServiceName +=
       "_" + std::to_string(
                 ignition::math::Rand::IntUniform(1, ignition::math::MAX_I32));
-  robotModelRequestMsg.set_response_topic(robotModelTopicName);
+  robotModelRequestMsg.set_response_topic(robotModelServiceName);
 
-  // Subscribe to the topic with the unique name generated above
-  if (!this->node.Subscribe(robotModelTopicName, &RenderWidget::OnSetRobotModel,
+   // Advertise the service with the unique name generated above
+  if (!node.Advertise(robotModelServiceName, &RenderWidget::OnSetRobotModel,
                       this)) {
-    ignerr << "Error subscribing to topic [" << robotModelTopicName << "]"
+    ignerr << "Error advertising service [" << robotModelServiceName << "]"
               << std::endl;
   }
 
@@ -172,9 +172,9 @@ RenderWidget::RenderWidget(QWidget* parent)
   bool result;
 
   // Request a robot model to be published into the unique-named channel
-  if(!this->node.Request("/GetRobotModel", robotModelRequestMsg, timeout, response,
+  if(!this->node.Request("/get_robot_model", robotModelRequestMsg, timeout, response,
                result)) {
-    ignerr << "Error requesting to service [" << robotModelTopicName << "]"
+    ignerr << "Error requesting to service [" << robotModelServiceName << "]"
               << std::endl;
   }
 }
@@ -264,9 +264,18 @@ std::string RenderWidget::ConfigStr() const {
 
 /////////////////////////////////////////////////
 void RenderWidget::OnSetRobotModel(
-    const ignition::msgs::Model_V& request) {
-  emit this->NewInitialModel(request);
+    const ignition::msgs::Model_V& request,
+    // NOLINTNEXTLINE(runtime/references) due to ign-transport API
+    ignition::msgs::Boolean& response,
+    // NOLINTNEXTLINE(runtime/references) due to ign-transport API
+    bool& result) {
+  {
+    std::cout << "Received robot model!!" << std::endl;
+    emit this->NewInitialModel(request);
+  }
+  result = true;
 }
+
 
 /////////////////////////////////////////////////
 void RenderWidget::OnUpdateScene(const ignition::msgs::Model_V& _msg) {

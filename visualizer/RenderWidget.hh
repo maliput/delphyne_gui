@@ -159,7 +159,11 @@ class RenderWidget : public ignition::gui::Plugin {
   /// \brief Set the initial robot model
   /// \param[in] request The robot model to be loaded
   void OnSetRobotModel(
-      const ignition::msgs::Model_V& request);
+      const ignition::msgs::Model_V& request,
+      // NOLINTNEXTLINE(runtime/references) due to ign-transport API
+      ignition::msgs::Boolean& response,
+      // NOLINTNEXTLINE(runtime/references) due to ign-transport API
+      bool& result);
 
   /// \brief Internal method to create the render window the first time
   /// RenderWidget::showEvent is called.
@@ -284,7 +288,7 @@ class RenderWidget : public ignition::gui::Plugin {
   bool initializedScene;
 
   /// \brief The name of the response topic for RobotModelRequest
-  std::string robotModelTopicName = "RobotModel";
+  std::string robotModelServiceName = "RobotModel";
 
   /// \brief The robot request message to be sent to the backend
   ignition::msgs::RobotModelRequest robotModelRequestMsg;

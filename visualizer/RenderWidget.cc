@@ -264,16 +264,11 @@ std::string RenderWidget::ConfigStr() const {
 
 /////////////////////////////////////////////////
 void RenderWidget::OnSetRobotModel(
-    const ignition::msgs::Model_V& request,
-    // NOLINTNEXTLINE(runtime/references) due to ign-transport API
-    ignition::msgs::Boolean& response,
-    // NOLINTNEXTLINE(runtime/references) due to ign-transport API
-    bool& result) {
+    const ignition::msgs::Model_V& request) {
   {
     std::cout << "Received robot model!!" << std::endl;
     emit this->NewInitialModel(request);
   }
-  result = true;
 }
 
 

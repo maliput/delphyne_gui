@@ -13,7 +13,7 @@ Delphyne back-end and the front-end.
     $ sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
     $ sudo apt-key adv --keyserver hkp://ha.pool.sks-keyservers.net:80 --recv-key 421C365BD9FF1F717815A3895523BAEEB01FA116
     $ sudo apt-get update
-    $ sudo apt-get install mercurial cmake pkg-config python ruby-ronn libprotoc-dev libprotobuf-dev protobuf-compiler uuid-dev libzmq3-dev git libogre-1.9-dev libglew-dev qtbase5-dev libicu-dev libboost-filesystem-dev libfreeimage-dev libtinyxml2-dev libgts-dev libavdevice-dev python3-vcstool mesa-utils lcov gcovr libqt5multimedia5
+    $ sudo apt-get install mercurial cmake pkg-config python ruby-ronn libprotoc-dev libprotobuf-dev protobuf-compiler uuid-dev libzmq3-dev git libogre-1.9-dev libglew-dev qtbase5-dev libicu-dev libboost-filesystem-dev libboost-python-dev libfreeimage-dev libtinyxml2-dev libgts-dev libavdevice-dev python3-vcstool mesa-utils lcov gcovr libqt5multimedia5
     ```
 
 1.  Now build a workspace for Delphyne. If you are familiar with ROS catkin
@@ -54,6 +54,20 @@ $ . src/delphyne_gui/setup.bash
 
 Next we can go on and build the components.
 
+# Build and install drake
+
+Drake must be built using the Bazel build tool. To build drake, do the
+following:
+
+```
+$ pushd src/drake
+$ bazel run //:install `pwd`/../../install
+$ bazel build //drake/automotive:*
+$ popd
+```
+
+Note that this will take a long time to compile.
+
 # Build dependencies
 
 Delphyne depends on a number of external dependencies. To make the tools and
@@ -64,27 +78,13 @@ commands:
 ```
 $ mkdir -p build
 $ pushd build
-$ for igndep in ign_tools ign_math ign_common ign_msgs ign_transport ign_gui ign_rendering; do mkdir -p $igndep ; pushd $igndep ; cmake ../../src/$igndep -DCMAKE_INSTALL_PREFIX=../../install ; make -j$( getconf _NPROCESSORS_ONLN ) install ; popd ; done
+$ for igndep in ign_tools ign_common ign_msgs ign_transport ign_gui ign_rendering; do mkdir -p $igndep ; pushd $igndep ; cmake ../../src/$igndep -DCMAKE_INSTALL_PREFIX=../../install ; make -j$( getconf _NPROCESSORS_ONLN ) install ; popd ; done
 $ popd
 ```
 
 This may take a little while to build the dependencies. At the end of the build,
 a new subdirectory called `install` will be at the top level of your
 delphyne workspace.
-
-# Build and install drake
-
-Drake must be built using the Bazel build tool. To build drake, do the
-following:
-
-```
-$ pushd src/drake
-$ bazel run //:install `pwd`/../../install_drake
-$ bazel build //drake/automotive:*
-$ popd
-```
-
-Note that this will take a long time to compile.
 
 # Build Delphyne back-end
 
@@ -93,7 +93,7 @@ The Delphyne back-end can now be built with CMake:
 ```
 $ mkdir -p build/delphyne
 $ pushd build/delphyne
-$ cmake ../../src/delphyne/ -DCMAKE_INSTALL_PREFIX=../../install -DDRAKE_INSTALL_PREFIX=../../install_drake
+$ cmake ../../src/delphyne/ -DCMAKE_INSTALL_PREFIX=../../install
 $ make -j$( getconf _NPROCESSORS_ONLN ) install
 $ popd
 ```

@@ -266,7 +266,6 @@ std::string RenderWidget::ConfigStr() const {
 void RenderWidget::OnSetRobotModel(
     const ignition::msgs::Model_V& request) {
   {
-    std::cout << "Received robot model!!" << std::endl;
     emit this->NewInitialModel(request);
   }
 }

@@ -155,9 +155,8 @@ RenderWidget::RenderWidget(QWidget* parent)
 
   // Setting up a unique-named service name
   // i.e: RobotModel_8493201843;
-  robotModelServiceName +=
-      "_" + std::to_string(
-                ignition::math::Rand::IntUniform(1, ignition::math::MAX_I32));
+  int randomId = ignition::math::Rand::IntUniform(1, ignition::math::MAX_I32);
+  robotModelServiceName += "_" + std::to_string(randomId);
   robotModelRequestMsg.set_response_topic(robotModelServiceName);
 
    // Advertise the service with the unique name generated above
@@ -172,11 +171,8 @@ RenderWidget::RenderWidget(QWidget* parent)
   bool result;
 
   // Request a robot model to be published into the unique-named channel
-  if(!this->node.Request("/get_robot_model", robotModelRequestMsg, timeout, response,
-               result)) {
-    ignerr << "Error requesting to service [" << robotModelServiceName << "]"
-              << std::endl;
-  }
+  this->node.Request("/get_robot_model", robotModelRequestMsg, timeout, response,
+               result);
 }
 
 /////////////////////////////////////////////////

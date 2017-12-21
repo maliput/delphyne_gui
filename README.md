@@ -61,8 +61,8 @@ following:
 
 ```
 $ pushd src/drake
-$ bazel run //:install `pwd`/../../install
-$ bazel build //drake/automotive:*
+$ bazel run --compiler=gcc-5 //:install `pwd`/../../install
+$ bazel build --compiler=gcc-5 //automotive:*
 $ popd
 ```
 
@@ -78,7 +78,7 @@ commands:
 ```
 $ mkdir -p build
 $ pushd build
-$ for igndep in ign_tools ign_common ign_msgs ign_transport ign_gui ign_rendering; do mkdir -p $igndep ; pushd $igndep ; cmake ../../src/$igndep -DCMAKE_INSTALL_PREFIX=../../install ; make -j$( getconf _NPROCESSORS_ONLN ) install ; popd ; done
+$ for igndep in ign_cmake ign_tools ign_common ign_msgs ign_transport ign_rendering ign_gui ; do mkdir -p $igndep ; pushd $igndep ; cmake ../../src/$igndep -DCMAKE_INSTALL_PREFIX=../../install ; make -j$( getconf _NPROCESSORS_ONLN ) install ; popd ; done
 $ popd
 ```
 

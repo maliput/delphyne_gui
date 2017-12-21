@@ -33,6 +33,8 @@
 #include <ignition/common/Util.hh>
 
 #ifndef Q_MOC_RUN
+#include <ignition/gui/MainWindow.hh>
+#include <ignition/gui/qt.h>
 #include <ignition/gui/Iface.hh>
 #endif
 

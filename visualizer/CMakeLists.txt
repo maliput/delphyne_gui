@@ -74,3 +74,8 @@ install (FILES initialLayout.config DESTINATION
 # Install layoutWithTeleop.config
 install (FILES layoutWithTeleop.config DESTINATION
   ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/delphyne/)
+
+# Install layoutWithRenderOnly.config
+install (FILES layoutWithRenderOnly.config DESTINATION
+  ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/delphyne/)
+

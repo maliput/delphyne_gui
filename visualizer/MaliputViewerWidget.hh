@@ -83,14 +83,6 @@ class MaliputViewerWidget : public ignition::gui::Plugin {
   /// \brief Default Destructor.
   virtual ~MaliputViewerWidget();
 
-  /// \brief Overridden method to load user configuration.
-  /// \param[in] _pluginElem The data containing the configuration.
-  virtual void LoadConfig(const tinyxml2::XMLElement* _pluginElem);
-
-  /// \brief Overridden method to get the configuration XML as a string.
-  /// \return Config element.
-  virtual std::string ConfigStr() const;
-
  protected:
   /// \brief Overridden method to receive Qt paint event.
   /// \param[in] _e The event that happened.
@@ -137,9 +129,6 @@ class MaliputViewerWidget : public ignition::gui::Plugin {
   /// RenderWidget::showEvent is called.
   void CreateRenderWindow();
 
-  /// \brief Render the ground plane.
-  void RenderGroundPlane();
-
   /// \brief Render a squared grid.
   /// \param[in] _cellCount the number of cells per side.
   /// \param[in] _cellLength the size of each cell.
@@ -177,11 +166,6 @@ class MaliputViewerWidget : public ignition::gui::Plugin {
 
   /// \brief Controls the view of the scene.
   std::unique_ptr<OrbitViewControl> orbitViewControl;
-
-  /// \brief List of paths that can contain resources (e.g.: meshes).
-  /// The content of this variable is populated with the value of the
-  /// DELPHYNE_PACKAGE_PATH environment variable.
-  std::vector<std::string> packagePaths;
 
   /// \brief A pointer to the rendering engine
   ignition::rendering::RenderEngine* engine;

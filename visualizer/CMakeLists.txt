@@ -20,7 +20,6 @@ target_link_libraries(${maliput_viewer_widget}
   ${IGNITION-GUI_LIBRARIES}
   ${IGNITION-MSGS_LIBRARIES}
   ${IGNITION-RENDERING_LIBRARIES}
-  ${IGNITION-TRANSPORT_LIBRARIES}
   ${Qt5Core_LIBRARIES}
   ${Qt5Widgets_LIBRARIES})
 

@@ -81,14 +81,6 @@ MaliputViewerWidget::MaliputViewerWidget(QWidget* parent)
   this->updateTimer = new QTimer(this);
   QObject::connect(this->updateTimer, SIGNAL(timeout()), this, SLOT(update()));
 
-  auto paths =
-      ignition::common::SystemPaths::PathsFromEnv("DELPHYNE_PACKAGE_PATH");
-  if (paths.empty()) {
-    ignerr << "DELPHYNE_PACKAGE_PATH environment variable is not set"
-           << std::endl;
-  }
-  std::copy(paths.begin(), paths.end(), std::back_inserter(this->packagePaths));
-
   this->setMinimumHeight(100);
 }
 
@@ -101,103 +93,6 @@ MaliputViewerWidget::~MaliputViewerWidget() {
     // cleanup.
     // this->engine->Fini();
   }
-}
-
-/////////////////////////////////////////////////
-void MaliputViewerWidget::LoadConfig(const tinyxml2::XMLElement* _pluginElem) {
-  tinyxml2::XMLPrinter printer;
-  if (!_pluginElem->Accept(&printer)) {
-    ignwarn << "There was an error parsing the plugin element for ["
-            << this->title << "]." << std::endl;
-    return;
-  }
-
-  // Load the user camera options.
-  auto userCameraXML = _pluginElem->FirstChildElement("camera");
-  while (userCameraXML) {
-    std::string cameraName;
-    if (userCameraXML->Attribute("name", "user_camera")) {
-      auto poseXML = userCameraXML->FirstChildElement("pose");
-      if (poseXML) {
-        auto poseStr = poseXML->GetText();
-        std::istringstream stream(poseStr);
-        stream >> this->userSettings.userCameraPose;
-      } else {
-        ignerr << "Unable to parse <pose> element within <camera>" << std::endl;
-      }
-      break;
-    }
-
-    // Not a user camera, skip to the next camera.
-    userCameraXML = userCameraXML->NextSiblingElement("camera");
-  }
-}
-
-/////////////////////////////////////////////////
-std::string MaliputViewerWidget::ConfigStr() const {
-
-  tinyxml2::XMLElement* pluginXML;
-  tinyxml2::XMLDocument xmlDoc;
-
-  if (configStr.empty()) {
-    // If we have no defined plugin configuration, create the XML doc with the
-    // plugin element and initialize it with the basic properties.
-    pluginXML = xmlDoc.NewElement("plugin");
-    pluginXML->SetAttribute("filename", "MaliputViewerWidget");
-    xmlDoc.InsertFirstChild(pluginXML);
-  } else {
-    // In case we do have an existing config, parse it.
-    xmlDoc.Parse(configStr.c_str());
-    pluginXML = xmlDoc.FirstChildElement("plugin");
-
-    // If there is a camera element, remove it as we will be overriding it below
-    auto cameraXML = pluginXML->FirstChildElement("camera");
-    if (cameraXML) {
-      pluginXML->DeleteChild(cameraXML);
-    }
-  }
-
-  // User camera options.
-  tinyxml2::XMLElement* userCameraXML = xmlDoc.NewElement("camera");
-  userCameraXML->SetAttribute("name", "user_camera");
-  pluginXML->InsertEndChild(userCameraXML);
-  tinyxml2::XMLElement* poseXML = xmlDoc.NewElement("pose");
-  auto pos = this->camera->LocalPose().Pos();
-  auto rot = this->camera->LocalPose().Rot().Euler();
-  std::stringstream stream;
-  stream << pos.X() << " " << pos.Y() << " " << pos.Z() << " " << rot.X() << " "
-         << rot.Y() << " " << rot.Z();
-  poseXML->SetText(stream.str().c_str());
-  userCameraXML->InsertEndChild(poseXML);
-
-  tinyxml2::XMLPrinter printer;
-  xmlDoc.Print(&printer);
-
-  return printer.CStr();
-}
-
-/////////////////////////////////////////////////
-void MaliputViewerWidget::RenderGroundPlane() {
-  auto material = this->scene->CreateMaterial();
-  if (!material) {
-    ignerr << "Failed to create ground plane material" << std::endl;
-    return;
-  }
-
-  material->SetShininess(50);
-  material->SetReflectivity(0);
-
-  auto groundPlaneVisual = this->scene->CreateVisual();
-  if (!groundPlaneVisual) {
-    ignerr << "Failed to create ground plane visual" << std::endl;
-    return;
-  }
-
-  // 100 x 100 ground plane.
-  groundPlaneVisual->SetLocalScale(100, 100, 1);
-  groundPlaneVisual->AddGeometry(scene->CreatePlane());
-  groundPlaneVisual->SetMaterial(material);
-  this->scene->RootVisual()->AddChild(groundPlaneVisual);
 }
 
 /////////////////////////////////////////////////
@@ -349,9 +244,6 @@ void MaliputViewerWidget::CreateRenderWindow() {
 
   // render once to create the window.
   this->camera->Update();
-
-  // Render the ground plane.
-  this->RenderGroundPlane();
 
   // Render the grid over the ground plane.
   this->RenderGroundPlaneGrid();

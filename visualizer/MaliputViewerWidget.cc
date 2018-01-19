@@ -1,4 +1,4 @@
-// Copyright 2017 Open Source Robotics Foundation
+// Copyright 2018 Open Source Robotics Foundation
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -31,7 +31,6 @@
 #include <sstream>
 #include <string>
 #include <utility>
-#include <tinyxml2.h>
 
 #include <ignition/common/Console.hh>
 #include <ignition/common/MeshManager.hh>
@@ -125,18 +124,22 @@ void MaliputViewerWidget::RenderGrid(
 
 /////////////////////////////////////////////////
 void MaliputViewerWidget::RenderGroundPlaneGrid() {
-  auto gray = this->scene->CreateMaterial();
-  if (gray) {
-    gray->SetAmbient(0.7, 0.7, 0.7);
-    gray->SetDiffuse(0.7, 0.7, 0.7);
-    gray->SetSpecular(0.7, 0.7, 0.7);
+  auto gridMaterial = this->scene->CreateMaterial();
+  if (gridMaterial) {
+    // Light blue color.
+    const double lightRed = 0.404;
+    const double lightGreen = 0.623;
+    const double lightBlue = 0.8;
+    gridMaterial->SetAmbient(lightRed, lightGreen, lightBlue);
+    gridMaterial->SetDiffuse(lightRed, lightGreen, lightBlue);
+    gridMaterial->SetSpecular(lightRed, lightGreen, lightBlue);
 
     const unsigned int kCellCount = 50u;
     const double       kCellLength = 1;
     const unsigned int kVerticalCellCount = 0u;
 
     this->RenderGrid(kCellCount, kCellLength, kVerticalCellCount,
-      gray, ignition::math::Pose3d::Zero);
+      gridMaterial, ignition::math::Pose3d::Zero);
   } else {
     ignerr << "Failed to create material for the grid" << std::endl;
   }
@@ -196,7 +199,10 @@ void MaliputViewerWidget::CreateRenderWindow() {
   }
 
   // Lights.
-  this->scene->SetAmbientLight(0.9, 0.9, 0.9);
+  const double lightRed = 0.88;
+  const double lightGreen = 0.88;
+  const double lightBlue = 0.95;
+  this->scene->SetAmbientLight(lightRed, lightGreen, lightBlue);
   ignition::rendering::VisualPtr root = this->scene->RootVisual();
   if (!root) {
     ignerr << "Failed to find the root visual" << std::endl;
@@ -208,8 +214,8 @@ void MaliputViewerWidget::CreateRenderWindow() {
     return;
   }
   directionalLight->SetDirection(-0.5, -0.5, -1);
-  directionalLight->SetDiffuseColor(0.9, 0.9, 0.9);
-  directionalLight->SetSpecularColor(0.9, 0.9, 0.9);
+  directionalLight->SetDiffuseColor(lightRed, lightGreen, lightBlue);
+  directionalLight->SetSpecularColor(lightRed, lightGreen, lightBlue);
   root->AddChild(directionalLight);
 
   // create user camera
@@ -229,7 +235,7 @@ void MaliputViewerWidget::CreateRenderWindow() {
   this->camera->SetHFOV(IGN_DTOR(60));
   root->AddChild(this->camera);
 
-  this->scene->SetBackgroundColor(0.9, 0.9, 0.9);
+  this->scene->SetBackgroundColor(lightRed, lightGreen, lightBlue);
 
   // create render window
   std::string winHandle = std::to_string(static_cast<uint64_t>(this->winId()));

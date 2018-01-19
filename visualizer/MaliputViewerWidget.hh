@@ -1,4 +1,4 @@
-// Copyright 2017 Open Source Robotics Foundation
+// Copyright 2018 Open Source Robotics Foundation
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -42,18 +42,6 @@
 #include <ignition/transport.hh>
 
 #include "OrbitViewControl.hh"
-
-// Forward declarations.
-namespace tinyxml2 {
-class XMLElement;
-}
-namespace ignition {
-namespace msgs {
-class Model;
-class Model_V;
-class Visual;
-}
-}
 
 namespace delphyne {
 namespace gui {

@@ -85,14 +85,8 @@ target_link_libraries(visualizer
 
 install (TARGETS visualizer DESTINATION ${BIN_INSTALL_DIR})
 
-# Install initialLayout.config
-install (FILES initialLayout.config DESTINATION
-  ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/delphyne/)
-
-# Install layoutWithTeleop.config
-install (FILES layoutWithTeleop.config DESTINATION
-  ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/delphyne/)
-
-# Install layoutMaliputViewer.config
-install (FILES layoutMaliputViewer.config DESTINATION
+# Install .config files.
+install (FILES
+  initialLayout.config layoutWithTeleop.config layoutMaliputViewer.config
+  DESTINATION
   ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/delphyne/)

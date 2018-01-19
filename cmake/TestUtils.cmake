@@ -29,7 +29,7 @@ macro (delphyne_build_tests)
     )
 
     target_link_libraries(${BINARY_NAME}
-      #${IGNITION-COMMON_LIBRARIES}
+      ${IGNITION-COMMON_LIBRARIES}
       #${IGNITION-GUI_LIBRARIES}
       #${IGNITION-MATH_LIBRARIES}
       #${IGNITION-MSGS_LIBRARIES}
@@ -37,6 +37,7 @@ macro (delphyne_build_tests)
       #${IGNITION-TRANSPORT_LIBRARIES}
       #${Qt5Core_LIBRARIES}
       #${Qt5Widgets_LIBRARIES}
+      ${global_attributes}
       lcm
     )
 
@@ -118,6 +119,7 @@ macro (delphyne_build_test)
     ${Qt5Core_LIBRARIES}
     ${Qt5Widgets_LIBRARIES}
     ${lcm_LIBRARIES}
+    ${global_attributes}
   )
 
   if (UNIX)

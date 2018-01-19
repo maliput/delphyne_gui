@@ -7,6 +7,14 @@ add_subdirectory(protobuf)
 set_source_files_properties(${PROTO_SRC} ${PROTO_HEADER}
   PROPERTIES GENERATED TRUE)
 
+# GlobalAttributes library.
+set(global_attributes GlobalAttributes)
+add_library(${global_attributes} SHARED
+  ${global_attributes}.cc)
+
+install(TARGETS ${global_attributes} DESTINATION
+  ${LIB_INSTALL_DIR} COMPONENT shlib)
+
 # MaliputViewerWidget GUI plugin.
 set(maliput_viewer_widget MaliputViewerWidget)
 QT5_WRAP_CPP(${maliput_viewer_widget}_MOC ${maliput_viewer_widget}.hh)
@@ -16,6 +24,8 @@ add_library(${maliput_viewer_widget} SHARED
   ${${maliput_viewer_widget}_MOC}
 )
 target_link_libraries(${maliput_viewer_widget}
+  ${drake_LIBRARIES}
+  ${global_attributes}
   ${IGNITION-COMMON_LIBRARIES}
   ${IGNITION-GUI_LIBRARIES}
   ${IGNITION-MSGS_LIBRARIES}
@@ -81,6 +91,7 @@ target_link_libraries(visualizer
   ${IGNITION-MATH_LIBRARIES}
   ${Qt5Core_LIBRARIES}
   ${Qt5Widgets_LIBRARIES}
+  ${global_attributes}
 )
 
 install (TARGETS visualizer DESTINATION ${BIN_INSTALL_DIR})
@@ -90,3 +101,5 @@ install (FILES
   initialLayout.config layoutWithTeleop.config layoutMaliputViewer.config
   DESTINATION
   ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/delphyne/)
+
+add_subdirectory(test)

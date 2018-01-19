@@ -55,7 +55,11 @@
 #include <ignition/rendering/RenderingIface.hh>
 #include <ignition/rendering/Scene.hh>
 
+#include <drake/automotive/maliput/monolane/loader.h>
+
 #include "MaliputViewerWidget.hh"
+#include "GlobalAttributes.hh"
+
 
 using namespace delphyne;
 using namespace gui;
@@ -81,6 +85,19 @@ MaliputViewerWidget::MaliputViewerWidget(QWidget* parent)
   QObject::connect(this->updateTimer, SIGNAL(timeout()), this, SLOT(update()));
 
   this->setMinimumHeight(100);
+
+  // Loads the maliput file path if any and parses it.
+  const int argumentIndex = 2;
+  if (global_attributes::GetNumberOfArguments() > argumentIndex) {
+    this->userSettings.maliputFilePath =
+      global_attributes::GetArgument(argumentIndex);
+    ignmsg << "About to load [" << this->userSettings.maliputFilePath
+      << "] monolane file." << std::endl;
+    this->roadGeometry = drake::maliput::monolane::LoadFile(
+      this->userSettings.maliputFilePath);
+    ignmsg << "Loaded [" << this->userSettings.maliputFilePath
+      << "] monolane file." << std::endl;
+  }
 }
 
 /////////////////////////////////////////////////

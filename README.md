@@ -13,7 +13,7 @@ Delphyne back-end and the front-end.
     $ sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
     $ sudo apt-key adv --keyserver hkp://ha.pool.sks-keyservers.net:80 --recv-key 421C365BD9FF1F717815A3895523BAEEB01FA116
     $ sudo apt-get update
-    $ sudo apt-get install mercurial cmake pkg-config python ruby-ronn libprotoc-dev libprotobuf-dev protobuf-compiler uuid-dev libzmq3-dev git libogre-1.9-dev libglew-dev qtbase5-dev libicu-dev libboost-filesystem-dev libboost-python-dev libfreeimage-dev libtinyxml2-dev libgts-dev libavdevice-dev python3-vcstool mesa-utils lcov gcovr libqt5multimedia5
+    $ sudo apt-get install mercurial cmake pkg-config python ruby-ronn libprotoc-dev libprotobuf-dev protobuf-compiler uuid-dev libzmq3-dev git libogre-1.9-dev libglew-dev qtbase5-dev libicu-dev libboost-filesystem-dev libfreeimage-dev libtinyxml2-dev libgts-dev libavdevice-dev python3-vcstool mesa-utils lcov gcovr libqt5multimedia5 libqwt-dev
     ```
 
 1.  Now build a workspace for Delphyne. If you are familiar with ROS catkin
@@ -61,8 +61,8 @@ following:
 
 ```
 $ pushd src/drake
-$ bazel run //:install `pwd`/../../install
-$ bazel build //drake/automotive:*
+$ bazel run --compiler=gcc-5 //:install `pwd`/../../install
+$ bazel build --compiler=gcc-5 //automotive:*
 $ popd
 ```
 
@@ -78,7 +78,7 @@ commands:
 ```
 $ mkdir -p build
 $ pushd build
-$ for igndep in ign_tools ign_common ign_msgs ign_transport ign_gui ign_rendering; do mkdir -p $igndep ; pushd $igndep ; cmake ../../src/$igndep -DCMAKE_INSTALL_PREFIX=../../install ; make -j$( getconf _NPROCESSORS_ONLN ) install ; popd ; done
+$ for igndep in ign_cmake ign_tools ign_common ign_msgs ign_transport ign_rendering ign_gui ; do mkdir -p $igndep ; pushd $igndep ; cmake ../../src/$igndep -DCMAKE_INSTALL_PREFIX=../../install ; make -j$( getconf _NPROCESSORS_ONLN ) install ; popd ; done
 $ popd
 ```
 

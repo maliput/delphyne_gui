@@ -64,8 +64,8 @@ int main(int argc, char* argv[]) {
   ignition::common::Console::SetVerbosity(3);
   ignmsg << versionStr << std::endl;
 
-  // Loads all the arguments into global attributes so any plugin can access to
-  // it afterwards.
+  // Loads all the command line parameters into a set of global attributes, so
+  // that any plugin can access them later.
   for (int i = 0; i < argc; ++i) {
     delphyne::gui::global_attributes::SetArgument(argv[i]);
   }

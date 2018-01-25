@@ -102,4 +102,10 @@ install (FILES
   DESTINATION
   ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/delphyne/)
 
+# Install .yaml files.
+install (FILES
+  road_samples/double_ring.yaml
+  DESTINATION
+  ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/delphyne/road_samples)
+
 add_subdirectory(test)

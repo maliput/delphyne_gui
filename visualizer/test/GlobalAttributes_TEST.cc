@@ -32,21 +32,21 @@
 
 namespace delphyne {
 namespace gui {
+namespace global_attributes{
 
 //////////////////////////////////////////////////
 /// \brief Checks GlobalAttributes API to add CLI strings.
 TEST(GlobalAttributes, GlobalAttributesTest) {
-  EXPECT_EQ(global_attributes::GetNumberOfArguments(), 0);
+  EXPECT_EQ(GetNumberOfArguments(), 0);
 
-  EXPECT_EQ(global_attributes::SetArgument("abc_123"), 0);
-  EXPECT_EQ(global_attributes::GetArgument(0), std::string("abc_123"));
-  EXPECT_EQ(global_attributes::GetNumberOfArguments(), 1);
+  EXPECT_EQ(SetArgument("abc_123"), 0);
+  EXPECT_EQ(GetArgument(0), std::string("abc_123"));
+  EXPECT_EQ(GetNumberOfArguments(), 1);
 
-
-  EXPECT_EQ(global_attributes::SetArgument("def_456"), 1);
-  EXPECT_EQ(global_attributes::GetArgument(0), std::string("abc_123"));
-  EXPECT_EQ(global_attributes::GetArgument(1), std::string("def_456"));
-  EXPECT_EQ(global_attributes::GetNumberOfArguments(), 2);
+  EXPECT_EQ(SetArgument("def_456"), 1);
+  EXPECT_EQ(GetArgument(0), std::string("abc_123"));
+  EXPECT_EQ(GetArgument(1), std::string("def_456"));
+  EXPECT_EQ(GetNumberOfArguments(), 2);
 }
 
 //////////////////////////////////////////////////
@@ -55,5 +55,6 @@ int main(int argc, char** argv) {
   return RUN_ALL_TESTS();
 }
 
-}  // namespace backend
-}  // namespace delphyne
+}
+}
+}

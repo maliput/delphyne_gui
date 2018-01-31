@@ -7,6 +7,25 @@ add_subdirectory(protobuf)
 set_source_files_properties(${PROTO_SRC} ${PROTO_HEADER}
   PROPERTIES GENERATED TRUE)
 
+# MaliputViewerWidget GUI plugin.
+set(maliput_viewer_widget MaliputViewerWidget)
+QT5_WRAP_CPP(${maliput_viewer_widget}_MOC ${maliput_viewer_widget}.hh)
+add_library(${maliput_viewer_widget} SHARED
+  ${CMAKE_CURRENT_SOURCE_DIR}/${maliput_viewer_widget}.cc
+  OrbitViewControl.cc
+  ${${maliput_viewer_widget}_MOC}
+)
+target_link_libraries(${maliput_viewer_widget}
+  ${IGNITION-COMMON_LIBRARIES}
+  ${IGNITION-GUI_LIBRARIES}
+  ${IGNITION-MSGS_LIBRARIES}
+  ${IGNITION-RENDERING_LIBRARIES}
+  ${Qt5Core_LIBRARIES}
+  ${Qt5Widgets_LIBRARIES})
+
+install(TARGETS ${maliput_viewer_widget} DESTINATION
+  ${LIB_INSTALL_DIR} COMPONENT shlib)
+
 # RenderWidget GUI plugin.
 set(render_widget RenderWidget)
 QT5_WRAP_CPP(${render_widget}_MOC ${render_widget}.hh)
@@ -67,12 +86,10 @@ target_link_libraries(visualizer
 
 install (TARGETS visualizer DESTINATION ${BIN_INSTALL_DIR})
 
-# Install initialLayout.config
-install (FILES initialLayout.config DESTINATION
-  ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/delphyne/)
-
-# Install layoutWithTeleop.config
-install (FILES layoutWithTeleop.config DESTINATION
+# Install .config files.
+install (FILES
+  initialLayout.config layoutWithTeleop.config layoutMaliputViewer.config
+  DESTINATION
   ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/delphyne/)
 
 # Install layoutWithRenderOnly.config

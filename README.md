@@ -82,7 +82,7 @@ $ mkdir -p pybind11
 $ pushd pybind11
 $ cmake ../../src/pybind11 -DCMAKE_INSTALL_PREFIX=../../install -DPYBIND11_TEST=False
 $ make -j2 install
-$ popd pybind11
+$ popd
 $ for igndep in ign_cmake ign_tools ign_common ign_msgs ign_transport ign_rendering ign_gui ; do mkdir -p $igndep ; pushd $igndep ; cmake ../../src/$igndep -DCMAKE_INSTALL_PREFIX=../../install ; make -j$( getconf _NPROCESSORS_ONLN ) install ; popd ; done
 $ popd
 ```

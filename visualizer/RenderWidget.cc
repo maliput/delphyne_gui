@@ -64,8 +64,8 @@ using namespace delphyne;
 using namespace gui;
 
 /////////////////////////////////////////////////
-static void setPoseFromMessage(const ignition::msgs::Visual& _vis,
-                               ignition::rendering::VisualPtr _shape) {
+static void setVisualPose(const ignition::msgs::Pose& _pose,
+                          ignition::rendering::VisualPtr _shape) {
   double x = 0.0;
   double y = 0.0;
   double z = 0.0;
@@ -74,23 +74,37 @@ static void setPoseFromMessage(const ignition::msgs::Visual& _vis,
   double qy = 0.0;
   double qz = 0.0;
 
-  if (_vis.has_pose()) {
-    if (_vis.pose().has_position()) {
-      x += _vis.pose().position().x();
-      y += _vis.pose().position().y();
-      z += _vis.pose().position().z();
-    }
-    if (_vis.pose().has_orientation()) {
-      qw = _vis.pose().orientation().w();
-      qx = _vis.pose().orientation().x();
-      qy = _vis.pose().orientation().y();
-      qz = _vis.pose().orientation().z();
-    }
+  if (_pose.has_position()) {
+    x += _pose.position().x();
+    y += _pose.position().y();
+    z += _pose.position().z();
+  }
+  if (_pose.has_orientation()) {
+    qw = _pose.orientation().w();
+    qx = _pose.orientation().x();
+    qy = _pose.orientation().y();
+    qz = _pose.orientation().z();
   }
 
   ignition::math::Pose3d newpose(x, y, z, qw, qx, qy, qz);
 
   _shape->SetLocalPose(newpose);
+}
+
+/////////////////////////////////////////////////
+static void setPoseFromMessage(const ignition::msgs::Visual& _vis,
+                               ignition::rendering::VisualPtr _shape) {
+  if (_vis.has_pose()) {
+    setVisualPose(_vis.pose(), _shape);
+  }
+}
+
+/////////////////////////////////////////////////
+static void setPoseFromMessage(const ignition::msgs::Link& _link,
+                               ignition::rendering::VisualPtr _shape) {
+  if (_link.has_pose()) {
+    setVisualPose(_link.pose(), _shape);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -526,8 +540,6 @@ ignition::rendering::VisualPtr RenderWidget::RenderMesh(
 
   setPoseFromMessage(_vis, mesh);
 
-  ignition::rendering::VisualPtr root = this->scene->RootVisual();
-
   return mesh;
 }
 
@@ -639,6 +651,8 @@ void RenderWidget::LoadModel(const ignition::msgs::Model& _msg) {
       }
 
       linkRootVisual->AddChild(ignvis);
+
+      setPoseFromMessage(link, linkRootVisual);
     }
   }
 
@@ -680,17 +694,11 @@ void RenderWidget::UpdateScene(const ignition::msgs::Model_V& _msg) {
                << std::endl;
         continue;
       }
-
-      auto pose = link.pose();
-
       // Update the pose of the root visual only;
       // the relative poses of the children remain the same
       auto& visual = visualsIt->second;
-      // The setPoseFromMessage() assumes an ignition::msgs::Visual
-      // message here, so we setup a dummy one to please it.
-      ignition::msgs::Visual tmpvis;
-      *tmpvis.mutable_pose() = pose;
-      setPoseFromMessage(tmpvis, visual);
+
+      setPoseFromMessage(link, visual);
     }
   }
 }

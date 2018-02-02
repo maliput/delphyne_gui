@@ -60,20 +60,18 @@ std::string defaultConfigPath() {
 }
 
 /////////////////////////////////////////////////
-int main(int argc, char* argv[]) {
+int main(int argc, const char* argv[]) {
   ignition::common::Console::SetVerbosity(3);
   ignmsg << versionStr << std::endl;
 
-  // Loads all the command line parameters into a set of global attributes, so
-  // that any plugin can access them later.
-  for (int i = 0; i < argc; ++i) {
-    delphyne::gui::global_attributes::SetArgument(argv[i]);
+  if (argc > 1) {
+    delphyne::gui::global_attributes::ParseArguments(argc - 1, &(argv[1]));
   }
 
   // Parse custom config file from args.
   const std::string configFile =
-    delphyne::gui::global_attributes::GetNumberOfArguments() > 1 ?
-      delphyne::gui::global_attributes::GetArgument(1) :
+    delphyne::gui::global_attributes::HasArgument("layout") ?
+      delphyne::gui::global_attributes::GetArgument("layout") :
       initialConfigFile;
 
   Q_INIT_RESOURCE(resources);

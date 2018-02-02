@@ -28,25 +28,56 @@
 
 #include "visualizer/GlobalAttributes.hh"
 
+#include <stdexcept>
+
 #include "gtest/gtest.h"
 
 namespace delphyne {
 namespace gui {
 namespace global_attributes{
+namespace test{
 
 //////////////////////////////////////////////////
-/// \brief Checks GlobalAttributes API to add CLI strings.
-TEST(GlobalAttributes, GlobalAttributesTest) {
-  EXPECT_EQ(GetNumberOfArguments(), 0);
 
-  EXPECT_EQ(SetArgument("abc_123"), 0);
-  EXPECT_EQ(GetArgument(0), std::string("abc_123"));
-  EXPECT_EQ(GetNumberOfArguments(), 1);
+/// \brief Checks GlobalAttributes API to parse and query CLI strings.
+TEST(GlobalAttributes, SampleUsage) {
+  EXPECT_FALSE(HasArgument("foo"));
 
-  EXPECT_EQ(SetArgument("def_456"), 1);
-  EXPECT_EQ(GetArgument(0), std::string("abc_123"));
-  EXPECT_EQ(GetArgument(1), std::string("def_456"));
-  EXPECT_EQ(GetNumberOfArguments(), 2);
+  const char* arguments[] = {
+    "--foo=bar",
+    "--bar=foo",
+    "--sample_param=123param"
+  };
+  EXPECT_NO_THROW(ParseArguments(3, arguments));
+
+  EXPECT_TRUE(HasArgument("foo"));
+  EXPECT_TRUE(HasArgument("bar"));
+  EXPECT_TRUE(HasArgument("sample_param"));
+  EXPECT_EQ(GetArgument("foo"), "bar");
+  EXPECT_EQ(GetArgument("bar"), "foo");
+  EXPECT_EQ(GetArgument("sample_param"), "123param");
+  EXPECT_FALSE(HasArgument("missing_argument"));
+  EXPECT_THROW(GetArgument("missing_argument"), std::runtime_error);
+}
+
+/// \brief Checks GlobalAttributes possible conditions where methods should
+/// throw.
+TEST(GlobalAttributes, WrongParameters) {
+  const char* wrong_arguments[] = {
+    "--=", // Short string.
+    "--b=", // Short string.
+    "--foobar", // Missing "=".
+    "foo=bar", // Missing "--".
+    "--foo= bar", // Whitespace.
+    "--foo=\tbar", // Tabulation.
+    "--foo=\nbar", // Newline.
+    "--foo=\rbar", // Carry return.
+    "--=bar", // Missing key.
+    "--foo=", // Missing value.
+  };
+  for (int i = 0; i < 9; ++i) {
+    EXPECT_THROW(ParseArguments(1, &(wrong_arguments[i])), std::runtime_error);
+  }
 }
 
 //////////////////////////////////////////////////
@@ -55,6 +86,7 @@ int main(int argc, char** argv) {
   return RUN_ALL_TESTS();
 }
 
+}
 }
 }
 }

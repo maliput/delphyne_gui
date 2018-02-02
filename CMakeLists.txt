@@ -258,3 +258,7 @@ else (build_errors)
   message(STATUS "Configuration successful. Type make to compile
   ${PROJECT_NAME_LOWER}")
 endif(build_errors)
+
+#################################################
+# Installs maliput_viewer.sh as a shortcut to run the visualizer.
+install (PROGRAMS tools/maliput_viewer.sh DESTINATION ${BIN_INSTALL_DIR})

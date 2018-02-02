@@ -10,7 +10,11 @@ set_source_files_properties(${PROTO_SRC} ${PROTO_HEADER}
 # GlobalAttributes library.
 set(global_attributes GlobalAttributes)
 add_library(${global_attributes} SHARED
-  ${global_attributes}.cc)
+  ${global_attributes}.cc
+)
+target_link_libraries(${global_attributes}
+  ${IGNITION-COMMON_LIBRARIES}
+)
 
 install(TARGETS ${global_attributes} DESTINATION
   ${LIB_INSTALL_DIR} COMPONENT shlib)

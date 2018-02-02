@@ -37,26 +37,36 @@ namespace delphyne {
 namespace gui {
 namespace global_attributes {
 
-/// \brief Adds a CLI argument and holds it as a std::string.
-/// \param[in] argument A pointer to the string argument.
-/// \return The index of @p argument. It is needed to retrieve it later.
+/// \brief Parses a list of CLI arguments and holds them as pairs key-value.
+/// \details Each element of @p argv must be "--{KEY}={VALUE}". The key will
+/// be KEY, and the value will be VALUE. Note that "--" and "=" are necessary.
+/// Each element of @p argv should not have: white spaces, '\n', '\r', '\t'
+/// characters and must be at least 5 characters long including "--" and "=".
+/// \param[in] argc The number of elements in @p argv.
+/// \param[in] argv A vector of string constants that hold the arguments.
+/// \throws std::runtime_error When any item of @p argv contains: white spaces,
+/// '\n', '\r' or '\t' characters.
+/// \throws std::runtime_error When any item of @p argv does not start with
+/// "--".
+/// \throws std::runtime_error When any item of @p argv does not have "=" from
+/// the third position on.
+/// \throws std::runtime_error When key or value any item of @p argv are empty
+/// strings.
 DELPHYNE_GUI_VISIBLE
-int SetArgument(const char* argument);
+void ParseArguments(int argc, const char** argv);
+
+/// \brief Query the @p key existence.
+/// \param[in] key A string to index the value.
+/// \return true When @p key exists, false otherwise.
+DELPHYNE_GUI_VISIBLE
+bool HasArgument(const std::string& key);
 
 /// \brief Gets a CLI argument previously set using SetArgument.
-/// \param[in] index An index to get a previously loaded argument. It must be
-/// higher or equal to zero and smaller than the total number of arguments.
-/// \see GetNumberOfArguments.
+/// \param[in] key A string to index the value.
 /// \return A std::string with the argument.
-/// \throws std::runtime_error When index is negative or it is higher or equal
-/// to the total number of arguments.
+/// \throws std::runtime_error When there is no value for @p key.
 DELPHYNE_GUI_VISIBLE
-std::string GetArgument(const int index);
-
-/// \brief Gets the total number of loaded arguments.
-/// \return The number of loaded arguments.
-DELPHYNE_GUI_VISIBLE
-int GetNumberOfArguments();
+std::string GetArgument(const std::string& key);
 
 }
 }

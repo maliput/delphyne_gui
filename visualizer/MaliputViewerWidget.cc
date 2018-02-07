@@ -87,9 +87,9 @@ MaliputViewerWidget::MaliputViewerWidget(QWidget* parent)
   this->setMinimumHeight(100);
 
   // Loads the maliput file path if any and parses it.
-  if (global_attributes::HasArgument("yaml_file")) {
+  if (GlobalAttributes::HasArgument("yaml_file")) {
     this->userSettings.maliputFilePath =
-      global_attributes::GetArgument("yaml_file");
+      GlobalAttributes::GetArgument("yaml_file");
     ignmsg << "About to load [" << this->userSettings.maliputFilePath
       << "] monolane file." << std::endl;
     this->roadGeometry = drake::maliput::monolane::LoadFile(

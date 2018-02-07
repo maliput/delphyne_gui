@@ -65,13 +65,13 @@ int main(int argc, const char* argv[]) {
   ignmsg << versionStr << std::endl;
 
   if (argc > 1) {
-    delphyne::gui::global_attributes::ParseArguments(argc - 1, &(argv[1]));
+    delphyne::gui::GlobalAttributes::ParseArguments(argc - 1, &(argv[1]));
   }
 
   // Parse custom config file from args.
   const std::string configFile =
-    delphyne::gui::global_attributes::HasArgument("layout") ?
-      delphyne::gui::global_attributes::GetArgument("layout") :
+    delphyne::gui::GlobalAttributes::HasArgument("layout") ?
+      delphyne::gui::GlobalAttributes::GetArgument("layout") :
       initialConfigFile;
 
   Q_INIT_RESOURCE(resources);

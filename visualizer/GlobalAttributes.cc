@@ -26,7 +26,6 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <map>
 #include <stdexcept>
 #include <regex>
 #include <vector>
@@ -38,10 +37,7 @@
 
 namespace delphyne {
 namespace gui {
-namespace global_attributes {
 namespace {
-// \breif Map of strings to hold global attributes.
-std::map<std::string, std::string> globalAttributes;
 
 // \brief Parses `arg` and checks all the constraints explained in
 // `ParseArguments` documentation.
@@ -106,7 +102,9 @@ std::pair<std::string, std::string> ExtractKeyAndValue(const std::string& arg) {
 
 }
 
-void ParseArguments(int argc, const char** argv) {
+std::map<std::string, std::string> GlobalAttributes::globalAttributes;
+
+void GlobalAttributes::ParseArguments(int argc, const char** argv) {
   if (argc < 0) {
     ignerr << "argc should be positive.\n";
     throw std::runtime_error("argc should be positive.");
@@ -119,12 +117,12 @@ void ParseArguments(int argc, const char** argv) {
 }
 
 
-bool HasArgument(const std::string& key) {
+bool GlobalAttributes::HasArgument(const std::string& key) {
   return globalAttributes.find(key) != globalAttributes.end();
 }
 
 
-std::string GetArgument(const std::string& key) {
+std::string GlobalAttributes::GetArgument(const std::string& key) {
   if (!HasArgument(key)) {
     ignerr << "Missing key: \"" << key << "\"\n";
     throw std::runtime_error(
@@ -134,6 +132,5 @@ std::string GetArgument(const std::string& key) {
   return globalAttributes[key];
 }
 
-}
 }
 }

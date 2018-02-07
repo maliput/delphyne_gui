@@ -34,30 +34,29 @@
 
 namespace delphyne {
 namespace gui {
-namespace global_attributes{
 namespace test{
 
 //////////////////////////////////////////////////
 
 /// \brief Checks GlobalAttributes API to parse and query CLI strings.
 TEST(GlobalAttributes, SampleUsage) {
-  EXPECT_FALSE(HasArgument("foo"));
+  EXPECT_FALSE(GlobalAttributes::HasArgument("foo"));
 
   const char* arguments[] = {
     "--foo=bar",
     "--bar=foo",
     "--sample_param=123param"
   };
-  EXPECT_NO_THROW(ParseArguments(3, arguments));
+  EXPECT_NO_THROW(GlobalAttributes::ParseArguments(3, arguments));
 
-  EXPECT_TRUE(HasArgument("foo"));
-  EXPECT_TRUE(HasArgument("bar"));
-  EXPECT_TRUE(HasArgument("sample_param"));
-  EXPECT_EQ(GetArgument("foo"), "bar");
-  EXPECT_EQ(GetArgument("bar"), "foo");
-  EXPECT_EQ(GetArgument("sample_param"), "123param");
-  EXPECT_FALSE(HasArgument("missing_argument"));
-  EXPECT_THROW(GetArgument("missing_argument"), std::runtime_error);
+  EXPECT_TRUE(GlobalAttributes::HasArgument("foo"));
+  EXPECT_TRUE(GlobalAttributes::HasArgument("bar"));
+  EXPECT_TRUE(GlobalAttributes::HasArgument("sample_param"));
+  EXPECT_EQ("bar", GlobalAttributes::GetArgument("foo"));
+  EXPECT_EQ("foo", GlobalAttributes::GetArgument("bar"));
+  EXPECT_EQ("123param", GlobalAttributes::GetArgument("sample_param"));
+  EXPECT_FALSE(GlobalAttributes::HasArgument("missing_argument"));
+  EXPECT_THROW(GlobalAttributes::GetArgument("missing_argument"), std::runtime_error);
 }
 
 /// \brief Checks GlobalAttributes possible conditions where methods should
@@ -76,7 +75,8 @@ TEST(GlobalAttributes, WrongParameters) {
     "--foo=", // Missing value.
   };
   for (int i = 0; i < 9; ++i) {
-    EXPECT_THROW(ParseArguments(1, &(wrong_arguments[i])), std::runtime_error);
+    EXPECT_THROW(GlobalAttributes::ParseArguments(
+      1, &(wrong_arguments[i])), std::runtime_error);
   }
 }
 
@@ -86,7 +86,6 @@ int main(int argc, char** argv) {
   return RUN_ALL_TESTS();
 }
 
-}
 }
 }
 }

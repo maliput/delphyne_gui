@@ -40,6 +40,8 @@
 
 #include "delphyne-gui/config.hh"
 
+#include "GlobalAttributes.hh"
+
 /// Constants.
 static const char versionStr[] = "Visualizer 0.1.0";
 static const std::string initialConfigFile = ignition::common::joinPaths(
@@ -58,15 +60,19 @@ std::string defaultConfigPath() {
 }
 
 /////////////////////////////////////////////////
-int main(int argc, char* argv[]) {
+int main(int argc, const char* argv[]) {
   ignition::common::Console::SetVerbosity(3);
   ignmsg << versionStr << std::endl;
 
-  // Parse custom config file from args
-  std::string configFile = initialConfigFile;
   if (argc > 1) {
-    configFile = argv[1];
+    delphyne::gui::GlobalAttributes::ParseArguments(argc - 1, &(argv[1]));
   }
+
+  // Parse custom config file from args.
+  const std::string configFile =
+    delphyne::gui::GlobalAttributes::HasArgument("layout") ?
+      delphyne::gui::GlobalAttributes::GetArgument("layout") :
+      initialConfigFile;
 
   Q_INIT_RESOURCE(resources);
 

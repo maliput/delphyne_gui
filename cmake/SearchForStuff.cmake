@@ -9,6 +9,21 @@ include (${project_cmake_dir}/Ronn2Man.cmake)
 add_manpage_target()
 
 ########################################
+# Find drake in unix platforms
+# In Windows we expect a call from configure.bat script with the paths
+if (NOT WIN32)
+  find_package(drake REQUIRED)
+  if (NOT drake_FOUND)
+    message(STATUS "Looking for drake-config.cmake - not found")
+    BUILD_ERROR ("Missing: Drake library (libdrake).")
+  else()
+    message(STATUS "Looking for drake-config.cmake - found")
+    include_directories(${DRAKE_INCLUDE_DIRS})
+    link_directories(${DRAKE_LIBRARY_DIRS})
+  endif()
+endif()
+
+########################################
 # Find ignition common in unix platforms
 # In Windows we expect a call from configure.bat script with the paths
 if (NOT WIN32)

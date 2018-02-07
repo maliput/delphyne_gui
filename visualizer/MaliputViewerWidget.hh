@@ -35,6 +35,8 @@
 #include <string>
 #include <vector>
 
+#include <drake/automotive/maliput/api/road_geometry.h>
+
 #include <ignition/gui/Plugin.hh>
 #include <ignition/math/Pose3.hh>
 #include <ignition/rendering/RenderTypes.hh>
@@ -59,9 +61,11 @@ class MaliputViewerWidget : public ignition::gui::Plugin {
 
   /// \brief All user options that can be configured.
   class UserSettings {
-    /// \brief Default user camera pose.
    public:
+    /// \brief Default user camera pose.
     ignition::math::Pose3d userCameraPose = {4.0, 4.0, 1.0, 0.0, 0.0, -2.35619};
+    /// \brief File path to the maliput map.
+    std::string maliputFilePath;
   };
 
  public:
@@ -160,6 +164,9 @@ class MaliputViewerWidget : public ignition::gui::Plugin {
 
   /// \brief Store all the user settings.
   UserSettings userSettings;
+
+  /// \brief Maliput RoadGeometry pointer.
+  std::unique_ptr<const drake::maliput::api::RoadGeometry> roadGeometry;
 };
 }
 }

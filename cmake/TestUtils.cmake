@@ -19,25 +19,15 @@ macro (delphyne_build_tests)
 
     add_executable(${BINARY_NAME}
       ${GTEST_SOURCE_file}
-     # ../lcm_to_delphyne_translation.cc
     )
 
     add_dependencies(${BINARY_NAME}
-      lcm_mock_robot_publisher
-      lcm_delphyne_transport_bridge
       gtest gtest_main
     )
 
     target_link_libraries(${BINARY_NAME}
-      #${IGNITION-COMMON_LIBRARIES}
-      #${IGNITION-GUI_LIBRARIES}
-      #${IGNITION-MATH_LIBRARIES}
-      #${IGNITION-MSGS_LIBRARIES}
-      #${IGNITION-RENDERING_LIBRARIES}
-      #${IGNITION-TRANSPORT_LIBRARIES}
-      #${Qt5Core_LIBRARIES}
-      #${Qt5Widgets_LIBRARIES}
-      lcm
+      ${IGNITION-COMMON_LIBRARIES}
+      ${global_attributes}
     )
 
     if (UNIX)
@@ -118,6 +108,7 @@ macro (delphyne_build_test)
     ${Qt5Core_LIBRARIES}
     ${Qt5Widgets_LIBRARIES}
     ${lcm_LIBRARIES}
+    ${global_attributes}
   )
 
   if (UNIX)

@@ -147,7 +147,7 @@ RenderWidget::RenderWidget(QWidget* parent)
 
   this->title = "RenderWidget";
 
-  QMetaObject::invokeMethod(this, "CreateRenderWindow");
+  this->CreateRenderWindow();
 
   // The below block means that every time the updateTime expires, we do an
   // update on the widget. Later on, we call the start() method to start this

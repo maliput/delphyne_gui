@@ -60,5 +60,6 @@ add_if_not_in_var DELPHYNE_PACKAGE_PATH $WS_DIR/src/delphyne_gui
 add_if_not_in_var PYTHONPATH $WS_DIR/install/lib/python2.7/site-packages/launcher
 add_if_not_in_var PYTHONPATH $WS_DIR/install/lib/python2.7/site-packages/utils
 add_if_not_in_var PYTHONPATH $WS_DIR/install/lib/python2.7/site-packages
+add_if_not_in_var PYTHONPATH $WS_DIR/install/lib
 add_if_not_in_var DRAKE_RESOURCE_ROOT $WS_DIR/install/share
 add_if_not_in_var DRAKE_PACKAGE_PATH $WS_DIR/install/share/drake/automotive/models

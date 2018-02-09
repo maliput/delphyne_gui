@@ -155,16 +155,15 @@ class RenderWidget : public ignition::gui::Plugin {
  protected slots:
   void ShowContextMenu(const QPoint& _pos);
 
-  /// \brief Internal method to create the render window the first time
-  /// RenderWidget::showEvent is called.
- protected slots:
-  void CreateRenderWindow();
-
  private:
   /// \brief Set the initial robot model
   /// \param[in] request The robot model to be loaded
   void OnSetRobotModel(
       const ignition::msgs::Model_V& request);
+
+  /// \brief Internal method to create the render window the first time
+  /// RenderWidget::showEvent is called.
+  void CreateRenderWindow();
 
   /// \brief Load an entire model in the scene
   /// \param[in] _msg The new model.

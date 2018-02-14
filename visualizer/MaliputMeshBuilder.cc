@@ -890,9 +890,9 @@ std::unique_ptr<ignition::common::Mesh> Convert(const std::string& name,
         ordered_vertices_indices;
     for (const IndexFace::Vertex& ifv : index_face.vertices()) {
       // Sets the correct normal.
-      const drake::maliput::api::GeoPosition n =
+      const drake::maliput::api::GeoPosition normal =
           geo_mesh.get_normal(ifv.normal_index).n();
-      sub_mesh->SetNormal(ifv.vertex_index, geo_position_to_ign_vector(n));
+      sub_mesh->SetNormal(ifv.vertex_index, geo_position_to_ign_vector(normal));
       // Adds the vertices to the vector so we can later order them.
       ordered_vertices_indices.push_back(
           std::make_tuple<ignition::math::Vector3d, int>(

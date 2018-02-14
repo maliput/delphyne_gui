@@ -2,6 +2,7 @@ include (${project_cmake_dir}/Utils.cmake)
 
 set (msgs
   automotive_driving_command.proto
+  robot_model_request.proto
 )
 
 set(PROTOBUF_IMPORT_DIRS ${IGNITION-MSGS_INCLUDE_DIRS})

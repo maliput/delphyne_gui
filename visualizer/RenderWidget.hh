@@ -37,11 +37,13 @@
 
 #include <ignition/gui/Plugin.hh>
 #include <ignition/math/Pose3.hh>
+#include <ignition/math/Rand.hh>
 #include <ignition/rendering/RenderTypes.hh>
 #include <ignition/rendering/RenderingIface.hh>
 #include <ignition/transport.hh>
 
 #include "OrbitViewControl.hh"
+#include "protobuf/robot_model_request.pb.h"
 
 // Forward declarations.
 namespace tinyxml2 {
@@ -150,9 +152,15 @@ class RenderWidget : public ignition::gui::Plugin {
   virtual QPaintEngine* paintEngine() const;
 
   // Documentation inherited
-  protected slots: void ShowContextMenu(const QPoint &_pos);
+ protected slots:
+  void ShowContextMenu(const QPoint& _pos);
 
  private:
+  /// \brief Set the initial robot model
+  /// \param[in] request The robot model to be loaded
+  void OnSetRobotModel(
+      const ignition::msgs::Model_V& request);
+
   /// \brief Internal method to create the render window the first time
   /// RenderWidget::showEvent is called.
   void CreateRenderWindow();
@@ -160,10 +168,6 @@ class RenderWidget : public ignition::gui::Plugin {
   /// \brief Load an entire model in the scene
   /// \param[in] _msg The new model.
   void LoadModel(const ignition::msgs::Model& _msg);
-
-  /// \brief Load a new model.
-  /// \param[in] _msg The message containing the model.
-  void OnInitialModel(const ignition::msgs::Model_V& _msg);
 
   /// \brief Update an existing visual.
   /// \param[in] _msg The pose of the new visual.
@@ -234,12 +238,10 @@ class RenderWidget : public ignition::gui::Plugin {
   /// \param[in] _verticalCellCount the number of vertical layers.
   /// \param[in] _material the material used to draw the lines.
   /// \param[in] _pose the pose of the grid.
-  void RenderGrid(
-      const unsigned int _cellCount,
-      const double _cellLength,
-      const unsigned int _verticalCellCount,
-      const ignition::rendering::MaterialPtr& _material,
-      const ignition::math::Pose3d& _pose);
+  void RenderGrid(const unsigned int _cellCount, const double _cellLength,
+                  const unsigned int _verticalCellCount,
+                  const ignition::rendering::MaterialPtr& _material,
+                  const ignition::math::Pose3d& _pose);
 
   /// \brief Render a 50x50 grid over the ground plane.
   void RenderGroundPlaneGrid();
@@ -280,6 +282,12 @@ class RenderWidget : public ignition::gui::Plugin {
 
   /// \brief Is the scene initialized?.
   bool initializedScene;
+
+  /// \brief The name of the response topic for RobotModelRequest
+  std::string robotModelServiceName = "RobotModel";
+
+  /// \brief The robot request message to be sent to the backend
+  ignition::msgs::RobotModelRequest robotModelRequestMsg;
 
   /// \brief Controls the view of the scene.
   std::unique_ptr<OrbitViewControl> orbitViewControl;

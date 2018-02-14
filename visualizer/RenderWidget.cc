@@ -147,12 +147,16 @@ RenderWidget::RenderWidget(QWidget* parent)
 
   this->title = "RenderWidget";
 
+  this->CreateRenderWindow();
+
   // The below block means that every time the updateTime expires, we do an
   // update on the widget. Later on, we call the start() method to start this
   // time at a fixed frequency.  Note that we do not start this timer until the
   // first time that showEvent() is called.
   this->updateTimer = new QTimer(this);
   QObject::connect(this->updateTimer, SIGNAL(timeout()), this, SLOT(update()));
+  this->updateTimer->start(this->kUpdateTimeFrequency);
+
   QObject::connect(
       this, SIGNAL(NewInitialModel(const ignition::msgs::Model_V&)), this,
       SLOT(SetInitialModels(const ignition::msgs::Model_V&)));
@@ -786,11 +790,6 @@ void RenderWidget::CreateRenderWindow() {
 /////////////////////////////////////////////////
 void RenderWidget::showEvent(QShowEvent* _e) {
   QApplication::flush();
-
-  if (!this->renderWindow) {
-    this->CreateRenderWindow();
-    this->updateTimer->start(this->kUpdateTimeFrequency);
-  }
 
   QWidget::showEvent(_e);
 

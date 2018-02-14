@@ -1,3 +1,4 @@
+// Copyright 2012-2016 Robot Locomotion Group @ CSAIL
 // Copyright 2018 Open Source Robotics Foundation
 //
 // Redistribution and use in source and binary forms, with or without
@@ -25,6 +26,10 @@
 // CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
+//
+// Note: code in this file was forked and changed from this file:
+// https://github.com/RobotLocomotion/drake/blob/master/automotive/maliput/utility/generate_obj.cc
+// and this commit: 82bf3c8a02678f553c746bdbbe0f8e5a345841b7
 
 #ifndef MALIPUT_MESH_HH
 #define MALIPUT_MESH_HH

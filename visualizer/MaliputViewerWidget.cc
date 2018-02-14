@@ -294,17 +294,16 @@ void MaliputViewerWidget::RenderRoadMeshes() {
     ignition::rendering::VisualPtr visual = this->scene->CreateVisual();
     if (!visual) {
       ignerr << "Failed to create visual.\n";
-      throw std::runtime_error("Failed to create visual.\n");
+      return;
     }
     ignition::rendering::MaterialPtr material = this->scene->CreateMaterial();
     if (!material) {
       ignerr << "Failed to create material.\n";
-      throw std::runtime_error("Failed to create material.\n");
+      return;
     }
     if (!this->FillMaterial(it.first, material)) {
       ignerr << "Failed to retrieve " << it.first << " information.\n";
-      throw std::runtime_error(std::string("Failed to retrieve ") +
-        it.first + std::string(" information.\n"));
+      return;
     }
 
     // Loads the mesh into the visual.

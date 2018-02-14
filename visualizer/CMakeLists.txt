@@ -7,6 +7,17 @@ add_subdirectory(protobuf)
 set_source_files_properties(${PROTO_SRC} ${PROTO_HEADER}
   PROPERTIES GENERATED TRUE)
 
+# MaliputMesh library.
+set(maliput_mesh MaliputMesh)
+add_library(${maliput_mesh} SHARED
+  MaliputMeshBuilder.cc)
+target_link_libraries(${maliput_mesh}
+  ${drake_LIBRARIES}
+  ${IGNITION-COMMON_LIBRARIES})
+
+install(TARGETS ${maliput_mesh} DESTINATION
+  ${LIB_INSTALL_DIR} COMPONENT shlib)
+
 # GlobalAttributes library.
 set(global_attributes GlobalAttributes)
 add_library(${global_attributes} SHARED
@@ -34,6 +45,7 @@ target_link_libraries(${maliput_viewer_widget}
   ${IGNITION-GUI_LIBRARIES}
   ${IGNITION-MSGS_LIBRARIES}
   ${IGNITION-RENDERING_LIBRARIES}
+  ${maliput_mesh}
   ${Qt5Core_LIBRARIES}
   ${Qt5Widgets_LIBRARIES})
 

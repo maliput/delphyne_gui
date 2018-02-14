@@ -57,9 +57,9 @@
 
 #include <drake/automotive/maliput/monolane/loader.h>
 
-#include "MaliputViewerWidget.hh"
 #include "GlobalAttributes.hh"
-
+#include "MaliputMeshBuilder.hh"
+#include "MaliputViewerWidget.hh"
 
 using namespace delphyne;
 using namespace gui;
@@ -96,6 +96,13 @@ MaliputViewerWidget::MaliputViewerWidget(QWidget* parent)
       this->userSettings.maliputFilePath);
     ignmsg << "Loaded [" << this->userSettings.maliputFilePath
       << "] monolane file." << std::endl;
+    ignmsg << "Loading RoadGeometry meshes..." << std::endl;
+    std::map<std::string, drake::maliput::mesh::GeoMesh> geoMeshes =
+      drake::maliput::mesh::BuildMeshes(this->roadGeometry.get(),
+        drake::maliput::mesh::Features());
+    ignmsg << "Meshes loaded." << std::endl;
+    this->ConvertMeshes(geoMeshes);
+    ignmsg << "Meshes converted to ignition type." << std::endl;
   }
 }
 
@@ -273,7 +280,91 @@ void MaliputViewerWidget::CreateRenderWindow() {
   // Render the origin reference frame.
   this->RenderOrigin();
 
+  // Render road meshes.
+  this->RenderRoadMeshes();
+
   this->orbitViewControl.reset(new OrbitViewControl(this->camera));
+}
+
+/////////////////////////////////////////////////
+void MaliputViewerWidget::RenderRoadMeshes() {
+  ignition::rendering::VisualPtr roadRootVisual = this->CreateRoadRootVisual();
+
+  for (const auto& it : this->meshes) {
+    ignition::rendering::VisualPtr visual = this->scene->CreateVisual();
+    if (!visual) {
+      ignerr << "Failed to create visual.\n";
+      return;
+    }
+    ignition::rendering::MaterialPtr material = this->scene->CreateMaterial();
+    if (!material) {
+      ignerr << "Failed to create material.\n";
+      return;
+    }
+    if (!this->FillMaterial(it.first, material)) {
+      ignerr << "Failed to retrieve " << it.first << " information.\n";
+      return;
+    }
+
+    // Loads the mesh into the visual.
+    ignition::rendering::MeshDescriptor descriptor(it.second.get());
+    descriptor.Load();
+    ignition::rendering::MeshPtr meshGeom = this->scene->CreateMesh(descriptor);
+    visual->AddGeometry(meshGeom);
+
+    // Sets the pose of the mesh.
+    visual->SetLocalPose(ignition::math::Pose3d(0, 0, 0, 1, 0, 0, 0));
+    visual->SetMaterial(material);
+    roadRootVisual->AddChild(visual);
+  }
+}
+
+/////////////////////////////////////////////////
+ignition::rendering::VisualPtr MaliputViewerWidget::CreateRoadRootVisual() {
+  ignition::rendering::VisualPtr rootVisual = this->scene->CreateVisual();
+  // The visual's root pose is initialized to zero because maliput's roads don't
+  // have a center.
+  const ignition::math::Pose3d origin(0, 0, 0, 1, 0, 0, 0);
+  rootVisual->SetLocalPose(origin);
+  this->scene->RootVisual()->AddChild(rootVisual);
+  return rootVisual;
+}
+
+/////////////////////////////////////////////////
+bool MaliputViewerWidget::FillMaterial(
+  const std::string& materialName,
+  ignition::rendering::MaterialPtr& material) const {
+
+  std::unique_ptr<drake::maliput::mesh::Material> maliputMaterial =
+    drake::maliput::mesh::GetMaterialByName(materialName);
+  if (!maliputMaterial) {
+    return false;
+  }
+
+  material->SetDiffuse(maliputMaterial->diffuse.X(),
+    maliputMaterial->diffuse.Y(), maliputMaterial->diffuse.Z());
+  material->SetAmbient(maliputMaterial->ambient.X(),
+    maliputMaterial->ambient.Y(), maliputMaterial->ambient.Z());
+  material->SetSpecular(maliputMaterial->specular.X(),
+    maliputMaterial->specular.Y(), maliputMaterial->specular.Z());
+  material->SetShininess(maliputMaterial->shinines);
+  material->SetTransparency(maliputMaterial->transparency);
+
+  return true;
+}
+
+/////////////////////////////////////////////////
+void MaliputViewerWidget::ConvertMeshes(
+  const std::map<std::string, drake::maliput::mesh::GeoMesh>& geoMeshes) {
+  for (const auto& it : geoMeshes) {
+    std::unique_ptr<ignition::common::Mesh> mesh =
+      drake::maliput::mesh::Convert(it.first, it.second);
+    if (mesh == nullptr) {
+      ignmsg << "Skipping mesh [" << it.first << "] because it is empty.\n";
+      continue;
+    }
+    this->meshes[it.first] = std::move(mesh);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -368,6 +459,7 @@ void MaliputViewerWidget::wheelEvent(QWheelEvent* _e) {
 
   this->orbitViewControl->OnMouseWheel(_e);
 }
+
 
 IGN_COMMON_REGISTER_SINGLE_PLUGIN(delphyne::gui::MaliputViewerWidget,
                                   ignition::gui::Plugin)

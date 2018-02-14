@@ -43,6 +43,7 @@
 #include <ignition/rendering/RenderingIface.hh>
 #include <ignition/transport.hh>
 
+#include "MaliputMesh.hh"
 #include "OrbitViewControl.hh"
 
 namespace delphyne {
@@ -140,6 +141,32 @@ class MaliputViewerWidget : public ignition::gui::Plugin {
   /// \brief Render the origin reference frame.
   void RenderOrigin();
 
+  /// \brief Creates the root visual of the meshes, all the materials and
+  ///        visuals for each mesh and then adds it to the root visual.
+  void RenderRoadMeshes();
+
+  /// \brief Fills @p _material with @p _materialName material properties.
+  /// \param[in] _materialName The name of the material to fill in. @see
+  ///            drake::maliput::mesh::GetMaterialByName for a list of available
+  ///            names.
+  /// \param[in] _material A valid ignition::rendering::MaterialPtr.
+  /// \return True when @p _materialName is valid and @p _material can be
+  /// filled.
+  bool FillMaterial(
+    const std::string& _materialName,
+    ignition::rendering::MaterialPtr& _material) const;
+
+  /// \brief Converts @p _geoMeshes into a
+  ///        std::map<std::string, std::unique_ptr<ignition::common::Mesh>>
+  ///        filling the instance variable meshes.
+  /// \param[in] _geoMeshes A map of std::string <--> GeoMesh objects to
+  ///            cd /convert.
+  void ConvertMeshes(
+    const std::map<std::string, drake::maliput::mesh::GeoMesh>& _geoMeshes);
+
+  /// \brief Creates a bare visual and adds it as a child of the scene's root
+  ///        visual.
+  ignition::rendering::VisualPtr CreateRoadRootVisual();
 
   /// \brief The frequency at which we'll do an update on the widget.
   const int kUpdateTimeFrequency = static_cast<int>(std::round(1000.0 / 60.0));
@@ -167,6 +194,9 @@ class MaliputViewerWidget : public ignition::gui::Plugin {
 
   /// \brief Maliput RoadGeometry pointer.
   std::unique_ptr<const drake::maliput::api::RoadGeometry> roadGeometry;
+
+  /// \brief Map of meshes to hold all the ignition meshes.
+  std::map<std::string, std::unique_ptr<ignition::common::Mesh>> meshes;
 };
 }
 }

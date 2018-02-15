@@ -79,11 +79,6 @@ TeleopWidget::TeleopWidget(QWidget* parent)
   this->setLayout(layout);
 
   QObject::connect(this->button, SIGNAL(clicked()), this, SLOT(StartDriving()));
-  QObject::connect(
-      this,
-      SIGNAL(RepeatingDriveTopic(const ignition::msgs::Boolean&, const bool)),
-      this,
-      SLOT(DriveTopicComplete(const ignition::msgs::Boolean&, const bool)));
 
   timer.start(10, this);
 }
@@ -109,41 +104,15 @@ void TeleopWidget::StartDriving() {
   } else {
     ignmsg << "Start Driving" << std::endl;
     auto lcmChannel = this->lineedit->text().toStdString();
-
-    // Ask the bridge to start repeating this channel
-    ignition::msgs::StringMsg request;
-    request.set_data(lcmChannel);
-
-    this->node_.Request("/repeat_ignition_topic", request,
-                        &TeleopWidget::OnRepeatIgnitionTopic, this);
+    auto ignTopic = "/" + lcmChannel;
+    this->publisher_.reset(new ignition::transport::Node::Publisher());
+    *(this->publisher_) =
+        this->node_.Advertise<ignition::msgs::AutomotiveDrivingCommand>(ignTopic);
+    this->button->setText("Stop Driving");
+    this->lineedit->setEnabled(false);
+    this->driving = true;
+    setFocus();
   }
-}
-
-/////////////////////////////////////////////////
-void TeleopWidget::OnRepeatIgnitionTopic(
-    const ignition::msgs::Boolean& response, const bool result) {
-  emit this->RepeatingDriveTopic(response, result);
-}
-
-/////////////////////////////////////////////////
-void TeleopWidget::DriveTopicComplete(const ignition::msgs::Boolean& response,
-                                      const bool result) {
-  auto lcmChannel = this->lineedit->text().toStdString();
-  auto ignTopic = "/" + lcmChannel;
-
-  if (!result || !response.data()) {
-    ignerr << "Repeat request for " << lcmChannel << " failed" << std::endl;
-    return;
-  }
-
-  this->publisher_.reset(new ignition::transport::Node::Publisher());
-  *(this->publisher_) =
-      this->node_.Advertise<ignition::msgs::AutomotiveDrivingCommand>(ignTopic);
-  this->button->setText("Stop Driving");
-  this->lineedit->setEnabled(false);
-  this->driving = true;
-
-  setFocus();
 }
 
 /////////////////////////////////////////////////

@@ -64,8 +64,8 @@ using namespace delphyne;
 using namespace gui;
 
 /////////////////////////////////////////////////
-static void setPoseFromMessage(const ignition::msgs::Visual& _vis,
-                               ignition::rendering::VisualPtr _shape) {
+static void setVisualPose(const ignition::msgs::Pose& _pose,
+                          ignition::rendering::VisualPtr _shape) {
   double x = 0.0;
   double y = 0.0;
   double z = 0.0;
@@ -74,23 +74,37 @@ static void setPoseFromMessage(const ignition::msgs::Visual& _vis,
   double qy = 0.0;
   double qz = 0.0;
 
-  if (_vis.has_pose()) {
-    if (_vis.pose().has_position()) {
-      x += _vis.pose().position().x();
-      y += _vis.pose().position().y();
-      z += _vis.pose().position().z();
-    }
-    if (_vis.pose().has_orientation()) {
-      qw = _vis.pose().orientation().w();
-      qx = _vis.pose().orientation().x();
-      qy = _vis.pose().orientation().y();
-      qz = _vis.pose().orientation().z();
-    }
+  if (_pose.has_position()) {
+    x += _pose.position().x();
+    y += _pose.position().y();
+    z += _pose.position().z();
+  }
+  if (_pose.has_orientation()) {
+    qw = _pose.orientation().w();
+    qx = _pose.orientation().x();
+    qy = _pose.orientation().y();
+    qz = _pose.orientation().z();
   }
 
   ignition::math::Pose3d newpose(x, y, z, qw, qx, qy, qz);
 
   _shape->SetLocalPose(newpose);
+}
+
+/////////////////////////////////////////////////
+static void setPoseFromMessage(const ignition::msgs::Visual& _vis,
+                               ignition::rendering::VisualPtr _shape) {
+  if (_vis.has_pose()) {
+    setVisualPose(_vis.pose(), _shape);
+  }
+}
+
+/////////////////////////////////////////////////
+static void setPoseFromMessage(const ignition::msgs::Link& _link,
+                               ignition::rendering::VisualPtr _shape) {
+  if (_link.has_pose()) {
+    setVisualPose(_link.pose(), _shape);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -133,12 +147,16 @@ RenderWidget::RenderWidget(QWidget* parent)
 
   this->title = "RenderWidget";
 
+  this->CreateRenderWindow();
+
   // The below block means that every time the updateTime expires, we do an
   // update on the widget. Later on, we call the start() method to start this
   // time at a fixed frequency.  Note that we do not start this timer until the
   // first time that showEvent() is called.
   this->updateTimer = new QTimer(this);
   QObject::connect(this->updateTimer, SIGNAL(timeout()), this, SLOT(update()));
+  this->updateTimer->start(this->kUpdateTimeFrequency);
+
   QObject::connect(
       this, SIGNAL(NewInitialModel(const ignition::msgs::Model_V&)), this,
       SLOT(SetInitialModels(const ignition::msgs::Model_V&)));
@@ -153,12 +171,26 @@ RenderWidget::RenderWidget(QWidget* parent)
   }
   std::copy(paths.begin(), paths.end(), std::back_inserter(this->packagePaths));
 
-  this->node.Subscribe("/DRAKE_VIEWER_LOAD_ROBOT",
-                       &RenderWidget::OnInitialModel, this);
-  this->node.Subscribe("/DRAKE_VIEWER_DRAW", &RenderWidget::OnUpdateScene,
-                       this);
+  // Setting up a unique-named service name
+  // i.e: RobotModel_8493201843;
+  int randomId = ignition::math::Rand::IntUniform(1, ignition::math::MAX_I32);
+  robotModelServiceName += "_" + std::to_string(randomId);
+  robotModelRequestMsg.set_response_topic(robotModelServiceName);
 
-  this->setMinimumHeight(100);
+   // Advertise the service with the unique name generated above
+  if (!node.Advertise(robotModelServiceName, &RenderWidget::OnSetRobotModel,
+                      this)) {
+    ignerr << "Error advertising service [" << robotModelServiceName << "]"
+              << std::endl;
+  }
+
+  ignition::msgs::Boolean response;
+  unsigned int timeout = 100;
+  bool result;
+
+  // Request a robot model to be published into the unique-named channel
+  this->node.Request("/get_robot_model", robotModelRequestMsg, timeout, response,
+               result);
 }
 
 /////////////////////////////////////////////////
@@ -204,7 +236,6 @@ void RenderWidget::LoadConfig(const tinyxml2::XMLElement* _pluginElem) {
 
 /////////////////////////////////////////////////
 std::string RenderWidget::ConfigStr() const {
-
   tinyxml2::XMLElement* pluginXML;
   tinyxml2::XMLDocument xmlDoc;
 
@@ -246,9 +277,13 @@ std::string RenderWidget::ConfigStr() const {
 }
 
 /////////////////////////////////////////////////
-void RenderWidget::OnInitialModel(const ignition::msgs::Model_V& _msg) {
-  emit this->NewInitialModel(_msg);
+void RenderWidget::OnSetRobotModel(
+    const ignition::msgs::Model_V& request) {
+  {
+    emit this->NewInitialModel(request);
+  }
 }
+
 
 /////////////////////////////////////////////////
 void RenderWidget::OnUpdateScene(const ignition::msgs::Model_V& _msg) {
@@ -388,12 +423,11 @@ void RenderWidget::RenderGroundPlane() {
 }
 
 /////////////////////////////////////////////////
-void RenderWidget::RenderGrid(
-      const unsigned int _cellCount,
-      const double _cellLength,
-      const unsigned int _verticalCellCount,
-      const ignition::rendering::MaterialPtr& _material,
-      const ignition::math::Pose3d& _pose) {
+void RenderWidget::RenderGrid(const unsigned int _cellCount,
+                              const double _cellLength,
+                              const unsigned int _verticalCellCount,
+                              const ignition::rendering::MaterialPtr& _material,
+                              const ignition::math::Pose3d& _pose) {
   auto gridGeom = this->scene->CreateGrid();
   if (!gridGeom) {
     ignerr << "Unable to create grid geometry" << std::endl;
@@ -424,11 +458,11 @@ void RenderWidget::RenderGroundPlaneGrid() {
     gray->SetSpecular(0.7, 0.7, 0.7);
 
     const unsigned int kCellCount = 50u;
-    const double       kCellLength = 1;
+    const double kCellLength = 1;
     const unsigned int kVerticalCellCount = 0u;
 
-    this->RenderGrid(kCellCount, kCellLength, kVerticalCellCount,
-      gray, ignition::math::Pose3d::Zero);
+    this->RenderGrid(kCellCount, kCellLength, kVerticalCellCount, gray,
+                     ignition::math::Pose3d::Zero);
   } else {
     ignerr << "Failed to create material for the grid" << std::endl;
   }
@@ -510,8 +544,6 @@ ignition::rendering::VisualPtr RenderWidget::RenderMesh(
 
   setPoseFromMessage(_vis, mesh);
 
-  ignition::rendering::VisualPtr root = this->scene->RootVisual();
-
   return mesh;
 }
 
@@ -524,6 +556,9 @@ void RenderWidget::SetInitialModels(const ignition::msgs::Model_V& _msg) {
   for (int i = 0; i < _msg.models_size(); ++i) {
     LoadModel(_msg.models(i));
   }
+
+  this->node.Subscribe("/DRAKE_VIEWER_DRAW", &RenderWidget::OnUpdateScene,
+                       this);
 }
 
 /////////////////////////////////////////////////
@@ -620,6 +655,8 @@ void RenderWidget::LoadModel(const ignition::msgs::Model& _msg) {
       }
 
       linkRootVisual->AddChild(ignvis);
+
+      setPoseFromMessage(link, linkRootVisual);
     }
   }
 
@@ -661,17 +698,11 @@ void RenderWidget::UpdateScene(const ignition::msgs::Model_V& _msg) {
                << std::endl;
         continue;
       }
-
-      auto pose = link.pose();
-
       // Update the pose of the root visual only;
       // the relative poses of the children remain the same
       auto& visual = visualsIt->second;
-      // The setPoseFromMessage() assumes an ignition::msgs::Visual
-      // message here, so we setup a dummy one to please it.
-      ignition::msgs::Visual tmpvis;
-      *tmpvis.mutable_pose() = pose;
-      setPoseFromMessage(tmpvis, visual);
+
+      setPoseFromMessage(link, visual);
     }
   }
 }
@@ -760,11 +791,6 @@ void RenderWidget::CreateRenderWindow() {
 void RenderWidget::showEvent(QShowEvent* _e) {
   QApplication::flush();
 
-  if (!this->renderWindow) {
-    this->CreateRenderWindow();
-    this->updateTimer->start(this->kUpdateTimeFrequency);
-  }
-
   QWidget::showEvent(_e);
 
   this->raise();
@@ -778,7 +804,7 @@ QPaintEngine* RenderWidget::paintEngine() const { return nullptr; }
 // Replace inherited implementation with a do-nothing one, so that the
 // context menu doesn't appear and we get back the zoom in/out using the
 // right mouse button.
-void RenderWidget::ShowContextMenu(const QPoint &_pos) {}
+void RenderWidget::ShowContextMenu(const QPoint& _pos) {}
 
 /////////////////////////////////////////////////
 void RenderWidget::paintEvent(QPaintEvent* _e) {

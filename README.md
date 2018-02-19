@@ -14,7 +14,7 @@ Delphyne back-end and the front-end.
     $ sudo apt-key adv --keyserver hkp://ha.pool.sks-keyservers.net:80 --recv-key 421C365BD9FF1F717815A3895523BAEEB01FA116
     $ sudo apt-get update
     $ sudo apt-get install mercurial cmake pkg-config python python-pip ruby-ronn libprotoc-dev libprotobuf-dev protobuf-compiler uuid-dev libzmq3-dev git libogre-1.9-dev libglew-dev qtbase5-dev libicu-dev libboost-filesystem-dev libfreeimage-dev libtinyxml2-dev libgts-dev libavdevice-dev python3-vcstool mesa-utils lcov gcovr libqt5multimedia5 libqwt-dev
-    $ sudo pip install git+https://github.com/NiklasRosenstein/pydoc-markdown.git
+    $ pip install pydoc-markdown --user
     ```
 
 1.  Now build a workspace for Delphyne. If you are familiar with ROS catkin

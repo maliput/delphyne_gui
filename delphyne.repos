@@ -6,7 +6,7 @@ repositories:
   ign_rendering   : { type: 'hg', url:  'https://bitbucket.org/ignitionrobotics/ign-rendering.git',     version: 'f70b3f5b73ba' }
   ign_msgs        : { type: 'hg', url:  'https://bitbucket.org/ignitionrobotics/ign-msgs.git',          version: 'e3d3e320c527' }
   ign_cmake       : { type: 'hg', url:  'https://bitbucket.org/ignitionrobotics/ign-cmake.git',         version: 'db89652250ed' }
-  pybind11        : { type: 'git', url: 'https://github.com/RobotLocomotion/pybind11.git',              version: 'a7e9d1ba30703dbdd97eefd45c314b91fc0eccd8' }
+  pybind11        : { type: 'git', url: 'https://github.com/RobotLocomotion/pybind11.git',              version: '3dcfcb00a440e858211661d179a15904586fb45f' }
   drake           : { type: 'git', url: 'https://github.com/RobotLocomotion/drake.git',                 version: '052f1553d8e09b32c168a241daf31e13726f80c1' }
   delphyne        : { type: 'git', url: 'git@github.com:ToyotaResearchInstitute/delphyne.git',          version: 'master' }
   delphyne_gui    : { type: 'git', url: 'git@github.com:ToyotaResearchInstitute/delphyne-gui.git',      version: 'master' }

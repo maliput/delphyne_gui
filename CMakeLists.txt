@@ -262,3 +262,4 @@ endif(build_errors)
 #################################################
 # Installs maliput_viewer.sh as a shortcut to run the visualizer.
 install (PROGRAMS tools/maliput_viewer.sh DESTINATION ${BIN_INSTALL_DIR})
+install (PROGRAMS setup.bash DESTINATION .)

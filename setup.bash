@@ -47,7 +47,7 @@ add_if_not_in_var() {
 }
 
 export DRAKE_RESOURCE_ROOT=$INSTALL_PREFIX/share/drake
-export DELPHYNE_RESOURCE_ROOT=${INSTALL_PREFIX}/share/delphyne              # Used by demo_launcher.py
+export DELPHYNE_RESOURCE_ROOT=${INSTALL_PREFIX}/share/delphyne
 export DELPHYNE_AGENT_PLUGIN_PATH=$INSTALL_PREFIX/lib/delphyne/agents
 
 add_if_not_in_var DELPHYNE_PACKAGE_PATH $INSTALL_PREFIX/share/drake/automotive/models

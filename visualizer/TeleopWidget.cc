@@ -100,6 +100,13 @@ void TeleopWidget::StartDriving() {
     this->button->setText("Start Driving");
     this->lineedit->setEnabled(true);
     this->driving = false;
+    this->currentThrottle = 0.0;
+    this->currentBrake = 0.0;
+    this->currentSteeringAngle = 0.0;
+    this->steeringAngleLabel->setText(
+        QString("%1").arg(this->currentSteeringAngle));
+    this->throttleValueLabel->setText(QString("%1").arg(this->currentThrottle));
+    this->brakeValueLabel->setText(QString("%1").arg(this->currentBrake));
     setFocus();
   } else {
     ignmsg << "Start Driving" << std::endl;
@@ -134,58 +141,60 @@ static void sec_and_nsec_now(int64_t& sec, int32_t& nsec) {
 
 /////////////////////////////////////////////////
 void TeleopWidget::timerEvent(QTimerEvent* event) {
-  if (event->timerId() == timer.timerId()) {
-    // do our stuff
-    if (this->driving) {
-      double last_throttle = this->currentThrottle;
-      double last_brake = this->currentBrake;
-
-      if (!this->keepCurrentThrottle) {
-        if (this->throttleKeyPressed) {
-          computeClampAndSetThrottle(1.0);
-        } else {
-          computeClampAndSetThrottle(-6.0);
-        }
-      }
-
-      if (!this->keepCurrentBrake) {
-        if (this->brakeKeyPressed) {
-          computeClampAndSetBrake(1.0);
-        } else {
-          computeClampAndSetBrake(-6.0);
-        }
-      }
-
-      if (last_throttle != this->currentThrottle ||
-          last_brake != this->currentBrake || this->newSteeringAngle) {
-        ignition::msgs::AutomotiveDrivingCommand ignMsg;
-
-        // We don't set the header here since the bridge completely ignores it
-
-        int32_t nsec;
-        int64_t sec;
-
-        sec_and_nsec_now(sec, nsec);
-
-        ignMsg.mutable_time()->set_sec(sec);
-        ignMsg.mutable_time()->set_nsec(nsec);
-
-        ignMsg.set_acceleration(this->currentThrottle - this->currentBrake);
-        ignMsg.set_theta(this->currentSteeringAngle);
-
-        this->publisher_->Publish(ignMsg);
-
-        this->steeringAngleLabel->setText(
-            QString("%1").arg(this->currentSteeringAngle));
-        this->throttleValueLabel->setText(
-            QString("%1").arg(this->currentThrottle));
-        this->brakeValueLabel->setText(QString("%1").arg(this->currentBrake));
-
-        this->newSteeringAngle = false;
-      }
-    }
-  } else {
+  if (event->timerId() != timer.timerId()) {
     QWidget::timerEvent(event);
+    return;
+  }
+
+  // do our stuff
+  if (!this->driving) {
+    return;
+  }
+
+  double last_throttle = this->currentThrottle;
+  double last_brake = this->currentBrake;
+
+  if (!this->keepCurrentThrottle) {
+    if (this->throttleKeyPressed) {
+      computeClampAndSetThrottle(1.0);
+    } else {
+      computeClampAndSetThrottle(-6.0);
+    }
+  }
+
+  if (!this->keepCurrentBrake) {
+    if (this->brakeKeyPressed) {
+      computeClampAndSetBrake(1.0);
+    } else {
+      computeClampAndSetBrake(-6.0);
+    }
+  }
+
+  if (last_throttle != this->currentThrottle ||
+      last_brake != this->currentBrake || this->newSteeringAngle) {
+    ignition::msgs::AutomotiveDrivingCommand ignMsg;
+
+    // We don't set the header here since the bridge completely ignores it
+
+    int32_t nsec;
+    int64_t sec;
+
+    sec_and_nsec_now(sec, nsec);
+
+    ignMsg.mutable_time()->set_sec(sec);
+    ignMsg.mutable_time()->set_nsec(nsec);
+
+    ignMsg.set_acceleration(this->currentThrottle - this->currentBrake);
+    ignMsg.set_theta(this->currentSteeringAngle);
+
+    this->publisher_->Publish(ignMsg);
+
+    this->steeringAngleLabel->setText(
+        QString("%1").arg(this->currentSteeringAngle));
+    this->throttleValueLabel->setText(QString("%1").arg(this->currentThrottle));
+    this->brakeValueLabel->setText(QString("%1").arg(this->currentBrake));
+
+    this->newSteeringAngle = false;
   }
 }
 

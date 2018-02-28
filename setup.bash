@@ -1,3 +1,4 @@
+#!/bin/bash
 # The setup script for Delphyne.  This script must be sourced from somewhere
 # within the Delphyne workspace.
 

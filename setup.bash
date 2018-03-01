@@ -47,7 +47,6 @@ add_if_not_in_var() {
     fi
 }
 
-export DRAKE_RESOURCE_ROOT=$INSTALL_PREFIX/share/drake
 export DELPHYNE_RESOURCE_ROOT=${INSTALL_PREFIX}/share/delphyne
 export DELPHYNE_AGENT_PLUGIN_PATH=$INSTALL_PREFIX/lib/delphyne/agents
 

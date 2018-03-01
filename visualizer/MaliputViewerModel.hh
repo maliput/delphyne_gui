@@ -45,15 +45,25 @@ namespace gui {
 class MaliputMesh {
  public:
   /// \brief Visualization status.
-  enum State{ kOff, kOn, kDisabled };
+  enum VisualState{ kOff, kOn};
+
+  /// \brief Mesh status.
+  enum State{ kEnabled, kDisabled };
+
+  /// \brief Converts @p _visualState into a valid VisualState value.
+  /// \param[in] _visualState Value to be casted into VisualState.
+  /// \return kOn when @p _visualState is true. Otherwise, kOff.
+  static VisualState BooleanToVisualState(bool _visualState);
 
   /// \brief Converts @p _state into a valid State value.
-  /// \param[in] _state Value to be casted into State. There is no mapping to
-  /// kDisabled.
-  /// \return kOn when @p _state is true. Otherwise, kOff.
-  static State FromBoolean(bool _state);
+  /// \param[in] _state Value to be casted into VisualState.
+  /// \return kEnabled when @p _state is true. Otherwise, kDisabled.
+  static State BooleanToState(bool _state);
 
   /// \brief Holds the visualization status.
+  VisualState visualState{kOff};
+
+  /// \brief Holds the mesh status.
   State state{kDisabled};
 
   /// \brief Holds a pointer to the mesh.
@@ -88,8 +98,9 @@ class MaliputViewerModel {
 
   /// \brief Modifies the visualization state of @p key mesh.
   /// \param[in] _key The name of the mesh.
-  /// \param[in] _newState The new visualization status of the mesh.
-  void SetLayerState(const std::string& _key, MaliputMesh::State _newState);
+  /// \param[in] _newVisualState The new visualization status of the mesh.
+  void SetLayerState(const std::string& _key,
+                     MaliputMesh::VisualState _newVisualState);
 
  private:
   /// \brief Converts @p _geoMeshes into a

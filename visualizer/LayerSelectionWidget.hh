@@ -37,6 +37,7 @@
 namespace delphyne {
 namespace gui {
 
+/// \brief Widget with checkboxes to enable / disable mesh visualization.
 class LayerSelectionWidget : public QWidget {
   Q_OBJECT
 
@@ -59,9 +60,10 @@ class LayerSelectionWidget : public QWidget {
   void onGrayedMarkerValueChanged(int state);
 
  signals:
-  void valueChanged(const std::string& key, MaliputMesh::State newValue);
+  void valueChanged(const std::string& key, bool newValue);
 
  private:
+  /// \brief Builds the GUI with all the check boxes for mesh toggling.
   void Build();
 
   QCheckBox* asphaltCheckBox{nullptr};

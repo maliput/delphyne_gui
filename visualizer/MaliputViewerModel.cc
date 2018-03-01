@@ -75,8 +75,10 @@ void MaliputViewerModel::ConvertMeshes(
     if (maliputMesh->mesh == nullptr) {
       ignmsg << "Skipping mesh [" << it.first << "] because it is empty.\n";
       maliputMesh->state = MaliputMesh::State::kDisabled;
+      maliputMesh->visualState = MaliputMesh::VisualState::kOff;
     } else {
-      maliputMesh->state = MaliputMesh::State::kOn;
+      maliputMesh->state = MaliputMesh::State::kEnabled;
+      maliputMesh->visualState = MaliputMesh::VisualState::kOn;
     }
     // Retrieves the material
     maliputMesh->material = drake::maliput::mesh::GetMaterialByName(it.first);
@@ -87,14 +89,20 @@ void MaliputViewerModel::ConvertMeshes(
 
 ///////////////////////////////////////////////////////
 void MaliputViewerModel::SetLayerState(const std::string& _key,
-  MaliputMesh::State _newState) {
+  MaliputMesh::VisualState _newVisualState) {
   if (this->maliputMeshes.find(_key) == this->maliputMeshes.end()) {
     throw std::runtime_error(_key + " doest not exist in maliputMeshes.");
   }
-  this->maliputMeshes[_key]->state = _newState;
+  this->maliputMeshes[_key]->visualState = _newVisualState;
 }
 
 ///////////////////////////////////////////////////////
-MaliputMesh::State MaliputMesh::FromBoolean(bool _state) {
- return _state ? State::kOn : State::kOff;
+MaliputMesh::VisualState MaliputMesh::BooleanToVisualState(bool _visualState) {
+ return _visualState ? MaliputMesh::VisualState::kOn :
+                       MaliputMesh::VisualState::kOff;
+}
+
+///////////////////////////////////////////////////////
+MaliputMesh::State MaliputMesh::BooleanToState(bool _state) {
+ return _state ? MaliputMesh::State::kEnabled : MaliputMesh::State::kDisabled;
 }

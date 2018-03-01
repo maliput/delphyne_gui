@@ -105,48 +105,40 @@ void LayerSelectionWidget::Build() {
 
 ///////////////////////////////////////////////////////
 void LayerSelectionWidget::onAsphaltValueChanged(int state) {
-  emit valueChanged("asphalt",
-      MaliputMesh::FromBoolean(this->asphaltCheckBox->isChecked()));
+  emit valueChanged("asphalt", this->asphaltCheckBox->isChecked());
 }
 
 ///////////////////////////////////////////////////////
 void LayerSelectionWidget::onLaneValueChanged(int state) {
-  emit valueChanged("lane",
-      MaliputMesh::FromBoolean(this->laneCheckBox->isChecked()));
+  emit valueChanged("lane", this->laneCheckBox->isChecked());
 }
 
 ///////////////////////////////////////////////////////
 void LayerSelectionWidget::onMarkerValueChanged(int state) {
-  emit valueChanged("marker",
-      MaliputMesh::FromBoolean(this->markerCheckBox->isChecked()));
+  emit valueChanged("marker", this->markerCheckBox->isChecked());
 }
 
 ///////////////////////////////////////////////////////
 void LayerSelectionWidget::onHBoundsValueChanged(int state) {
-  emit valueChanged("h_bounds",
-      MaliputMesh::FromBoolean(this->hboundCheckBox->isChecked()));
+  emit valueChanged("h_bounds", this->hboundCheckBox->isChecked());
 }
 
 ///////////////////////////////////////////////////////
 void LayerSelectionWidget::onBranchPointValueChanged(int state) {
-  emit valueChanged("branch_point",
-      MaliputMesh::FromBoolean(this->branchPointCheckBox->isChecked()));
+  emit valueChanged("branch_point", this->branchPointCheckBox->isChecked());
 }
 
 ///////////////////////////////////////////////////////
 void LayerSelectionWidget::onGrayedAsphaltValueChanged(int state) {
-  emit valueChanged("grayed_asphalt",
-      MaliputMesh::FromBoolean(this->grayedAsphaltCheckBox->isChecked()));
+  emit valueChanged("grayed_asphalt", this->grayedAsphaltCheckBox->isChecked());
 }
 
 ///////////////////////////////////////////////////////
 void LayerSelectionWidget::onGrayedLaneValueChanged(int state) {
-  emit valueChanged("grayed_lane",
-      MaliputMesh::FromBoolean(this->grayedLaneCheckBox->isChecked()));
+  emit valueChanged("grayed_lane", this->grayedLaneCheckBox->isChecked());
 }
 
 ///////////////////////////////////////////////////////
 void LayerSelectionWidget::onGrayedMarkerValueChanged(int state) {
-  emit valueChanged("grayed_marker",
-      MaliputMesh::FromBoolean(this->grayedMarkerCheckBox->isChecked()));
+  emit valueChanged("grayed_marker", this->grayedMarkerCheckBox->isChecked());
 }

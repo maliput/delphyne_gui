@@ -15,15 +15,15 @@ MaliputViewerWidget::MaliputViewerWidget(QWidget* parent)
   this->model->Load();
 
   QObject::connect(this->layerSelectionWidget,
-    SIGNAL(valueChanged(const std::string&, MaliputMesh::State)), this,
-    SLOT(OnLayerMeshChanged(const std::string&, MaliputMesh::State)));
+    SIGNAL(valueChanged(const std::string&, bool)), this,
+    SLOT(OnLayerMeshChanged(const std::string&, bool)));
 }
 
 /////////////////////////////////////////////////
 void MaliputViewerWidget::OnLayerMeshChanged(const std::string& key,
-  MaliputMesh::State newValue) {
+  bool newValue) {
   // Updates the model.
-  this->model->SetLayerState(key, newValue);
+  this->model->SetLayerState(key, MaliputMesh::BooleanToVisualState(newValue));
   // Replicates into the GUI.
   this->renderWidget->RenderRoadMeshes(this->model->Meshes());
 }

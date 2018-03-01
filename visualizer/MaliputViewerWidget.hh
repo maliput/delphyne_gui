@@ -41,9 +41,9 @@ class MaliputViewerWidget : public ignition::gui::Plugin {
   /// \brief Updates the model based on the @p key mesh name and @p newValue and
   /// the mesh on the GUI.
   /// \param[in] key Name of the mesh.
-  /// \param[in] newValue Mesh visualization status.
+  /// \param[in] newValue New mesh visualization status.
   protected slots: void OnLayerMeshChanged(const std::string& key,
-    MaliputMesh::State newValue);
+    bool newValue);
 
  protected:
   /// \brief Overridden method to receive Qt paint event.

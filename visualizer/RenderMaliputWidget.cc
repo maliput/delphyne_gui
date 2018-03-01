@@ -339,7 +339,7 @@ void RenderMaliputWidget::RenderRoadMeshes(
       }
 
       // Applies the correct material to the mesh.
-      if (it.second->state == MaliputMesh::State::kOff) {
+      if (it.second->visualState == MaliputMesh::VisualState::kOff) {
         this->CreateTransparentMaterial(material);
       } else if (!this->FillMaterial(it.second->material.get(), material)) {
         ignerr << "Failed to fill " << it.first << " material information.\n";

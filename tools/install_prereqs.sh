@@ -32,33 +32,34 @@ echo "**************************************************************************
 echo ""
 
 apt install --no-install-recommends $(tr '\n' ' ' <<EOF
-mercurial
 cmake
-pkg-config
-python
-python-pip
-ruby-ronn
-libprotoc-dev
-libprotobuf-dev
-protobuf-compiler
-uuid-dev
-libzmq3-dev
+coreutils
+gcovr
 git
-libogre-1.9-dev
-libglew-dev
-qtbase5-dev
-libicu-dev
+lcov
+libavdevice-dev
 libboost-filesystem-dev
 libfreeimage-dev
-libtinyxml2-dev
+libglew-dev
 libgts-dev
-libavdevice-dev
-python3-vcstool
-mesa-utils
-lcov
-gcovr
+libicu-dev
+libogre-1.9-dev
 libqt5multimedia5
 libqwt-dev
+libprotobuf-dev
+libprotoc-dev
+libtinyxml2-dev
+libzmq3-dev
+mercurial
+mesa-utils
+pkg-config
+protobuf-compiler
+python
+python-pip
+python3-vcstool
+qtbase5-dev
+ruby-ronn
+uuid-dev
 EOF
 )
 

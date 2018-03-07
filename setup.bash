@@ -1,12 +1,11 @@
+#!/bin/bash
 # The setup script for Delphyne.  This script must be sourced from somewhere
 # within the Delphyne workspace.
 
 # First we determine where the script is, and based on that we assume the
 # workspace is setup as specified in the README.md to find the workspace.
-DELPHYNE_GUI_SCRIPT=$( realpath ${BASH_SOURCE[0]} )
-DELPHYNE_GUI_DIR=$( dirname $DELPHYNE_GUI_SCRIPT )
-SRC_DIR=$( dirname $DELPHYNE_GUI_DIR )
-WS_DIR=$( dirname $SRC_DIR )
+SETUP_BASH_SCRIPT=$( realpath ${BASH_SOURCE[0]} )
+INSTALL_PREFIX=$( dirname $SETUP_BASH_SCRIPT )
 
 # A function to add a new item (needle) to the passed environment variable, only
 # if the new item is not already in the environment variable.  The function
@@ -48,18 +47,14 @@ add_if_not_in_var() {
     fi
 }
 
-export DRAKE_INSTALL_PATH=$WS_DIR/install
-export DELPHYNE_WS_DIR=$WS_DIR
-export DRAKE_SRC_DIR=$WS_DIR/src/drake
-export DELPHYNE_AGENT_PLUGIN_PATH=$WS_DIR/install/lib/delphyne/agents
-add_if_not_in_var PATH $WS_DIR/install/bin
-add_if_not_in_var LD_LIBRARY_PATH $WS_DIR/install/lib
-add_if_not_in_var DELPHYNE_PACKAGE_PATH $WS_DIR/install/share/drake/automotive/models
-add_if_not_in_var DELPHYNE_PACKAGE_PATH $WS_DIR/src/delphyne
-add_if_not_in_var DELPHYNE_PACKAGE_PATH $WS_DIR/src/delphyne_gui
-add_if_not_in_var PYTHONPATH $WS_DIR/install/lib/python2.7/site-packages/launcher
-add_if_not_in_var PYTHONPATH $WS_DIR/install/lib/python2.7/site-packages/utils
-add_if_not_in_var PYTHONPATH $WS_DIR/install/lib/python2.7/site-packages
-add_if_not_in_var PYTHONPATH $WS_DIR/install/lib
-add_if_not_in_var DRAKE_RESOURCE_ROOT $WS_DIR/install/share
-add_if_not_in_var DRAKE_PACKAGE_PATH $WS_DIR/install/share/drake/automotive/models
+export DELPHYNE_RESOURCE_ROOT=${INSTALL_PREFIX}/share/delphyne
+export DELPHYNE_AGENT_PLUGIN_PATH=$INSTALL_PREFIX/lib/delphyne/agents
+
+add_if_not_in_var DELPHYNE_PACKAGE_PATH $INSTALL_PREFIX/share/drake/automotive/models
+add_if_not_in_var LD_LIBRARY_PATH $INSTALL_PREFIX/lib
+add_if_not_in_var PATH $INSTALL_PREFIX/bin
+# Need to clean up how we install python modules so we don't need this tangle
+add_if_not_in_var PYTHONPATH $INSTALL_PREFIX/lib/python2.7/site-packages/launcher
+add_if_not_in_var PYTHONPATH $INSTALL_PREFIX/lib/python2.7/site-packages/utils
+add_if_not_in_var PYTHONPATH $INSTALL_PREFIX/lib/python2.7/site-packages
+add_if_not_in_var PYTHONPATH $INSTALL_PREFIX/lib

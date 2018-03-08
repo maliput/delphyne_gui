@@ -56,6 +56,7 @@ pkg-config
 protobuf-compiler
 python
 python-pip
+python-setuptools
 python3-vcstool
 qtbase5-dev
 ruby-ronn

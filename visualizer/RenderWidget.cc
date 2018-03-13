@@ -197,6 +197,16 @@ void RenderWidget::LoadConfig(const tinyxml2::XMLElement* _pluginElem) {
         auto poseStr = poseXML->GetText();
         std::istringstream stream(poseStr);
         stream >> this->userSettings.userCameraPose;
+
+        if (this->camera)
+        {
+          auto position = this->userSettings.userCameraPose.Pos();
+          auto rotation = this->userSettings.userCameraPose.Rot().Euler();
+          this->camera->SetLocalRotation(
+            rotation.X(), rotation.Y(), rotation.Z());
+          this->camera->SetLocalPosition(
+            position.X(), position.Y(), position.Z());
+        }
       } else {
         ignerr << "Unable to parse <pose> element within <camera>" << std::endl;
       }

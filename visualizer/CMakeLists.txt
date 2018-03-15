@@ -113,7 +113,7 @@ add_executable(visualizer
 target_link_libraries(visualizer
   ${IGNITION-COMMON_LIBRARIES}
   ${IGNITION-GUI_LIBRARIES}
-  ${IGNITION-MATH_LIBRARIES}
+  ${drake_LIBRARIES}
   ${Qt5Core_LIBRARIES}
   ${Qt5Widgets_LIBRARIES}
   ${global_attributes}

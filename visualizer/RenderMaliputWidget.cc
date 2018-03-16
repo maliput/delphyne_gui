@@ -306,7 +306,7 @@ void RenderMaliputWidget::RenderRoadMeshes(
     const auto meshExists = this->meshes.find(it.first);
     // If the mesh is disabled, there is no mesh for it so it must be set to
     // transparent.
-    if (it.second->state == MaliputMesh::State::kDisabled) {
+    if (!it.second->enabled) {
       // If the mesh already exits, a new transparent material is set.
       if (meshExists != this->meshes.end()) {
         this->CreateTransparentMaterial(material);
@@ -339,7 +339,7 @@ void RenderMaliputWidget::RenderRoadMeshes(
       }
 
       // Applies the correct material to the mesh.
-      if (it.second->visualState == MaliputMesh::VisualState::kOff) {
+      if (!it.second->visible) {
         this->CreateTransparentMaterial(material);
       } else if (!this->FillMaterial(it.second->material.get(), material)) {
         ignerr << "Failed to fill " << it.first << " material information.\n";
@@ -405,6 +405,8 @@ void RenderMaliputWidget::moveEvent(QMoveEvent* _e) {
     return;
   }
   this->renderWindow->OnMove();
+
+  this->UpdateViewport();
 }
 
 /////////////////////////////////////////////////
@@ -414,6 +416,8 @@ void RenderMaliputWidget::mousePressEvent(QMouseEvent* _e) {
   }
 
   this->orbitViewControl->OnMousePress(_e);
+
+  this->UpdateViewport();
 }
 
 /////////////////////////////////////////////////
@@ -423,6 +427,8 @@ void RenderMaliputWidget::mouseReleaseEvent(QMouseEvent* _e) {
   }
 
   this->orbitViewControl->OnMouseRelease(_e);
+
+  this->UpdateViewport();
 }
 
 /////////////////////////////////////////////////
@@ -432,6 +438,8 @@ void RenderMaliputWidget::mouseMoveEvent(QMouseEvent* _e) {
   }
 
   this->orbitViewControl->OnMouseMove(_e);
+
+  this->UpdateViewport();
 }
 
 /////////////////////////////////////////////////
@@ -441,4 +449,13 @@ void RenderMaliputWidget::wheelEvent(QWheelEvent* _e) {
   }
 
   this->orbitViewControl->OnMouseWheel(_e);
+
+  this->UpdateViewport();
+}
+
+/////////////////////////////////////////////////
+void RenderMaliputWidget::UpdateViewport() {
+  if (this->renderWindow && this->camera) {
+    this->camera->Update();
+  }
 }

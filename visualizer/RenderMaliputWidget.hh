@@ -159,6 +159,13 @@ class RenderMaliputWidget : public QWidget {
   /// visual.
   void CreateRoadRootVisual();
 
+  /// \brief Refreshes the ignition rendering viewport.
+  /// TODO(basicNew): For some reason I can't understand, the required repaint
+  /// after a mouse event stopped being triggered. As a quick workaround I
+  /// created this event an explicitly call it on every mouse event, but we
+  /// should definitely research the underlying cause.
+  void UpdateViewport();
+
   /// \brief The frequency at which we'll do an update on the widget.
   const int kUpdateTimeFrequency = static_cast<int>(std::round(1000.0 / 60.0));
 

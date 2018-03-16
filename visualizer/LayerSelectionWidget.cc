@@ -79,8 +79,7 @@ void LayerSelectionWidget::Build() {
   this->hboundCheckBox->setChecked(true);
   this->branchPointCheckBox->setChecked(true);
   // TODO(agalbachicar):  Once grayed layers are created, we can allow to toggle
-  //                      them. In the meantime, we have just wired them and
-  //                      disabled.
+  // them. In the meantime, we have just wired them and disabled.
   this->grayedAsphaltCheckBox->setCheckable(false);
   this->grayedLaneCheckBox->setCheckable(false);
   this->grayedMarkerCheckBox->setCheckable(false);

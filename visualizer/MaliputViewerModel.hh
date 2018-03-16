@@ -44,27 +44,11 @@ namespace gui {
 /// \brief Holds the mesh, material and visualization status.
 class MaliputMesh {
  public:
-  /// \brief Visualization status.
-  enum VisualState{ kOff, kOn};
-
-  /// \brief Mesh status.
-  enum State{ kEnabled, kDisabled };
-
-  /// \brief Converts @p _visualState into a valid VisualState value.
-  /// \param[in] _visualState Value to be casted into VisualState.
-  /// \return kOn when @p _visualState is true. Otherwise, kOff.
-  static VisualState BooleanToVisualState(bool _visualState);
-
-  /// \brief Converts @p _state into a valid State value.
-  /// \param[in] _state Value to be casted into VisualState.
-  /// \return kEnabled when @p _state is true. Otherwise, kDisabled.
-  static State BooleanToState(bool _state);
-
   /// \brief Holds the visualization status.
-  VisualState visualState{kOff};
+  bool visible{false};
 
   /// \brief Holds the mesh status.
-  State state{kDisabled};
+  bool enabled{false};
 
   /// \brief Holds a pointer to the mesh.
   std::unique_ptr<ignition::common::Mesh> mesh{};
@@ -99,8 +83,7 @@ class MaliputViewerModel {
   /// \brief Modifies the visualization state of @p key mesh.
   /// \param[in] _key The name of the mesh.
   /// \param[in] _newVisualState The new visualization status of the mesh.
-  void SetLayerState(const std::string& _key,
-                     MaliputMesh::VisualState _newVisualState);
+  void SetLayerState(const std::string& _key, bool _isVisible);
 
  private:
   /// \brief Converts @p _geoMeshes into a

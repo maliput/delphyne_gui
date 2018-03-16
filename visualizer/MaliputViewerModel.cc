@@ -42,18 +42,18 @@ bool MaliputViewerModel::Load() {
   if (GlobalAttributes::HasArgument("yaml_file")) {
     const std::string maliputFilePath =
       GlobalAttributes::GetArgument("yaml_file");
-    ignmsg << "About to load ["
+    igndbg << "About to load ["
            << maliputFilePath <<
            "] monolane file." << std::endl;
     this->roadGeometry = drake::maliput::monolane::LoadFile(maliputFilePath);
-    ignmsg << "Loaded [" << maliputFilePath << "] monolane file." << std::endl;
-    ignmsg << "Loading RoadGeometry meshes..." << std::endl;
+    igndbg << "Loaded [" << maliputFilePath << "] monolane file." << std::endl;
+    igndbg << "Loading RoadGeometry meshes..." << std::endl;
     std::map<std::string, drake::maliput::mesh::GeoMesh> geoMeshes =
       drake::maliput::mesh::BuildMeshes(this->roadGeometry.get(),
         drake::maliput::mesh::Features());
-    ignmsg << "Meshes loaded." << std::endl;
+    igndbg << "Meshes loaded." << std::endl;
     this->ConvertMeshes(geoMeshes);
-    ignmsg << "Meshes converted to ignition type." << std::endl;
+    igndbg << "Meshes converted to ignition type." << std::endl;
     return true;
   }
   return false;
@@ -74,11 +74,11 @@ void MaliputViewerModel::ConvertMeshes(
     maliputMesh->mesh = drake::maliput::mesh::Convert(it.first, it.second);
     if (maliputMesh->mesh == nullptr) {
       ignmsg << "Skipping mesh [" << it.first << "] because it is empty.\n";
-      maliputMesh->state = MaliputMesh::State::kDisabled;
-      maliputMesh->visualState = MaliputMesh::VisualState::kOff;
+      maliputMesh->enabled = false;
+      maliputMesh->visible = false;
     } else {
-      maliputMesh->state = MaliputMesh::State::kEnabled;
-      maliputMesh->visualState = MaliputMesh::VisualState::kOn;
+      maliputMesh->enabled = true;
+      maliputMesh->visible = true;
     }
     // Retrieves the material
     maliputMesh->material = drake::maliput::mesh::GetMaterialByName(it.first);
@@ -88,21 +88,9 @@ void MaliputViewerModel::ConvertMeshes(
 }
 
 ///////////////////////////////////////////////////////
-void MaliputViewerModel::SetLayerState(const std::string& _key,
-  MaliputMesh::VisualState _newVisualState) {
+void MaliputViewerModel::SetLayerState(const std::string& _key, bool _isVisible) {
   if (this->maliputMeshes.find(_key) == this->maliputMeshes.end()) {
     throw std::runtime_error(_key + " doest not exist in maliputMeshes.");
   }
-  this->maliputMeshes[_key]->visualState = _newVisualState;
-}
-
-///////////////////////////////////////////////////////
-MaliputMesh::VisualState MaliputMesh::BooleanToVisualState(bool _visualState) {
- return _visualState ? MaliputMesh::VisualState::kOn :
-                       MaliputMesh::VisualState::kOff;
-}
-
-///////////////////////////////////////////////////////
-MaliputMesh::State MaliputMesh::BooleanToState(bool _state) {
- return _state ? MaliputMesh::State::kEnabled : MaliputMesh::State::kDisabled;
+  this->maliputMeshes[_key]->visible = _isVisible;
 }

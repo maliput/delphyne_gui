@@ -23,7 +23,7 @@ MaliputViewerWidget::MaliputViewerWidget(QWidget* parent)
 void MaliputViewerWidget::OnLayerMeshChanged(const std::string& key,
   bool newValue) {
   // Updates the model.
-  this->model->SetLayerState(key, MaliputMesh::BooleanToVisualState(newValue));
+  this->model->SetLayerState(key, newValue);
   // Replicates into the GUI.
   this->renderWidget->RenderRoadMeshes(this->model->Meshes());
 }

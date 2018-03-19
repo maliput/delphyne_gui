@@ -54,10 +54,9 @@ void MaliputViewerWidget::paintEvent(QPaintEvent* _e) {
   QWidget::paintEvent(_e);
 
   // TODO(agalbachicar): Properly sync the first paint event, so road meshes can
-  //                     be queried from the model and set to the view.
-  static bool first_run{false};
-  if (!first_run) {
-    first_run = true;
+  // be queried from the model and set to the view.
+  if (!first_run_) {
+    first_run_ = true;
     this->renderWidget->RenderRoadMeshes(this->model->Meshes());
   }
 

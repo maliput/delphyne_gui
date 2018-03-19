@@ -62,6 +62,11 @@ class MaliputViewerWidget : public ignition::gui::Plugin {
 
   /// \brief Model that holds the meshes and the visualization status.
   std::unique_ptr<MaliputViewerModel> model{};
+
+  /// \brief Flag used to record the first paint event and sync on the road
+  /// meshes when required.
+  bool first_run_{false};
+
 };
 
 }

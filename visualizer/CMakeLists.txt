@@ -33,10 +33,18 @@ install(TARGETS ${global_attributes} DESTINATION
 # MaliputViewerWidget GUI plugin.
 set(maliput_viewer_widget MaliputViewerWidget)
 QT5_WRAP_CPP(${maliput_viewer_widget}_MOC ${maliput_viewer_widget}.hh)
+QT5_WRAP_CPP(LayerSelectionWidget_MOC LayerSelectionWidget.hh)
+QT5_WRAP_CPP(RenderMaliputWidget_MOC RenderMaliputWidget.hh)
 add_library(${maliput_viewer_widget} SHARED
+  ${CMAKE_CURRENT_SOURCE_DIR}/LayerSelectionWidget.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/${maliput_viewer_widget}.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/RenderMaliputWidget.cc
+  MaliputViewerModel.cc
   OrbitViewControl.cc
+  RenderMaliputWidget.cc
   ${${maliput_viewer_widget}_MOC}
+  ${LayerSelectionWidget_MOC}
+  ${RenderMaliputWidget_MOC}
 )
 target_link_libraries(${maliput_viewer_widget}
   ${drake_LIBRARIES}

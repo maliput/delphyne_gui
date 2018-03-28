@@ -28,6 +28,8 @@ macro (delphyne_build_tests)
     target_link_libraries(${BINARY_NAME}
       ${IGNITION-COMMON_LIBRARIES}
       ${global_attributes}
+      libgtest.a
+      pthread
     )
 
     if (UNIX)

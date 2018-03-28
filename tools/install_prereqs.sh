@@ -20,6 +20,8 @@ trap at_exit EXIT
 
 [[ "${EUID}" -eq 0 ]] || die "${me} must run as root. Please use sudo."
 
+sh -c 'echo "deb http://packages.osrfoundation.org/gazebo/ubuntu-stable xenial main" > /etc/apt/sources.list.d/gazebo-stable.list'
+apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys D2486D2DD83DB69272AFE98867170598AF249743
 sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
 apt-key adv --keyserver hkp://ha.pool.sks-keyservers.net:80 --recv-key 421C365BD9FF1F717815A3895523BAEEB01FA116
 
@@ -43,11 +45,12 @@ libfreeimage-dev
 libglew-dev
 libgts-dev
 libicu-dev
+libignition-cmake-dev
 libogre-1.9-dev
-libqt5multimedia5
-libqwt-dev
 libprotobuf-dev
 libprotoc-dev
+libqt5multimedia5
+libqwt-dev
 libtinyxml2-dev
 libzmq3-dev
 mercurial

@@ -1,0 +1,60 @@
+# -*- yaml -*-
+---
+# distances are meters; angles are degrees.
+maliput_multilane_builder:
+  id: "sample"
+  lane_width: 5
+  left_shoulder: 1
+  right_shoulder: 1.5
+  elevation_bounds: [0, 5]
+  linear_tolerance: 0.01
+  angular_tolerance: 0.5
+  points:
+    a:
+      xypoint: [0, 0, 0]
+      zpoint: [0, 0, 0, 0]
+  connections:
+    s1:
+      lanes: [3, 0, 0]
+      start: ["ref", "points.a.forward"]
+      length: 50
+      z_end: ["ref", [0, 0, 0, 0]]
+    s2:
+      lanes: [1, 0, 5]
+      left_shoulder: 1.2
+      start: ["ref", "connections.s1.end.1.forward"]
+      arc: [15, 180]
+      z_end: ["ref", [0, 0, 0, 0]]
+    s3:
+      lanes: [1, 0, 5]
+      right_shoulder: 0.8
+      start: ["ref", "connections.s2.end.ref.forward"]
+      length: 50
+      z_end: ["ref", [0, 0, 0, 0]]
+    s4:
+      lanes: [1, 0, 5]
+      start: ["ref", "connections.s3.end.ref.forward"]
+      arc: [15, 180]
+      explicit_end: ["ref", "connections.s1.start.ref.forward"]
+    s5:
+      lanes: [2, 0, 0]
+      start: ["ref", "connections.s1.end.0.forward"]
+      arc: [20, -180]
+      z_end: ["ref", [0, 0, 0, 0]]
+    s6:
+      lanes: [2, 0, 0]
+      start: ["ref", "connections.s5.end.0.forward"]
+      length: 50
+      z_end: ["ref", [0, 0, 0, 0]]
+    s7:
+      lanes: [2, 0, 0]
+      start: ["ref", "connections.s6.end.0.forward"]
+      arc: [20, -180]
+      explicit_end: ["ref", "connections.s1.start.ref.forward"]
+    s8:
+      lanes: [1, 0, 0]
+      start: ["ref", "connections.s6.end.1.forward"]
+      arc: [20, 90]
+      z_end: ["ref", [0, 0, 0, 0]]
+  groups:
+    g1: [s2, s5]

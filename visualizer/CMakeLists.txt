@@ -129,6 +129,7 @@ install (FILES
 # Install .yaml files.
 install (FILES
   road_samples/double_ring.yaml
+  road_samples/multilane_sample.yaml
   DESTINATION
   ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/delphyne/road_samples)
 

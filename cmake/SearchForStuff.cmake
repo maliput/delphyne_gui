@@ -136,6 +136,11 @@ if (NOT Qt5Test_FOUND)
   BUILD_ERROR("Missing: Qt5Test")
 endif()
 
+########################################
+# Find Delphyne
+find_package(delphyne0 REQUIRED)
+message(STATUS "found.....${delphyne0_FOUND}")
+
 #################################################
 # Macro to check for visibility capability in compiler
 # Original idea from: https://gitorious.org/ferric-cmake-stuff/

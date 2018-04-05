@@ -1,12 +1,6 @@
 include (${project_cmake_dir}/Utils.cmake)
 
 # ----------------------------------------
-# Generate protobuf headers
-add_subdirectory(protobuf)
-
-set_source_files_properties(${PROTO_SRC} ${PROTO_HEADER}
-  PROPERTIES GENERATED TRUE)
-
 # MaliputMesh library.
 set(maliput_mesh MaliputMesh)
 add_library(${maliput_mesh} SHARED
@@ -76,7 +70,7 @@ target_link_libraries(${render_widget}
   ${IGNITION-TRANSPORT_LIBRARIES}
   ${Qt5Core_LIBRARIES}
   ${Qt5Widgets_LIBRARIES}
-  delphyne_gui_protobuf_msgs)
+  delphyne::protobuf_messages)
 
 install(TARGETS ${render_widget} DESTINATION ${LIB_INSTALL_DIR} COMPONENT shlib)
 
@@ -94,7 +88,7 @@ target_link_libraries(${teleop_widget}
   ${IGNITION-TRANSPORT_LIBRARIES}
   ${Qt5Core_LIBRARIES}
   ${Qt5Widgets_LIBRARIES}
-  delphyne_gui_protobuf_msgs
+  delphyne::protobuf_messages
 )
 
 install(TARGETS ${teleop_widget} DESTINATION ${LIB_INSTALL_DIR} COMPONENT shlib)

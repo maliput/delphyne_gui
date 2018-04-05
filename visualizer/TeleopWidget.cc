@@ -4,7 +4,7 @@
 #include <cmath>
 #include <string>
 
-#include "protobuf/automotive_driving_command.pb.h"
+#include <delphyne/protobuf/automotive_driving_command.pb.h>
 
 #include "TeleopWidget.hh"
 

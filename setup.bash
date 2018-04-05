@@ -54,8 +54,5 @@ add_if_not_in_var DELPHYNE_PACKAGE_PATH $INSTALL_PREFIX/share/drake/automotive/m
 add_if_not_in_var LD_LIBRARY_PATH $INSTALL_PREFIX/lib
 add_if_not_in_var PATH $INSTALL_PREFIX/bin
 # Need to clean up how we install python modules so we don't need this tangle
-add_if_not_in_var PYTHONPATH $INSTALL_PREFIX/lib/python2.7/site-packages/pydrake
-add_if_not_in_var PYTHONPATH $INSTALL_PREFIX/lib/python2.7/site-packages/launcher
-add_if_not_in_var PYTHONPATH $INSTALL_PREFIX/lib/python2.7/site-packages/utils
 add_if_not_in_var PYTHONPATH $INSTALL_PREFIX/lib/python2.7/site-packages
 add_if_not_in_var PYTHONPATH $INSTALL_PREFIX/lib

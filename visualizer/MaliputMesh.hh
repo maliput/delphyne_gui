@@ -26,8 +26,6 @@
 
 #include "fmt/ostream.h"
 
-#include "System.hh"
-
 #include <ignition/common/Console.hh>
 
 namespace drake {
@@ -43,7 +41,7 @@ namespace mesh {
 // @tparam KeyEqual  an equivalence relation suitable for std::unordered_map
 //                   (e.g., std::equal_to)
 template <class T, class Hash, class KeyEqual>
-class DELPHYNE_GUI_VISIBLE UniqueIndexer {
+class UniqueIndexer {
  public:
   // Creates an empty UniqueIndexer.
   UniqueIndexer() {}
@@ -74,7 +72,7 @@ class DELPHYNE_GUI_VISIBLE UniqueIndexer {
 
 
 // A world frame vertex.
-class DELPHYNE_GUI_VISIBLE GeoVertex {
+class GeoVertex {
  public:
   // A hasher operation suitable for std::unordered_map.
   using Hash = drake::DefaultHash;
@@ -108,7 +106,7 @@ class DELPHYNE_GUI_VISIBLE GeoVertex {
 
 
 // A world frame normal vector.
-class DELPHYNE_GUI_VISIBLE GeoNormal {
+class GeoNormal {
  public:
   // A hasher operation suitable for std::unordered_map.
   using Hash = drake::DefaultHash;
@@ -142,7 +140,7 @@ class DELPHYNE_GUI_VISIBLE GeoNormal {
 
 
 // A world frame face:  a sequence of vertices with corresponding normals.
-class DELPHYNE_GUI_VISIBLE GeoFace {
+class GeoFace {
  public:
   GeoFace() {}
 
@@ -170,7 +168,7 @@ class DELPHYNE_GUI_VISIBLE GeoFace {
 // A face --- a sequence of vertices with normals --- in which the
 // vertices and normals are represented by integer indices into some
 // other container/dictionary.
-class DELPHYNE_GUI_VISIBLE IndexFace {
+class IndexFace {
  public:
   struct Vertex {
     Vertex(int vertex_index_in, int normal_index_in)
@@ -192,7 +190,7 @@ class DELPHYNE_GUI_VISIBLE IndexFace {
 
 
 // A world frame mesh:  a collection of GeoFaces.
-class DELPHYNE_GUI_VISIBLE GeoMesh {
+class GeoMesh {
  public:
   GeoMesh() {}
 
@@ -278,7 +276,7 @@ class DELPHYNE_GUI_VISIBLE GeoMesh {
 // A `Lane`-frame face: a sequence of vertices expressed in the (s,r,h)
 // coordinates of an api::Lane (which is not referenced here).  Each
 // vertex has a normal vector also expressed in the `Lane`-frame.
-class DELPHYNE_GUI_VISIBLE SrhFace {
+class SrhFace {
  public:
   SrhFace(const std::initializer_list<api::LanePosition> vertices,
           const api::LanePosition& normal)

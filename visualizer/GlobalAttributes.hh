@@ -6,8 +6,6 @@
 #include <map>
 #include <string>
 
-#include "System.hh"
-
 namespace delphyne {
 namespace gui {
 
@@ -15,7 +13,7 @@ namespace gui {
 ///
 /// \details Developers should not instantiate an object of this type but use
 ///          the API that this class provides.
-class DELPHYNE_GUI_VISIBLE GlobalAttributes {
+class GlobalAttributes {
   /// \brief Parses a list of CLI arguments and holds them as pairs key-value.
   /// \details Each element of @p argv must be "--{KEY}={VALUE}". The key will
   /// be KEY, and the value will be VALUE. Note that "--" and "=" are necessary.

@@ -17,7 +17,6 @@
 #include <ignition/common/Mesh.hh>
 
 #include "MaliputMesh.hh"
-#include "System.hh"
 
 namespace drake {
 namespace maliput {
@@ -25,7 +24,7 @@ namespace mesh {
 
 /// Multitude of parameters for generating an OBJ model of a road surface,
 /// with sensible defaults.
-struct DELPHYNE_GUI_VISIBLE Features {
+struct Features {
   /// Maximum distance between rendered vertices, in either s- or r-dimension,
   /// along a lane's surface
   double max_grid_unit{1.0};
@@ -63,7 +62,7 @@ struct DELPHYNE_GUI_VISIBLE Features {
 
 
 /// Material information.
-struct DELPHYNE_GUI_VISIBLE Material {
+struct Material {
   ignition::math::Vector3d diffuse;  /// Kd
   ignition::math::Vector3d ambient;  /// Ka
   ignition::math::Vector3d specular;  /// Ks
@@ -86,7 +85,6 @@ struct DELPHYNE_GUI_VISIBLE Material {
 ///   - grayed_asphalt
 ///   - grayed_lane
 ///   - grayed_marker
-DELPHYNE_GUI_VISIBLE
 std::map<std::string, GeoMesh> BuildMeshes(const api::RoadGeometry* rg,
                                            const Features& features);
 
@@ -105,7 +103,6 @@ std::map<std::string, GeoMesh> BuildMeshes(const api::RoadGeometry* rg,
 ///
 /// The produced mesh covers the area within the driveable-bounds of the
 /// road surface described by the RoadGeometry.
-DELPHYNE_GUI_VISIBLE
 void GenerateObjFile(const api::RoadGeometry* rg,
                      const std::string& dirpath,
                      const std::string& fileroot,
@@ -126,7 +123,6 @@ void GenerateObjFile(const api::RoadGeometry* rg,
 /// @return A std::unique_ptr<ignition::common::Mesh> with the equivalent mesh
 /// construction. The pointer will be nullptr when the mesh has not the correct
 /// vertices requirements.
-DELPHYNE_GUI_VISIBLE
 std::unique_ptr<ignition::common::Mesh> Convert(const std::string& name,
                                                 const GeoMesh& geo_mesh);
 
@@ -146,7 +142,6 @@ std::unique_ptr<ignition::common::Mesh> Convert(const std::string& name,
 /// @param material_name The key to get the material.
 /// @return A std::unique_ptr<Material> with a filled Material structure. It
 /// will be nullptr when `material_name` is not any of the previous options.
-DELPHYNE_GUI_VISIBLE
 std::unique_ptr<Material> GetMaterialByName(const std::string& material_name);
 
 

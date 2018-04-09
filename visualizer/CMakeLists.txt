@@ -3,7 +3,7 @@ include (${project_cmake_dir}/Utils.cmake)
 # ----------------------------------------
 # MaliputMesh library.
 set(maliput_mesh MaliputMesh)
-add_library(${maliput_mesh} SHARED
+add_library(${maliput_mesh}
   MaliputMeshBuilder.cc)
 target_link_libraries(${maliput_mesh}
   ${drake_LIBRARIES}
@@ -14,7 +14,7 @@ install(TARGETS ${maliput_mesh} DESTINATION
 
 # GlobalAttributes library.
 set(global_attributes GlobalAttributes)
-add_library(${global_attributes} SHARED
+add_library(${global_attributes}
   ${global_attributes}.cc
 )
 target_link_libraries(${global_attributes}

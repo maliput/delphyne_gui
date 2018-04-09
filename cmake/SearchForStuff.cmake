@@ -130,3 +130,8 @@ find_package (Qt5Test)
 if (NOT Qt5Test_FOUND)
   BUILD_ERROR("Missing: Qt5Test")
 endif()
+
+########################################
+# Find Delphyne
+find_package(delphyne0 REQUIRED)
+message(STATUS "Looking for Delphyne.....${delphyne0_FOUND}")

@@ -110,8 +110,8 @@ std::string RenderWidget::FindFile(const std::string& _path) const {
 /////////////////////////////////////////////////
 RenderWidget::RenderWidget(QWidget* parent)
     : Plugin(), initializedScene(false), engine(nullptr) {
-  qRegisterMetaType<ignition::msgs::Model_V>();
   qRegisterMetaType<ignition::msgs::Scene>();
+  qRegisterMetaType<ignition::msgs::Model_V>();
 
   this->setAttribute(Qt::WA_OpaquePaintEvent, true);
   this->setAttribute(Qt::WA_PaintOnScreen, true);
@@ -148,15 +148,15 @@ RenderWidget::RenderWidget(QWidget* parent)
   std::copy(paths.begin(), paths.end(), std::back_inserter(this->packagePaths));
 
   // Setting up a unique-named service name
-  // i.e: RobotModel_8493201843;
+  // i.e: Scene_8493201843;
   int randomId = ignition::math::Rand::IntUniform(1, ignition::math::MAX_I32);
-  robotModelServiceName += "_" + std::to_string(randomId);
-  robotModelRequestMsg.set_response_topic(robotModelServiceName);
+  sceneServiceName += "_" + std::to_string(randomId);
+  sceneRequestMsg.set_response_topic(sceneServiceName);
 
    // Advertise the service with the unique name generated above
-  if (!node.Advertise(robotModelServiceName, &RenderWidget::OnSetScene,
+  if (!node.Advertise(sceneServiceName, &RenderWidget::OnSetScene,
                       this)) {
-    ignerr << "Error advertising service [" << robotModelServiceName << "]"
+    ignerr << "Error advertising service [" << sceneServiceName << "]"
               << std::endl;
   }
 
@@ -164,8 +164,8 @@ RenderWidget::RenderWidget(QWidget* parent)
   unsigned int timeout = 100;
   bool result;
 
-  // Request a robot model to be published into the unique-named channel
-  this->node.Request("/get_robot_model", robotModelRequestMsg, timeout, response,
+  // Request a scene to be published into the unique-named channel
+  this->node.Request("/get_scene", sceneRequestMsg, timeout, response,
                result);
 }
 

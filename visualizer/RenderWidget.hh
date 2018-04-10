@@ -25,8 +25,9 @@ class XMLElement;
 }
 namespace ignition {
 namespace msgs {
-class Model;
+class Scene;
 class Model_V;
+class Model;
 class Visual;
 }
 }
@@ -66,21 +67,20 @@ class RenderWidget : public ignition::gui::Plugin {
   /// \return Config element.
   virtual std::string ConfigStr() const;
 
-  /// \brief Callback to set collection of models for the first time to populate
-  /// the scene.
-  /// \param[in] _msg The new model.
+  /// \brief Callback to set the initial scene..
+  /// \param[in] _msg The new scene.
  public slots:
-  void SetInitialModels(const ignition::msgs::Model_V& _msg);
+  void SetInitialScene(const ignition::msgs::Scene& _msg);
 
   /// \brief Callback to update the scene.
   /// \param[in] _msg Message containing an update.
  public slots:
   void UpdateScene(const ignition::msgs::Model_V& _msg);
 
-  /// \brief Notify that there's a new model.
-  /// \param[in] _msg The new model.
+  /// \brief Notify that there's a new scene.
+  /// \param[in] _msg The new scene.
  signals:
-  void NewInitialModel(const ignition::msgs::Model_V& _msg);
+  void NewInitialScene(const ignition::msgs::Scene& _msg);
 
   /// \brief Notify that there's a new draw update.
   /// \param[in] _msg Message contining the update.
@@ -130,10 +130,10 @@ class RenderWidget : public ignition::gui::Plugin {
   void ShowContextMenu(const QPoint& _pos);
 
  private:
-  /// \brief Set the initial robot model
-  /// \param[in] request The robot model to be loaded
-  void OnSetRobotModel(
-      const ignition::msgs::Model_V& request);
+  /// \brief Set the initial scene
+  /// \param[in] request The scene to be loaded
+  void OnSetScene(
+      const ignition::msgs::Scene& request);
 
   /// \brief Internal method to create the render window the first time
   /// RenderWidget::showEvent is called.

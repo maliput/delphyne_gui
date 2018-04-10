@@ -32,6 +32,7 @@
 
 #include "RenderWidget.hh"
 
+Q_DECLARE_METATYPE(ignition::msgs::Scene)
 Q_DECLARE_METATYPE(ignition::msgs::Model_V)
 
 using namespace delphyne;
@@ -110,6 +111,7 @@ std::string RenderWidget::FindFile(const std::string& _path) const {
 RenderWidget::RenderWidget(QWidget* parent)
     : Plugin(), initializedScene(false), engine(nullptr) {
   qRegisterMetaType<ignition::msgs::Model_V>();
+  qRegisterMetaType<ignition::msgs::Scene>();
 
   this->setAttribute(Qt::WA_OpaquePaintEvent, true);
   this->setAttribute(Qt::WA_PaintOnScreen, true);
@@ -132,8 +134,8 @@ RenderWidget::RenderWidget(QWidget* parent)
   this->updateTimer->start(this->kUpdateTimeFrequency);
 
   QObject::connect(
-      this, SIGNAL(NewInitialModel(const ignition::msgs::Model_V&)), this,
-      SLOT(SetInitialModels(const ignition::msgs::Model_V&)));
+      this, SIGNAL(NewInitialScene(const ignition::msgs::Scene&)), this,
+      SLOT(SetInitialScene(const ignition::msgs::Scene&)));
   QObject::connect(this, SIGNAL(NewDraw(const ignition::msgs::Model_V&)), this,
                    SLOT(UpdateScene(const ignition::msgs::Model_V&)));
 
@@ -152,7 +154,7 @@ RenderWidget::RenderWidget(QWidget* parent)
   robotModelRequestMsg.set_response_topic(robotModelServiceName);
 
    // Advertise the service with the unique name generated above
-  if (!node.Advertise(robotModelServiceName, &RenderWidget::OnSetRobotModel,
+  if (!node.Advertise(robotModelServiceName, &RenderWidget::OnSetScene,
                       this)) {
     ignerr << "Error advertising service [" << robotModelServiceName << "]"
               << std::endl;
@@ -261,10 +263,10 @@ std::string RenderWidget::ConfigStr() const {
 }
 
 /////////////////////////////////////////////////
-void RenderWidget::OnSetRobotModel(
-    const ignition::msgs::Model_V& request) {
+void RenderWidget::OnSetScene(
+    const ignition::msgs::Scene& request) {
   {
-    emit this->NewInitialModel(request);
+    emit this->NewInitialScene(request);
   }
 }
 
@@ -532,13 +534,13 @@ ignition::rendering::VisualPtr RenderWidget::RenderMesh(
 }
 
 /////////////////////////////////////////////////
-void RenderWidget::SetInitialModels(const ignition::msgs::Model_V& _msg) {
+void RenderWidget::SetInitialScene(const ignition::msgs::Scene& _msg) {
   if (this->initializedScene) {
     return;
   }
 
-  for (int i = 0; i < _msg.models_size(); ++i) {
-    LoadModel(_msg.models(i));
+  for (int i = 0; i < _msg.model_size(); ++i) {
+    LoadModel(_msg.model(i));
   }
 
   this->node.Subscribe("/DRAKE_VIEWER_DRAW", &RenderWidget::OnUpdateScene,

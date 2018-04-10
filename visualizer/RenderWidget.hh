@@ -9,6 +9,8 @@
 #include <string>
 #include <vector>
 
+#include <delphyne/protobuf/scene_request.pb.h>
+
 #include <ignition/gui/Plugin.hh>
 #include <ignition/math/Pose3.hh>
 #include <ignition/math/Rand.hh>
@@ -17,7 +19,6 @@
 #include <ignition/transport.hh>
 
 #include "OrbitViewControl.hh"
-#include <delphyne/protobuf/robot_model_request.pb.h>
 
 // Forward declarations.
 namespace tinyxml2 {
@@ -257,11 +258,11 @@ class RenderWidget : public ignition::gui::Plugin {
   /// \brief Is the scene initialized?.
   bool initializedScene;
 
-  /// \brief The name of the response topic for RobotModelRequest
-  std::string robotModelServiceName = "RobotModel";
+  /// \brief The name of the response topic for SceneRequest
+  std::string sceneServiceName = "Scene";
 
-  /// \brief The robot request message to be sent to the backend
-  ignition::msgs::RobotModelRequest robotModelRequestMsg;
+  /// \brief The scene request message to be sent to the backend
+  ignition::msgs::SceneRequest sceneRequestMsg;
 
   /// \brief Controls the view of the scene.
   std::unique_ptr<OrbitViewControl> orbitViewControl;

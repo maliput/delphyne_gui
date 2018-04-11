@@ -28,7 +28,7 @@ TeleopWidget::TeleopWidget(QWidget* parent)
   this->title = "TeleopWidget";
 
   this->lineedit = new QLineEdit();
-  this->lineedit->setText("DRIVING_COMMAND_0");
+  this->lineedit->setText("driving_command_0");
 
   this->button = new QPushButton("Start Driving");
 
@@ -62,7 +62,7 @@ void TeleopWidget::LoadConfig(const tinyxml2::XMLElement* _pluginElem) {
   if (_pluginElem) {
     if (auto channelElem = _pluginElem->FirstChildElement("car_number")) {
       std::string channelName =
-          "DRIVING_COMMAND_" + std::string(channelElem->GetText());
+          "driving_command_" + std::string(channelElem->GetText());
       this->lineedit->setText(QString::fromStdString(channelName));
     }
   }

@@ -32,8 +32,8 @@
 
 #include "RenderWidget.hh"
 
-Q_DECLARE_METATYPE(ignition::msgs::Scene)
 Q_DECLARE_METATYPE(ignition::msgs::Model_V)
+Q_DECLARE_METATYPE(ignition::msgs::Scene)
 
 using namespace delphyne;
 using namespace gui;
@@ -150,7 +150,7 @@ RenderWidget::RenderWidget(QWidget* parent)
   // Setting up a unique-named service name
   // i.e: Scene_8493201843;
   int randomId = ignition::math::Rand::IntUniform(1, ignition::math::MAX_I32);
-  sceneServiceName += "_" + std::to_string(randomId);
+  std::string sceneServiceName = "Scene_" + std::to_string(randomId);
   sceneRequestMsg.set_response_topic(sceneServiceName);
 
    // Advertise the service with the unique name generated above

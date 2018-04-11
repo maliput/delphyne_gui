@@ -26,9 +26,9 @@ class XMLElement;
 }
 namespace ignition {
 namespace msgs {
-class Scene;
-class Model_V;
 class Model;
+class Model_V;
+class Scene;
 class Visual;
 }
 }
@@ -257,9 +257,6 @@ class RenderWidget : public ignition::gui::Plugin {
 
   /// \brief Is the scene initialized?.
   bool initializedScene;
-
-  /// \brief The name of the response topic for SceneRequest
-  std::string sceneServiceName = "Scene";
 
   /// \brief The scene request message to be sent to the backend
   ignition::msgs::SceneRequest sceneRequestMsg;

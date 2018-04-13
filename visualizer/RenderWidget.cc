@@ -541,7 +541,7 @@ void RenderWidget::SetInitialModels(const ignition::msgs::Model_V& _msg) {
     LoadModel(_msg.models(i));
   }
 
-  this->node.Subscribe("/DRAKE_VIEWER_DRAW", &RenderWidget::OnUpdateScene,
+  this->node.Subscribe("visualizer/scene_update", &RenderWidget::OnUpdateScene,
                        this);
 }
 

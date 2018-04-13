@@ -33,6 +33,7 @@
 #include "RenderWidget.hh"
 
 Q_DECLARE_METATYPE(ignition::msgs::Model_V)
+Q_DECLARE_METATYPE(ignition::msgs::Scene)
 
 using namespace delphyne;
 using namespace gui;
@@ -109,6 +110,7 @@ std::string RenderWidget::FindFile(const std::string& _path) const {
 /////////////////////////////////////////////////
 RenderWidget::RenderWidget(QWidget* parent)
     : Plugin(), initializedScene(false), engine(nullptr) {
+  qRegisterMetaType<ignition::msgs::Scene>();
   qRegisterMetaType<ignition::msgs::Model_V>();
 
   this->setAttribute(Qt::WA_OpaquePaintEvent, true);
@@ -132,8 +134,8 @@ RenderWidget::RenderWidget(QWidget* parent)
   this->updateTimer->start(this->kUpdateTimeFrequency);
 
   QObject::connect(
-      this, SIGNAL(NewInitialModel(const ignition::msgs::Model_V&)), this,
-      SLOT(SetInitialModels(const ignition::msgs::Model_V&)));
+      this, SIGNAL(NewInitialScene(const ignition::msgs::Scene&)), this,
+      SLOT(SetInitialScene(const ignition::msgs::Scene&)));
   QObject::connect(this, SIGNAL(NewDraw(const ignition::msgs::Model_V&)), this,
                    SLOT(UpdateScene(const ignition::msgs::Model_V&)));
 
@@ -146,15 +148,15 @@ RenderWidget::RenderWidget(QWidget* parent)
   std::copy(paths.begin(), paths.end(), std::back_inserter(this->packagePaths));
 
   // Setting up a unique-named service name
-  // i.e: RobotModel_8493201843;
+  // i.e: Scene_8493201843;
   int randomId = ignition::math::Rand::IntUniform(1, ignition::math::MAX_I32);
-  robotModelServiceName += "_" + std::to_string(randomId);
-  robotModelRequestMsg.set_response_topic(robotModelServiceName);
+  std::string sceneServiceName = "Scene_" + std::to_string(randomId);
+  sceneRequestMsg.set_response_topic(sceneServiceName);
 
    // Advertise the service with the unique name generated above
-  if (!node.Advertise(robotModelServiceName, &RenderWidget::OnSetRobotModel,
+  if (!node.Advertise(sceneServiceName, &RenderWidget::OnSetScene,
                       this)) {
-    ignerr << "Error advertising service [" << robotModelServiceName << "]"
+    ignerr << "Error advertising service [" << sceneServiceName << "]"
               << std::endl;
   }
 
@@ -162,8 +164,8 @@ RenderWidget::RenderWidget(QWidget* parent)
   unsigned int timeout = 100;
   bool result;
 
-  // Request a robot model to be published into the unique-named channel
-  this->node.Request("/get_robot_model", robotModelRequestMsg, timeout, response,
+  // Request a scene to be published into the unique-named channel
+  this->node.Request("/get_scene", sceneRequestMsg, timeout, response,
                result);
 }
 
@@ -261,10 +263,10 @@ std::string RenderWidget::ConfigStr() const {
 }
 
 /////////////////////////////////////////////////
-void RenderWidget::OnSetRobotModel(
-    const ignition::msgs::Model_V& request) {
+void RenderWidget::OnSetScene(
+    const ignition::msgs::Scene& request) {
   {
-    emit this->NewInitialModel(request);
+    emit this->NewInitialScene(request);
   }
 }
 
@@ -532,13 +534,13 @@ ignition::rendering::VisualPtr RenderWidget::RenderMesh(
 }
 
 /////////////////////////////////////////////////
-void RenderWidget::SetInitialModels(const ignition::msgs::Model_V& _msg) {
+void RenderWidget::SetInitialScene(const ignition::msgs::Scene& _msg) {
   if (this->initializedScene) {
     return;
   }
 
-  for (int i = 0; i < _msg.models_size(); ++i) {
-    LoadModel(_msg.models(i));
+  for (int i = 0; i < _msg.model_size(); ++i) {
+    LoadModel(_msg.model(i));
   }
 
   this->node.Subscribe("visualizer/scene_update", &RenderWidget::OnUpdateScene,

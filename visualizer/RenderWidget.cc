@@ -387,30 +387,6 @@ ignition::rendering::VisualPtr RenderWidget::RenderCylinder(
 }
 
 /////////////////////////////////////////////////
-void RenderWidget::RenderGroundPlane() {
-  auto material = this->scene->CreateMaterial();
-  if (!material) {
-    ignerr << "Failed to create ground plane material" << std::endl;
-    return;
-  }
-
-  material->SetShininess(50);
-  material->SetReflectivity(0);
-
-  auto groundPlaneVisual = this->scene->CreateVisual();
-  if (!groundPlaneVisual) {
-    ignerr << "Failed to create ground plane visual" << std::endl;
-    return;
-  }
-
-  // 100 x 100 ground plane.
-  groundPlaneVisual->SetLocalScale(100, 100, 1);
-  groundPlaneVisual->AddGeometry(scene->CreatePlane());
-  groundPlaneVisual->SetMaterial(material);
-  this->scene->RootVisual()->AddChild(groundPlaneVisual);
-}
-
-/////////////////////////////////////////////////
 void RenderWidget::RenderGrid(const unsigned int _cellCount,
                               const double _cellLength,
                               const unsigned int _verticalCellCount,

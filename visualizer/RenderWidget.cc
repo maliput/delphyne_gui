@@ -1,5 +1,6 @@
 // Copyright 2017 Toyota Research Institute
 
+#include <array>
 #include <cstdlib>
 #include <iterator>
 #include <sstream>
@@ -14,6 +15,7 @@
 #include <ignition/common/SystemPaths.hh>
 #include <ignition/gui/Iface.hh>
 #include <ignition/gui/Plugin.hh>
+#include <ignition/math/Color.hh>
 #include <ignition/math/Helpers.hh>
 #include <ignition/math/Pose3.hh>
 #include <ignition/math/Vector3.hh>
@@ -593,7 +595,6 @@ void RenderWidget::LoadModel(const ignition::msgs::Model& _msg) {
     }
 
     if (link.visual_size() == 0) {
-      ignerr << "No visuals for [" << link.name() << "]. Skipping" << std::endl;
       continue;
     }
 
@@ -745,7 +746,13 @@ void RenderWidget::CreateRenderWindow() {
   this->camera->SetHFOV(IGN_DTOR(60));
   root->AddChild(this->camera);
 
-  this->scene->SetBackgroundColor(0.9, 0.9, 0.9);
+  // Set a gradient background color from white (top) to black (bottom)
+  std::array<ignition::math::Color, 4> gradientBbackgroundColor;
+  gradientBbackgroundColor[0].Set(1.0, 1.0, 1.0);
+  gradientBbackgroundColor[1].Set(0.0, 0.0, 0.0);
+  gradientBbackgroundColor[2].Set(1.0, 1.0, 1.0);
+  gradientBbackgroundColor[3].Set(0.0, 0.0, 0.0);
+  this->scene->SetGradientBackgroundColor(gradientBbackgroundColor);
 
   // create render window
   std::string winHandle = std::to_string(static_cast<uint64_t>(this->winId()));
@@ -760,9 +767,6 @@ void RenderWidget::CreateRenderWindow() {
 
   // render once to create the window.
   this->camera->Update();
-
-  // Render the ground plane.
-  this->RenderGroundPlane();
 
   // Render the grid over the ground plane.
   this->RenderGroundPlaneGrid();

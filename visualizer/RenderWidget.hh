@@ -204,9 +204,6 @@ class RenderWidget : public ignition::gui::Plugin {
   /// \return A pointer to the new visual.
   ignition::rendering::VisualPtr RenderMesh(const ignition::msgs::Visual& _vis);
 
-  /// \brief Render the ground plane.
-  void RenderGroundPlane();
-
   /// \brief Render a squared grid.
   /// \param[in] _cellCount the number of cells per side.
   /// \param[in] _cellLength the size of each cell.

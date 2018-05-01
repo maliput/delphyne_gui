@@ -1,5 +1,6 @@
 // Copyright 2017 Toyota Research Institute
 
+#include <array>
 #include <cstdlib>
 #include <iterator>
 #include <sstream>
@@ -14,6 +15,7 @@
 #include <ignition/common/SystemPaths.hh>
 #include <ignition/gui/Iface.hh>
 #include <ignition/gui/Plugin.hh>
+#include <ignition/math/Color.hh>
 #include <ignition/math/Helpers.hh>
 #include <ignition/math/Pose3.hh>
 #include <ignition/math/Vector3.hh>
@@ -385,30 +387,6 @@ ignition::rendering::VisualPtr RenderWidget::RenderCylinder(
 }
 
 /////////////////////////////////////////////////
-void RenderWidget::RenderGroundPlane() {
-  auto material = this->scene->CreateMaterial();
-  if (!material) {
-    ignerr << "Failed to create ground plane material" << std::endl;
-    return;
-  }
-
-  material->SetShininess(50);
-  material->SetReflectivity(0);
-
-  auto groundPlaneVisual = this->scene->CreateVisual();
-  if (!groundPlaneVisual) {
-    ignerr << "Failed to create ground plane visual" << std::endl;
-    return;
-  }
-
-  // 100 x 100 ground plane.
-  groundPlaneVisual->SetLocalScale(100, 100, 1);
-  groundPlaneVisual->AddGeometry(scene->CreatePlane());
-  groundPlaneVisual->SetMaterial(material);
-  this->scene->RootVisual()->AddChild(groundPlaneVisual);
-}
-
-/////////////////////////////////////////////////
 void RenderWidget::RenderGrid(const unsigned int _cellCount,
                               const double _cellLength,
                               const unsigned int _verticalCellCount,
@@ -593,7 +571,6 @@ void RenderWidget::LoadModel(const ignition::msgs::Model& _msg) {
     }
 
     if (link.visual_size() == 0) {
-      ignerr << "No visuals for [" << link.name() << "]. Skipping" << std::endl;
       continue;
     }
 
@@ -745,7 +722,13 @@ void RenderWidget::CreateRenderWindow() {
   this->camera->SetHFOV(IGN_DTOR(60));
   root->AddChild(this->camera);
 
-  this->scene->SetBackgroundColor(0.9, 0.9, 0.9);
+  // Set a gradient background color from white (top) to black (bottom)
+  std::array<ignition::math::Color, 4> gradientBackgroundColor;
+  gradientBackgroundColor[0].Set(1.0, 1.0, 1.0);
+  gradientBackgroundColor[1].Set(0.0, 0.0, 0.0);
+  gradientBackgroundColor[2].Set(1.0, 1.0, 1.0);
+  gradientBackgroundColor[3].Set(0.0, 0.0, 0.0);
+  this->scene->SetGradientBackgroundColor(gradientBackgroundColor);
 
   // create render window
   std::string winHandle = std::to_string(static_cast<uint64_t>(this->winId()));
@@ -760,9 +743,6 @@ void RenderWidget::CreateRenderWindow() {
 
   // render once to create the window.
   this->camera->Update();
-
-  // Render the ground plane.
-  this->RenderGroundPlane();
 
   // Render the grid over the ground plane.
   this->RenderGroundPlaneGrid();

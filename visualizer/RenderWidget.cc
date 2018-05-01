@@ -723,12 +723,12 @@ void RenderWidget::CreateRenderWindow() {
   root->AddChild(this->camera);
 
   // Set a gradient background color from white (top) to black (bottom)
-  std::array<ignition::math::Color, 4> gradientBbackgroundColor;
-  gradientBbackgroundColor[0].Set(1.0, 1.0, 1.0);
-  gradientBbackgroundColor[1].Set(0.0, 0.0, 0.0);
-  gradientBbackgroundColor[2].Set(1.0, 1.0, 1.0);
-  gradientBbackgroundColor[3].Set(0.0, 0.0, 0.0);
-  this->scene->SetGradientBackgroundColor(gradientBbackgroundColor);
+  std::array<ignition::math::Color, 4> gradientBackgroundColor;
+  gradientBackgroundColor[0].Set(1.0, 1.0, 1.0);
+  gradientBackgroundColor[1].Set(0.0, 0.0, 0.0);
+  gradientBackgroundColor[2].Set(1.0, 1.0, 1.0);
+  gradientBackgroundColor[3].Set(0.0, 0.0, 0.0);
+  this->scene->SetGradientBackgroundColor(gradientBackgroundColor);
 
   // create render window
   std::string winHandle = std::to_string(static_cast<uint64_t>(this->winId()));

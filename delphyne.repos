@@ -6,6 +6,6 @@ repositories:
   ign_rendering   : { type: 'hg', url:  'https://bitbucket.org/ignitionrobotics/ign-rendering.git',     version: '2d046d5daa73' }
   ign_msgs        : { type: 'hg', url:  'https://bitbucket.org/ignitionrobotics/ign-msgs.git',          version: '043b69f902f6' }
   ign_cmake       : { type: 'hg', url:  'https://bitbucket.org/ignitionrobotics/ign-cmake.git',         version: 'c4a7896c4622' }
-  drake           : { type: 'git', url: 'https://github.com/RobotLocomotion/drake.git',                 version: '84066107e966e2336c1fa8adf18e4c2fb203586e' }
+  drake           : { type: 'git', url: 'https://github.com/RobotLocomotion/drake.git',                 version: '14596fbf433f3c8ca15bf51832acdc184088a2df' }
   delphyne        : { type: 'git', url: 'git@github.com:ToyotaResearchInstitute/delphyne.git',          version: 'master' }
   delphyne_gui    : { type: 'git', url: 'git@github.com:ToyotaResearchInstitute/delphyne-gui.git',      version: 'master' }

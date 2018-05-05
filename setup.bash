@@ -48,7 +48,6 @@ add_if_not_in_var() {
 }
 
 export DELPHYNE_RESOURCE_ROOT=${INSTALL_PREFIX}/share/delphyne
-export DELPHYNE_AGENT_PLUGIN_PATH=$INSTALL_PREFIX/lib/delphyne/agents
 
 add_if_not_in_var DELPHYNE_PACKAGE_PATH $INSTALL_PREFIX/share/drake/automotive/models
 add_if_not_in_var LD_LIBRARY_PATH $INSTALL_PREFIX/lib

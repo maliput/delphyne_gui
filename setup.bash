@@ -54,7 +54,7 @@ add_if_not_in_var LD_LIBRARY_PATH $INSTALL_PREFIX/lib
 add_if_not_in_var PATH $INSTALL_PREFIX/bin
 
 # Needed for helping Ignition Msgs to find .desc files
-add_if_not_in_var IGN_DESCRIPTOR_DIR $INSTALL_PREFIX/include/delphyne0/delphyne/protobuf
+add_if_not_in_var IGN_DESCRIPTOR_PATH $INSTALL_PREFIX/include/delphyne0/delphyne/protobuf
 
 # Need to clean up how we install python modules so we don't need this tangle
 add_if_not_in_var PYTHONPATH $INSTALL_PREFIX/lib/python2.7/site-packages

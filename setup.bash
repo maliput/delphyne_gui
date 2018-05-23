@@ -56,8 +56,7 @@ export DELPHYNE_RESOURCE_ROOT=${INSTALL_PREFIX}/share/delphyne
 add_if_not_in_var DELPHYNE_PACKAGE_PATH $INSTALL_PREFIX/share/drake/automotive/models
 
 # Path to descriptors of custom ignition messages (nec. for topic introspection)
-#   TODO(caguero): switch to IGN_DESCRIPTOR_PATH once that change goes in
-add_if_not_in_var IGN_DESCRIPTOR_DIR $INSTALL_PREFIX/include/delphyne0/delphyne/protobuf
+add_if_not_in_var IGN_DESCRIPTOR_PATH $INSTALL_PREFIX/include/delphyne0/delphyne/protobuf
 
 # Path to c++ libraries
 add_if_not_in_var LD_LIBRARY_PATH $INSTALL_PREFIX/lib

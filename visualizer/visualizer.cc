@@ -19,7 +19,7 @@
 /// Constants.
 static const char versionStr[] = "Visualizer 0.1.0";
 static const std::string initialConfigFile = ignition::common::joinPaths(
-    DELPHYNE_INITIAL_CONFIG_PATH, "initialLayout.config");
+    DELPHYNE_INITIAL_CONFIG_PATH, "layoutWithTeleop.config");
 
 /////////////////////////////////////////////////
 /// \brief Get the path of the default configuration file for Delphyne.

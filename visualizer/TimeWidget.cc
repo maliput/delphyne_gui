@@ -1,7 +1,5 @@
 // Copyright 2018 Toyota Research Institute
 
-#include <delphyne/protobuf/world_stats.pb.h>
-
 #include <ignition/common/Console.hh>
 #include <ignition/common/PluginMacros.hh>
 #include <ignition/common/Time.hh>

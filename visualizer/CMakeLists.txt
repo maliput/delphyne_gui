@@ -133,7 +133,7 @@ install (TARGETS visualizer DESTINATION ${BIN_INSTALL_DIR})
 
 # Install .config files.
 install (FILES
-  initialLayout.config layoutWithTeleop.config layoutMaliputViewer.config
+  layoutWithRenderOnly.config layoutWithTeleop.config layoutMaliputViewer.config
   DESTINATION
   ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/delphyne/)
 
@@ -145,7 +145,3 @@ install (FILES
   ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/delphyne/road_samples)
 
 add_subdirectory(test)
-
-# Install layoutWithRenderOnly.config
-install (FILES layoutWithRenderOnly.config DESTINATION
-  ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/delphyne/)

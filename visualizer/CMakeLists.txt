@@ -122,9 +122,9 @@ install (FILES
 
 # Install .yaml files.
 install (FILES
-  road_samples/double_ring.yaml
-  road_samples/circuit.yaml
+  roads/double_ring.yaml
+  roads/circuit.yaml
   DESTINATION
-  ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/delphyne/road_samples)
+  ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/delphyne/roads)
 
 add_subdirectory(test)

@@ -14,7 +14,7 @@ namespace ignition
 {
 namespace msgs
 {
-  class WorldStatisticsD;
+  class WorldStatistics;
 }
 }
 
@@ -82,7 +82,7 @@ namespace gui
     signals: void SetRealTimeFactor(QString _rtf);
 
     /// \brief Subscriber callback when new world statistics are received
-    private: void OnWorldStatsMsg(const ignition::msgs::WorldStatisticsD &_msg);
+    private: void OnWorldStatsMsg(const ignition::msgs::WorldStatistics &_msg);
 
     // Private data
     private: std::unique_ptr<TimeWidgetPrivate> dataPtr;

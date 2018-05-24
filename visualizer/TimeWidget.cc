@@ -6,6 +6,8 @@
 #include <ignition/common/PluginMacros.hh>
 #include <ignition/common/Time.hh>
 
+#include <ignition/msgs.hh>
+
 #include "TimeWidget.hh"
 
 namespace delphyne
@@ -15,7 +17,7 @@ namespace gui
   class TimeWidgetPrivate
   {
     /// \brief Message holding latest world statistics
-    public: ignition::msgs::WorldStatisticsD msg;
+    public: ignition::msgs::WorldStatistics msg;
 
     /// \brief Service to send world control requests
     public: std::string controlService;
@@ -260,7 +262,7 @@ void TimeWidget::ProcessMsg()
 }
 
 /////////////////////////////////////////////////
-void TimeWidget::OnWorldStatsMsg(const ignition::msgs::WorldStatisticsD &_msg)
+void TimeWidget::OnWorldStatsMsg(const ignition::msgs::WorldStatistics &_msg)
 {
   std::lock_guard<std::recursive_mutex> lock(this->dataPtr->mutex);
 

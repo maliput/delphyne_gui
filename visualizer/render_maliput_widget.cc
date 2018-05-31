@@ -24,6 +24,7 @@
 #include <ignition/rendering/RenderTypes.hh>
 #include <ignition/rendering/RenderingIface.hh>
 #include <ignition/rendering/Scene.hh>
+#include <ignition/rendering/Text.hh>
 
 using namespace delphyne;
 using namespace gui;
@@ -267,6 +268,26 @@ void RenderMaliputWidget::CreateTransparentMaterial(
 }
 
 /////////////////////////////////////////////////
+void RenderMaliputWidget::CreateLaneLabelMaterial(
+    ignition::rendering::MaterialPtr& _material) const {
+  _material->SetDiffuse(0.8, 0.8, 0.0);
+  _material->SetAmbient(1.0, 1.0, 0.0);
+  _material->SetSpecular(1.0, 1.0, 0.5);
+  _material->SetShininess(10.);
+  _material->SetTransparency(0.5);
+}
+
+/////////////////////////////////////////////////
+void RenderMaliputWidget::CreateBranchPointLabelMaterial(
+    ignition::rendering::MaterialPtr& _material) const {
+  _material->SetDiffuse(0.0, 0.7, 0.0);
+  _material->SetAmbient(1.0, 1.0, 0.0);
+  _material->SetSpecular(1.0, 1.0, 0.5);
+  _material->SetShininess(10.);
+  _material->SetTransparency(0.5);
+}
+
+/////////////////////////////////////////////////
 void RenderMaliputWidget::RenderRoadMeshes(
   const std::map<std::string, std::unique_ptr<MaliputMesh>>& _maliputMeshes) {
   for (const auto& it : _maliputMeshes) {
@@ -320,6 +341,46 @@ void RenderMaliputWidget::RenderRoadMeshes(
         return;
       }
       visual->SetMaterial(material);
+    }
+  }
+}
+
+/////////////////////////////////////////////////
+void RenderMaliputWidget::RenderLabels(
+    const std::map<MaliputLabelType, std::vector<MaliputLabel>>& _labels) {
+  for (const auto& it : _labels) {
+    for (const MaliputLabel& label : it.second) {
+      ignition::rendering::VisualPtr visual = this->scene->CreateVisual();
+      visual->SetLocalPose(ignition::math::Pose3d(
+          label.position, ignition::math::Quaterniond()));
+      // Creates the text geometry.
+      ignition::rendering::TextPtr textGeometry = this->scene->CreateText();
+      textGeometry->SetFontName("Liberation Sans");
+      textGeometry->SetTextString(label.text);
+      textGeometry->SetShowOnTop(true);
+      textGeometry->SetTextAlignment(
+          ignition::rendering::TextHorizontalAlign::CENTER,
+          ignition::rendering::TextVerticalAlign::CENTER);
+      visual->AddGeometry(textGeometry);
+
+      // Creates a material for the visual.
+      ignition::rendering::MaterialPtr material = this->scene->CreateMaterial();
+      if (label.visible) {
+        if (it.first == MaliputLabelType::kLane) {
+          CreateLaneLabelMaterial(material);
+        } else if (it.first == MaliputLabelType::kBranchPoint) {
+          CreateBranchPointLabelMaterial(material);
+        } else {
+          ignerr << "Unsuported label type for: " << label.text << std::endl;
+        }
+      } else {
+        CreateTransparentMaterial(material);
+      }
+
+      // Applies the correct material to the mesh.
+      visual->SetMaterial(material);
+      // Adds the mesh to the parent root visual.
+      this->rootVisual->AddChild(visual);
     }
   }
 }

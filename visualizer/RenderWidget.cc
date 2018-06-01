@@ -730,19 +730,8 @@ void RenderWidget::CreateRenderWindow() {
   gradientBackgroundColor[3].Set(0.0, 0.0, 0.0);
   this->scene->SetGradientBackgroundColor(gradientBackgroundColor);
 
-  // create render window
-  std::string winHandle = std::to_string(static_cast<uint64_t>(this->winId()));
-  this->renderWindow = this->camera->CreateRenderWindow();
-  if (!this->renderWindow) {
-    ignerr << "Failed to create camera render window" << std::endl;
-    return;
-  }
-  this->renderWindow->SetHandle(winHandle);
-  this->renderWindow->SetWidth(this->width());
-  this->renderWindow->SetHeight(this->height());
-
-  // render once to create the window.
-  this->camera->Update();
+  // Store window id
+  this->windowId = this->winId();
 
   // Render the grid over the ground plane.
   this->RenderGroundPlaneGrid();
@@ -774,6 +763,21 @@ void RenderWidget::ShowContextMenu(const QPoint& _pos) {}
 
 /////////////////////////////////////////////////
 void RenderWidget::paintEvent(QPaintEvent* _e) {
+  // Create render window on first paint, so we're sure the window is showing
+  // when we attach to it
+  if (!this->renderWindow) {
+    this->renderWindow = this->camera->CreateRenderWindow();
+    if (!this->renderWindow) {
+      ignerr << "Failed to create camera render window" << std::endl;
+      return;
+    }
+
+    this->renderWindow->SetHandle(
+        std::to_string(static_cast<uint64_t>(this->windowId)));
+    this->renderWindow->SetWidth(this->width());
+    this->renderWindow->SetHeight(this->height());
+  }
+
   if (this->renderWindow && this->camera) {
     this->camera->Update();
   }

@@ -278,6 +278,10 @@ class RenderWidget : public ignition::gui::Plugin {
 
   /// \brief Store all the user settings.
   UserSettings userSettings;
+
+  /// \brief Store the window id to use at paintEvent once
+  /// (Qt complains if we call this->winId() from the paint event)
+  WId windowId;
 };
 }
 }

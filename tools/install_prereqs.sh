@@ -45,7 +45,6 @@ libfreeimage-dev
 libglew-dev
 libgts-dev
 libicu-dev
-libignition-cmake-dev
 libogre-1.9-dev
 libprotobuf-dev
 libprotoc-dev

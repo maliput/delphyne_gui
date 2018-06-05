@@ -45,12 +45,11 @@ libfreeimage-dev
 libglew-dev
 libgts-dev
 libicu-dev
-libignition-cmake-dev
 libogre-1.9-dev
 libprotobuf-dev
 libprotoc-dev
 libqt5multimedia5
-libqwt-dev
+libqwt-qt5-dev
 libtinyxml2-dev
 libzmq3-dev
 mercurial

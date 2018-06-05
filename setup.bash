@@ -47,15 +47,25 @@ add_if_not_in_var() {
     fi
 }
 
+# Path to various resources used by shell/python scripts and demos
+#   e.g. configuration files, protos, road geometries
 export DELPHYNE_RESOURCE_ROOT=${INSTALL_PREFIX}/share/delphyne
 
+# Paths to resources used for rendering (see RenderWidget.hh/.cc)
+#   e.g. sdf/urdf/obj/dae/textures
 add_if_not_in_var DELPHYNE_PACKAGE_PATH $INSTALL_PREFIX/share/drake/automotive/models
-add_if_not_in_var LD_LIBRARY_PATH $INSTALL_PREFIX/lib
-add_if_not_in_var PATH $INSTALL_PREFIX/bin
 
-# Needed for helping Ignition Msgs to find .desc files
+# Path to descriptors of custom ignition messages (nec. for topic introspection)
 add_if_not_in_var IGN_DESCRIPTOR_PATH $INSTALL_PREFIX/include/delphyne0/delphyne/protobuf
 
-# Need to clean up how we install python modules so we don't need this tangle
+# Path to c++ libraries
+add_if_not_in_var LD_LIBRARY_PATH $INSTALL_PREFIX/lib
+
+# Path to executables
+add_if_not_in_var PATH $INSTALL_PREFIX/bin
+
+# Path to python modules
 add_if_not_in_var PYTHONPATH $INSTALL_PREFIX/lib/python2.7/site-packages
+
+# Path to python bindings
 add_if_not_in_var PYTHONPATH $INSTALL_PREFIX/lib

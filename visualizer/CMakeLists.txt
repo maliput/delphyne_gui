@@ -91,23 +91,6 @@ target_link_libraries(${teleop_widget}
   delphyne::protobuf_messages
 )
 
-# TimeWidget GUI plugin.
-set(teleop_widget TimeWidget)
-QT5_WRAP_CPP(${teleop_widget}_MOC ${teleop_widget}.hh)
-add_library(${teleop_widget} SHARED
-  ${CMAKE_CURRENT_SOURCE_DIR}/${teleop_widget}.cc
-  ${${teleop_widget}_MOC}
-)
-target_link_libraries(${teleop_widget}
-  ${IGNITION-COMMON_LIBRARIES}
-  ${IGNITION-GUI_LIBRARIES}
-  ${IGNITION-MSGS_LIBRARIES}
-  ${IGNITION-TRANSPORT_LIBRARIES}
-  ${Qt5Core_LIBRARIES}
-  ${Qt5Widgets_LIBRARIES}
-  delphyne::protobuf_messages
-)
-
 install(TARGETS ${teleop_widget} DESTINATION ${LIB_INSTALL_DIR} COMPONENT shlib)
 
 include_directories(

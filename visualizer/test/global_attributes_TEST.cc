@@ -1,6 +1,6 @@
 // Copyright 2017 Toyota Research Institute
 
-#include "visualizer/GlobalAttributes.hh"
+#include "visualizer/global_attributes.hh"
 
 #include <stdexcept>
 

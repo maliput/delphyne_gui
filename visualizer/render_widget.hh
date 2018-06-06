@@ -18,7 +18,7 @@
 #include <ignition/rendering/RenderingIface.hh>
 #include <ignition/transport.hh>
 
-#include "OrbitViewControl.hh"
+#include "orbit_view_control.hh"
 
 // Forward declarations.
 namespace tinyxml2 {

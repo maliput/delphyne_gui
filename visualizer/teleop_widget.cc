@@ -6,7 +6,7 @@
 
 #include <delphyne/protobuf/automotive_driving_command.pb.h>
 
-#include "TeleopWidget.hh"
+#include "teleop_widget.hh"
 
 #include <ignition/common/Console.hh>
 #include <ignition/common/PluginMacros.hh>

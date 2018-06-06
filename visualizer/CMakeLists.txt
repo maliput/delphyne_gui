@@ -4,7 +4,7 @@ include (${project_cmake_dir}/Utils.cmake)
 # MaliputMesh library.
 set(maliput_mesh MaliputMesh)
 add_library(${maliput_mesh}
-  MaliputMeshBuilder.cc)
+  maliput_mesh_builder.cc)
 target_link_libraries(${maliput_mesh}
   ${drake_LIBRARIES}
   ${IGNITION-COMMON_LIBRARIES})
@@ -15,7 +15,7 @@ install(TARGETS ${maliput_mesh} DESTINATION
 # GlobalAttributes library.
 set(global_attributes GlobalAttributes)
 add_library(${global_attributes}
-  ${global_attributes}.cc
+  global_attributes.cc
 )
 target_link_libraries(${global_attributes}
   ${IGNITION-COMMON_LIBRARIES}
@@ -26,16 +26,16 @@ install(TARGETS ${global_attributes} DESTINATION
 
 # MaliputViewerWidget GUI plugin.
 set(maliput_viewer_widget MaliputViewerWidget)
-QT5_WRAP_CPP(${maliput_viewer_widget}_MOC ${maliput_viewer_widget}.hh)
-QT5_WRAP_CPP(LayerSelectionWidget_MOC LayerSelectionWidget.hh)
-QT5_WRAP_CPP(RenderMaliputWidget_MOC RenderMaliputWidget.hh)
+QT5_WRAP_CPP(${maliput_viewer_widget}_MOC maliput_viewer_widget.hh)
+QT5_WRAP_CPP(LayerSelectionWidget_MOC layer_selection_widget.hh)
+QT5_WRAP_CPP(RenderMaliputWidget_MOC render_maliput_widget.hh)
 add_library(${maliput_viewer_widget} SHARED
-  ${CMAKE_CURRENT_SOURCE_DIR}/LayerSelectionWidget.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/${maliput_viewer_widget}.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/RenderMaliputWidget.cc
-  MaliputViewerModel.cc
-  OrbitViewControl.cc
-  RenderMaliputWidget.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/layer_selection_widget.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/maliput_viewer_widget.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/render_maliput_widget.cc
+  maliput_viewer_model.cc
+  orbit_view_control.cc
+  render_maliput_widget.cc
   ${${maliput_viewer_widget}_MOC}
   ${LayerSelectionWidget_MOC}
   ${RenderMaliputWidget_MOC}
@@ -56,10 +56,10 @@ install(TARGETS ${maliput_viewer_widget} DESTINATION
 
 # RenderWidget GUI plugin.
 set(render_widget RenderWidget)
-QT5_WRAP_CPP(${render_widget}_MOC ${render_widget}.hh)
+QT5_WRAP_CPP(${render_widget}_MOC render_widget.hh)
 add_library(${render_widget} SHARED
-  ${CMAKE_CURRENT_SOURCE_DIR}/${render_widget}.cc
-  OrbitViewControl.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/render_widget.cc
+  orbit_view_control.cc
   ${${render_widget}_MOC}
 )
 target_link_libraries(${render_widget}
@@ -76,9 +76,9 @@ install(TARGETS ${render_widget} DESTINATION ${LIB_INSTALL_DIR} COMPONENT shlib)
 
 # TeleopWidget GUI plugin.
 set(teleop_widget TeleopWidget)
-QT5_WRAP_CPP(${teleop_widget}_MOC ${teleop_widget}.hh)
+QT5_WRAP_CPP(${teleop_widget}_MOC teleop_widget.hh)
 add_library(${teleop_widget} SHARED
-  ${CMAKE_CURRENT_SOURCE_DIR}/${teleop_widget}.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/teleop_widget.cc
   ${${teleop_widget}_MOC}
 )
 target_link_libraries(${teleop_widget}
@@ -116,7 +116,7 @@ install (TARGETS visualizer DESTINATION ${BIN_INSTALL_DIR})
 
 # Install .config files.
 install (FILES
-  layoutWithRenderOnly.config layoutWithTeleop.config layoutMaliputViewer.config
+  layout_with_render_only.config layout_with_teleop.config layout_maliput_viewer.config
   DESTINATION
   ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/delphyne/)
 

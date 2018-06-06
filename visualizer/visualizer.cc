@@ -14,7 +14,7 @@
 
 #include "delphyne-gui/config.hh"
 
-#include "GlobalAttributes.hh"
+#include "global_attributes.hh"
 
 /// Constants.
 static const char versionStr[] = "Visualizer 0.1.0";

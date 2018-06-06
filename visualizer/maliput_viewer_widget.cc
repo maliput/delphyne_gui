@@ -1,6 +1,6 @@
 // Copyright 2017 Toyota Research Institute
 
-#include "MaliputViewerWidget.hh"
+#include "maliput_viewer_widget.hh"
 
 using namespace delphyne;
 using namespace gui;

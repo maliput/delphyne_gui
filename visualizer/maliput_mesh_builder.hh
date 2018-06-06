@@ -16,7 +16,7 @@
 
 #include <ignition/common/Mesh.hh>
 
-#include "MaliputMesh.hh"
+#include "maliput_mesh.hh"
 
 namespace drake {
 namespace maliput {

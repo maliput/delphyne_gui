@@ -1,13 +1,13 @@
 // Copyright 2018 Toyota Research Institute
 
-#include "MaliputViewerModel.hh"
+#include "maliput_viewer_model.hh"
 
 #include <ignition/common/Console.hh>
 
 #include <drake/automotive/maliput/monolane/loader.h>
 
-#include "GlobalAttributes.hh"
-#include "MaliputMeshBuilder.hh"
+#include "global_attributes.hh"
+#include "maliput_mesh_builder.hh"
 
 using namespace delphyne;
 using namespace gui;

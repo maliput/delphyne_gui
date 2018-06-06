@@ -8,5 +8,5 @@ repositories:
   ign_transport   : { type: 'hg',  url: 'https://bitbucket.org/ignitionrobotics/ign-transport.git',     version: '5dbab06cfc85' }
   ign_rendering   : { type: 'hg',  url: 'https://bitbucket.org/ignitionrobotics/ign-rendering.git',     version: '446f37de18c6' }
   ign_gui         : { type: 'hg',  url: 'https://bitbucket.org/ignitionrobotics/ign-gui.git',           version: '8afd2c1d4de1' }
-  delphyne        : { type: 'git', url: 'git@github.com:ToyotaResearchInstitute/delphyne.git',          version: 'v0.3.0' }
-  delphyne_gui    : { type: 'git', url: 'git@github.com:ToyotaResearchInstitute/delphyne-gui.git',      version: 'v0.3.0' }
+  delphyne        : { type: 'git', url: 'git@github.com:ToyotaResearchInstitute/delphyne.git',          version: 'master' }
+  delphyne_gui    : { type: 'git', url: 'git@github.com:ToyotaResearchInstitute/delphyne-gui.git',      version: 'master' }

@@ -1,6 +1,6 @@
 // Copyright 2018 Toyota Research Institute
 
-#include "RenderMaliputWidget.hh"
+#include "render_maliput_widget.hh"
 
 #include <ignition/common/Console.hh>
 #include <ignition/common/MeshManager.hh>

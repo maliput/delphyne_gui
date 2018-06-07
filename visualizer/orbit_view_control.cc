@@ -6,7 +6,7 @@
 #include <ignition/math/Vector2.hh>
 #include <ignition/rendering/Camera.hh>
 
-#include "OrbitViewControl.hh"
+#include "orbit_view_control.hh"
 
 using namespace delphyne;
 using namespace gui;

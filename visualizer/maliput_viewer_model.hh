@@ -11,8 +11,8 @@
 
 #include <ignition/common/Mesh.hh>
 
-#include "MaliputMesh.hh"
-#include "MaliputMeshBuilder.hh"
+#include "maliput_mesh.hh"
+#include "maliput_mesh_builder.hh"
 
 namespace delphyne {
 namespace gui {

@@ -32,7 +32,7 @@
 #include <ignition/rendering/RenderingIface.hh>
 #include <ignition/rendering/Scene.hh>
 
-#include "RenderWidget.hh"
+#include "render_widget.hh"
 
 Q_DECLARE_METATYPE(ignition::msgs::Model_V)
 Q_DECLARE_METATYPE(ignition::msgs::Scene)

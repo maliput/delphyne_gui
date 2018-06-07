@@ -13,9 +13,9 @@
 
 #include <QtWidgets/QWidget>
 
-#include "MaliputMesh.hh"
-#include "MaliputViewerModel.hh"
-#include "OrbitViewControl.hh"
+#include "maliput_mesh.hh"
+#include "maliput_viewer_model.hh"
+#include "orbit_view_control.hh"
 
 namespace delphyne {
 namespace gui {

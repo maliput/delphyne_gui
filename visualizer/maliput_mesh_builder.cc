@@ -26,7 +26,7 @@
 #include <ignition/common/SubMesh.hh>
 #include <ignition/math/Vector3.hh>
 
-#include "MaliputMeshBuilder.hh"
+#include "maliput_mesh_builder.hh"
 
 namespace drake {
 namespace maliput {

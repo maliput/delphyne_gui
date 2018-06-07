@@ -7,7 +7,7 @@
 
 #include <ignition/common/Console.hh>
 
-#include "GlobalAttributes.hh"
+#include "global_attributes.hh"
 
 namespace delphyne {
 namespace gui {

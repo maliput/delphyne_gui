@@ -1,6 +1,6 @@
 // Copyright 2018 Toyota Research Institute
 
-#include "LayerSelectionWidget.hh"
+#include "layer_selection_widget.hh"
 
 #include <QtWidgets/QGroupBox>
 #include <QtWidgets/QVBoxLayout>

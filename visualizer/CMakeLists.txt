@@ -6,6 +6,7 @@ set(maliput_mesh MaliputMesh)
 add_library(${maliput_mesh}
   maliput_mesh_builder.cc)
 target_link_libraries(${maliput_mesh}
+  delphyne::assert
   ${drake_LIBRARIES}
   ${IGNITION-COMMON_LIBRARIES})
 

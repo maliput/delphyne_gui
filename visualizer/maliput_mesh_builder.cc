@@ -14,7 +14,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include <delphyne/assert.h>
+#include <delphyne/macros.h>
 
 #include <drake/automotive/maliput/api/branch_point.h>
 #include <drake/automotive/maliput/api/junction.h>

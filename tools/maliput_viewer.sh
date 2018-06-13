@@ -32,5 +32,5 @@
 # CLI arguments will be forwarded to `visualizer`.
 # It is assumed that the environment is already configured.
 visualizer \
-  --layout=${DELPHYNE_RESOURCE_ROOT}/layoutMaliputViewer.config \
+  --layout=${DELPHYNE_RESOURCE_ROOT}/layout_maliput_viewer.config \
   "$@"

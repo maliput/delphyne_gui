@@ -17,12 +17,13 @@
 #include <unordered_map>
 #include <vector>
 
+#include <delphyne/macros.h>
+
 #include <drake/automotive/maliput/api/branch_point.h>
 #include <drake/automotive/maliput/api/junction.h>
 #include <drake/automotive/maliput/api/lane.h>
 #include <drake/automotive/maliput/api/road_geometry.h>
 #include <drake/automotive/maliput/api/segment.h>
-#include <drake/common/drake_assert.h>
 
 #include "fmt/ostream.h"
 
@@ -147,7 +148,7 @@ class GeoFace {
   GeoFace(const std::vector<GeoVertex>& vertices,
           const std::vector<GeoNormal>& normals)
       : vertices_(vertices), normals_(normals) {
-    DRAKE_DEMAND(vertices.size() == normals.size());
+    DELPHYNE_DEMAND(vertices.size() == normals.size());
   }
 
   void push_vn(const GeoVertex& vertex, const GeoNormal& normal) {

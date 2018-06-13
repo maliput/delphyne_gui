@@ -14,13 +14,14 @@
 #include <unordered_map>
 #include <vector>
 
+#include <delphyne/macros.h>
+
 #include <drake/automotive/maliput/api/branch_point.h>
 #include <drake/automotive/maliput/api/junction.h>
 #include <drake/automotive/maliput/api/lane.h>
 #include <drake/automotive/maliput/api/lane_data.h>
 #include <drake/automotive/maliput/api/road_geometry.h>
 #include <drake/automotive/maliput/api/segment.h>
-#include <drake/common/drake_assert.h>
 
 #include <ignition/common/Console.hh>
 #include <ignition/common/SubMesh.hh>
@@ -170,8 +171,9 @@ void StripeLaneBounds(GeoMesh* mesh, const api::Lane* lane,
 // @param h_offset  h value of each vertex (height above road surface)
 void DrawLaneArrow(GeoMesh* mesh, const api::Lane* lane, double grid_unit,
                    double s_offset, double s_size, double h_offset) {
-  DRAKE_DEMAND(s_offset >= 0.);
-  DRAKE_DEMAND((s_offset + s_size) <= lane->length());
+  DELPHYNE_DEMAND(s_offset >= 0.);
+  DELPHYNE_DEMAND((s_offset + s_size) <= lane->length());
+
   const double kRelativeWidth = 0.8;
 
   const api::RBounds rb0 = lane->lane_bounds(s_offset);
@@ -186,7 +188,7 @@ void DrawLaneArrow(GeoMesh* mesh, const api::Lane* lane, double grid_unit,
   const int num_units = std::max(max_num_s_units,
                                  std::max(max_num_rl_units,
                                           max_num_rr_units));
-  DRAKE_DEMAND(num_units >= 1);
+  DELPHYNE_DEMAND(num_units >= 1);
   const double s_unit = s_size / num_units;
   const double rl_unit = rl_size / num_units;
   const double rr_unit = rr_size / num_units;
@@ -541,7 +543,7 @@ bool IsSegmentRenderedNormally(const api::SegmentId& id,
 std::vector<std::tuple<ignition::math::Vector3d, int>> PolarSort(
     const std::vector<std::tuple<ignition::math::Vector3d, int>>&
         unordered_vector) {
-  DRAKE_DEMAND(unordered_vector.size() > 0);
+  DELPHYNE_DEMAND(unordered_vector.size() > 0);
 
   std::vector<std::tuple<ignition::math::Vector3d, int>> ordered_vector =
       unordered_vector;
@@ -688,7 +690,7 @@ void GenerateObjFile(const api::RoadGeometry* rg,
     // The bound on error due to rounding to `n` places is `0.5 * 10^(-n)`,
     // so we want `n` such that `0.5 * 10^(-n) < ε / (sqrt(3) * 10)`.
     // This yields:  `n > log10(sqrt(3) * 5) - log10(ε)`.
-    DRAKE_DEMAND(rg->linear_tolerance() > 0.);
+    DELPHYNE_DEMAND(rg->linear_tolerance() > 0.);
     const int precision =
         std::max(0., std::ceil(std::log10(std::sqrt(3.) * 5.) -
                                std::log10(rg->linear_tolerance())));
@@ -856,8 +858,8 @@ std::unique_ptr<ignition::common::Mesh> Convert(const std::string& name,
     //                        than 4 vertices. The class supports more, however
     //                        proper triangulation code needs to be done so as
     //                        to support it.
-    DRAKE_DEMAND(index_face.vertices().size() == 3 ||
-                 index_face.vertices().size() == 4);
+    DELPHYNE_DEMAND(index_face.vertices().size() == 3 ||
+                    index_face.vertices().size() == 4);
 
     std::vector<std::tuple<ignition::math::Vector3d, int>>
         ordered_vertices_indices;

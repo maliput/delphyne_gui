@@ -9,6 +9,8 @@ maliput_multilane_builder:
   elevation_bounds: [0, 5]
   linear_tolerance: 0.01
   angular_tolerance: 0.5
+  scale_length: 1.0
+  computation_policy: prefer-accuracy
   points:
     a:
       xypoint: [0, 0, 0]

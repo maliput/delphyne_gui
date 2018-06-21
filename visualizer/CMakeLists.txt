@@ -121,7 +121,7 @@ install (TARGETS visualizer DESTINATION ${BIN_INSTALL_DIR})
 install (FILES
   layout_with_render_only.config layout_with_teleop.config layout_maliput_viewer.config
   DESTINATION
-  ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/delphyne/)
+  ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/delphyne/layouts)
 
 # Install .yaml files.
 install (FILES

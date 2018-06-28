@@ -521,8 +521,8 @@ void RenderWidget::SetInitialScene(const ignition::msgs::Scene& _msg) {
     LoadModel(_msg.model(i));
   }
 
-  this->node.Subscribe("visualizer/scene_update", &RenderWidget::OnUpdateScene,
-                       this);
+  // this->node.Subscribe("visualizer/scene_update", &RenderWidget::OnUpdateScene,
+  //                      this);
 }
 
 /////////////////////////////////////////////////

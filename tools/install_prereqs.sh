@@ -73,7 +73,7 @@ echo "* Local Pip Installs for $SUDO_USER"
 echo "***********************************************************************************"
 echo ""
 
-sudo -u $SUDO_USER pip install pydoc-markdown pycodestyle --user
+sudo -u $SUDO_USER pip install pycodestyle --user
 
 echo ""
 echo "***********************************************************************************"

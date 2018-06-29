@@ -56,6 +56,7 @@ mercurial
 mesa-utils
 pkg-config
 protobuf-compiler
+pylint
 python
 python-pip
 python-setuptools
@@ -72,7 +73,7 @@ echo "* Local Pip Installs for $SUDO_USER"
 echo "***********************************************************************************"
 echo ""
 
-sudo -u $SUDO_USER pip install pydoc-markdown --user
+sudo -u $SUDO_USER pip install pycodestyle --user
 
 echo ""
 echo "***********************************************************************************"

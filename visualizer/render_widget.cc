@@ -745,7 +745,7 @@ void RenderWidget::CreateRenderWindow() {
   this->camera->Update();
 
   // Render the grid over the ground plane.
-  this->RenderGroundPlaneGrid();
+  //this->RenderGroundPlaneGrid();
 
   // Render the origin reference frame.
   this->RenderOrigin();

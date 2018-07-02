@@ -46,6 +46,7 @@ RenderMaliputWidget::RenderMaliputWidget(QWidget* parent) :
   // first time that showEvent() is called.
   this->updateTimer = new QTimer(this);
   QObject::connect(this->updateTimer, SIGNAL(timeout()), this, SLOT(update()));
+  this->CreateRenderWindow();
 }
 
 /////////////////////////////////////////////////
@@ -217,7 +218,7 @@ void RenderMaliputWidget::CreateRenderWindow() {
   this->camera->Update();
 
   // Render the grid over the ground plane.
-  this->RenderGroundPlaneGrid();
+  //this->RenderGroundPlaneGrid();
 
   // Render the origin reference frame.
   this->RenderOrigin();

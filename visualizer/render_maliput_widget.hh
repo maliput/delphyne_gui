@@ -46,10 +46,16 @@ class RenderMaliputWidget : public QWidget {
   // one each time. That API is available on this commit:
   // https://bitbucket.org/ignitionrobotics/ign-rendering/commits/5accdc88afc557afc03c811d9e892ccb7f99951a
   // ign-cmake dependency should be switched to 'Components' branch. So, once
-  // eveything is stable on default or in a release branch, we should modify
+  // everything is stable on default or in a release branch, we should modify
   // this method to properly set the transparency.
   void RenderRoadMeshes(
     const std::map<std::string, std::unique_ptr<MaliputMesh>>& _maliputMeshes);
+
+  /// \brief Builds visuals for each label inside @p _labels whose state
+  /// is State::kOn.
+  /// \param[in] _labels A map of labels to render.
+  void RenderLabels(
+    const std::map<MaliputLabelType, std::vector<MaliputLabel>>& _labels);
 
   /// \brief Overridden method to receive Qt paint event.
   /// \param[in] _e The event that happened.
@@ -128,6 +134,16 @@ class RenderMaliputWidget : public QWidget {
   /// \brief Fills a material to be transparent.
   /// \param[in] _material Material to be transparent.
   void CreateTransparentMaterial(
+    ignition::rendering::MaterialPtr& _material) const;
+
+  /// \brief Fills a material for a lane label.
+  /// \param[in] _material Material to be filled.
+  void CreateLaneLabelMaterial(
+    ignition::rendering::MaterialPtr& _material) const;
+
+  /// \brief Fills a material for a branch point label.
+  /// \param[in] _material Material to be filled.
+  void CreateBranchPointLabelMaterial(
     ignition::rendering::MaterialPtr& _material) const;
 
   /// \brief Creates a bare visual and adds it as a child of the scene's root

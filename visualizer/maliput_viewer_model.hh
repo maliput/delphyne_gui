@@ -34,6 +34,28 @@ class MaliputMesh {
   std::unique_ptr<drake::maliput::mesh::Material> material{};
 };
 
+/// \brief Holds the information to build a label.
+class MaliputLabel {
+ public:
+  /// \brief Holds the visualization status.
+  bool visible{false};
+
+  /// \brief Holds the mesh status.
+  bool enabled{false};
+
+  /// \brief Text to show by the label.
+  std::string text{};
+
+  /// \brief Position of the label.
+  ignition::math::Vector3d position{};
+};
+
+/// \brief Type of label based on road entities.
+enum class MaliputLabelType {
+  kLane,         ///< A lane label.
+  kBranchPoint,  ///< A branch point label.
+};
+
 /// \brief Model of the plugin.
 ///
 /// Holds the information, as a map of meshes and materials.
@@ -57,6 +79,10 @@ class MaliputViewerModel {
   /// \return The map of meshes.
   const std::map<std::string, std::unique_ptr<MaliputMesh>>& Meshes() const;
 
+  /// \brief Getter of the map of labels.
+  /// \return The map of labels.
+  const std::map<MaliputLabelType, std::vector<MaliputLabel>>& Labels() const;
+
   /// \brief Modifies the visualization state of @p key mesh.
   /// \param[in] _key The name of the mesh.
   /// \param[in] _newVisualState The new visualization status of the mesh.
@@ -71,11 +97,18 @@ class MaliputViewerModel {
   void ConvertMeshes(
     const std::map<std::string, drake::maliput::mesh::GeoMesh>& _geoMeshes);
 
+  /// \brief Populates this->labels map with this->roadGeometry lane and branch
+  ///        point IDs.
+  void GenerateLabels();
+
   /// \brief Maliput RoadGeometry pointer.
   std::unique_ptr<const drake::maliput::api::RoadGeometry> roadGeometry;
 
   /// \brief Map of meshes to hold all the ignition meshes.
   std::map<std::string, std::unique_ptr<MaliputMesh>> maliputMeshes;
+
+  /// \brief Map of labels.
+  std::map<MaliputLabelType, std::vector<MaliputLabel>> labels;
 };
 
 }

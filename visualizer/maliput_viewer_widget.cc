@@ -58,6 +58,7 @@ void MaliputViewerWidget::paintEvent(QPaintEvent* _e) {
   if (!first_run_) {
     first_run_ = true;
     this->renderWidget->RenderRoadMeshes(this->model->Meshes());
+    this->renderWidget->RenderLabels(this->model->Labels());
   }
 
   this->renderWidget->paintEvent(_e);

@@ -29,6 +29,8 @@ bool MaliputViewerModel::Load() {
     igndbg << "Meshes loaded." << std::endl;
     this->ConvertMeshes(geoMeshes);
     igndbg << "Meshes converted to ignition type." << std::endl;
+    this->GenerateLabels();
+    igndbg << "Labels generated." << std::endl;
     return true;
   }
   return false;
@@ -38,6 +40,12 @@ bool MaliputViewerModel::Load() {
 const std::map<std::string, std::unique_ptr<MaliputMesh>>&
   MaliputViewerModel::Meshes() const {
   return this->maliputMeshes;
+}
+
+/////////////////////////////////////////////////
+const std::map<MaliputLabelType, std::vector<MaliputLabel>>&
+MaliputViewerModel::Labels() const {
+  return this->labels;
 }
 
 /////////////////////////////////////////////////
@@ -59,6 +67,93 @@ void MaliputViewerModel::ConvertMeshes(
     maliputMesh->material = drake::maliput::mesh::GetMaterialByName(it.first);
 
     this->maliputMeshes[it.first] = std::move(maliputMesh);
+  }
+}
+
+///////////////////////////////////////////////////////
+namespace {
+
+// \brief An offset to be applied over lane's height to avoid meshes
+// intersection.
+static const double kLaneHeightOffset{7.};
+
+// \brief An offset to be applied over branch point's height to avoid meshes
+// intersection.
+static const double kBranchPointHeightOffset{3.};
+
+// \brief Returns the world position of @p laneEnd.
+// \param laneEnd The LaneEnd to get the position from.
+// \return An ignition::math::Vector3d with the world position of
+// @p laneEnd.lane at @p laneEnd.end extent.
+ignition::math::Vector3d LaneEndWorldPosition(
+    const drake::maliput::api::LaneEnd& laneEnd) {
+  const double s_position =
+      laneEnd.end == drake::maliput::api::LaneEnd::Which::kStart
+          ? 0.
+          : laneEnd.lane->length();
+  const drake::maliput::api::GeoPosition position =
+      laneEnd.lane->ToGeoPosition({s_position, 0., 0.});
+  return {position.x(), position.y(), position.z() + kBranchPointHeightOffset};
+}
+
+// \brief Builds a MaliputLabel from the branch point @p bp.
+// \details Sets label's position to one of the lane ends that @p bp has.
+// Label's text is @p bp's ID.
+// \param bp A BranchPoint to build a label from.
+// \return A MaliputLabel with @p bp's information.
+MaliputLabel LabelFor(const drake::maliput::api::BranchPoint& bp) {
+  MaliputLabel label;
+  label.text = bp.id().string();
+  label.visible = true;
+  if (bp.GetASide() && bp.GetASide()->size() != 0) {
+    label.position = LaneEndWorldPosition(bp.GetASide()->get(0));
+  } else if (bp.GetBSide() && bp.GetBSide()->size() != 0) {
+    label.position = LaneEndWorldPosition(bp.GetBSide()->get(0));
+  } else {
+    ignerr << "Maliput's BranchPoint [" << bp.id().string()
+           << "] has two empty sides." << std::endl;
+  }
+  return label;
+}
+
+// \brief Builds a MaliputLabel from the lane @p lane.
+// \details Sets label's position to half the @p lane's length world position.
+// Label's text is @p lane's ID.
+// \param lane A Lane to build a label from.
+// \return A MaliputLabel with @p lane's information.
+MaliputLabel LabelFor(const drake::maliput::api::Lane& lane) {
+  MaliputLabel label;
+  label.text = lane.id().string();
+  label.visible = true;
+  const drake::maliput::api::GeoPosition position =
+      lane.ToGeoPosition({lane.length() / 2., 0., 0.});
+  label.position.Set(position.x(), position.y(),
+                     position.z() + kLaneHeightOffset);
+  return label;
+}
+}
+
+///////////////////////////////////////////////////////
+void MaliputViewerModel::GenerateLabels() {
+  // Traverses branch points to generate labels for them.
+  this->labels[MaliputLabelType::kBranchPoint] = std::vector<MaliputLabel>();
+  for (int i = 0; i < roadGeometry->num_branch_points(); ++i) {
+    const drake::maliput::api::BranchPoint* bp = roadGeometry->branch_point(i);
+    this->labels[MaliputLabelType::kBranchPoint].push_back(LabelFor(*bp));
+  }
+
+  // Traverses lanes to generate labels for them.
+  this->labels[MaliputLabelType::kLane] = std::vector<MaliputLabel>();
+  for (int i = 0; i < this->roadGeometry->num_junctions(); ++i) {
+    const drake::maliput::api::Junction* junction =
+        this->roadGeometry->junction(i);
+    for (int j = 0; j < junction->num_segments(); ++j) {
+      const drake::maliput::api::Segment* segment = junction->segment(j);
+      for (int k = 0; k < segment->num_lanes(); ++k) {
+        this->labels[MaliputLabelType::kLane].push_back(
+            LabelFor(*segment->lane(k)));
+      }
+    }
   }
 }
 

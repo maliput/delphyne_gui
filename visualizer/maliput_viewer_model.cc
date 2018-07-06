@@ -60,17 +60,17 @@ void MaliputViewerModel::LoadRoadGeometry(const std::string& _maliputFilePath) {
   std::string line;
   while (!fileStream.eof()) {
     std::getline(fileStream, line);
-    if (line.find("maliput_monolane_builder") != std::string::npos) {
+    if (line.find("maliput_monolane_builder:") != std::string::npos) {
       this->roadGeometry = drake::maliput::monolane::LoadFile(_maliputFilePath);
       return;
-    } else if (line.find("maliput_multilane_builder") != std::string::npos) {
+    } else if (line.find("maliput_multilane_builder:") != std::string::npos) {
       this->roadGeometry = drake::maliput::multilane::LoadFile(
           drake::maliput::multilane::BuilderFactory(), _maliputFilePath);
       return;
     }
   }
   throw std::runtime_error(_maliputFilePath +
-                           " doesn't have  any of the multilane nor"
+                           " doesn't have any of the multilane nor"
                            " monolane keys");
 }
 

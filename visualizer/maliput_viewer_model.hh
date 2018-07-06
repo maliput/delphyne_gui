@@ -88,6 +88,11 @@ class MaliputViewerModel {
   /// \param[in] _newVisualState The new visualization status of the mesh.
   void SetLayerState(const std::string& _key, bool _isVisible);
 
+  /// \brief Modifies the visualization state of @p key text label.
+  /// \param[in] _key The name of the label.
+  /// \param[in] _newVisualState The new visualization status of the text label.
+  void SetTextLabelState(const std::string& _key, bool _isVisible);
+
  private:
   /// \brief Loads a maliput RoadGeometry of either monolane or multilane from
   /// @p _maliputFilePath.

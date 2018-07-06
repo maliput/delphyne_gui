@@ -38,12 +38,19 @@ class MaliputViewerWidget : public ignition::gui::Plugin {
   /// \return NULL.
   virtual QPaintEngine* paintEngine() const;
 
+
+ protected slots:
   /// \brief Updates the model based on the @p key mesh name and @p newValue and
   /// the mesh on the GUI.
   /// \param[in] key Name of the mesh.
   /// \param[in] newValue New mesh visualization status.
-  protected slots: void OnLayerMeshChanged(const std::string& key,
-    bool newValue);
+  void OnLayerMeshChanged(const std::string& key, bool newValue);
+
+  /// \brief Updates the model based on the @p key text label group name and
+  /// @p newValue and the label group on the GUI.
+  /// \param[in] key Name of the label group.
+  /// \param[in] newValue New label group visualization status.
+  void OnTextLabelChanged(const std::string& key, bool newValue);
 
  protected:
   /// \brief Overridden method to receive Qt paint event.
@@ -56,6 +63,8 @@ class MaliputViewerWidget : public ignition::gui::Plugin {
 
   /// \brief Widget to hold and modify the visualization status of each layer.
   LayerSelectionWidget* layerSelectionWidget{nullptr};
+
+  LabelSelectionWidget* labelSelectionWidget{nullptr};
 
   /// \brief World render widget.
   RenderMaliputWidget* renderWidget{nullptr};

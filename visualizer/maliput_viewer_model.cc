@@ -130,6 +130,7 @@ ignition::math::Vector3d LaneEndWorldPosition(
 MaliputLabel LabelFor(const drake::maliput::api::BranchPoint& bp) {
   MaliputLabel label;
   label.text = bp.id().string();
+  label.enabled = true;
   label.visible = true;
   if (bp.GetASide() && bp.GetASide()->size() != 0) {
     label.position = LaneEndWorldPosition(bp.GetASide()->get(0));
@@ -150,6 +151,7 @@ MaliputLabel LabelFor(const drake::maliput::api::BranchPoint& bp) {
 MaliputLabel LabelFor(const drake::maliput::api::Lane& lane) {
   MaliputLabel label;
   label.text = lane.id().string();
+  label.enabled = true;
   label.visible = true;
   const drake::maliput::api::GeoPosition position =
       lane.ToGeoPosition({lane.length() / 2., 0., 0.});
@@ -189,4 +191,24 @@ void MaliputViewerModel::SetLayerState(const std::string& _key, bool _isVisible)
     throw std::runtime_error(_key + " doest not exist in maliputMeshes.");
   }
   this->maliputMeshes[_key]->visible = _isVisible;
+}
+
+///////////////////////////////////////////////////////
+void MaliputViewerModel::SetTextLabelState(
+    const std::string& _key, bool _isVisible) {
+  if (_key == "lane_text_label") {
+    std::vector<MaliputLabel>& lane_labels = labels[MaliputLabelType::kLane];
+    for (MaliputLabel& label : lane_labels) {
+      label.visible = _isVisible;
+    }
+  } else if ("branchpoint_text_label") {
+    std::vector<MaliputLabel>& branchpoint_labels =
+        labels[MaliputLabelType::kBranchPoint];
+    for (MaliputLabel& label : branchpoint_labels) {
+      label.visible = _isVisible;
+    }
+  } else {
+    ignerr << "_key = [" << _key << " ] is not \"lane_text_label\" nor "
+              "\"branchpoint_text_label\"." << std::endl;
+  }
 }

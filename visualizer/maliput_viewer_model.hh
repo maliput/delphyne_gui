@@ -89,6 +89,15 @@ class MaliputViewerModel {
   void SetLayerState(const std::string& _key, bool _isVisible);
 
  private:
+  /// \brief Loads a maliput RoadGeometry of either monolane or multilane from
+  /// @p _maliputFilePath.
+  /// \details Opens the file, iterates for each line, and tries to match it
+  /// with either "maliput_monolane_builder:" or "maliput_multilane_builder:".
+  /// If there is none of these keys in the file, it's just not valid.
+  /// Otherwise the correct loader will be called to parse the file.
+  /// \param _maliputFilePath The YAML file path to parse.
+  void LoadRoadGeometry(const std::string& _maliputFilePath);
+
   /// \brief Converts @p _geoMeshes into a
   ///        std::map<std::string, std::unique_ptr<ignition::common::Mesh>>
   ///        filling the instance variable meshes.

@@ -2,9 +2,12 @@
 
 #include "maliput_viewer_model.hh"
 
+#include <iostream>
+
 #include <ignition/common/Console.hh>
 
 #include <drake/automotive/maliput/monolane/loader.h>
+#include <drake/automotive/maliput/multilane/loader.h>
 
 #include "global_attributes.hh"
 #include "maliput_mesh_builder.hh"
@@ -17,11 +20,10 @@ bool MaliputViewerModel::Load() {
   if (GlobalAttributes::HasArgument("yaml_file")) {
     const std::string maliputFilePath =
       GlobalAttributes::GetArgument("yaml_file");
-    igndbg << "About to load ["
-           << maliputFilePath <<
-           "] monolane file." << std::endl;
-    this->roadGeometry = drake::maliput::monolane::LoadFile(maliputFilePath);
-    igndbg << "Loaded [" << maliputFilePath << "] monolane file." << std::endl;
+    igndbg << "About to load [" << maliputFilePath << "] maliput file."
+           << std::endl;
+    LoadRoadGeometry(maliputFilePath);
+    igndbg << "Loaded [" << maliputFilePath << "] maliput file." << std::endl;
     igndbg << "Loading RoadGeometry meshes..." << std::endl;
     std::map<std::string, drake::maliput::mesh::GeoMesh> geoMeshes =
       drake::maliput::mesh::BuildMeshes(this->roadGeometry.get(),
@@ -46,6 +48,30 @@ const std::map<std::string, std::unique_ptr<MaliputMesh>>&
 const std::map<MaliputLabelType, std::vector<MaliputLabel>>&
 MaliputViewerModel::Labels() const {
   return this->labels;
+}
+
+/////////////////////////////////////////////////
+void MaliputViewerModel::LoadRoadGeometry(const std::string& _maliputFilePath) {
+  std::ifstream fileStream(_maliputFilePath);
+  if (!fileStream.is_open()) {
+    throw std::runtime_error(_maliputFilePath +
+                             " doesn't exist or can't be opened.");
+  }
+  std::string line;
+  while (!fileStream.eof()) {
+    std::getline(fileStream, line);
+    if (line.find("maliput_monolane_builder:") != std::string::npos) {
+      this->roadGeometry = drake::maliput::monolane::LoadFile(_maliputFilePath);
+      return;
+    } else if (line.find("maliput_multilane_builder:") != std::string::npos) {
+      this->roadGeometry = drake::maliput::multilane::LoadFile(
+          drake::maliput::multilane::BuilderFactory(), _maliputFilePath);
+      return;
+    }
+  }
+  throw std::runtime_error(_maliputFilePath +
+                           " doesn't have any of the multilane nor"
+                           " monolane keys");
 }
 
 /////////////////////////////////////////////////

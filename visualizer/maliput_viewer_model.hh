@@ -82,7 +82,7 @@ class MaliputViewerModel {
   /// Gets the file path from GlobalAttributes and loads the RoadGeometry into
   /// memory. Then, converts it into a map of meshes, loading each mesh material
   /// information. Meshes that are not available, are set to kDisabled.
-  bool Load();
+  bool Load(const std::string _maliputFilePath);
 
   /// \brief Getter of the map of meshes.
   /// \return The map of meshes.

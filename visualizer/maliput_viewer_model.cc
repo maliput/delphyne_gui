@@ -3,6 +3,7 @@
 #include "maliput_viewer_model.hh"
 
 #include <iostream>
+#include <string>
 
 #include <ignition/common/Console.hh>
 
@@ -130,8 +131,6 @@ ignition::math::Vector3d LaneEndWorldPosition(
 MaliputLabel LabelFor(const drake::maliput::api::BranchPoint& bp) {
   MaliputLabel label;
   label.text = bp.id().string();
-  label.enabled = true;
-  label.visible = true;
   if (bp.GetASide() && bp.GetASide()->size() != 0) {
     label.position = LaneEndWorldPosition(bp.GetASide()->get(0));
   } else if (bp.GetBSide() && bp.GetBSide()->size() != 0) {

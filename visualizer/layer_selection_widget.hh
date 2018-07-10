@@ -3,6 +3,8 @@
 #ifndef DELPHYNE_GUI_LAYERSELECTIONWIDGET_HH
 #define DELPHYNE_GUI_LAYERSELECTIONWIDGET_HH
 
+#include <string>
+
 #include <QtWidgets/QWidget>
 #include <QtWidgets/QCheckBox>
 

@@ -295,7 +295,7 @@ void RenderMaliputWidget::RenderRoadMeshes(
     ignition::rendering::MaterialPtr material = this->scene->CreateMaterial();
     if (!material) {
       ignerr << "Failed to create material.\n";
-      return;
+      continue;
     }
     // Checks if the mesh to be rendered already exists or not.
     const auto meshExists = this->meshes.find(it.first);
@@ -315,7 +315,7 @@ void RenderMaliputWidget::RenderRoadMeshes(
         visual = this->scene->CreateVisual();
         if (!visual) {
           ignerr << "Failed to create visual.\n";
-          return;
+          continue;
         }
         // Adds the visual to the map for later reference.
         this->meshes[it.first] = visual;
@@ -338,7 +338,7 @@ void RenderMaliputWidget::RenderRoadMeshes(
         this->CreateTransparentMaterial(material);
       } else if (!this->FillMaterial(it.second->material.get(), material)) {
         ignerr << "Failed to fill " << it.first << " material information.\n";
-        return;
+        continue;
       }
       visual->SetMaterial(material);
     }
@@ -354,7 +354,7 @@ void RenderMaliputWidget::RenderLabels(
       ignition::rendering::MaterialPtr material = this->scene->CreateMaterial();
       if (!material) {
         ignerr << "Failed to create material.\n";
-        return;
+        continue;
       }
       // Checks if the text labels to be rendered already exists or not.
       const auto labelExists = this->textLabels.find(label.text);
@@ -362,19 +362,19 @@ void RenderMaliputWidget::RenderLabels(
       //  set to transparent.
       if (!label.enabled) {
         // If the text label already exits, a new transparent material is set.
-        if (labelExists != this->meshes.end()) {
+        if (labelExists != this->textLabels.end()) {
           this->CreateTransparentMaterial(material);
           this->textLabels[label.text]->SetMaterial(material);
         }
       } else {
-        // If the text label doesn't exist, it creates new one. Otherwise, just
-        // it gathers the pointer to set the correct material.
+        // If the text label doesn't exist, it creates new one. Otherwise,
+        // it just gathers the pointer to set the correct material.
         ignition::rendering::VisualPtr visual;
         if (labelExists == this->textLabels.end()) {
           visual = this->scene->CreateVisual();
           if (!visual) {
             ignerr << "Failed to create visual.\n";
-            return;
+            continue;
           }
           // Adds the visual to the map for later reference.
           this->textLabels[label.text] = visual;

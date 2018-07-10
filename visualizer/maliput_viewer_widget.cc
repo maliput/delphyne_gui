@@ -36,7 +36,7 @@ void MaliputViewerWidget::OnLayerMeshChanged(const std::string& key,
 void MaliputViewerWidget::OnTextLabelChanged(
     const std::string& key, bool newValue) {
   // Updates the model.
-  this->model->SetTextLabelState(key, newValue);
+  this->model->SetTextLabelState(FromString(key), newValue);
   // Replicates into the GUI.
   this->renderWidget->RenderLabels(this->model->Labels());
 }

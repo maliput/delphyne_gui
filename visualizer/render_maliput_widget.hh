@@ -38,8 +38,12 @@ class RenderMaliputWidget : public QWidget {
   /// \brief Destructor.
   virtual ~RenderMaliputWidget();
 
-  /// \brief Builds visuals for each mesh inside @p _maliputMeshes whose state
-  /// is State::kOn.
+  /// \brief Builds visuals for each mesh inside @p _maliputMeshes that is
+  /// enabled.
+  /// \details When meshes are disabled but were previously created, their
+  /// material are set to transparent. The same happens to those which
+  /// are both enabled and visibility flag is false. Otherwise, the mesh is
+  /// created (if necessary) with its appropriate material.
   /// \param[in] _maliputMeshes A map of meshes to render.
   // TODO(agalbachicar): In order to properly modify the visibility of the
   // meshes, we should query visuals for their mesh rather than creating a new
@@ -51,9 +55,19 @@ class RenderMaliputWidget : public QWidget {
   void RenderRoadMeshes(
     const std::map<std::string, std::unique_ptr<MaliputMesh>>& _maliputMeshes);
 
-  /// \brief Builds visuals for each label inside @p _labels whose state
-  /// is State::kOn.
+  /// \brief Builds visuals for each label inside @p _labels that is enabled.
+  /// \details When labels are disabled but were previously created, their
+  /// materials are set to transparent. The same happens to those which are
+  /// both enabled and visibility flag is false. Otherwise, the text visual is
+  /// created (if necessary) and its appropriate material is assigned.
   /// \param[in] _labels A map of labels to render.
+  // TODO(agalbachicar): In order to properly modify the visibility of the
+  // meshes, we should query visuals for their mesh rather than creating a new
+  // one each time. That API is available on this commit:
+  // https://bitbucket.org/ignitionrobotics/ign-rendering/commits/5accdc88afc557afc03c811d9e892ccb7f99951a
+  // ign-cmake dependency should be switched to 'Components' branch. So, once
+  // everything is stable on default or in a release branch, we should modify
+  // this method to properly set the transparency.
   void RenderLabels(
     const std::map<MaliputLabelType, std::vector<MaliputLabel>>& _labels);
 
@@ -186,6 +200,10 @@ class RenderMaliputWidget : public QWidget {
 
   /// \brief Map of mesh visual pointers.
   std::map<std::string, ignition::rendering::VisualPtr> meshes;
+
+  /// \brief Map of text labels visual pointers.
+  std::map<std::string, ignition::rendering::VisualPtr>
+      textLabels;
 };
 
 }

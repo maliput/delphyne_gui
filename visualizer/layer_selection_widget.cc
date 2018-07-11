@@ -115,3 +115,50 @@ void LayerSelectionWidget::onGrayedLaneValueChanged(int state) {
 void LayerSelectionWidget::onGrayedMarkerValueChanged(int state) {
   emit valueChanged("grayed_marker", this->grayedMarkerCheckBox->isChecked());
 }
+
+///////////////////////////////////////////////////////
+LabelSelectionWidget::LabelSelectionWidget(QWidget* parent) : QWidget(parent) {
+  // Build the widget.
+  this->Build();
+  // Connects all the check box events.
+  QObject::connect(this->laneCheckBox, SIGNAL(stateChanged(int)), this,
+    SLOT(onLaneValueChanged(int)));
+  QObject::connect(this->branchPointCheckBox, SIGNAL(stateChanged(int)), this,
+    SLOT(onBranchPointValueChanged(int)));
+}
+
+///////////////////////////////////////////////////////
+LabelSelectionWidget::~LabelSelectionWidget() {}
+
+///////////////////////////////////////////////////////
+void LabelSelectionWidget::onLaneValueChanged(int state) {
+  emit valueChanged("lane_text_label", this->laneCheckBox->isChecked());
+}
+
+///////////////////////////////////////////////////////
+void LabelSelectionWidget::onBranchPointValueChanged(int state) {
+  emit valueChanged("branchpoint_text_label",
+                    this->branchPointCheckBox->isChecked());
+}
+
+///////////////////////////////////////////////////////
+void LabelSelectionWidget::Build() {
+  this->laneCheckBox = new QCheckBox("Lane", this);
+  this->branchPointCheckBox = new QCheckBox("BranchPoint", this);
+
+  // Sets all the check boxes as activated.
+  this->laneCheckBox->setChecked(true);
+  this->branchPointCheckBox->setChecked(true);
+
+  auto *layout = new QVBoxLayout(this);
+  layout->addWidget(laneCheckBox);
+  layout->addWidget(branchPointCheckBox);
+
+  auto *groupBox = new QGroupBox("Labels", this);
+  groupBox->setLayout(layout);
+
+  auto *widgetLayout = new QVBoxLayout(this);
+  widgetLayout->addWidget(groupBox);
+  widgetLayout->addStretch();
+  this->setLayout(widgetLayout);
+}

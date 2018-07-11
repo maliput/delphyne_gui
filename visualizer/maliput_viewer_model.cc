@@ -3,6 +3,7 @@
 #include "maliput_viewer_model.hh"
 
 #include <iostream>
+#include <string>
 
 #include <ignition/common/Console.hh>
 
@@ -130,7 +131,6 @@ ignition::math::Vector3d LaneEndWorldPosition(
 MaliputLabel LabelFor(const drake::maliput::api::BranchPoint& bp) {
   MaliputLabel label;
   label.text = bp.id().string();
-  label.visible = true;
   if (bp.GetASide() && bp.GetASide()->size() != 0) {
     label.position = LaneEndWorldPosition(bp.GetASide()->get(0));
   } else if (bp.GetBSide() && bp.GetBSide()->size() != 0) {
@@ -150,7 +150,6 @@ MaliputLabel LabelFor(const drake::maliput::api::BranchPoint& bp) {
 MaliputLabel LabelFor(const drake::maliput::api::Lane& lane) {
   MaliputLabel label;
   label.text = lane.id().string();
-  label.visible = true;
   const drake::maliput::api::GeoPosition position =
       lane.ToGeoPosition({lane.length() / 2., 0., 0.});
   label.position.Set(position.x(), position.y(),
@@ -184,9 +183,50 @@ void MaliputViewerModel::GenerateLabels() {
 }
 
 ///////////////////////////////////////////////////////
-void MaliputViewerModel::SetLayerState(const std::string& _key, bool _isVisible) {
+void MaliputViewerModel::SetLayerState(
+    const std::string& _key, bool _isVisible) {
   if (this->maliputMeshes.find(_key) == this->maliputMeshes.end()) {
     throw std::runtime_error(_key + " doest not exist in maliputMeshes.");
   }
   this->maliputMeshes[_key]->visible = _isVisible;
+}
+
+///////////////////////////////////////////////////////
+void MaliputViewerModel::SetTextLabelState(
+    MaliputLabelType _type, bool _isVisible) {
+  switch (_type) {
+    case MaliputLabelType::kLane: {
+        std::vector<MaliputLabel>& lane_labels =
+            labels[MaliputLabelType::kLane];
+        for (MaliputLabel& label : lane_labels) {
+          label.visible = _isVisible;
+        }
+      }
+      break;
+    case MaliputLabelType::kBranchPoint: {
+        std::vector<MaliputLabel>& branchpoint_labels =
+            labels[MaliputLabelType::kBranchPoint];
+        for (MaliputLabel& label : branchpoint_labels) {
+          label.visible = _isVisible;
+        }
+      }
+      break;
+    default:
+      throw std::runtime_error(
+          std::string("_type is not a valid MaliputLabelType."));
+      break;
+  }
+}
+
+///////////////////////////////////////////////////////
+MaliputLabelType delphyne::gui::FromString(const std::string& _type) {
+  if (_type == "lane_text_label") {
+    return MaliputLabelType::kLane;
+  } else if (_type == "branchpoint_text_label") {
+    return MaliputLabelType::kBranchPoint;
+  }
+  throw std::runtime_error(
+      std::string("_type = [") + _type +
+      std::string(" ] is not \"lane_text_label\" nor ") +
+      std::string("\"branchpoint_text_label\"."));
 }

@@ -38,10 +38,10 @@ class MaliputMesh {
 class MaliputLabel {
  public:
   /// \brief Holds the visualization status.
-  bool visible{false};
+  bool visible{true};
 
   /// \brief Holds the mesh status.
-  bool enabled{false};
+  bool enabled{true};
 
   /// \brief Text to show by the label.
   std::string text{};
@@ -55,6 +55,15 @@ enum class MaliputLabelType {
   kLane,         ///< A lane label.
   kBranchPoint,  ///< A branch point label.
 };
+
+/// \brief Converts @p _type into a MaliputLabelType.
+/// \details @p _type must be either "lane_text_label" or
+/// "branchpoint_text_label".
+/// \throws std::runtime_error When @p _type is not "lane_text_label" nor
+/// "branchpoint_text_label".
+/// \return A MaliputLabelType that is kLane when @p _type is "lane_text_label"
+/// and kBranchPoint when @p _type is "branchpoint_text_label".
+MaliputLabelType FromString(const std::string& _type);
 
 /// \brief Model of the plugin.
 ///
@@ -85,8 +94,13 @@ class MaliputViewerModel {
 
   /// \brief Modifies the visualization state of @p key mesh.
   /// \param[in] _key The name of the mesh.
-  /// \param[in] _newVisualState The new visualization status of the mesh.
+  /// \param[in] _isVisible The new visualization status of the mesh.
   void SetLayerState(const std::string& _key, bool _isVisible);
+
+  /// \brief Modifies the visualization state of @p _type type text labels.
+  /// \param[in] _type Labels type.
+  /// \param[in] _isVisible The new visualization status of the text label.
+  void SetTextLabelState(MaliputLabelType _type, bool _isVisible);
 
  private:
   /// \brief Loads a maliput RoadGeometry of either monolane or multilane from

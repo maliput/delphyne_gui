@@ -3,6 +3,8 @@
 #ifndef DELPHYNE_GUI_LAYERSELECTIONWIDGET_HH
 #define DELPHYNE_GUI_LAYERSELECTIONWIDGET_HH
 
+#include <string>
+
 #include <QtWidgets/QWidget>
 #include <QtWidgets/QCheckBox>
 
@@ -46,6 +48,32 @@ class LayerSelectionWidget : public QWidget {
   QCheckBox* grayedAsphaltCheckBox{nullptr};
   QCheckBox* grayedLaneCheckBox{nullptr};
   QCheckBox* grayedMarkerCheckBox{nullptr};
+};
+
+/// \brief Widget with checkboxes to enable / disable label visualization.
+class LabelSelectionWidget : public QWidget {
+  Q_OBJECT
+
+ public:
+  /// \brief Default constructor.
+  explicit LabelSelectionWidget(QWidget* parent = 0);
+
+  /// \brief Default Destructor.
+  virtual ~LabelSelectionWidget();
+
+ public slots:
+  void onLaneValueChanged(int state);
+  void onBranchPointValueChanged(int state);
+
+ signals:
+  void valueChanged(const std::string& key, bool newValue);
+
+ private:
+  /// \brief Builds the GUI with all the check boxes for label toggling.
+  void Build();
+
+  QCheckBox* branchPointCheckBox{nullptr};
+  QCheckBox* laneCheckBox{nullptr};
 };
 
 }

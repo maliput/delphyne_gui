@@ -17,6 +17,10 @@ MaliputViewerWidget::MaliputViewerWidget(QWidget* parent)
   QObject::connect(this->layerSelectionWidget,
     SIGNAL(valueChanged(const std::string&, bool)), this,
     SLOT(OnLayerMeshChanged(const std::string&, bool)));
+
+  QObject::connect(this->labelSelectionWidget,
+    SIGNAL(valueChanged(const std::string&, bool)), this,
+    SLOT(OnTextLabelChanged(const std::string&, bool)));
 }
 
 /////////////////////////////////////////////////
@@ -26,6 +30,15 @@ void MaliputViewerWidget::OnLayerMeshChanged(const std::string& key,
   this->model->SetLayerState(key, newValue);
   // Replicates into the GUI.
   this->renderWidget->RenderRoadMeshes(this->model->Meshes());
+}
+
+/////////////////////////////////////////////////
+void MaliputViewerWidget::OnTextLabelChanged(
+    const std::string& key, bool newValue) {
+  // Updates the model.
+  this->model->SetTextLabelState(FromString(key), newValue);
+  // Replicates into the GUI.
+  this->renderWidget->RenderLabels(this->model->Labels());
 }
 
 /////////////////////////////////////////////////
@@ -42,11 +55,20 @@ void MaliputViewerWidget::BuildGUI() {
   this->setMinimumHeight(100);
 
   this->layerSelectionWidget = new LayerSelectionWidget(this);
+  this->labelSelectionWidget = new LabelSelectionWidget(this);
   this->renderWidget = new RenderMaliputWidget(this);
-  auto layout = new QHBoxLayout(this);
-  layout->addWidget(this->renderWidget);
-  layout->addWidget(this->layerSelectionWidget);
-  this->setLayout(layout);
+
+  auto verticalLayout = new QVBoxLayout(this);
+  verticalLayout->addWidget(this->layerSelectionWidget);
+  verticalLayout->addWidget(this->labelSelectionWidget);
+  auto controlGroup = new QGroupBox("Control panel", this);
+  controlGroup->setLayout(verticalLayout);
+
+  auto horizontalLayout = new QHBoxLayout(this);
+  horizontalLayout->addWidget(this->renderWidget);
+  horizontalLayout->addWidget(controlGroup);
+
+  this->setLayout(horizontalLayout);
 }
 
 /////////////////////////////////////////////////

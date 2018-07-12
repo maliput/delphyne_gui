@@ -1,0 +1,25 @@
+# Copyright 2018 Toyota Research Institute
+#
+# -*- yaml -*-
+---
+# distances are meters; angles are degrees.
+maliput_multilane_builder:
+  id: "straight"
+  lane_width: 4
+  left_shoulder: 1.0
+  right_shoulder: 1.0
+  elevation_bounds: [0, 5]
+  linear_tolerance: 0.01
+  angular_tolerance: 0.5
+  scale_length: 1.0
+  computation_policy: prefer-accuracy  # or prefer-speed
+  points:
+    start:
+      xypoint: [0, 0, 0]  # x,y, heading
+      zpoint: [0, 0, 0, 0]  # z, zdot, theta (superelevation), thetadot
+  connections:
+    s0:
+      lanes: [3, 0, 0]
+      start: ["ref", "points.start.forward"]
+      length: 500
+      z_end: ["ref", [0, 0, 0, 0]]

@@ -127,6 +127,8 @@ install (FILES
 install (FILES
   roads/double_ring.yaml
   roads/circuit.yaml
+  roads/curved_lanes.yaml
+  roads/straight_lanes.yaml
   DESTINATION
   ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/delphyne/roads)
 

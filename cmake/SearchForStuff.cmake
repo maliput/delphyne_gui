@@ -107,6 +107,16 @@ if (NOT WIN32)
     include_directories(${IGNITION-TRANSPORT_INCLUDE_DIRS})
     link_directories(${IGNITION-TRANSPORT_LIBRARY_DIRS})
   endif()
+  # Find ignition transport LOG
+  find_package(ignition-transport5-log REQUIRED)
+  if (NOT ignition-transport5-log_FOUND)
+    message(STATUS "Looking for ignition-transport5-log-config.cmake - not found")
+    BUILD_ERROR ("Missing: Ignition transport5-log library.")
+  else()
+    message(STATUS "Looking for ignition-transport5-log-config.cmake - found")
+    include_directories(${IGNITION-TRANSPORT-LOG_INCLUDE_DIRS})
+    link_directories(${IGNITION-TRANSPORT-LOG_LIBRARY_DIRS})
+  endif()
 endif()
 
 ########################################

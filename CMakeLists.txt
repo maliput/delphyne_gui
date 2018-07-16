@@ -240,6 +240,7 @@ else (build_errors)
 
   set(TEST_TYPE "UNIT")
   add_subdirectory(visualizer)
+  add_subdirectory(replayer)
   add_subdirectory(test)
 
   ########################################

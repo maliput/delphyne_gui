@@ -46,6 +46,7 @@ libglew-dev
 libgts-dev
 libicu-dev
 libogre-1.9-dev
+libsqlite3-dev
 libprotobuf-dev
 libprotoc-dev
 libqt5multimedia5

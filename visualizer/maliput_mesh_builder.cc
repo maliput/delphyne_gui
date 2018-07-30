@@ -841,6 +841,8 @@ std::unique_ptr<ignition::common::Mesh> Convert(const std::string& name,
   //                        create meshes with unique names (by adding an
   //                        increasing ID to name) so it can be referenced and
   //                        not mixed with another mesh.
+  //                        This ticket has been created to track this issue:
+  // https://bitbucket.org/ignitionrobotics/ign-rendering/issues/27/mesh-addition-removal-and-addition-with
   mesh->SetName(GenerateUniqueMeshName(name));
 
   auto sub_mesh = std::make_unique<ignition::common::SubMesh>();

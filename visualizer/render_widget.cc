@@ -748,7 +748,7 @@ void RenderWidget::CreateRenderWindow() {
   //this->RenderGroundPlaneGrid();
 
   // Render the origin reference frame.
-  this->RenderOrigin();
+  //this->RenderOrigin();
 
   this->orbitViewControl.reset(new OrbitViewControl(this->camera));
 }

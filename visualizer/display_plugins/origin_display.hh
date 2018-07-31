@@ -28,7 +28,7 @@ namespace delphyne
 {
 namespace gui
 {
-namespace displays
+namespace display_plugins
 {
   /// \brief Display the realtime factor on an Ignition Rendering scene.
   class OriginDisplay : public ignition::gui::DisplayPlugin

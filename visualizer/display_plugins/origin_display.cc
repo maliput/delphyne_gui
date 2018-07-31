@@ -26,7 +26,7 @@
 
 using namespace delphyne;
 using namespace gui;
-using namespace displays;
+using namespace display_plugins;
 
 /////////////////////////////////////////////////
 OriginDisplay::OriginDisplay()
@@ -87,5 +87,5 @@ void OriginDisplay::Initialize(
 
 // Register this plugin
 IGN_COMMON_REGISTER_SINGLE_PLUGIN(
-  delphyne::gui::displays::OriginDisplay,
+  delphyne::gui::display_plugins::OriginDisplay,
   ignition::gui::DisplayPlugin)

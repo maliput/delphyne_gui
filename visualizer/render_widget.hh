@@ -204,23 +204,6 @@ class RenderWidget : public ignition::gui::Plugin {
   /// \return A pointer to the new visual.
   ignition::rendering::VisualPtr RenderMesh(const ignition::msgs::Visual& _vis);
 
-  /// \brief Render a squared grid.
-  /// \param[in] _cellCount the number of cells per side.
-  /// \param[in] _cellLength the size of each cell.
-  /// \param[in] _verticalCellCount the number of vertical layers.
-  /// \param[in] _material the material used to draw the lines.
-  /// \param[in] _pose the pose of the grid.
-  void RenderGrid(const unsigned int _cellCount, const double _cellLength,
-                  const unsigned int _verticalCellCount,
-                  const ignition::rendering::MaterialPtr& _material,
-                  const ignition::math::Pose3d& _pose);
-
-  /// \brief Render a 50x50 grid over the ground plane.
-  void RenderGroundPlaneGrid();
-
-  /// \brief Render the origin reference frame.
-  void RenderOrigin();
-
   /// \brief Find a file by name.
   /// In the case of an absolute path:
   ///   The function will check if the path exists.

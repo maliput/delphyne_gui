@@ -17,9 +17,7 @@ using namespace gui;
 
 /////////////////////////////////////////////////
 bool MaliputViewerModel::Load(const std::string _maliputFilePath) {
-  this->roadGeometry.reset();
-  this->labels.clear();
-  this->maliputMeshes.clear();
+  this->Clear();
 
   ignmsg << "About to load [" << _maliputFilePath << "] maliput file."
          << std::endl;
@@ -37,6 +35,15 @@ bool MaliputViewerModel::Load(const std::string _maliputFilePath) {
   ignmsg << "Labels generated." << std::endl;
   return true;
 }
+
+
+///////////////////////////////////////////////////////
+void MaliputViewerModel::Clear() {
+  this->roadGeometry.reset();
+  this->labels.clear();
+  this->maliputMeshes.clear();
+}
+
 
 /////////////////////////////////////////////////
 const std::map<std::string, std::unique_ptr<MaliputMesh>>&

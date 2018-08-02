@@ -124,6 +124,9 @@ class MaliputViewerModel {
   ///        point IDs.
   void GenerateLabels();
 
+  /// \brief Frees and clears the roadGeometry, maliputMeshes and labels.
+  void Clear();
+
   /// \brief Maliput RoadGeometry pointer.
   std::unique_ptr<const drake::maliput::api::RoadGeometry> roadGeometry;
 

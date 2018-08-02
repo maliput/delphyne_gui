@@ -2,6 +2,7 @@
 
 #include "layer_selection_widget.hh"
 
+#include <QtCore/QDir>
 #include <QtWidgets/QFileDialog>
 #include <QtWidgets/QGroupBox>
 #include <QtWidgets/QVBoxLayout>
@@ -167,6 +168,12 @@ void LabelSelectionWidget::Build() {
 ///////////////////////////////////////////////////////
 MaliputFileSelectionWidget::MaliputFileSelectionWidget(QWidget* parent)
     : QWidget(parent) {
+  if (!QDir::homePath().isEmpty()) {
+    this->fileDialogOpenPath =
+        QDir::toNativeSeparators(QDir::homePath()).toStdString();
+  } else {
+    this->fileDialogOpenPath = "/";
+  }
   // Build the widget.
   this->Build();
   // Connects all the check box events.
@@ -185,7 +192,12 @@ void MaliputFileSelectionWidget::SetFileNameLabel(const std::string& fileName) {
 ///////////////////////////////////////////////////////
 void MaliputFileSelectionWidget::onLoadButtonPressed() {
   QString fileName = QFileDialog::getOpenFileName(
-      this, tr("Open Maliput YAML"), "/", tr("YAML Files (*.yaml)"));
+      this, tr("Open Maliput YAML"),
+      QString::fromStdString(this->fileDialogOpenPath),
+      tr("YAML Files (*.yaml)"));
+  if (!fileName.isEmpty()) {
+    this->fileDialogOpenPath = fileName.toStdString();
+  }
   emit maliputFileChanged(fileName.toStdString());
 }
 

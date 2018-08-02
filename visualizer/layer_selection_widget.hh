@@ -105,6 +105,7 @@ class MaliputFileSelectionWidget : public QWidget {
 
   QPushButton* loadButton{nullptr};
   QLabel* fileNameLabel{nullptr};
+  std::string fileDialogOpenPath{};
 };
 
 }

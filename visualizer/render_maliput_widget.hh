@@ -71,14 +71,8 @@ class RenderMaliputWidget : public QWidget {
   void RenderLabels(
     const std::map<MaliputLabelType, std::vector<MaliputLabel>>& _labels);
 
-  /// \brief Clears all the references to meshes from the visualizer.
-  void ClearMeshes();
-
-  /// \brief Clears all the references to text labels from the visualizer.
-  void ClearLabels();
-
-  /// \brief Clears the scene.
-  void ClearScene();
+  /// \brief Clears all the references to text labels, meshes and the scene.
+  void Clear();
 
   /// \brief Overridden method to receive Qt paint event.
   /// \param[in] _e The event that happened.

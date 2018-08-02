@@ -57,12 +57,9 @@ void MaliputViewerWidget::OnNewYamlFile(const std::string& filePath) {
   }
 
   // Clears the GUI meshes and then populates with the meshes.
-  this->renderWidget->ClearMeshes();
-  this->renderWidget->ClearLabels();
-  this->renderWidget->ClearScene();
+  this->renderWidget->Clear();
 
   // Loads the new file.
-  this->model.reset();
   this->model = std::make_unique<MaliputViewerModel>();
   this->model->Load(filePath);
 

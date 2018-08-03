@@ -576,12 +576,12 @@ std::vector<std::tuple<ignition::math::Vector3d, int>> PolarSort(
 }
 
 // \brief Generates a unique name for a mesh.
-// \param suffix The base name. It will be appended with "_ID".
-// \return A string formatted like: @p suffix + "_" + ID , where ID is a
-// increasing integer.
-const std::string GenerateUniqueMeshName(const std::string& suffix) {
-  static int counter = 0;
-  return suffix + "_" + std::to_string(counter++);
+// \param baseName The base name. It will be appended with "_ID".
+// \return A string formatted like: @p baseName + "_" + ID , where ID is a
+// increasing unsigned integer.
+const std::string GenerateUniqueMeshName(const std::string& baseName) {
+  static uint counter = 0;
+  return baseName + "_" + std::to_string(counter++);
 }
 
 // This map holds the properties of different materials. Those properties were

@@ -16,7 +16,7 @@ using namespace delphyne;
 using namespace gui;
 
 /////////////////////////////////////////////////
-bool MaliputViewerModel::Load(const std::string _maliputFilePath) {
+bool MaliputViewerModel::Load(const std::string& _maliputFilePath) {
   this->Clear();
 
   ignmsg << "About to load [" << _maliputFilePath << "] maliput file."

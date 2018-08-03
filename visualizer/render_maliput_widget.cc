@@ -416,6 +416,23 @@ void RenderMaliputWidget::RenderLabels(
 }
 
 /////////////////////////////////////////////////
+void RenderMaliputWidget::Clear() {
+  // Clears the text labels.
+  for (auto it : textLabels) {
+    this->rootVisual->RemoveChild(it.second);
+  }
+  textLabels.clear();
+  // Clears the meshes.
+  for (auto it : meshes) {
+    this->rootVisual->RemoveChild(it.second);
+  }
+  meshes.clear();
+  // Clears the scene.
+  this->scene->Clear();
+}
+
+
+/////////////////////////////////////////////////
 void RenderMaliputWidget::showEvent(QShowEvent* _e) {
   QApplication::flush();
 

@@ -52,19 +52,32 @@ class MaliputViewerWidget : public ignition::gui::Plugin {
   /// \param[in] newValue New label group visualization status.
   void OnTextLabelChanged(const std::string& key, bool newValue);
 
+  /// \brief Clears the visualizer, loads the new set of meshes and text labels.
+  /// \param filePath The path to the YAML file to load and visualize.
+  void OnNewYamlFile(const std::string& filePath);
+
  protected:
   /// \brief Overridden method to receive Qt paint event.
   /// \param[in] _e The event that happened.
   virtual void paintEvent(QPaintEvent* _e);
 
  private:
+  /// \brief Loads in the GUI the file name that @p filePath refers to.
+  /// \param filePath The file path to the yaml file.
+  void VisualizeFileName(const std::string& filePath);
+
   /// \brief Builds the widgets of the GUI.
   void BuildGUI();
 
   /// \brief Widget to hold and modify the visualization status of each layer.
   LayerSelectionWidget* layerSelectionWidget{nullptr};
 
+  /// \brief Widget to hold and modify the visualization status of lane and
+  /// branch point text labels.
   LabelSelectionWidget* labelSelectionWidget{nullptr};
+
+  /// \brief Widget to load yaml files.
+  MaliputFileSelectionWidget* maliputFileSelectionWidget{nullptr};
 
   /// \brief World render widget.
   RenderMaliputWidget* renderWidget{nullptr};

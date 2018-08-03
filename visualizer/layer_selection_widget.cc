@@ -2,6 +2,8 @@
 
 #include "layer_selection_widget.hh"
 
+#include <QtCore/QDir>
+#include <QtWidgets/QFileDialog>
 #include <QtWidgets/QGroupBox>
 #include <QtWidgets/QVBoxLayout>
 
@@ -161,4 +163,51 @@ void LabelSelectionWidget::Build() {
   widgetLayout->addWidget(groupBox);
   widgetLayout->addStretch();
   this->setLayout(widgetLayout);
+}
+
+///////////////////////////////////////////////////////
+MaliputFileSelectionWidget::MaliputFileSelectionWidget(QWidget* parent)
+    : QWidget(parent) {
+  if (!QDir::homePath().isEmpty()) {
+    this->fileDialogOpenPath =
+        QDir::toNativeSeparators(QDir::homePath()).toStdString();
+  } else {
+    this->fileDialogOpenPath = "/";
+  }
+  // Build the widget.
+  this->Build();
+  // Connects all the check box events.
+  QObject::connect(this->loadButton, SIGNAL(released()), this,
+                   SLOT(onLoadButtonPressed()));
+}
+
+///////////////////////////////////////////////////////
+MaliputFileSelectionWidget::~MaliputFileSelectionWidget() {}
+
+///////////////////////////////////////////////////////
+void MaliputFileSelectionWidget::SetFileNameLabel(const std::string& fileName) {
+  this->fileNameLabel->setText(QString::fromStdString(fileName));
+}
+
+///////////////////////////////////////////////////////
+void MaliputFileSelectionWidget::onLoadButtonPressed() {
+  QString fileName = QFileDialog::getOpenFileName(
+      this, tr("Open Maliput YAML"),
+      QString::fromStdString(this->fileDialogOpenPath),
+      tr("YAML Files (*.yaml)"));
+  if (!fileName.isEmpty()) {
+    this->fileDialogOpenPath = fileName.toStdString();
+  }
+  emit maliputFileChanged(fileName.toStdString());
+}
+
+///////////////////////////////////////////////////////
+void MaliputFileSelectionWidget::Build() {
+  this->loadButton = new QPushButton("Load", this);
+  this->fileNameLabel = new QLabel("", this);
+
+  auto* layout = new QVBoxLayout(this);
+  layout->addWidget(fileNameLabel);
+  layout->addWidget(loadButton);
+  this->setLayout(layout);
 }

@@ -10,34 +10,40 @@
 #include <drake/automotive/maliput/monolane/loader.h>
 #include <drake/automotive/maliput/multilane/loader.h>
 
-#include "global_attributes.hh"
 #include "maliput_mesh_builder.hh"
 
 using namespace delphyne;
 using namespace gui;
 
 /////////////////////////////////////////////////
-bool MaliputViewerModel::Load() {
-  if (GlobalAttributes::HasArgument("yaml_file")) {
-    const std::string maliputFilePath =
-      GlobalAttributes::GetArgument("yaml_file");
-    igndbg << "About to load [" << maliputFilePath << "] maliput file."
-           << std::endl;
-    LoadRoadGeometry(maliputFilePath);
-    igndbg << "Loaded [" << maliputFilePath << "] maliput file." << std::endl;
-    igndbg << "Loading RoadGeometry meshes..." << std::endl;
-    std::map<std::string, drake::maliput::mesh::GeoMesh> geoMeshes =
+bool MaliputViewerModel::Load(const std::string& _maliputFilePath) {
+  this->Clear();
+
+  ignmsg << "About to load [" << _maliputFilePath << "] maliput file."
+         << std::endl;
+  LoadRoadGeometry(_maliputFilePath);
+  ignmsg << "Loaded [" << _maliputFilePath << "] maliput file." << std::endl;
+  ignmsg << "Loading RoadGeometry meshes of "
+         << this->roadGeometry->id().string() << std::endl;
+  std::map<std::string, drake::maliput::mesh::GeoMesh> geoMeshes =
       drake::maliput::mesh::BuildMeshes(this->roadGeometry.get(),
-        drake::maliput::mesh::Features());
-    igndbg << "Meshes loaded." << std::endl;
-    this->ConvertMeshes(geoMeshes);
-    igndbg << "Meshes converted to ignition type." << std::endl;
-    this->GenerateLabels();
-    igndbg << "Labels generated." << std::endl;
-    return true;
-  }
-  return false;
+                                        drake::maliput::mesh::Features());
+  ignmsg << "Meshes loaded." << std::endl;
+  this->ConvertMeshes(geoMeshes);
+  ignmsg << "Meshes converted to ignition type." << std::endl;
+  this->GenerateLabels();
+  ignmsg << "Labels generated." << std::endl;
+  return true;
 }
+
+
+///////////////////////////////////////////////////////
+void MaliputViewerModel::Clear() {
+  this->roadGeometry.reset();
+  this->labels.clear();
+  this->maliputMeshes.clear();
+}
+
 
 /////////////////////////////////////////////////
 const std::map<std::string, std::unique_ptr<MaliputMesh>>&
@@ -87,6 +93,7 @@ void MaliputViewerModel::ConvertMeshes(
       maliputMesh->enabled = false;
       maliputMesh->visible = false;
     } else {
+      ignmsg << "Enabling mesh [" << it.first << "].\n";
       maliputMesh->enabled = true;
       maliputMesh->visible = true;
     }
@@ -186,7 +193,8 @@ void MaliputViewerModel::GenerateLabels() {
 void MaliputViewerModel::SetLayerState(
     const std::string& _key, bool _isVisible) {
   if (this->maliputMeshes.find(_key) == this->maliputMeshes.end()) {
-    throw std::runtime_error(_key + " doest not exist in maliputMeshes.");
+    igndbg << _key + " doest not exist in maliputMeshes." << std::endl;
+    return;
   }
   this->maliputMeshes[_key]->visible = _isVisible;
 }

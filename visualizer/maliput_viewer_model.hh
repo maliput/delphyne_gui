@@ -82,7 +82,7 @@ class MaliputViewerModel {
   /// Gets the file path from GlobalAttributes and loads the RoadGeometry into
   /// memory. Then, converts it into a map of meshes, loading each mesh material
   /// information. Meshes that are not available, are set to kDisabled.
-  bool Load();
+  bool Load(const std::string& _maliputFilePath);
 
   /// \brief Getter of the map of meshes.
   /// \return The map of meshes.
@@ -123,6 +123,9 @@ class MaliputViewerModel {
   /// \brief Populates this->labels map with this->roadGeometry lane and branch
   ///        point IDs.
   void GenerateLabels();
+
+  /// \brief Frees and clears the roadGeometry, maliputMeshes and labels.
+  void Clear();
 
   /// \brief Maliput RoadGeometry pointer.
   std::unique_ptr<const drake::maliput::api::RoadGeometry> roadGeometry;

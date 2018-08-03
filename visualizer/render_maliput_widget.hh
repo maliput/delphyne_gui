@@ -71,6 +71,9 @@ class RenderMaliputWidget : public QWidget {
   void RenderLabels(
     const std::map<MaliputLabelType, std::vector<MaliputLabel>>& _labels);
 
+  /// \brief Clears all the references to text labels, meshes and the scene.
+  void Clear();
+
   /// \brief Overridden method to receive Qt paint event.
   /// \param[in] _e The event that happened.
   virtual void paintEvent(QPaintEvent* _e);
@@ -202,8 +205,7 @@ class RenderMaliputWidget : public QWidget {
   std::map<std::string, ignition::rendering::VisualPtr> meshes;
 
   /// \brief Map of text labels visual pointers.
-  std::map<std::string, ignition::rendering::VisualPtr>
-      textLabels;
+  std::map<std::string, ignition::rendering::VisualPtr> textLabels;
 };
 
 }

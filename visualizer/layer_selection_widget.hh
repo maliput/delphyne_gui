@@ -7,6 +7,8 @@
 
 #include <QtWidgets/QWidget>
 #include <QtWidgets/QCheckBox>
+#include <QtWidgets/QLabel>
+#include <QtWidgets/QPushButton>
 
 namespace delphyne {
 namespace gui {
@@ -74,6 +76,36 @@ class LabelSelectionWidget : public QWidget {
 
   QCheckBox* branchPointCheckBox{nullptr};
   QCheckBox* laneCheckBox{nullptr};
+};
+
+/// \brief Controls the button and the file dialog to load a yaml file.
+class MaliputFileSelectionWidget : public QWidget {
+  Q_OBJECT
+
+ public:
+  /// \brief Constructor.
+  explicit MaliputFileSelectionWidget(QWidget* parent = 0);
+
+  /// \brief Destructor.
+  virtual ~MaliputFileSelectionWidget();
+
+  /// Sets @p fileName into the label to display the loaded file.
+  void SetFileNameLabel(const std::string& fileName);
+
+ public slots:
+  void onLoadButtonPressed();
+
+ signals:
+  void maliputFileChanged(const std::string& filePath);
+
+ private:
+  /// \brief Builds the GUI with a button to load a file dialog and a label to
+  /// display the name of the loaded file.
+  void Build();
+
+  QPushButton* loadButton{nullptr};
+  QLabel* fileNameLabel{nullptr};
+  std::string fileDialogOpenPath{};
 };
 
 }

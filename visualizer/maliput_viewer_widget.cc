@@ -2,6 +2,8 @@
 
 #include "maliput_viewer_widget.hh"
 
+#include "global_attributes.hh"
+
 using namespace delphyne;
 using namespace gui;
 
@@ -12,7 +14,10 @@ MaliputViewerWidget::MaliputViewerWidget(QWidget* parent)
   this->BuildGUI();
   // Loads the maliput file path if any and parses it.
   this->model = std::make_unique<MaliputViewerModel>();
-  this->model->Load();
+  if (GlobalAttributes::HasArgument("yaml_file")) {
+    this->model->Load(GlobalAttributes::GetArgument("yaml_file"));
+    this->VisualizeFileName(GlobalAttributes::GetArgument("yaml_file"));
+  }
 
   QObject::connect(this->layerSelectionWidget,
     SIGNAL(valueChanged(const std::string&, bool)), this,
@@ -21,6 +26,10 @@ MaliputViewerWidget::MaliputViewerWidget(QWidget* parent)
   QObject::connect(this->labelSelectionWidget,
     SIGNAL(valueChanged(const std::string&, bool)), this,
     SLOT(OnTextLabelChanged(const std::string&, bool)));
+
+  QObject::connect(this->maliputFileSelectionWidget,
+                   SIGNAL(maliputFileChanged(const std::string&)), this,
+                   SLOT(OnNewYamlFile(const std::string&)));
 }
 
 /////////////////////////////////////////////////
@@ -42,6 +51,34 @@ void MaliputViewerWidget::OnTextLabelChanged(
 }
 
 /////////////////////////////////////////////////
+void MaliputViewerWidget::OnNewYamlFile(const std::string& filePath) {
+  if (filePath.empty()) {
+    return;
+  }
+
+  // Clears the GUI meshes and then populates with the meshes.
+  this->renderWidget->Clear();
+
+  // Loads the new file.
+  this->model = std::make_unique<MaliputViewerModel>();
+  this->model->Load(filePath);
+
+  this->renderWidget->RenderRoadMeshes(this->model->Meshes());
+  this->renderWidget->RenderLabels(this->model->Labels());
+
+  this->VisualizeFileName(filePath);
+}
+
+/////////////////////////////////////////////////
+void MaliputViewerWidget::VisualizeFileName(const std::string& filePath) {
+  const auto filePathDividerPosition = filePath.rfind("/");
+  if (filePathDividerPosition != std::string::npos) {
+    this->maliputFileSelectionWidget->SetFileNameLabel(
+        filePath.substr(filePathDividerPosition + 1));
+  }
+}
+
+/////////////////////////////////////////////////
 QPaintEngine* MaliputViewerWidget::paintEngine() const { return nullptr; }
 
 /////////////////////////////////////////////////
@@ -54,11 +91,13 @@ void MaliputViewerWidget::BuildGUI() {
 
   this->setMinimumHeight(100);
 
+  this->maliputFileSelectionWidget = new MaliputFileSelectionWidget(this);
   this->layerSelectionWidget = new LayerSelectionWidget(this);
   this->labelSelectionWidget = new LabelSelectionWidget(this);
   this->renderWidget = new RenderMaliputWidget(this);
 
   auto verticalLayout = new QVBoxLayout(this);
+  verticalLayout->addWidget(this->maliputFileSelectionWidget);
   verticalLayout->addWidget(this->layerSelectionWidget);
   verticalLayout->addWidget(this->labelSelectionWidget);
   auto controlGroup = new QGroupBox("Control panel", this);

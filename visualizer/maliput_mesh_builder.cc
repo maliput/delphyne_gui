@@ -575,6 +575,15 @@ std::vector<std::tuple<ignition::math::Vector3d, int>> PolarSort(
   return ordered_vector;
 }
 
+// \brief Generates a unique name for a mesh.
+// \param baseName The base name. It will be appended with "_ID".
+// \return A string formatted like: @p baseName + "_" + ID , where ID is a
+// increasing unsigned integer.
+const std::string GenerateUniqueMeshName(const std::string& baseName) {
+  static uint counter = 0;
+  return baseName + "_" + std::to_string(counter++);
+}
+
 // This map holds the properties of different materials. Those properties were
 // taken from the original .mtl description that lives in GenerateObjFile().
 const std::map<std::string, Material> kMaterial{
@@ -827,7 +836,14 @@ std::unique_ptr<ignition::common::Mesh> Convert(const std::string& name,
   }
 
   auto mesh = std::make_unique<ignition::common::Mesh>();
-  mesh->SetName(name);
+  // TODO(agalbachicar):    ignition::rendering and ignition::common do not
+  //                        support unloading meshes. So, as for now, we need to
+  //                        create meshes with unique names (by adding an
+  //                        increasing ID to name) so it can be referenced and
+  //                        not mixed with another mesh.
+  //                        This ticket has been created to track this issue:
+  // https://bitbucket.org/ignitionrobotics/ign-rendering/issues/27/mesh-addition-removal-and-addition-with
+  mesh->SetName(GenerateUniqueMeshName(name));
 
   auto sub_mesh = std::make_unique<ignition::common::SubMesh>();
   sub_mesh->SetPrimitiveType(ignition::common::SubMesh::TRIANGLES);

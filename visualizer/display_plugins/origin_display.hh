@@ -8,7 +8,6 @@
 
 #include <ignition/gui/qt.h>
 #include <ignition/gui/DisplayPlugin.hh>
-#include <ignition/msgs.hh>
 
 namespace delphyne
 {
@@ -16,7 +15,7 @@ namespace gui
 {
 namespace display_plugins
 {
-  /// \brief Display the realtime factor on an Ignition Rendering scene.
+  /// \brief Display the origin on an Ignition Rendering scene.
   class OriginDisplay : public ignition::gui::DisplayPlugin
   {
     Q_OBJECT

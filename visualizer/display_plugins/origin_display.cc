@@ -1,11 +1,8 @@
 // Copyright 2017 Toyota Research Institute
 
-#include <iomanip>
-
 #include <ignition/common/Console.hh>
 #include <ignition/common/PluginMacros.hh>
 #include <ignition/rendering/Text.hh>
-#include <ignition/transport.hh>
 
 #include "origin_display.hh"
 

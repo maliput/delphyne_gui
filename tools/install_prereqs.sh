@@ -52,6 +52,7 @@ libprotoc-dev
 libqt5multimedia5
 libqwt-qt5-dev
 libtinyxml2-dev
+libzip-dev
 libzmq3-dev
 mercurial
 mesa-utils

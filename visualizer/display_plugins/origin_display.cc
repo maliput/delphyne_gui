@@ -67,13 +67,6 @@ void OriginDisplay::Initialize(
   }
 }
 
-/////////////////////////////////////////////////
-std::string OriginDisplay::Type() const
-{
-  return "OriginDisplay";
-}
-
-
 // Register this plugin
 IGN_COMMON_REGISTER_SINGLE_PLUGIN(
   delphyne::gui::display_plugins::OriginDisplay,

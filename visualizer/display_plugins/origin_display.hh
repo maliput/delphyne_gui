@@ -4,7 +4,6 @@
 #define DELPHYNE_GUI_DISPLAYS_ORIGINDISPLAY_HH
 
 #include <memory>
-#include <string>
 
 #include <ignition/gui/qt.h>
 #include <ignition/gui/DisplayPlugin.hh>
@@ -29,9 +28,6 @@ namespace display_plugins
     // Documentation inherited
     public: virtual void Initialize(const tinyxml2::XMLElement *_pluginElem)
         override;
-
-    // Documentation inherited
-    public: virtual std::string Type() const override;
   };
 }
 }

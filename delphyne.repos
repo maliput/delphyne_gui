@@ -5,7 +5,7 @@ repositories:
   ign_math        : { type: 'hg',  url: 'https://bitbucket.org/ignitionrobotics/ign-math.git',          version: 'da2f7940f3f1' }
   ign_common      : { type: 'hg',  url: 'https://bitbucket.org/ignitionrobotics/ign-common.git',        version: '9aa7c3b9da1b' }
   ign_msgs        : { type: 'hg',  url: 'https://bitbucket.org/ignitionrobotics/ign-msgs.git',          version: 'ef3a5f00b764' }
-  ign_transport   : { type: 'hg',  url: 'https://bitbucket.org/ignitionrobotics/ign-transport.git',     version: '696017f574d2' }
+  ign_transport   : { type: 'hg',  url: 'https://bitbucket.org/ignitionrobotics/ign-transport.git',     version: 'f6f581a6852b' }
   ign_rendering   : { type: 'hg',  url: 'https://bitbucket.org/ignitionrobotics/ign-rendering.git',     version: '446f37de18c6' }
   ign_gui         : { type: 'hg',  url: 'https://bitbucket.org/ignitionrobotics/ign-gui.git',           version: '8afd2c1d4de1' }
   delphyne        : { type: 'git', url: 'git@github.com:ToyotaResearchInstitute/delphyne.git',          version: 'master' }

@@ -11,26 +11,17 @@ using namespace gui;
 using namespace display_plugins;
 
 /////////////////////////////////////////////////
-OriginDisplay::OriginDisplay()
-  : DisplayPlugin()
-{
-  this->title = "Origin";
-}
+OriginDisplay::OriginDisplay() : DisplayPlugin() { this->title = "Origin"; }
 
 /////////////////////////////////////////////////
-OriginDisplay::~OriginDisplay()
-{
-}
+OriginDisplay::~OriginDisplay() {}
 
 /////////////////////////////////////////////////
-void OriginDisplay::Initialize(
-  const tinyxml2::XMLElement */*_pluginElem*/)
-{
+void OriginDisplay::Initialize(const tinyxml2::XMLElement* /*_pluginElem*/) {
   const double kAxisRadius = 0.02;
   const double kAxisLength = 10000;
   const double kAxisHalfLength = kAxisLength / 2.0;
-  if (auto scenePtr = this->Scene().lock())
-  {
+  if (auto scenePtr = this->Scene().lock()) {
     // Create the visual axes.
     std::array<ignition::rendering::VisualPtr, 3> axes;
     for (auto& axis : axes) {
@@ -58,16 +49,12 @@ void OriginDisplay::Initialize(
     for (auto& axis : axes) {
       this->Visual()->AddChild(axis);
     }
-  }
-  else
-  {
-    ignerr << "Scene invalid. Origin display not initialized."
-      << std::endl;
+  } else {
+    ignerr << "Scene invalid. Origin display not initialized." << std::endl;
     return;
   }
 }
 
 // Register this plugin
-IGN_COMMON_REGISTER_SINGLE_PLUGIN(
-  delphyne::gui::display_plugins::OriginDisplay,
-  ignition::gui::DisplayPlugin)
+IGN_COMMON_REGISTER_SINGLE_PLUGIN(delphyne::gui::display_plugins::OriginDisplay,
+                                  ignition::gui::DisplayPlugin)

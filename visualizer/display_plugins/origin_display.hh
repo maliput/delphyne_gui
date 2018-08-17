@@ -5,30 +5,28 @@
 
 #include <memory>
 
-#include <ignition/gui/qt.h>
 #include <ignition/gui/DisplayPlugin.hh>
+#include <ignition/gui/qt.h>
 
-namespace delphyne
-{
-namespace gui
-{
-namespace display_plugins
-{
-  /// \brief Display the origin on an Ignition Rendering scene.
-  class OriginDisplay : public ignition::gui::DisplayPlugin
-  {
-    Q_OBJECT
+namespace delphyne {
+namespace gui {
+namespace display_plugins {
+/// \brief Display the origin on an Ignition Rendering scene.
+class OriginDisplay : public ignition::gui::DisplayPlugin {
+  Q_OBJECT
 
-    /// \brief Constructor
-    public: OriginDisplay();
+  /// \brief Constructor
+ public:
+  OriginDisplay();
 
-    /// \brief Destructor
-    public: virtual ~OriginDisplay();
+  /// \brief Destructor
+ public:
+  virtual ~OriginDisplay();
 
-    // Documentation inherited
-    public: virtual void Initialize(const tinyxml2::XMLElement *_pluginElem)
-        override;
-  };
+  // Documentation inherited
+ public:
+  virtual void Initialize(const tinyxml2::XMLElement* _pluginElem) override;
+};
 }
 }
 }

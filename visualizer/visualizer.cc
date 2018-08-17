@@ -2,6 +2,8 @@
 
 #include <string>
 
+#include <delphyne/utility/package.h>
+
 #include <ignition/common/Console.hh>
 #include <ignition/common/Filesystem.hh>
 #include <ignition/common/Util.hh>
@@ -47,6 +49,17 @@ int main(int argc, const char* argv[]) {
     delphyne::gui::GlobalAttributes::HasArgument("layout") ?
       delphyne::gui::GlobalAttributes::GetArgument("layout") :
       initialConfigFile;
+
+  delphyne::utility::PackageManager* package_manager =
+      delphyne::utility::PackageManager::Instance();
+  if (delphyne::gui::GlobalAttributes::HasArgument("package")) {
+    package_manager->Use(
+        std::make_unique<delphyne::utility::BundledPackage>(
+            delphyne::gui::GlobalAttributes::GetArgument("package")));
+  } else {
+    package_manager->Use(
+        std::make_unique<delphyne::utility::SystemPackage>());
+  }
 
   Q_INIT_RESOURCE(resources);
 

@@ -8,6 +8,8 @@
 #include <utility>
 #include <tinyxml2.h>
 
+#include <delphyne/utility/package.h>
+
 #include <ignition/common/Console.hh>
 #include <ignition/common/MeshManager.hh>
 #include <ignition/common/PluginMacros.hh>
@@ -32,6 +34,7 @@
 #include <ignition/rendering/Scene.hh>
 
 #include "render_widget.hh"
+
 
 Q_DECLARE_METATYPE(ignition::msgs::Model_V)
 Q_DECLARE_METATYPE(ignition::msgs::Scene)
@@ -84,31 +87,6 @@ static void setPoseFromMessage(const ignition::msgs::Link& _link,
 }
 
 /////////////////////////////////////////////////
-std::string RenderWidget::FindFile(const std::string& _path) const {
-  std::string res = "";
-  // Case 1: Absolute path. E.g,: "/tmp/my_mesh.dae"
-  if (ignition::common::StartsWith(_path, "/")) {
-    if (ignition::common::exists(_path)) {
-      res = _path;
-    }
-    return res;
-  }
-
-  auto index = _path.find("://");
-  std::string path = _path;
-
-  // Case 2: Contains a prefix. E.g.: "package://meshes/my_mesh.dae"
-  if (index != std::string::npos) {
-    // Remove the prefix.
-    path = _path.substr(index + 3, _path.size() - index - 3);
-  }
-
-  // Case 3: Relative path. E.g.: "meshes/my_mesh.dae"
-  return ignition::common::SystemPaths::LocateLocalFile(path,
-                                                        this->packagePaths);
-}
-
-/////////////////////////////////////////////////
 RenderWidget::RenderWidget(QWidget* parent)
     : Plugin(), initializedScene(false), engine(nullptr) {
   qRegisterMetaType<ignition::msgs::Scene>();
@@ -139,14 +117,6 @@ RenderWidget::RenderWidget(QWidget* parent)
       SLOT(SetInitialScene(const ignition::msgs::Scene&)));
   QObject::connect(this, SIGNAL(NewDraw(const ignition::msgs::Model_V&)), this,
                    SLOT(UpdateScene(const ignition::msgs::Model_V&)));
-
-  auto paths =
-      ignition::common::SystemPaths::PathsFromEnv("DELPHYNE_PACKAGE_PATH");
-  if (paths.empty()) {
-    ignerr << "DELPHYNE_PACKAGE_PATH environment variable is not set"
-           << std::endl;
-  }
-  std::copy(paths.begin(), paths.end(), std::back_inserter(this->packagePaths));
 
   // Setting up a unique-named service name
   // i.e: Scene_8493201843;
@@ -408,12 +378,17 @@ ignition::rendering::VisualPtr RenderWidget::RenderMesh(
   }
 
   auto filename = _vis.geometry().mesh().filename();
+  delphyne::utility::PackageManager* package_manager =
+      delphyne::utility::PackageManager::Instance();
+  const utility::Package& package_in_use =
+      package_manager->package_in_use();
   ignition::rendering::MeshDescriptor descriptor;
-  descriptor.meshName = this->FindFile(filename);
-  if (descriptor.meshName.empty()) {
+  ignition::common::URI mesh_uri = package_in_use.Resolve(filename);
+  if (!mesh_uri.Valid()) {
     ignerr << "Unable to locate mesh [" << filename << "]" << std::endl;
     return nullptr;
   }
+  descriptor.meshName = "/" + mesh_uri.Path().Str();
   ignition::common::MeshManager* meshManager =
       ignition::common::MeshManager::Instance();
   descriptor.mesh = meshManager->Load(descriptor.meshName);

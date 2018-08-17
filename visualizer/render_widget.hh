@@ -204,19 +204,6 @@ class RenderWidget : public ignition::gui::Plugin {
   /// \return A pointer to the new visual.
   ignition::rendering::VisualPtr RenderMesh(const ignition::msgs::Visual& _vis);
 
-  /// \brief Find a file by name.
-  /// In the case of an absolute path:
-  ///   The function will check if the path exists.
-  /// In the case of a relative path:
-  ///   The function will search for the path in all the directories
-  ///   specified in the environment variable DELPHYNE_PACKAGE_PATH.
-  /// In the case of a path with a prefix (e.g.: package://drake/my_mesh.dae):
-  ///   The prefix ("package://") is removed and the remaining path is
-  /// searched as if a relative path was specified.
-  /// \param[in] _path The path of the file.
-  /// \return The full path to the file or an empty string if not found.
-  std::string FindFile(const std::string& _path) const;
-
   /// \brief The frequency at which we'll do an update on the widget.
   const int kUpdateTimeFrequency = static_cast<int>(std::round(1000.0 / 60.0));
 
@@ -243,11 +230,6 @@ class RenderWidget : public ignition::gui::Plugin {
 
   /// \brief Controls the view of the scene.
   std::unique_ptr<OrbitViewControl> orbitViewControl;
-
-  /// \brief List of paths that can contain resources (e.g.: meshes).
-  /// The content of this variable is populated with the value of the
-  /// DELPHYNE_PACKAGE_PATH environment variable.
-  std::vector<std::string> packagePaths;
 
   /// \brief This the data structure that stores the pointers to all visuals.
   /// The key is the model Id.

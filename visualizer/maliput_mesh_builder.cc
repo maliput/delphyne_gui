@@ -894,19 +894,11 @@ std::unique_ptr<ignition::common::Mesh> Convert(const std::string& name,
     sub_mesh->AddIndex(std::get<1>(ordered_vertices_indices[0]));
     sub_mesh->AddIndex(std::get<1>(ordered_vertices_indices[1]));
     sub_mesh->AddIndex(std::get<1>(ordered_vertices_indices[2]));
-
-    sub_mesh->AddIndex(std::get<1>(ordered_vertices_indices[2]));
-    sub_mesh->AddIndex(std::get<1>(ordered_vertices_indices[1]));
-    sub_mesh->AddIndex(std::get<1>(ordered_vertices_indices[0]));
     // Includes the remaining triangle.
     if (index_face.vertices().size() == 4) {
       sub_mesh->AddIndex(std::get<1>(ordered_vertices_indices[2]));
       sub_mesh->AddIndex(std::get<1>(ordered_vertices_indices[3]));
       sub_mesh->AddIndex(std::get<1>(ordered_vertices_indices[0]));
-
-      sub_mesh->AddIndex(std::get<1>(ordered_vertices_indices[0]));
-      sub_mesh->AddIndex(std::get<1>(ordered_vertices_indices[3]));
-      sub_mesh->AddIndex(std::get<1>(ordered_vertices_indices[2]));
     }
   }
 

@@ -1,4 +1,4 @@
-// Copyright 2017 Toyota Research Institute
+// Copyright 2018 Toyota Research Institute
 
 #include <ignition/common/Console.hh>
 #include <ignition/common/PluginMacros.hh>

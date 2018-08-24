@@ -1,4 +1,4 @@
-// Copyright 2017 Toyota Research Institute
+// Copyright 2018 Toyota Research Institute
 
 #ifndef DELPHYNE_GUI_DISPLAYS_ORIGINDISPLAY_HH
 #define DELPHYNE_GUI_DISPLAYS_ORIGINDISPLAY_HH

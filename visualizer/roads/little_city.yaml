@@ -1,6 +1,13 @@
 # -*- yaml -*-
 ---
-# distances are meters; angles are degrees.
+# References:
+# - Units: distances are meters; angles are degrees.
+# - Points: all the points except for 'alpha' are on the ground. 'alpha' is
+# elevated to do the highway.
+# - Connections: 'cX_N', where X is the start point and N the piece number, are
+# roads on the ground. 'hX_N' are highways, where X and N mean the same as
+# before. 'cXN_YM' are connections on the ground where 'cX_N' and 'cY_M' are the
+# connected roads. 'rX_N' are roads that connect both levels.
 maliput_multilane_builder:
   id: "circuit"
   lane_width: 5
@@ -13,7 +20,7 @@ maliput_multilane_builder:
   computation_policy: prefer-accuracy
   points:
     a:
-      xypoint: [0, 0, 0]
+      xypoint: [10, 0, 0]
       zpoint: [0, 0, 0, 0]
     b:
       xypoint: [290, 100, 180]
@@ -43,14 +50,9 @@ maliput_multilane_builder:
       xypoint: [50, 0, 0]
       zpoint: [20, 0, 0, 0]
   connections:
-    ca0:
-      lanes: [1, 0, 0]
-      start: ["ref", "points.a.forward"]
-      length: 10
-      z_end: ["ref", [0, 0, 0, 0]]
     ca1:
       lanes: [1, 0, 0]
-      start: ["ref", "connections.ca0.end.ref.forward"]
+      start: ["ref", "points.a.forward"]
       length: 80
       z_end: ["ref", [0, 0, 0, 0]]
     ca2_0:
@@ -642,7 +644,7 @@ maliput_multilane_builder:
       right_shoulder: 0.
       left_shoulder: 0.
       start: ["ref", "connections.rc3.end.ref.forward"]
-      arc: [50, -18.2]
+      arc: [50, -18.35]
       z_end: ["ref", [20, 0, 0, 0]]
 
     rd0:
@@ -678,24 +680,23 @@ maliput_multilane_builder:
       right_shoulder: 0.
       left_shoulder: 0.
       start: ["ref", "connections.rd3.end.ref.forward"]
-      arc: [50, -18.2]
+      arc: [50, -18.35]
       z_end: ["ref", [0, 0, 0, 0]]
 
   groups:
-    g1: [ca0, cz3_a1]
-    g2: [ca2_0, ca1_y1]
-    g3: [ca2_2, cx5_a3]
-    g4: [ca3, ca3_w1]
-    g5: [cb8_z3, cz2]
-    g6: [cy1_b8, cb6_y3, cy2, cb7]
-    g7: [cb4_x5, cx4_b6, cx4, cb5]
-    g8: [cc2_y5, cy3_c4, cy4, cc3]
-    g9: [cx1_c6, cc4_x3, cx2, cc5]
-    g10: [ra2, cb4]
-    g11: [ra3, cb8]
-    g12: [rb2, cc2]
-    g13: [rb3, cc6]
-    g14: [rc0, rc1, cc1, cz1_c2]
-    g15: [hg0, rc3, rc4]
-    g16: [hc0, rd0, rd1]
-    g17: [cc6_w5, rd3, rd4, cw4]
+    g1: [ca2_0, ca1_y1]
+    g2: [ca2_2, cx5_a3]
+    g3: [ca3, ca3_w1]
+    g4: [cb8_z3, cz2]
+    g5: [cy1_b8, cb6_y3, cy2, cb7]
+    g6: [cb4_x5, cx4_b6, cx4, cb5]
+    g7: [cc2_y5, cy3_c4, cy4, cc3]
+    g8: [cx1_c6, cc4_x3, cx2, cc5]
+    g9: [ra2, cb4]
+    g10: [ra3, cb8]
+    g11: [rb2, cc2]
+    g12: [rb3, cc6]
+    g13: [rc0, rc1, cc1, cz1_c2]
+    g14: [hg0, rc3, rc4]
+    g15: [hc0, rd0, rd1]
+    g16: [cc6_w5, rd3, rd4, cw4]

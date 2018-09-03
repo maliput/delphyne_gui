@@ -1,6 +1,7 @@
 // Copyright 2018 Toyota Research Institute
 
 #include <chrono>
+#include <cstdint>
 #include <cstdlib>
 #include <string>
 #include <utility>
@@ -82,8 +83,9 @@ void PlaybackWidget::LoadConfig(const tinyxml2::XMLElement* _pluginElem) {
                 this, SLOT(OnStepButtonPush()));
 
   time_step_spinbox_ = new QSpinBox();
+  // Max value gets overwritten as soon as the time range is known.
+  time_step_spinbox_->setRange(10, INT32_MAX);
   time_step_spinbox_->setSuffix(" ms");
-  time_step_spinbox_->setMinimum(10);
   time_step_spinbox_->setSingleStep(1);
   time_step_spinbox_->setToolTip("Time step");
 
@@ -95,7 +97,7 @@ void PlaybackWidget::LoadConfig(const tinyxml2::XMLElement* _pluginElem) {
   timeline_slider_->setOrientation(Qt::Horizontal);
   this->connect(timeline_slider_, SIGNAL(sliderPressed()),
                 this, SLOT(OnTimelinePress()));
-  this->connect(timeline_slider_, SIGNAL(valueChanged(int)),
+  this->connect(timeline_slider_, SIGNAL(sliderMoved(int)),
                 this, SLOT(OnTimelineMove(int)));
   this->connect(timeline_slider_, SIGNAL(sliderReleased()),
                 this, SLOT(OnTimelineRelease()));
@@ -235,6 +237,14 @@ void PlaybackWidget::Update(const ignition::msgs::PlaybackStatus& status) {
       .arg(std::chrono::duration_cast<seconds>(
           time_range).count(), kFieldWidth,
           kFieldFormat, kFieldPrecision));
+  // Updates maximum value in time step spinbox with the actual lenght of the
+  // playback. This runs only once since the widget gets enabled afterwards.
+  if(!this->isEnabled()) {
+    time_step_spinbox_->setMaximum(
+        std::chrono::duration_cast<std::chrono::milliseconds>(time_range)
+            .count());
+  }
+
   // Enables the entire widget.
   this->setEnabled(true);
   // Tracks time of update.

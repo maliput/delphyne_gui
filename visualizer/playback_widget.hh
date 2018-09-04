@@ -72,7 +72,7 @@ class PlaybackWidget : public ignition::gui::Plugin {
 
   // A slot to detect the start of a timeline interaction.
   void OnTimelinePress();
-  
+
   // A slot to react to timeline interactions (i.e. the user moving
   // the timeline slider).
   // @param[in] location Timeline slider location (i.e. its value).
@@ -98,7 +98,7 @@ class PlaybackWidget : public ignition::gui::Plugin {
   // Issues a playback seek request, to the given @p seek_offset
   // from playback start.
   void RequestSeek(const ignition::msgs::Duration& seek_offset);
-  
+
   // A button to rewind a playback (i.e. back to the start).
   QPushButton* rewind_button_{nullptr};
 

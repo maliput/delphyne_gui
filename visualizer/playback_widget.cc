@@ -62,7 +62,7 @@ void PlaybackWidget::LoadConfig(const tinyxml2::XMLElement* _pluginElem) {
   rewind_button_->setToolTip("Rewind");
   this->connect(rewind_button_, SIGNAL(clicked()),
                 this, SLOT(OnRewindButtonPush()));
-  
+
   pause_button_ = new QPushButton(QIcon(":/icons/pause.svg"), "");
   pause_button_->setToolTip("Pause");
   pause_button_->setCheckable(true);
@@ -163,7 +163,7 @@ void PlaybackWidget::OnStepButtonPush() {
 
 /////////////////////////////////////////////////
 void PlaybackWidget::OnTimelinePress() {
-  timeline_interaction_ = true;  
+  timeline_interaction_ = true;
 }
 
 /////////////////////////////////////////////////
@@ -215,7 +215,7 @@ void PlaybackWidget::Update(const ignition::msgs::PlaybackStatus& status) {
     const int slider_range =
         timeline_slider_->maximum() - timeline_slider_->minimum();
     timeline_scale_ = time_range / slider_range;
-  }  
+  }
   using seconds = std::chrono::duration<double>;
   constexpr int kFieldWidth{0};  // Default.
   constexpr char kFieldFormat{'f'};  // No scientific notation.

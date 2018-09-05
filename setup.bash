@@ -66,3 +66,6 @@ add_if_not_in_var PATH $INSTALL_PREFIX/bin
 
 # Path to python modules
 add_if_not_in_var PYTHONPATH $INSTALL_PREFIX/lib/python2.7/site-packages
+
+# Path to display plugins
+add_if_not_in_var IGN_GUI_DISPLAY_PLUGIN_PATH $INSTALL_PREFIX/lib

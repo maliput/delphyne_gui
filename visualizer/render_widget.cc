@@ -23,7 +23,6 @@
 #include <ignition/math/Vector3.hh>
 #include <ignition/msgs.hh>
 #include <ignition/rendering/Camera.hh>
-#include <ignition/rendering/Grid.hh>
 #include <ignition/rendering/Light.hh>
 #include <ignition/rendering/Material.hh>
 #include <ignition/rendering/MeshDescriptor.hh>
@@ -366,87 +365,6 @@ ignition::rendering::VisualPtr RenderWidget::RenderCylinder(
 }
 
 /////////////////////////////////////////////////
-void RenderWidget::RenderGrid(const unsigned int _cellCount,
-                              const double _cellLength,
-                              const unsigned int _verticalCellCount,
-                              const ignition::rendering::MaterialPtr& _material,
-                              const ignition::math::Pose3d& _pose) {
-  auto gridGeom = this->scene->CreateGrid();
-  if (!gridGeom) {
-    ignerr << "Unable to create grid geometry" << std::endl;
-    return;
-  }
-  gridGeom->SetCellCount(_cellCount);
-  gridGeom->SetCellLength(_cellLength);
-  gridGeom->SetVerticalCellCount(_verticalCellCount);
-
-  auto grid = this->scene->CreateVisual();
-  if (!grid) {
-    ignerr << "Unable to create grid visual" << std::endl;
-    return;
-  }
-
-  grid->AddGeometry(gridGeom);
-  grid->SetLocalPose(_pose);
-  grid->SetMaterial(_material);
-  this->scene->RootVisual()->AddChild(grid);
-}
-
-/////////////////////////////////////////////////
-void RenderWidget::RenderGroundPlaneGrid() {
-  auto gray = this->scene->CreateMaterial();
-  if (gray) {
-    gray->SetAmbient(0.7, 0.7, 0.7);
-    gray->SetDiffuse(0.7, 0.7, 0.7);
-    gray->SetSpecular(0.7, 0.7, 0.7);
-
-    const unsigned int kCellCount = 50u;
-    const double kCellLength = 1;
-    const unsigned int kVerticalCellCount = 0u;
-
-    this->RenderGrid(kCellCount, kCellLength, kVerticalCellCount, gray,
-                     ignition::math::Pose3d::Zero);
-  } else {
-    ignerr << "Failed to create material for the grid" << std::endl;
-  }
-}
-
-/////////////////////////////////////////////////
-void RenderWidget::RenderOrigin() {
-  const double kAxisRadius = 0.02;
-  const double kAxisLength = 10000;
-  const double kAxisHalfLength = kAxisLength / 2.0;
-
-  // Create the visual axes.
-  std::array<ignition::rendering::VisualPtr, 3> axes;
-  for (auto& axis : axes) {
-    axis = this->scene->CreateVisual();
-    if (!axis) {
-      ignerr << "Failed to create axis visual" << std::endl;
-      return;
-    }
-    axis->SetLocalScale(kAxisRadius, kAxisRadius, kAxisLength);
-    axis->AddGeometry(scene->CreateCylinder());
-  }
-
-  const ignition::math::Pose3d kAxisPoseX(kAxisHalfLength, 0, 0, 0, IGN_PI_2,
-                                          0);
-  axes[0]->SetLocalPose(kAxisPoseX);
-  axes[0]->SetMaterial("Default/TransRed");
-  const ignition::math::Pose3d kAxisPoseY(0, kAxisHalfLength, 0, IGN_PI_2, 0,
-                                          0);
-  axes[1]->SetLocalPose(kAxisPoseY);
-  axes[1]->SetMaterial("Default/TransGreen");
-  const ignition::math::Pose3d kAxisPoseZ(0, 0, kAxisHalfLength, 0, 0, 0);
-  axes[2]->SetLocalPose(kAxisPoseZ);
-  axes[2]->SetMaterial("Default/TransBlue");
-
-  for (auto& axis : axes) {
-    this->scene->RootVisual()->AddChild(axis);
-  }
-}
-
-/////////////////////////////////////////////////
 ignition::rendering::VisualPtr RenderWidget::RenderMesh(
     const ignition::msgs::Visual& _vis) {
   // Sanity check: Make sure that the message contains all required fields.
@@ -728,12 +646,6 @@ void RenderWidget::CreateRenderWindow() {
 
   // render once to create the window.
   this->camera->Update();
-
-  // Render the grid over the ground plane.
-  this->RenderGroundPlaneGrid();
-
-  // Render the origin reference frame.
-  this->RenderOrigin();
 
   this->orbitViewControl.reset(new OrbitViewControl(this->camera));
 }

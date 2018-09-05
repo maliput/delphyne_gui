@@ -103,6 +103,33 @@ include_directories(
   ${CMAKE_SOURCE_DIR}
 )
 
+# PlaybackWidget GUI plugin.
+set(playback_widget PlaybackWidget)
+QT5_WRAP_CPP(${playback_widget}_MOC playback_widget.hh)
+QT5_ADD_RESOURCES(${playback_widget}_resources_RCC playback.qrc)
+add_library(${playback_widget} SHARED
+  ${CMAKE_CURRENT_SOURCE_DIR}/playback_widget.cc
+  ${${playback_widget}_MOC}
+  ${${playback_widget}_resources_RCC}
+)
+target_link_libraries(${playback_widget}
+  ${IGNITION-COMMON_LIBRARIES}
+  ${IGNITION-GUI_LIBRARIES}
+  ${IGNITION-MSGS_LIBRARIES}
+  ${IGNITION-TRANSPORT_LIBRARIES}
+  ${Qt5Core_LIBRARIES}
+  ${Qt5Widgets_LIBRARIES}
+  delphyne::protobuf_messages
+)
+
+install(TARGETS ${playback_widget} DESTINATION ${LIB_INSTALL_DIR} COMPONENT shlib)
+
+include_directories(
+  ${Qt5Core_INCLUDE_DIRS}
+  ${CMAKE_BINARY_DIR}/include
+  ${CMAKE_SOURCE_DIR}
+)
+
 # Visualizer
 add_executable(visualizer
   visualizer.cc
@@ -121,7 +148,8 @@ install (TARGETS visualizer DESTINATION ${BIN_INSTALL_DIR})
 
 # Install .config files.
 install (FILES
-  layout_with_render_only.config layout_with_teleop.config layout_maliput_viewer.config
+  layout_with_render_only.config layout_with_teleop.config
+  layout_maliput_viewer.config layout_for_playback.config
   DESTINATION
   ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/delphyne/layouts)
 
@@ -131,6 +159,7 @@ install (FILES
   roads/circuit.yaml
   roads/curved_lanes.yaml
   roads/straight_lanes.yaml
+  roads/little_city.yaml
   DESTINATION
   ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/delphyne/roads)
 

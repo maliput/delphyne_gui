@@ -1,0 +1,702 @@
+# -*- yaml -*-
+---
+# References:
+# - Units: distances are meters; angles are degrees.
+# - Points: all the points except for 'alpha' are on the ground. 'alpha' is
+# elevated to do the highway.
+# - Connections: 'cX_N', where X is the start point and N the piece number, are
+# roads on the ground. 'hX_N' are highways, where X and N mean the same as
+# before. 'cXN_YM' are connections on the ground where 'cX_N' and 'cY_M' are the
+# connected roads. 'rX_N' are roads that connect both levels.
+maliput_multilane_builder:
+  id: "circuit"
+  lane_width: 5
+  left_shoulder: 1
+  right_shoulder: 1
+  elevation_bounds: [0, 5]
+  linear_tolerance: 0.01
+  angular_tolerance: 0.5
+  scale_length: 1.0
+  computation_policy: prefer-accuracy
+  points:
+    a:
+      xypoint: [10, 0, 0]
+      zpoint: [0, 0, 0, 0]
+    b:
+      xypoint: [290, 100, 180]
+      zpoint: [0, 0, 0, 0]
+    c:
+      xypoint: [0, 200, 0]
+      zpoint: [0, 0, 0, 0]
+    d:
+      xypoint: [280, 300, 180]
+      zpoint: [0, 0, -30, 0]
+    e:
+      xypoint: [0, 400, 0]
+      zpoint: [0, 0, 0, 0]
+    z:
+      xypoint: [0, 280, -90]
+      zpoint: [0, 0, -30, 0]
+    y:
+      xypoint: [100, 10, 90]
+      zpoint: [0, 0, 0, 0]
+    x:
+      xypoint: [200, 290, -90]
+      zpoint: [0, 0, 0, 0]
+    w:
+      xypoint: [300, 20, 90]
+      zpoint: [0, 0, -30, 0]
+    alpha:
+      xypoint: [50, 0, 0]
+      zpoint: [20, 0, 0, 0]
+  connections:
+    ca1:
+      lanes: [1, 0, 0]
+      start: ["ref", "points.a.forward"]
+      length: 80
+      z_end: ["ref", [0, 0, 0, 0]]
+    ca2_0:
+      lanes: [1, 0, 0]
+      start: ["ref", "connections.ca1.end.ref.forward"]
+      length: 20
+      z_end: ["ref", [0, 0, 0, 0]]
+    ca2_1:
+      lanes: [1, 0, 0]
+      start: ["ref", "connections.ca2_0.end.ref.forward"]
+      length: 80
+      z_end: ["ref", [0, 0, 0, 0]]
+    ca2_2:
+      lanes: [1, 0, 0]
+      start: ["ref", "connections.ca2_1.end.ref.forward"]
+      length: 20
+      z_end: ["ref", [0, 0, 0, 0]]
+    ca3:
+      lanes: [1, 0, 0]
+      start: ["ref", "connections.ca2_2.end.ref.forward"]
+      length: 70
+      z_end: ["ref", [0, 0, -30, 0]]
+    cb4:
+      lanes: [1, 0, 0]
+      start: ["ref", "points.b.forward"]
+      length: 80
+      z_end: ["ref", [0, 0, 0, 0]]
+    cb5:
+      lanes: [1, 0, 0]
+      start: ["ref", "connections.cb4.end.ref.forward"]
+      length: 20
+      z_end: ["ref", [0, 0, 0, 0]]
+    cb6_a:
+      lanes: [1, 0, 0]
+      start: ["ref", "connections.cb5.end.ref.forward"]
+      length: 40
+      z_end: ["ref", [0, 0, 0, 0]]
+    cb6_b:
+      lanes: [1, 0, 0]
+      start: ["ref", "connections.cb6_a.end.ref.forward"]
+      length: 40
+      z_end: ["ref", [0, 0, 0, 0]]
+
+    cb7:
+      lanes: [1, 0, 0]
+      start: ["ref", "connections.cb6_b.end.ref.forward"]
+      length: 20
+      z_end: ["ref", [0, 0, 0, 0]]
+    cb8:
+      lanes: [1, 0, 0]
+      start: ["ref", "connections.cb7.end.ref.forward"]
+      length: 80
+      z_end: ["ref", [0, 0, 0, 0]]
+    cc1:
+      lanes: [1, 0, 0]
+      start: ["ref", "points.c.forward"]
+      length: 10
+      z_end: ["ref", [0, 0, 0, 0]]
+    cc2:
+      lanes: [1, 0, 0]
+      start: ["ref", "connections.cc1.end.ref.forward"]
+      length: 80
+      z_end: ["ref", [0, 0, 0, 0]]
+    cc3:
+      lanes: [1, 0, 0]
+      start: ["ref", "connections.cc2.end.ref.forward"]
+      length: 20
+      z_end: ["ref", [0, 0, 0, 0]]
+    cc4_a:
+      lanes: [1, 0, 0]
+      start: ["ref", "connections.cc3.end.ref.forward"]
+      length: 40
+      z_end: ["ref", [0, 0, 0, 0]]
+    cc4_b:
+      lanes: [1, 0, 0]
+      start: ["ref", "connections.cc4_a.end.ref.forward"]
+      length: 40
+      z_end: ["ref", [0, 0, 0, 0]]
+    cc5:
+      lanes: [1, 0, 0]
+      start: ["ref", "connections.cc4_b.end.ref.forward"]
+      length: 20
+      z_end: ["ref", [0, 0, 0, 0]]
+    cc6:
+      lanes: [1, 0, 0]
+      start: ["ref", "connections.cc5.end.ref.forward"]
+      length: 80
+      z_end: ["ref", [0, 0, 0, 0]]
+    cd4:
+      lanes: [1, 0, 0]
+      start: ["ref", "points.d.forward"]
+      length: 70
+      z_end: ["ref", [0, 0, 0, 0]]
+    cd5:
+      lanes: [1, 0, 0]
+      start: ["ref", "connections.cd4.end.ref.forward"]
+      length: 20
+      z_end: ["ref", [0, 0, 0, 0]]
+    cd6:
+      lanes: [1, 0, 0]
+      start: ["ref", "connections.cd5.end.ref.forward"]
+      length: 80
+      z_end: ["ref", [0, 0, 0, 0]]
+    cd7:
+      lanes: [1, 0, 0]
+      start: ["ref", "connections.cd6.end.ref.forward"]
+      length: 20
+      z_end: ["ref", [0, 0, 0, 0]]
+    cd8:
+      lanes: [1, 0, 0]
+      start: ["ref", "connections.cd7.end.ref.forward"]
+      length: 70
+      z_end: ["ref", [0, 0, -30, 0]]
+
+    cz1:
+      lanes: [1, 0, 0]
+      start: ["ref", "points.z.forward"]
+      length: 70
+      z_end: ["ref", [0, 0, 0, 0]]
+    cz2:
+      lanes: [1, 0, 0]
+      start: ["ref", "connections.cz1.end.ref.forward"]
+      length: 120
+      z_end: ["ref", [0, 0, 0, 0]]
+    cz3:
+      lanes: [1, 0, 0]
+      start: ["ref", "connections.cz2.end.ref.forward"]
+      length: 80
+      z_end: ["ref", [0, 0, 0, 0]]
+    cy1:
+      lanes: [1, 0, 0]
+      start: ["ref", "points.y.forward"]
+      length: 80
+      z_end: ["ref", [0, 0, 0, 0]]
+    cy2:
+      lanes: [1, 0, 0]
+      start: ["ref", "connections.cy1.end.ref.forward"]
+      length: 20
+      z_end: ["ref", [0, 0, 0, 0]]
+    cy3:
+      lanes: [1, 0, 0]
+      start: ["ref", "connections.cy2.end.ref.forward"]
+      length: 80
+      z_end: ["ref", [0, 0, 0, 0]]
+    cy4:
+      lanes: [1, 0, 0]
+      start: ["ref", "connections.cy3.end.ref.forward"]
+      length: 20
+      z_end: ["ref", [0, 0, 0, 0]]
+    cy5:
+      lanes: [1, 0, 0]
+      start: ["ref", "connections.cy4.end.ref.forward"]
+      length: 80
+      z_end: ["ref", [0, 0, 0, 0]]
+    cx1:
+      lanes: [1, 0, 0]
+      start: ["ref", "points.x.forward"]
+      length: 80
+      z_end: ["ref", [0, 0, 0, 0]]
+    cx2:
+      lanes: [1, 0, 0]
+      start: ["ref", "connections.cx1.end.ref.forward"]
+      length: 20
+      z_end: ["ref", [0, 0, 0, 0]]
+    cx3:
+      lanes: [1, 0, 0]
+      start: ["ref", "connections.cx2.end.ref.forward"]
+      length: 80
+      z_end: ["ref", [0, 0, 0, 0]]
+    cx4:
+      lanes: [1, 0, 0]
+      start: ["ref", "connections.cx3.end.ref.forward"]
+      length: 20
+      z_end: ["ref", [0, 0, 0, 0]]
+    cx5:
+      lanes: [1, 0, 0]
+      start: ["ref", "connections.cx4.end.ref.forward"]
+      length: 80
+      z_end: ["ref", [0, 0, 0, 0]]
+    cw1:
+      lanes: [1, 0, 0]
+      start: ["ref", "points.w.forward"]
+      length: 70
+      z_end: ["ref", [0, 0, 0, 0]]
+    cw2:
+      lanes: [1, 0, 0]
+      start: ["ref", "connections.cw1.end.ref.forward"]
+      length: 20
+      z_end: ["ref", [0, 0, 0, 0]]
+    cw3:
+      lanes: [1, 0, 0]
+      start: ["ref", "connections.cw2.end.ref.forward"]
+      length: 80
+      z_end: ["ref", [0, 0, 0, 0]]
+    cw4:
+      lanes: [1, 0, 0]
+      start: ["ref", "connections.cw3.end.ref.forward"]
+      length: 20
+      z_end: ["ref", [0, 0, 0, 0]]
+    cw5:
+      lanes: [1, 0, 0]
+      start: ["ref", "connections.cw4.end.ref.forward"]
+      length: 70
+      z_end: ["ref", [0, 0, -30, 0]]
+
+    cz3_a1:
+      lanes: [1, 0, 0]
+      start: ["ref", "connections.cz3.end.ref.forward"]
+      arc: [10, 90]
+      explicit_end: ["ref", "connections.ca1.start.ref.forward"]
+    ca1_y1:
+      lanes: [1, 0, 0]
+      start: ["ref", "connections.ca1.end.ref.forward"]
+      arc: [10, 90]
+      explicit_end: ["ref", "connections.cy1.start.ref.forward"]
+    cx5_a3:
+      lanes: [1, 0, 0]
+      start: ["ref", "connections.cx5.end.ref.forward"]
+      arc: [10, 90]
+      explicit_end: ["ref", "connections.ca3.start.ref.forward"]
+    ca3_w1:
+      lanes: [1, 0, 0]
+      start: ["ref", "connections.ca3.end.ref.forward"]
+      arc: [20, 90]
+      explicit_end: ["ref", "connections.cw1.start.ref.forward"]
+
+    cw1_b4:
+      lanes: [1, 0, 0]
+      start: ["ref", "connections.cw1.end.ref.forward"]
+      arc: [10, 90]
+      explicit_end: ["ref", "connections.cb4.start.ref.forward"]
+    cb4_x5:
+      lanes: [1, 0, 0]
+      start: ["ref", "connections.cb4.end.ref.forward"]
+      arc: [10, 90]
+      explicit_end: ["ref", "connections.cx5.start.ref.forward"]
+    cy1_b8:
+      lanes: [1, 0, 0]
+      start: ["ref", "connections.cy1.end.ref.forward"]
+      arc: [10, 90]
+      explicit_end: ["ref", "connections.cb8.start.ref.forward"]
+    cb8_z3:
+      lanes: [1, 0, 0]
+      start: ["ref", "connections.cb8.end.ref.forward"]
+      arc: [10, 90]
+      explicit_end: ["ref", "connections.cz3.start.ref.forward"]
+
+    cw1_b4:
+      lanes: [1, 0, 0]
+      start: ["ref", "connections.cw1.end.ref.forward"]
+      arc: [10, 90]
+      explicit_end: ["ref", "connections.cb4.start.ref.forward"]
+    cb4_x5:
+      lanes: [1, 0, 0]
+      start: ["ref", "connections.cb4.end.ref.forward"]
+      arc: [10, 90]
+      explicit_end: ["ref", "connections.cx5.start.ref.forward"]
+    cy1_b8:
+      lanes: [1, 0, 0]
+      start: ["ref", "connections.cy1.end.ref.forward"]
+      arc: [10, 90]
+      explicit_end: ["ref", "connections.cb8.start.ref.forward"]
+    cb8_z3:
+      lanes: [1, 0, 0]
+      start: ["ref", "connections.cb8.end.ref.forward"]
+      arc: [10, 90]
+      explicit_end: ["ref", "connections.cz3.start.ref.forward"]
+
+    cw1_b4:
+      lanes: [1, 0, 0]
+      start: ["ref", "connections.cw1.end.ref.forward"]
+      arc: [10, 90]
+      explicit_end: ["ref", "connections.cb4.start.ref.forward"]
+    cb4_x5:
+      lanes: [1, 0, 0]
+      start: ["ref", "connections.cb4.end.ref.forward"]
+      arc: [10, 90]
+      explicit_end: ["ref", "connections.cx5.start.ref.forward"]
+    cy1_b8:
+      lanes: [1, 0, 0]
+      start: ["ref", "connections.cy1.end.ref.forward"]
+      arc: [10, 90]
+      explicit_end: ["ref", "connections.cb8.start.ref.forward"]
+    cb8_z3:
+      lanes: [1, 0, 0]
+      start: ["ref", "connections.cb8.end.ref.forward"]
+      arc: [10, 90]
+      explicit_end: ["ref", "connections.cz3.start.ref.forward"]
+    cx4_b6:
+      lanes: [1, 0, 0]
+      start: ["ref", "connections.cx4.start.ref.forward"]
+      arc: [10, -90]
+      explicit_end: ["ref", "connections.cb6_a.start.ref.forward"]
+    cb6_y3:
+      lanes: [1, 0, 0]
+      start: ["ref", "connections.cb6_b.end.ref.forward"]
+      arc: [10, -90]
+      explicit_end: ["ref", "connections.cy3.start.ref.forward"]
+
+    cz1_c2:
+      lanes: [1, 0, 0]
+      start: ["ref", "connections.cz1.end.ref.forward"]
+      arc: [10, 90]
+      explicit_end: ["ref", "connections.cc2.start.ref.forward"]
+    cc2_y5:
+      lanes: [1, 0, 0]
+      start: ["ref", "connections.cc2.end.ref.forward"]
+      arc: [10, 90]
+      explicit_end: ["ref", "connections.cy5.start.ref.forward"]
+    cx1_c6:
+      lanes: [1, 0, 0]
+      start: ["ref", "connections.cx1.end.ref.forward"]
+      arc: [10, 90]
+      explicit_end: ["ref", "connections.cc6.start.ref.forward"]
+    cc6_w5:
+      lanes: [1, 0, 0]
+      start: ["ref", "connections.cc6.end.ref.forward"]
+      arc: [10, 90]
+      explicit_end: ["ref", "connections.cw5.start.ref.forward"]
+    cy3_c4:
+      lanes: [1, 0, 0]
+      start: ["ref", "connections.cy3.end.ref.forward"]
+      arc: [10, -90]
+      explicit_end: ["ref", "connections.cc4_a.start.ref.forward"]
+    cc4_x3:
+      lanes: [1, 0, 0]
+      start: ["ref", "connections.cc4_b.end.ref.forward"]
+      arc: [10, -90]
+      explicit_end: ["ref", "connections.cx3.start.ref.forward"]
+
+    cw5_d4:
+      lanes: [1, 0, 0]
+      start: ["ref", "connections.cw5.end.ref.forward"]
+      arc: [20, 90]
+      explicit_end: ["ref", "connections.cd4.start.ref.forward"]
+    cd4_x1:
+      lanes: [1, 0, 0]
+      start: ["ref", "connections.cd4.end.ref.forward"]
+      arc: [10, 90]
+      explicit_end: ["ref", "connections.cx1.start.ref.forward"]
+    cy5_d8:
+      lanes: [1, 0, 0]
+      start: ["ref", "connections.cy5.end.ref.forward"]
+      arc: [10, 90]
+      explicit_end: ["ref", "connections.cd8.start.ref.forward"]
+    cd8_z1:
+      lanes: [1, 0, 0]
+      start: ["ref", "connections.cd8.end.ref.forward"]
+      arc: [20, 90]
+      explicit_end: ["ref", "connections.cz1.start.ref.forward"]
+
+    ha0:
+      lanes: [2, 0, 0]
+      left_shoulder: 0.
+      start: ["ref", "points.alpha.forward"]
+      length: 200
+      z_end: ["ref", [20, 0, 0, 0]]
+    ha1_a:
+      lanes: [2, 0, -15]
+      left_shoulder: 0.
+      start: ["ref", "connections.ha0.end.ref.reverse"]
+      length: 5
+      z_end: ["ref", [20, 0, 0, 0]]
+    ha1_b:
+      lanes: [2, 0, -15]
+      left_shoulder: 0.
+      start: ["ref", "connections.ha1_a.end.ref.forward"]
+      length: 190
+      z_end: ["ref", [20, 0, 0, 0]]
+    ha1_c:
+      lanes: [2, 0, -15]
+      left_shoulder: 0.
+      start: ["ref", "connections.ha1_b.end.ref.forward"]
+      length: 5
+      z_end: ["ref", [20, 0, 0, 0]]
+    hb0:
+      lanes: [2, 0, 0]
+      left_shoulder: 0.
+      start: ["ref", "connections.ha0.end.ref.forward"]
+      arc: [50, 90]
+      z_end: ["ref", [20, 0, 0, 0]]
+    hb1:
+      lanes: [2, 0, -15]
+      left_shoulder: 0.
+      start: ["ref", "connections.hb0.end.ref.reverse"]
+      arc: [50, -90]
+      z_end: ["ref", [20, 0, 0, 0]]
+    hc0:
+      lanes: [2, 0, 0]
+      left_shoulder: 0.
+      start: ["ref", "connections.hb0.end.ref.forward"]
+      length: 200
+      z_end: ["ref", [20, 0, 0, 0]]
+    hc1:
+      lanes: [2, 0, -15]
+      left_shoulder: 0.
+      start: ["ref", "connections.hc0.end.ref.reverse"]
+      length: 200
+      z_end: ["ref", [20, 0, 0, 0]]
+    hd0:
+      lanes: [2, 0, 0]
+      left_shoulder: 0.
+      start: ["ref", "connections.hc0.end.ref.forward"]
+      arc: [50, 90]
+      z_end: ["ref", [20, 0, 0, 0]]
+    hd1:
+      lanes: [2, 0, -15]
+      left_shoulder: 0.
+      start: ["ref", "connections.hd0.end.ref.reverse"]
+      arc: [50, -90]
+      z_end: ["ref", [20, 0, 0, 0]]
+    he0:
+      lanes: [2, 0, 0]
+      left_shoulder: 0.
+      start: ["ref", "connections.hd0.end.ref.forward"]
+      length: 200
+      z_end: ["ref", [20, 0, 0, 0]]
+    he1_a:
+      lanes: [2, 0, -15]
+      left_shoulder: 0.
+      start: ["ref", "connections.he0.end.ref.reverse"]
+      length: 5
+      z_end: ["ref", [20, 0, 0, 0]]
+    he1_b:
+      lanes: [2, 0, -15]
+      left_shoulder: 0.
+      start: ["ref", "connections.he1_a.end.ref.forward"]
+      length: 190
+      z_end: ["ref", [20, 0, 0, 0]]
+    he1_c:
+      lanes: [2, 0, -15]
+      left_shoulder: 0.
+      start: ["ref", "connections.he1_b.end.ref.forward"]
+      length: 5
+      z_end: ["ref", [20, 0, 0, 0]]
+    hf0:
+      lanes: [2, 0, 0]
+      left_shoulder: 0.
+      start: ["ref", "connections.he0.end.ref.forward"]
+      arc: [50, 90]
+      z_end: ["ref", [20, 0, 0, 0]]
+    hf1:
+      lanes: [2, 0, -15]
+      left_shoulder: 0.
+      start: ["ref", "connections.hf0.end.ref.reverse"]
+      arc: [50, -90]
+      z_end: ["ref", [20, 0, 0, 0]]
+    hg0:
+      lanes: [2, 0, 0]
+      left_shoulder: 0.
+      start: ["ref", "connections.hf0.end.ref.forward"]
+      length: 200
+      z_end: ["ref", [20, 0, 0, 0]]
+    hg1:
+      lanes: [2, 0, -15]
+      left_shoulder: 0.
+      start: ["ref", "connections.hg0.end.ref.reverse"]
+      length: 200
+      z_end: ["ref", [20, 0, 0, 0]]
+    hh0:
+      lanes: [2, 0, 0]
+      left_shoulder: 0.
+      start: ["ref", "connections.hg0.end.ref.forward"]
+      arc: [50, 90]
+      z_end: ["ref", [20, 0, 0, 0]]
+    hh1:
+      lanes: [2, 0, -15]
+      left_shoulder: 0.
+      start: ["ref", "connections.hh0.end.ref.reverse"]
+      arc: [50, -90]
+      z_end: ["ref", [20, 0, 0, 0]]
+
+    ra0:
+      lanes: [1, 0, -15]
+      left_shoulder: 0.
+      right_shoulder: 0.
+      start: ["ref", "connections.ha1_b.start.ref.forward"]
+      arc: [30, -90]
+      z_end: ["ref", [20, 0, 0, 0]]
+    ra1:
+      lanes: [1, 0, -15]
+      left_shoulder: 0.
+      right_shoulder: 0.
+      start: ["ref", "connections.ra0.end.ref.forward"]
+      length: 50
+      z_end: ["ref", [0, 0, 0, 0]]
+    ra2:
+      lanes: [1, 0, -15]
+      left_shoulder: 0.
+      right_shoulder: 0.
+      start: ["ref", "connections.ra1.end.ref.forward"]
+      arc: [5, 90]
+      z_end: ["ref", [0, 0, 0, 0]]
+    ra3:
+      lanes: [1, 0, 0]
+      left_shoulder: 0.
+      right_shoulder: 0.
+      start: ["ref", "connections.cb8.start.ref.forward"]
+      arc: [20, 90]
+      z_end: ["ref", [0, 0, 0, 0]]
+    ra4:
+      lanes: [1, 0, 0]
+      left_shoulder: 0.
+      right_shoulder: 0.
+      start: ["ref", "connections.ra3.end.ref.forward"]
+      length: 50
+      z_end: ["ref", [20, 0, 0, 0]]
+    ra5:
+      lanes: [1, 0, 0]
+      left_shoulder: 0.
+      right_shoulder: 0.
+      start: ["ref", "connections.ra4.end.ref.forward"]
+      arc: [15, -90]
+      z_end: ["ref", [20, 0, 0, 0]]
+
+    rb0:
+      lanes: [1, 0, -15]
+      left_shoulder: 0.
+      right_shoulder: 0.
+      start: ["ref", "connections.he1_b.start.ref.forward"]
+      arc: [30, -90]
+      z_end: ["ref", [20, 0, 0, 0]]
+    rb1:
+      lanes: [1, 0, -15]
+      left_shoulder: 0.
+      right_shoulder: 0.
+      start: ["ref", "connections.rb0.end.ref.forward"]
+      length: 50
+      z_end: ["ref", [0, 0, 0, 0]]
+    rb2:
+      lanes: [1, 0, -15]
+      left_shoulder: 0.
+      right_shoulder: 0.
+      start: ["ref", "connections.rb1.end.ref.forward"]
+      arc: [5, 90]
+      z_end: ["ref", [0, 0, 0, 0]]
+    rb3:
+      lanes: [1, 0, 0]
+      left_shoulder: 0.
+      right_shoulder: 0.
+      start: ["ref", "connections.cc5.end.ref.forward"]
+      arc: [20, 90]
+      z_end: ["ref", [0, 0, 0, 0]]
+    rb4:
+      lanes: [1, 0, 0]
+      left_shoulder: 0.
+      right_shoulder: 0.
+      start: ["ref", "connections.rb3.end.ref.forward"]
+      length: 50
+      z_end: ["ref", [20, 0, 0, 0]]
+    rb5:
+      lanes: [1, 0, 0]
+      left_shoulder: 0.
+      right_shoulder: 0.
+      start: ["ref", "connections.rb4.end.ref.forward"]
+      arc: [15, -90]
+      z_end: ["ref", [20, 0, 0, 0]]
+
+    rc0:
+      lanes: [1, 0, 0]
+      right_shoulder: 0.
+      left_shoulder: 0.
+      start: ["ref", "connections.cz1.end.ref.forward"]
+      arc: [50, -18.2]
+      z_end: ["ref", [0, 0, 0, 0]]
+    rc1:
+      lanes: [1, 0, 0]
+      right_shoulder: 0.
+      left_shoulder: 0.
+      start: ["ref", "connections.rc0.end.ref.forward"]
+      arc: [50, 18.2]
+      z_end: ["ref", [0, 0, 0, 0]]
+    rc2:
+      lanes: [1, 0, 0]
+      right_shoulder: 0.
+      left_shoulder: 0.
+      start: ["ref", "connections.rc1.end.ref.forward"]
+      length: 97.4
+      z_end: ["ref", [20, 0, 0, 0]]
+    rc3:
+      lanes: [1, 0, 0]
+      right_shoulder: 0.
+      left_shoulder: 0.
+      start: ["ref", "connections.rc2.end.ref.forward"]
+      arc: [50, 18.2]
+      z_end: ["ref", [20, 0, 0, 0]]
+    rc4:
+      lanes: [1, 0, 0]
+      right_shoulder: 0.
+      left_shoulder: 0.
+      start: ["ref", "connections.rc3.end.ref.forward"]
+      arc: [50, -18.35]
+      z_end: ["ref", [20, 0, 0, 0]]
+
+    rd0:
+      lanes: [1, 0, 0]
+      right_shoulder: 0.
+      left_shoulder: 0.
+      start: ["ref", "connections.hc0.start.ref.forward"]
+      arc: [50, -18.2]
+      z_end: ["ref", [20, 0, 0, 0]]
+    rd1:
+      lanes: [1, 0, 0]
+      right_shoulder: 0.
+      left_shoulder: 0.
+      start: ["ref", "connections.rd0.end.ref.forward"]
+      arc: [50, 18.2]
+      z_end: ["ref", [20, 0, 0, 0]]
+    rd2:
+      lanes: [1, 0, 0]
+      right_shoulder: 0.
+      left_shoulder: 0.
+      start: ["ref", "connections.rd1.end.ref.forward"]
+      length: 97.4
+      z_end: ["ref", [0, 0, 0, 0]]
+    rd3:
+      lanes: [1, 0, 0]
+      right_shoulder: 0.
+      left_shoulder: 0.
+      start: ["ref", "connections.rd2.end.ref.forward"]
+      arc: [50, 18.2]
+      z_end: ["ref", [0, 0, 0, 0]]
+    rd4:
+      lanes: [1, 0, 0]
+      right_shoulder: 0.
+      left_shoulder: 0.
+      start: ["ref", "connections.rd3.end.ref.forward"]
+      arc: [50, -18.35]
+      z_end: ["ref", [0, 0, 0, 0]]
+
+  groups:
+    g1: [ca2_0, ca1_y1]
+    g2: [ca2_2, cx5_a3]
+    g3: [ca3, ca3_w1]
+    g4: [cb8_z3, cz2]
+    g5: [cy1_b8, cb6_y3, cy2, cb7]
+    g6: [cb4_x5, cx4_b6, cx4, cb5]
+    g7: [cc2_y5, cy3_c4, cy4, cc3]
+    g8: [cx1_c6, cc4_x3, cx2, cc5]
+    g9: [ra2, cb4]
+    g10: [ra3, cb8]
+    g11: [rb2, cc2]
+    g12: [rb3, cc6]
+    g13: [rc0, rc1, cc1, cz1_c2]
+    g14: [hg0, rc3, rc4]
+    g15: [hc0, rd0, rd1]
+    g16: [cc6_w5, rd3, rd4, cw4]

@@ -160,6 +160,15 @@ void RenderWidget::LoadConfig(const tinyxml2::XMLElement* _pluginElem) {
     return;
   }
 
+  // Configure if we need to cast shadows.
+  bool castShadows = kCastShadowsByDefault;
+
+  if (auto castShadowsElem = _pluginElem->FirstChildElement("cast_shadows")) {
+    castShadowsElem->QueryBoolText(&castShadows);
+  }
+
+  this->mainDirectionalLight->SetCastShadows(castShadows);
+
   // Load the user camera options.
   auto userCameraXML = _pluginElem->FirstChildElement("camera");
   while (userCameraXML) {
@@ -588,15 +597,16 @@ void RenderWidget::CreateRenderWindow() {
     ignerr << "Failed to find the root visual" << std::endl;
     return;
   }
-  auto directionalLight = this->scene->CreateDirectionalLight();
-  if (!directionalLight) {
+  this->mainDirectionalLight = this->scene->CreateDirectionalLight();
+  if (!this->mainDirectionalLight) {
     ignerr << "Failed to create a directional light" << std::endl;
     return;
   }
-  directionalLight->SetDirection(-0.5, -0.5, -1);
-  directionalLight->SetDiffuseColor(0.9, 0.9, 0.9);
-  directionalLight->SetSpecularColor(0.9, 0.9, 0.9);
-  root->AddChild(directionalLight);
+  this->mainDirectionalLight->SetDirection(-0.5, -0.5, -1);
+  this->mainDirectionalLight->SetDiffuseColor(0.9, 0.9, 0.9);
+  this->mainDirectionalLight->SetSpecularColor(0.9, 0.9, 0.9);
+  this->mainDirectionalLight->SetCastShadows(kCastShadowsByDefault);
+  root->AddChild(this->mainDirectionalLight);
 
   // create user camera
   this->camera = this->scene->CreateCamera("user_camera");

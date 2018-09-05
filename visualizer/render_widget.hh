@@ -216,6 +216,9 @@ class RenderWidget : public ignition::gui::Plugin {
   /// \brief Pointer to the camera created by this class.
   ignition::rendering::CameraPtr camera;
 
+  /// \brief Pointer to the main directional light created by this class.
+  ignition::rendering::DirectionalLightPtr mainDirectionalLight;
+
   /// \brief A transport node.
   ignition::transport::Node node;
 
@@ -243,6 +246,9 @@ class RenderWidget : public ignition::gui::Plugin {
 
   /// \brief Store all the user settings.
   UserSettings userSettings;
+
+  /// \brief Are we casting shadows by default?
+  bool kCastShadowsByDefault{true};
 };
 }
 }

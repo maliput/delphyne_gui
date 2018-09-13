@@ -33,6 +33,24 @@ echo "* Deb Installs"
 echo "***********************************************************************************"
 echo ""
 
+echo ""
+echo "***********************************************************************************"
+echo "* Debs (Build Tools)"
+echo "***********************************************************************************"
+echo ""
+
+# python-vcstool || python3-vcstool
+dpkg -s python-vcstool > /dev/null 2> /dev/null
+PYTHON_VCSTOOLS_FOUND=$?
+dpkg -s python3-vcstool > /dev/null 2> /dev/null
+PYTHON3_VCSTOOLS_FOUND=$?
+if [ ${PYTHON_VCSTOOLS_FOUND} -ne 0 ] && [ ${PYTHON_VCSTOOLS_FOUND} -ne 0 ]; then
+  echo " - python3-vcstool installed"
+  apt install python3-vcstool
+else
+  echo " - python*-vcstool found"
+fi
+
 apt install --no-install-recommends $(tr '\n' ' ' <<EOF
 cmake
 coreutils
@@ -62,7 +80,6 @@ pylint
 python
 python-pip
 python-setuptools
-python3-vcstool
 qtbase5-dev
 ruby-ronn
 uuid-dev

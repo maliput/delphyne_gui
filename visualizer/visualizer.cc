@@ -48,11 +48,6 @@ int main(int argc, const char* argv[]) {
   }
 
   // Parse custom config file from args.
-  const std::string configFile =
-    delphyne::gui::GlobalAttributes::HasArgument("layout") ?
-      delphyne::gui::GlobalAttributes::GetArgument("layout") :
-      initialConfigFile;
-
   delphyne::utility::PackageManager* package_manager =
       delphyne::utility::PackageManager::Instance();
   if (delphyne::gui::GlobalAttributes::HasArgument("package")) {
@@ -79,15 +74,18 @@ int main(int argc, const char* argv[]) {
   // Plugins installed by gazebo end up here
   ignition::gui::addPluginPath(PLUGIN_INSTALL_PATH);
 
-  // Attempt to load window layout from default config file.
-  // If it's not availeble, load it from configFile.
-  if (!ignition::gui::loadDefaultConfig()) {
-    // If config file parsed from args is not
-    // a valid path, exit the application.
-    if(!ignition::gui::loadConfig(configFile)) {
-      return 1;
-    }
-  }
+  // Attempt to load window layout from parsed arguments.
+  bool layout_loaded =
+      delphyne::gui::GlobalAttributes::HasArgument("layout") &&
+      ignition::gui::loadConfig(
+          delphyne::gui::GlobalAttributes::GetArgument("layout"));
+  // If no layout was found, attempt to use the default config file.
+  layout_loaded = layout_loaded || ignition::gui::loadDefaultConfig();
+  // If that's not available either, load it from initial config file.
+  layout_loaded = layout_loaded || ignition::gui::loadConfig(initialConfigFile);
+  // If no layout has been loaded so far, exit the application.
+  if (!layout_loaded) return 1;
+
   // Plugin injection pattern. Use `receiver-injected` for
   // horizontal splits and `receiver/injected` for vertical
   // splits.

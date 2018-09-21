@@ -11,6 +11,7 @@
 #ifndef Q_MOC_RUN
 #include <ignition/gui/MainWindow.hh>
 #include <ignition/gui/qt.h>
+#include <ignition/gui/Dock.hh>
 #include <ignition/gui/Iface.hh>
 #endif
 
@@ -86,11 +87,56 @@ int main(int argc, const char* argv[]) {
     }
   }
 
+  std::vector<std::pair<std::string, std::string>> pluginInjectionList;
+  if (delphyne::gui::GlobalAttributes::HasArgument("inject-plugin")) {
+    const std::string injectPlugin =
+        delphyne::gui::GlobalAttributes::GetArgument("inject-plugin");
+    const int delimiterPos = injectPlugin.find("@");
+    if (delimiterPos != std::string::npos) {
+      pluginInjectionList.push_back(std::make_pair<std::string, std::string>(
+          injectPlugin.substr(0, delimiterPos),
+          injectPlugin.substr(delimiterPos + 1)));
+    } else {
+      ignerr << "Ill formed --inject-plugin="
+             << injectPlugin << " argument."
+             << " Missing '@'." << std::endl;
+    }
+  }
+
   // Create main window
   ignition::gui::createMainWindow();
 
   auto win = ignition::gui::mainWindow();
   win->setWindowTitle(versionStr);
+
+  for (auto pluginInjectionEntry : pluginInjectionList) {
+    const std::string& receiverPluginName = pluginInjectionEntry.second;
+    auto receiverWidget =
+        win->findChild<ignition::gui::Dock*>(
+            QString(receiverPluginName.c_str()));
+    if (!receiverWidget) {
+      ignerr << "Unknown " << receiverPluginName
+             << " plugin for injection. Skipping."
+             << std::endl;
+      continue;
+    }
+    const std::string& injectedPluginName = pluginInjectionEntry.first;
+    auto injectedWidget =
+        win->findChild<ignition::gui::Dock*>(
+            QString(injectedPluginName.c_str()));
+    if (injectedWidget != nullptr) {
+      ignmsg << "Injected "<< injectedPluginName << " plugin"
+             << " already found. Skipping." << std::endl;
+      continue;
+    }
+    if (!ignition::gui::loadPlugin(injectedPluginName)) {
+      continue;
+    }
+    ignition::gui::addPluginsToWindow();
+    injectedWidget = win->findChild<ignition::gui::Dock*>(
+        QString(injectedPluginName.c_str()));
+    win->splitDockWidget(receiverWidget, injectedWidget, Qt::Vertical);
+  }
 
   ignition::gui::runMainWindow();
 

@@ -1,6 +1,8 @@
 // Copyright 2017 Toyota Research Institute
 
+#include <regex>
 #include <string>
+#include <tuple>
 
 #include <delphyne/utility/package.h>
 
@@ -11,6 +13,7 @@
 #ifndef Q_MOC_RUN
 #include <ignition/gui/MainWindow.hh>
 #include <ignition/gui/qt.h>
+#include <ignition/gui/Dock.hh>
 #include <ignition/gui/Iface.hh>
 #endif
 
@@ -85,12 +88,70 @@ int main(int argc, const char* argv[]) {
       return 1;
     }
   }
+  // Plugin injection pattern. Use `receiver-injected` for
+  // horizontal splits and `receiver/injected` for vertical
+  // splits.
+  std::regex injectionPattern{"(\\w+)\\s*(/|-)\\s*(\\w+)"};
+  std::vector<std::tuple<std::string, std::string,
+                         Qt::Orientation>> pluginInjectionList;
+  if (delphyne::gui::GlobalAttributes::HasArgument("inject-plugin")) {
+    const std::string injectPluginArg =
+        delphyne::gui::GlobalAttributes::GetArgument("inject-plugin");
+    std::smatch match;
+    if (std::regex_search(injectPluginArg, match, injectionPattern)) {
+      const std::string& receiverPluginName = match[1];
+      const Qt::Orientation splitOrientation =
+          match[2] == "/" ? Qt::Vertical : Qt::Horizontal;
+      const std::string& injectedPluginName = match[3];
+      pluginInjectionList.push_back(std::make_tuple(
+          receiverPluginName, injectedPluginName, splitOrientation));
+    } else {
+      ignerr << "Ill formed --inject-plugin="
+             << injectPluginArg << " argument."
+             << " Missing '@'." << std::endl;
+    }
+  }
 
   // Create main window
   ignition::gui::createMainWindow();
 
   auto win = ignition::gui::mainWindow();
   win->setWindowTitle(versionStr);
+
+  for (auto pluginInjectionEntry : pluginInjectionList) {
+    const std::string& receiverPluginName =
+        std::get<0>(pluginInjectionEntry);
+    auto receiverWidget =
+        win->findChild<ignition::gui::Dock*>(
+            QString(receiverPluginName.c_str()));
+    if (!receiverWidget) {
+      ignerr << "Unknown " << receiverPluginName
+             << " plugin for injection. Skipping."
+             << std::endl;
+      continue;
+    }
+    const std::string& injectedPluginName =
+        std::get<1>(pluginInjectionEntry);
+    auto injectedWidget =
+        win->findChild<ignition::gui::Dock*>(
+            QString(injectedPluginName.c_str()));
+    if (injectedWidget != nullptr) {
+      ignmsg << "Injected "<< injectedPluginName << " plugin"
+             << " already found. Skipping." << std::endl;
+      continue;
+    }
+    if (!ignition::gui::loadPlugin(injectedPluginName)) {
+      continue;
+    }
+    ignition::gui::addPluginsToWindow();
+    injectedWidget = win->findChild<ignition::gui::Dock*>(
+        QString(injectedPluginName.c_str()));
+    const Qt::Orientation& splitOrientation =
+        std::get<2>(pluginInjectionEntry);
+    win->splitDockWidget(receiverWidget,
+                         injectedWidget,
+                         splitOrientation);
+  }
 
   ignition::gui::runMainWindow();
 

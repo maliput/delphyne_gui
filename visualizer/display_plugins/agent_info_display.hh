@@ -16,6 +16,7 @@ namespace delphyne {
 namespace gui {
 namespace display_plugins {
 
+class AgentInfoText;
 class AgentInfoDisplayPrivate;
 
 /// \brief Display the origin on an Ignition Rendering scene.
@@ -38,6 +39,14 @@ class AgentInfoDisplay : public ignition::gui::DisplayPlugin {
   private: void OnAgentState(const ignition::msgs::AgentState_V& _msg);
 
   private: std::string NameFromAgent(const ignition::msgs::AgentState& agent);
+
+  private: std::shared_ptr<AgentInfoText> CreateAgentText(const std::string& _agentName,
+                                                          QVBoxLayout *_layout,
+                                                          std::shared_ptr<ignition::rendering::Scene> _scenePtr);
+  private: void UpdateAgentLabel(const ignition::msgs::AgentState& _agent,
+                                 const std::string& _agentName,
+                                 std::shared_ptr<AgentInfoText> _agentInfoText);
+  private: QVBoxLayout *CreateLayout();
 
   /// \internal
   /// \brief Pointer to private data.

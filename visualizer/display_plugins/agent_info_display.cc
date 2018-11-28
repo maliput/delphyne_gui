@@ -9,7 +9,7 @@
 #include <ignition/common/PluginMacros.hh>
 #include <ignition/rendering/Text.hh>
 
-#include "ignition/gui/NumberWidget.hh"
+#include <ignition/gui/NumberWidget.hh>
 
 #include "delphyne/protobuf/agent_state_v.pb.h"
 
@@ -85,12 +85,17 @@ AgentInfoDisplay::~AgentInfoDisplay() {}
 
 std::string AgentInfoDisplay::NameFromAgent(const ignition::msgs::AgentState& agent)
 {
+  // The names that we get from the agents are of the form:
+  //
+  // "/agent/0/state"
+  //
+  // To reduce screen real estate a bit, remove the "/state" from the name.
   return agent.name().substr(0, agent.name().length() - 6);
 }
 
 /////////////////////////////////////////////////
 void AgentInfoDisplay::ToggleText(const QString& _agentName) {
-  auto agentInfoText = this->dataPtr->agentInfoText[_agentName.toStdString()];
+  std::shared_ptr<AgentInfoText> agentInfoText = this->dataPtr->agentInfoText[_agentName.toStdString()];
 
   agentInfoText->visible = !agentInfoText->visible;
 
@@ -132,10 +137,108 @@ QWidget *AgentInfoDisplay::CreateCustomProperties() const {
 }
 
 /////////////////////////////////////////////////
+std::shared_ptr<AgentInfoText> AgentInfoDisplay::CreateAgentText(const std::string& _agentName,
+                                                                 QVBoxLayout *_layout,
+                                                                 std::shared_ptr<ignition::rendering::Scene> _scenePtr)
+{
+  auto visibleCheck = new QCheckBox(QString::fromStdString(_agentName), this);
+  visibleCheck->setChecked(true);
+  _layout->addWidget(visibleCheck);
+
+  this->dataPtr->signalMapper->setMapping(visibleCheck, QString::fromStdString(_agentName));
+  connect(visibleCheck, SIGNAL(clicked()), this->dataPtr->signalMapper, SLOT(map()));
+
+  // Now that we've created the widgets, create the hovering text
+  auto agentInfoText = std::make_shared<AgentInfoText>();
+
+  agentInfoText->visible = true;
+
+  agentInfoText->text = _scenePtr->CreateText();
+  agentInfoText->text->SetShowOnTop(true);
+  agentInfoText->text->SetCharHeight(charHeight);
+
+  agentInfoText->textVis = _scenePtr->CreateVisual();
+  agentInfoText->textVis->SetLocalScale(1.0, 1.0, 1.0);
+  agentInfoText->textVis->AddGeometry(agentInfoText->text);
+
+  this->Visual()->AddChild(agentInfoText->textVis);
+
+  this->dataPtr->agentInfoText[_agentName] = agentInfoText;
+
+  return agentInfoText;
+}
+
+/////////////////////////////////////////////////
+void AgentInfoDisplay::UpdateAgentLabel(const ignition::msgs::AgentState& _agent,
+                                        const std::string& _agentName,
+                                        std::shared_ptr<AgentInfoText> _agentInfoText)
+{
+  double x = 0.0;
+  double y = 0.0;
+  double z = 0.0;
+  double roll = 0.0;
+  double pitch = 0.0;
+  double yaw = 0.0;
+  double vx = 0.0;
+  double vy = 0.0;
+  double vz = 0.0;
+  double vroll = 0.0;
+  double vpitch = 0.0;
+  double vyaw = 0.0;
+
+  if (_agent.has_position()) {
+    x = _agent.position().x();
+    y = _agent.position().y();
+    z = _agent.position().z();
+  }
+  if (_agent.has_orientation()) {
+    roll = _agent.orientation().roll();
+    pitch = _agent.orientation().pitch();
+    yaw = _agent.orientation().yaw();
+  }
+  if (_agent.has_linear_velocity()) {
+    vx = _agent.linear_velocity().x();
+    vy = _agent.linear_velocity().y();
+    vz = _agent.linear_velocity().z();
+  }
+  if (_agent.has_angular_velocity()) {
+    vroll = _agent.angular_velocity().x();
+    vpitch = _agent.angular_velocity().y();
+    vyaw = _agent.angular_velocity().z();
+  }
+
+  std::stringstream ss;
+  ss << _agentName << std::setprecision(2) << "\n pos:(x:" << x << ",y:" << y << ",z:" << z << ",roll:" << roll << ",pitch:" << pitch << ",yaw:" << yaw << ")" << "\n vel:(x:" << vx << ",y:" << vy << ",z:" << vz << ",roll:" << vroll << ",pitch:" << vpitch << ",yaw:" << vyaw << ")";
+  _agentInfoText->text->SetTextString(ss.str());
+  _agentInfoText->textVis->SetLocalPose(ignition::math::Pose3d(x, y, z, roll, pitch, yaw));
+}
+
+/////////////////////////////////////////////////
+QVBoxLayout *AgentInfoDisplay::CreateLayout()
+{
+  // Step 1 from above
+  QVBoxLayout *layout = new QVBoxLayout();
+  layout->setContentsMargins(0, 0, 0, 0);
+  layout->setSpacing(0);
+
+  // Step 3 from above
+  auto widget = new QWidget();
+  widget->setLayout(layout);
+
+  // Step 4 from above
+  this->dataPtr->stackedLayout->addWidget(widget);
+
+  // Step 5 from above
+  this->dataPtr->stackedLayout->setCurrentIndex(this->dataPtr->stackedLayout->count() - 1);
+
+  return layout;
+}
+
+/////////////////////////////////////////////////
 void AgentInfoDisplay::ProcessMsg() {
   std::lock_guard<std::recursive_mutex> lock(this->dataPtr->mutex);
 
-  auto scenePtr = this->Scene().lock();
+  std::shared_ptr<ignition::rendering::Scene> scenePtr = this->Scene().lock();
   if (!scenePtr) {
     ignerr << "Scene invalid. Agent Info display not initialized." << std::endl;
     return;
@@ -145,22 +248,7 @@ void AgentInfoDisplay::ProcessMsg() {
 
   if (this->dataPtr->stackedLayout->count() == 0) {
     // This is the first message; create the widgets and the hovering text that we'll use
-
-    // Step 1 from above
-    layout = new QVBoxLayout();
-    layout->setContentsMargins(0, 0, 0, 0);
-    layout->setSpacing(0);
-
-    // Step 3 from above
-    auto widget = new QWidget();
-    widget->setLayout(layout);
-
-    // Step 4 from above
-    this->dataPtr->stackedLayout->addWidget(widget);
-
-    // Step 5 from above
-    this->dataPtr->stackedLayout->setCurrentIndex(this->dataPtr->stackedLayout->count() - 1);
-
+    layout = CreateLayout();
     // We delay doing step 2 until the loop below so we can just iterate over
     // the agents once.
   }
@@ -172,71 +260,12 @@ void AgentInfoDisplay::ProcessMsg() {
 
     // Step 2 from above if necessary
     if (layout != nullptr) {
-      auto visibleCheck = new QCheckBox(QString::fromStdString(agentName), this);
-      visibleCheck->setChecked(true);
-      layout->addWidget(visibleCheck);
-
-      this->dataPtr->signalMapper->setMapping(visibleCheck, QString::fromStdString(agentName));
-      connect(visibleCheck, SIGNAL(clicked()), this->dataPtr->signalMapper, SLOT(map()));
-
-      // Now that we've created the widgets, create the hovering text
-      agentInfoText = std::make_shared<AgentInfoText>();
-
-      agentInfoText->visible = true;
-
-      agentInfoText->text = scenePtr->CreateText();
-      agentInfoText->text->SetShowOnTop(true);
-      agentInfoText->text->SetCharHeight(charHeight);
-
-      agentInfoText->textVis = scenePtr->CreateVisual();
-      agentInfoText->textVis->SetLocalScale(1.0, 1.0, 1.0);
-      agentInfoText->textVis->AddGeometry(agentInfoText->text);
-
-      this->Visual()->AddChild(agentInfoText->textVis);
-
-      this->dataPtr->agentInfoText[agentName] = agentInfoText;
+      agentInfoText = CreateAgentText(agentName, layout, scenePtr);
     } else {
       agentInfoText = this->dataPtr->agentInfoText[agentName];
     }
 
-    double x = 0.0;
-    double y = 0.0;
-    double z = 0.0;
-    double roll = 0.0;
-    double pitch = 0.0;
-    double yaw = 0.0;
-    double vx = 0.0;
-    double vy = 0.0;
-    double vz = 0.0;
-    double vroll = 0.0;
-    double vpitch = 0.0;
-    double vyaw = 0.0;
-
-    if (agent.has_position()) {
-      x = agent.position().x();
-      y = agent.position().y();
-      z = agent.position().z();
-    }
-    if (agent.has_orientation()) {
-      roll = agent.orientation().roll();
-      pitch = agent.orientation().pitch();
-      yaw = agent.orientation().yaw();
-    }
-    if (agent.has_linear_velocity()) {
-      vx = agent.linear_velocity().x();
-      vy = agent.linear_velocity().y();
-      vz = agent.linear_velocity().z();
-    }
-    if (agent.has_angular_velocity()) {
-      vroll = agent.angular_velocity().x();
-      vpitch = agent.angular_velocity().y();
-      vyaw = agent.angular_velocity().z();
-    }
-
-    std::stringstream ss;
-    ss << agentName << std::setprecision(2) << " pos:(x:" << x << ",y:" << y << ",z:" << z << ",r:" << roll << ",p:" << pitch << ",y:" << yaw << ")" << " vel:(x:" << vx << ",y:" << vy << ",z:" << vz << ",r:" << vroll << ",p:" << vpitch << ",y" << vyaw << ")";
-    agentInfoText->text->SetTextString(ss.str());
-    agentInfoText->textVis->SetLocalPose(ignition::math::Pose3d(x, y, z, roll, pitch, yaw));
+    UpdateAgentLabel(agent, agentName, agentInfoText);
   }
 }
 

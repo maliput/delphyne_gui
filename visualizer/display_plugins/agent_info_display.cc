@@ -201,7 +201,9 @@ void AgentInfoDisplay::UpdateAgentLabel(const ignition::msgs::AgentState& _agent
   }
 
   std::stringstream ss;
-  ss << _agentName << ":\n pos:(x:" << std::setprecision(2) << x << ",y:" << y << ",z:" << z << ",yaw:" << yaw << ")" << "\n vel:(x:" << vx << ",y:" << vy << ",z:" << vz << ")";
+  ss << _agentName << ":\n pos:(x:" << std::setprecision(2) << x << ",y:" << y
+     << ",z:" << z << ",yaw:" << yaw << ")"
+     << "\n vel:(x:" << vx << ",y:" << vy << ",z:" << vz << ")";
   _agentInfoText->text->SetTextString(ss.str());
   _agentInfoText->textVis->SetLocalPose(ignition::math::Pose3d(x, y, z + 2.6, roll, pitch, yaw));
 }

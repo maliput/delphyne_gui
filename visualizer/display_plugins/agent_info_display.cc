@@ -89,8 +89,9 @@ std::string AgentInfoDisplay::NameFromAgent(const ignition::msgs::AgentState& ag
   //
   // "/agent/0/state"
   //
-  // To reduce screen real estate a bit, remove the "/state" from the name.
-  return agent.name().substr(0, agent.name().length() - 6);
+  // To reduce screen real estate, remove the "/agent/" from the start and
+  // "/state" from the rear.
+  return agent.name().substr(7, agent.name().length() - 7 - 6);
 }
 
 /////////////////////////////////////////////////
@@ -182,9 +183,6 @@ void AgentInfoDisplay::UpdateAgentLabel(const ignition::msgs::AgentState& _agent
   double vx = 0.0;
   double vy = 0.0;
   double vz = 0.0;
-  double vroll = 0.0;
-  double vpitch = 0.0;
-  double vyaw = 0.0;
 
   if (_agent.has_position()) {
     x = _agent.position().x();
@@ -201,16 +199,13 @@ void AgentInfoDisplay::UpdateAgentLabel(const ignition::msgs::AgentState& _agent
     vy = _agent.linear_velocity().y();
     vz = _agent.linear_velocity().z();
   }
-  if (_agent.has_angular_velocity()) {
-    vroll = _agent.angular_velocity().x();
-    vpitch = _agent.angular_velocity().y();
-    vyaw = _agent.angular_velocity().z();
-  }
 
   std::stringstream ss;
-  ss << _agentName << std::setprecision(2) << "\n pos:(x:" << x << ",y:" << y << ",z:" << z << ",roll:" << roll << ",pitch:" << pitch << ",yaw:" << yaw << ")" << "\n vel:(x:" << vx << ",y:" << vy << ",z:" << vz << ",roll:" << vroll << ",pitch:" << vpitch << ",yaw:" << vyaw << ")";
+  ss << _agentName << ":\n pos:(x:" << std::setprecision(2) << x << ",y:" << y
+     << ",z:" << z << ",yaw:" << yaw << ")"
+     << "\n vel:(x:" << vx << ",y:" << vy << ",z:" << vz << ")";
   _agentInfoText->text->SetTextString(ss.str());
-  _agentInfoText->textVis->SetLocalPose(ignition::math::Pose3d(x, y, z, roll, pitch, yaw));
+  _agentInfoText->textVis->SetLocalPose(ignition::math::Pose3d(x, y, z + 2.6, roll, pitch, yaw));
 }
 
 /////////////////////////////////////////////////

@@ -103,11 +103,11 @@ class MaliputViewerModel {
   void SetTextLabelState(MaliputLabelType _type, bool _isVisible);
 
  private:
-  /// \brief Loads a maliput RoadGeometry of either monolane or multilane from
+  /// \brief Loads a maliput RoadGeometry of multilane from
   /// @p _maliputFilePath.
   /// \details Opens the file, iterates for each line, and tries to match it
-  /// with either "maliput_monolane_builder:" or "maliput_multilane_builder:".
-  /// If there is none of these keys in the file, it's just not valid.
+  /// with "maliput_multilane_builder:".
+  /// If the key doesn't exist in the file, it's not valid.
   /// Otherwise the correct loader will be called to parse the file.
   /// \param _maliputFilePath The YAML file path to parse.
   void LoadRoadGeometry(const std::string& _maliputFilePath);

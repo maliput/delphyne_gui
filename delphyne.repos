@@ -3,7 +3,7 @@ repositories:
   ign_cmake       : { type: 'hg',  url: 'https://bitbucket.org/ignitionrobotics/ign-cmake.git',         version: '9b5a8d7e1a58' }
   ign_tools       : { type: 'hg',  url: 'https://bitbucket.org/ignitionrobotics/ign-tools.git',         version: 'b4ea8a5347db' }
   ign_math        : { type: 'hg',  url: 'https://bitbucket.org/ignitionrobotics/ign-math.git',          version: '7c83076419cf' }
-  ign_common      : { type: 'hg',  url: 'https://bitbucket.org/ignitionrobotics/ign-common.git',        version: '9aa7c3b9da1b' }
+  ign_common      : { type: 'hg',  url: 'https://bitbucket.org/ignitionrobotics/ign-common.git',        version: '2f1840c94d69' }
   ign_msgs        : { type: 'hg',  url: 'https://bitbucket.org/ignitionrobotics/ign-msgs.git',          version: 'ef3a5f00b764' }
   ign_transport   : { type: 'hg',  url: 'https://bitbucket.org/ignitionrobotics/ign-transport.git',     version: '3d157ef7e32e' }
   ign_rendering   : { type: 'hg',  url: 'https://bitbucket.org/ignitionrobotics/ign-rendering.git',     version: '458e05322ef8' }

@@ -40,16 +40,7 @@ echo "**************************************************************************
 echo ""
 
 # python-vcstool || python3-vcstool
-dpkg -s python-vcstool > /dev/null 2> /dev/null
-PYTHON_VCSTOOLS_FOUND=$?
-dpkg -s python3-vcstool > /dev/null 2> /dev/null
-PYTHON3_VCSTOOLS_FOUND=$?
-if [ ${PYTHON_VCSTOOLS_FOUND} -ne 0 ] && [ ${PYTHON_VCSTOOLS_FOUND} -ne 0 ]; then
-  echo " - python3-vcstool installed"
-  apt install python3-vcstool
-else
-  echo " - python*-vcstool found"
-fi
+apt install python3-vcstool
 
 apt install --no-install-recommends $(tr '\n' ' ' <<EOF
 cmake
@@ -76,11 +67,10 @@ mercurial
 mesa-utils
 pkg-config
 protobuf-compiler
-pycodestyle
-pylint
-python
-python-pip
-python-setuptools
+python3-pycodestyle
+pylint3
+python3
+python3-setuptools
 qtbase5-dev
 ruby-ronn
 uuid-dev

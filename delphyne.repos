@@ -10,3 +10,4 @@ repositories:
   ign_gui         : { type: 'hg',  url: 'https://bitbucket.org/ignitionrobotics/ign-gui.git',           version: 'dhood_display_plugins_rtf_overlay' }
   delphyne        : { type: 'git', url: 'git@github.com:ToyotaResearchInstitute/delphyne.git',          version: 'master' }
   delphyne_gui    : { type: 'git', url: 'git@github.com:ToyotaResearchInstitute/delphyne-gui.git',      version: 'master' }
+  malidrive       : { type: 'git', url: 'git@github.com:ToyotaResearchInstitute/malidrive.git',         version: 'master'}

@@ -258,4 +258,13 @@ endif(build_errors)
 #################################################
 # Installs maliput_viewer.sh as a shortcut to run the visualizer.
 install (PROGRAMS tools/maliput_viewer.sh DESTINATION ${BIN_INSTALL_DIR})
-install (PROGRAMS setup.bash DESTINATION ${CMAKE_INSTALL_PREFIX})
+
+configure_file(
+  setup.bash.in
+  ${PROJECT_BINARY_DIR}/setup.bash
+  IMMEDIATE @ONLY
+)
+install(
+  PROGRAMS ${PROJECT_BINARY_DIR}/setup.bash
+  DESTINATION ${CMAKE_INSTALL_DATADIR}/${PROJECT_NAME}
+)

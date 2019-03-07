@@ -1,5 +1,5 @@
 repositories:
-  drake           : { type: 'git', url: 'https://github.com/RobotLocomotion/drake.git',                 version: 'a5a156599feb6be5dfa32d8af22f503fb9cd987b' }
+  drake           : { type: 'git', url: 'https://github.com/RobotLocomotion/drake.git',                 version: 'master' }
   ign_cmake       : { type: 'hg',  url: 'https://bitbucket.org/ignitionrobotics/ign-cmake.git',         version: '9b5a8d7e1a58' }
   ign_tools       : { type: 'hg',  url: 'https://bitbucket.org/ignitionrobotics/ign-tools.git',         version: 'b4ea8a5347db' }
   ign_math        : { type: 'hg',  url: 'https://bitbucket.org/ignitionrobotics/ign-math.git',          version: '7c83076419cf' }

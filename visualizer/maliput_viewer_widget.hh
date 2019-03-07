@@ -54,7 +54,7 @@ class MaliputViewerWidget : public ignition::gui::Plugin {
 
   /// \brief Clears the visualizer, loads the new set of meshes and text labels.
   /// \param filePath The path to the YAML file to load and visualize.
-  void OnNewYamlFile(const std::string& filePath);
+  void OnNewMultilaneFile(const std::string& filePath);
 
  protected:
   /// \brief Overridden method to receive Qt paint event.

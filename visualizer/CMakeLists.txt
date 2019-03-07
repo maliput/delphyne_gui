@@ -52,7 +52,8 @@ target_link_libraries(${maliput_viewer_widget}
   ${IGNITION-RENDERING_LIBRARIES}
   ${maliput_mesh}
   ${Qt5Core_LIBRARIES}
-  ${Qt5Widgets_LIBRARIES})
+  ${Qt5Widgets_LIBRARIES}
+  delphyne::maliput_utilities)
 
 install(TARGETS ${maliput_viewer_widget} DESTINATION
   ${LIB_INSTALL_DIR} COMPONENT shlib)

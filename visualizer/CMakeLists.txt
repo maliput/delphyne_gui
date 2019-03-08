@@ -120,6 +120,7 @@ target_link_libraries(${playback_widget}
   ${Qt5Core_LIBRARIES}
   ${Qt5Widgets_LIBRARIES}
   delphyne::protobuf_messages
+  delphyne::public_headers
 )
 
 install(TARGETS ${playback_widget} DESTINATION ${LIB_INSTALL_DIR} COMPONENT shlib)

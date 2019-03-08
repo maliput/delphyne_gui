@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 import argparse
 import os
 import pwd
@@ -19,16 +17,26 @@ RUN locale-gen en_US.UTF-8
 ENV LANG en_US.UTF-8
 
 # Install development packages
-RUN apt-get update && apt-get install -y sudo tmux git make python-vcstools openssh-server software-properties-common bash-completion debian-keyring debian-archive-keyring
+RUN apt-get update && apt-get install -y sudo tmux git make python-vcstools openssh-server software-properties-common bash-completion debian-keyring debian-archive-keyring curl
+RUN echo "deb http://packages.osrfoundation.org/gazebo/ubuntu-stable bionic main" > /etc/apt/sources.list.d/gazebo-stable.list
+RUN sudo apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys D2486D2DD83DB69272AFE98867170598AF249743
+
+RUN echo "deb http://packages.ros.org/ros/ubuntu `lsb_release -cs` main" > /etc/apt/sources.list.d/ros-latest.list
+RUN sudo apt-key adv --keyserver ha.pool.sks-keyservers.net --recv-keys 421C365BD9FF1F717815A3895523BAEEB01FA116
+
+RUN apt-get update && apt-get install -y python3-colcon-common-extensions {USE_IGNITION_BINARIES}
 
 # Create a user with passwordless sudo
 RUN adduser --gecos \"Development User\" --disabled-password {USER_NAME}
 RUN adduser {USER_NAME} sudo
 RUN echo \'%sudo ALL=(ALL) NOPASSWD:ALL\' >> /etc/sudoers
 RUN echo \"export QT_X11_NO_MITSHM=1\" >> /home/{USER_NAME}/.bashrc
+{DRAKE_ENV_VARS_FOR_BINARY}
+RUN sudo mkdir -p /home/{USER_NAME}/.cache
+RUN chown -R {USER_NAME} /home/{USER_NAME}/.cache
 
 WORKDIR /home/{USER_NAME}
-USER {USER_NAME}"""
+USER {USER_NAME}\n"""
 
 SHELL_FILE = """#! /bin/bash
 SCRIPT_PATH=$(dirname "$(readlink -f "$0")")
@@ -40,34 +48,42 @@ docker run --name delphyne --privileged --rm --net=host -e DISPLAY=${DISPLAY} \\
        -it {DOCKER_IMAGE_NAME} /bin/bash
 """
 
-def create_docker_file(user_name, path, docker_image_name):
+IGNITION_BINARIES = ('libignition-gui0-dev '
+'libignition-rendering0-dev '
+'libignition-common2-dev '
+'libignition-tools-dev '
+'libignition-cmake1-dev '
+'libignition-math5-dev '
+'libignition-transport5-dev')
+
+ENV_DRAKE_VARS_FOR_DOCKER_FILE = """ENV LD_LIBRARY_PATH=\"${LD_LIBRARY_PATH}:/opt/drake/lib\"
+ENV PYTHONPATH=\"${PYTHONPATH}:/opt/drake/lib/python3.6/site-packages\"
+ENV CMAKE_PREFIX_PATH=\"/opt/drake:${CMAKE_PREFIX_PATH}\"
+"""
+
+def create_docker_file(user_name, path, docker_image_name, use_ign_binaries, use_drake_binary):
     print('Using user: ' + user_name + " and path: " + path)
-    with open(os.path.join(path, 'Dockerfile'), 'w') as docker_file:
-        docker_file.write(DOCKER_FILE.replace('{USER_NAME}', user_name))
+    docker_file = ''
+    if use_ign_binaries:
+        docker_file = DOCKER_FILE.replace(
+            '{USER_NAME}', user_name).replace(
+            '{USE_IGNITION_BINARIES}', IGNITION_BINARIES)
+    else:
+        docker_file = DOCKER_FILE.replace(
+            '{USER_NAME}', user_name).replace(
+            '{USE_IGNITION_BINARIES}', '')
+    if use_drake_binary:
+        docker_file = docker_file.replace(
+            '{DRAKE_ENV_VARS_FOR_BINARY}', ENV_DRAKE_VARS_FOR_DOCKER_FILE)
+    else:
+        docker_file = docker_file.replace(
+            '{DRAKE_ENV_VARS_FOR_BINARY}', '')
+    with open(os.path.join(path, 'Dockerfile'), 'w') as file:
+        file.write(docker_file)
     create_shell_file(user_name, path, docker_image_name)
 
 def create_shell_file(user_name, path, docker_image_name):
     with open(os.path.join(path, 'start_ws.sh'), 'w') as shell_file:
         sh_replaced = SHELL_FILE.replace('{USER_NAME}', user_name)
         shell_file.write(sh_replaced.replace('{DOCKER_IMAGE_NAME}', docker_image_name))
-    os.chmod(path + 'start_ws.sh', 0775)
-
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Create docker environment.')
-    parser.add_argument('-u', help='User name. Will use current logged in user by default')
-    parser.add_argument('-p', help='Path to workspace. Will use current dir by default')
-    parser.add_argument('-d', help='Docker image name. Will use delphyne:18.04 by default')
-    args = parser.parse_args()
-    user_name = pwd.getpwuid(os.getuid())[0]
-    path = os.getcwd()
-    docker_image_name = 'delphyne:18.04'
-    if args.u is not None:
-        user_name = args.u
-    if args.p is not None:
-        path = args.p
-        if path[-1] is not '/':
-            path += '/'
-    if args.d is not None:
-        docker_image_name = args.d
-    shutil.copy2(os.path.dirname(os.path.realpath(__file__)) + '/Makefile', path)
-    create_docker_file(user_name, path, docker_image_name)
+    os.chmod(os.path.join(path, 'start_ws.sh'), 0775)

@@ -14,7 +14,11 @@ MaliputViewerWidget::MaliputViewerWidget(QWidget* parent)
   this->BuildGUI();
   // Loads the maliput file path if any and parses it.
   this->model = std::make_unique<MaliputViewerModel>();
-  if (GlobalAttributes::HasArgument("yaml_file")) {
+  if (GlobalAttributes::HasArgument("xodr_file")) {
+    this->model->Load(GlobalAttributes::GetArgument("xodr_file"));
+    this->VisualizeFileName(GlobalAttributes::GetArgument("xodr_file"));
+  }
+  else if (GlobalAttributes::HasArgument("yaml_file")){
     this->model->Load(GlobalAttributes::GetArgument("yaml_file"));
     this->VisualizeFileName(GlobalAttributes::GetArgument("yaml_file"));
   }
@@ -29,7 +33,7 @@ MaliputViewerWidget::MaliputViewerWidget(QWidget* parent)
 
   QObject::connect(this->maliputFileSelectionWidget,
                    SIGNAL(maliputFileChanged(const std::string&)), this,
-                   SLOT(OnNewYamlFile(const std::string&)));
+                   SLOT(OnNewMultilaneFile(const std::string&)));
 }
 
 /////////////////////////////////////////////////
@@ -51,7 +55,7 @@ void MaliputViewerWidget::OnTextLabelChanged(
 }
 
 /////////////////////////////////////////////////
-void MaliputViewerWidget::OnNewYamlFile(const std::string& filePath) {
+void MaliputViewerWidget::OnNewMultilaneFile(const std::string& filePath) {
   if (filePath.empty()) {
     return;
   }

@@ -192,9 +192,9 @@ void MaliputFileSelectionWidget::SetFileNameLabel(const std::string& fileName) {
 ///////////////////////////////////////////////////////
 void MaliputFileSelectionWidget::onLoadButtonPressed() {
   QString fileName = QFileDialog::getOpenFileName(
-      this, tr("Open Maliput YAML"),
+      this, tr("Open Maliput XODR or YAML"),
       QString::fromStdString(this->fileDialogOpenPath),
-      tr("YAML Files (*.yaml)"));
+      tr("XODR Files (*.XODR);;YAML files (*.YAML)"));
   if (!fileName.isEmpty()) {
     this->fileDialogOpenPath = fileName.toStdString();
   }

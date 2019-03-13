@@ -59,6 +59,7 @@ libsqlite3-dev
 libprotobuf-dev
 libprotoc-dev
 libqt5multimedia5
+libqt5opengl5-dev
 libqwt-qt5-dev
 libtinyxml2-dev
 libzip-dev

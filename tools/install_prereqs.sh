@@ -75,6 +75,7 @@ python3-setuptools
 qtbase5-dev
 ruby-ronn
 uuid-dev
+unzip
 zip
 EOF
 )

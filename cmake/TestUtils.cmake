@@ -59,7 +59,7 @@ macro (delphyne_build_tests)
         # Check that the test produced a result and create a failure if
         # it didn't. Guards against crashed and timed out tests.
         add_test(check_${BINARY_NAME} python
-          ${PROJECT_SOURCE_DIR}/tools/check_test_ran.py
+          ${PROJECT_SOURCE_DIR}/test/utils/check_test_ran.py
           ${CMAKE_BINARY_DIR}/test_results/${BINARY_NAME}.xml)
       endif()
     endif()

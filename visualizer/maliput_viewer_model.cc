@@ -6,8 +6,8 @@
 #include <string>
 
 #include <ignition/common/Console.hh>
-
 #include <drake/automotive/maliput/multilane/loader.h>
+#include <delphyne/maliput/road_builder.h>
 
 #include "maliput_mesh_builder.hh"
 
@@ -66,7 +66,13 @@ void MaliputViewerModel::LoadRoadGeometry(const std::string& _maliputFilePath) {
   std::string line;
   while (!fileStream.eof()) {
     std::getline(fileStream, line);
-    if (line.find("maliput_multilane_builder:") != std::string::npos) {
+    if (line.find("<OpenDRIVE>") != std::string::npos) {
+      this->roadGeometry = delphyne::maliput::CreateMalidriveFromFile(
+        _maliputFilePath.substr(_maliputFilePath.find_last_of("/") + 1),
+        _maliputFilePath);
+      return;
+    }
+    else if (line.find("maliput_multilane_builder:") != std::string::npos) {
       this->roadGeometry = drake::maliput::multilane::LoadFile(
           drake::maliput::multilane::BuilderFactory(), _maliputFilePath);
       return;

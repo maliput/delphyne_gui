@@ -407,6 +407,12 @@ ignition::rendering::VisualPtr RenderWidget::RenderMesh(
 
   ignition::rendering::MeshPtr meshGeom = this->scene->CreateMesh(descriptor);
   mesh->AddGeometry(meshGeom);
+  if (mesh_uri.Query().Str().find("culling=off") != std::string::npos) {
+    DELPHYNE_VALIDATE(mesh->GeometryCount() == 1, std::runtime_error,
+                    "Expected one geometry.");
+    auto subMesh = mesh->GeometryByIndex(0);
+    subMesh->Material()->SetCulling(ignition::rendering::CullMode::CM_NONE);
+  }
 
   setPoseFromMessage(_vis, mesh);
 

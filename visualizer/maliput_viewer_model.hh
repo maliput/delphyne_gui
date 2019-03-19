@@ -8,6 +8,7 @@
 #include <string>
 
 #include <drake/automotive/maliput/api/road_geometry.h>
+#include <drake/automotive/maliput/api/road_network.h>
 
 #include <ignition/common/Mesh.hh>
 
@@ -127,8 +128,14 @@ class MaliputViewerModel {
   /// \brief Frees and clears the roadGeometry, maliputMeshes and labels.
   void Clear();
 
+  // To support both malidrive and multilane files, we have both. roadNetwork
+  // has a pointer to a RoadGeometry.
+  
   /// \brief Maliput RoadGeometry pointer.
   std::unique_ptr<const drake::maliput::api::RoadGeometry> roadGeometry;
+
+  /// \brief Maliput RoadNetwork pointer.
+  std::unique_ptr<const drake::maliput::api::RoadNetwork> roadNetwork;
 
   /// \brief Map of meshes to hold all the ignition meshes.
   std::map<std::string, std::unique_ptr<MaliputMesh>> maliputMeshes;

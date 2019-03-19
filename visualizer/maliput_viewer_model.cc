@@ -21,11 +21,13 @@ bool MaliputViewerModel::Load(const std::string& _maliputFilePath) {
   ignmsg << "About to load [" << _maliputFilePath << "] maliput file."
          << std::endl;
   LoadRoadGeometry(_maliputFilePath);
+  const drake::maliput::api::RoadGeometry* rg = roadGeometry == nullptr ?
+  roadNetwork->road_geometry() : roadGeometry.get();
   ignmsg << "Loaded [" << _maliputFilePath << "] maliput file." << std::endl;
   ignmsg << "Loading RoadGeometry meshes of "
-         << this->roadGeometry->id().string() << std::endl;
+         << rg->id().string() << std::endl;
   std::map<std::string, drake::maliput::mesh::GeoMesh> geoMeshes =
-      drake::maliput::mesh::BuildMeshes(this->roadGeometry.get(),
+      drake::maliput::mesh::BuildMeshes(rg,
                                         drake::maliput::mesh::Features());
   ignmsg << "Meshes loaded." << std::endl;
   this->ConvertMeshes(geoMeshes);
@@ -39,6 +41,7 @@ bool MaliputViewerModel::Load(const std::string& _maliputFilePath) {
 ///////////////////////////////////////////////////////
 void MaliputViewerModel::Clear() {
   this->roadGeometry.reset();
+  this->roadNetwork.reset();
   this->labels.clear();
   this->maliputMeshes.clear();
 }
@@ -67,7 +70,7 @@ void MaliputViewerModel::LoadRoadGeometry(const std::string& _maliputFilePath) {
   while (!fileStream.eof()) {
     std::getline(fileStream, line);
     if (line.find("<OpenDRIVE>") != std::string::npos) {
-      this->roadGeometry = delphyne::maliput::CreateMalidriveFromFile(
+      this->roadNetwork = delphyne::maliput::CreateMalidriveFromFile(
         _maliputFilePath.substr(_maliputFilePath.find_last_of("/") + 1),
         _maliputFilePath);
       return;
@@ -170,16 +173,18 @@ MaliputLabel LabelFor(const drake::maliput::api::Lane& lane) {
 void MaliputViewerModel::GenerateLabels() {
   // Traverses branch points to generate labels for them.
   this->labels[MaliputLabelType::kBranchPoint] = std::vector<MaliputLabel>();
-  for (int i = 0; i < roadGeometry->num_branch_points(); ++i) {
-    const drake::maliput::api::BranchPoint* bp = roadGeometry->branch_point(i);
+  const drake::maliput::api::RoadGeometry* rg = roadGeometry == nullptr ?
+  roadNetwork->road_geometry() : roadGeometry.get();
+  for (int i = 0; i < rg->num_branch_points(); ++i) {
+    const drake::maliput::api::BranchPoint* bp = rg->branch_point(i);
     this->labels[MaliputLabelType::kBranchPoint].push_back(LabelFor(*bp));
   }
 
   // Traverses lanes to generate labels for them.
   this->labels[MaliputLabelType::kLane] = std::vector<MaliputLabel>();
-  for (int i = 0; i < this->roadGeometry->num_junctions(); ++i) {
+  for (int i = 0; i < rg->num_junctions(); ++i) {
     const drake::maliput::api::Junction* junction =
-        this->roadGeometry->junction(i);
+        rg->junction(i);
     for (int j = 0; j < junction->num_segments(); ++j) {
       const drake::maliput::api::Segment* segment = junction->segment(j);
       for (int k = 0; k < segment->num_lanes(); ++k) {

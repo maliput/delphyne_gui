@@ -297,6 +297,7 @@ void RenderMaliputWidget::RenderRoadMeshes(
       ignerr << "Failed to create material.\n";
       continue;
     }
+    material->SetCulling(ignition::rendering::CullMode::CM_NONE);
     // Checks if the mesh to be rendered already exists or not.
     const auto meshExists = this->meshes.find(it.first);
     // If the mesh is disabled, there is no mesh for it so it must be set to

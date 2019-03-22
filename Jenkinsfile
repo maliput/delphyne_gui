@@ -7,7 +7,7 @@ node('delphyne-linux-bionic-unprovisioned') {
   timeout(60) {
     ansiColor('xterm') {
       try {
-        stach('checkout') {
+        stage('checkout') {
           dir('src/delphyne_gui') {
             checkout scm
           }

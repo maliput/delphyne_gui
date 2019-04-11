@@ -68,6 +68,7 @@ mercurial
 mesa-utils
 pkg-config
 protobuf-compiler
+pycodestyle
 python3-pycodestyle
 pylint3
 python3

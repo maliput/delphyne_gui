@@ -1,5 +1,5 @@
 #!/bin/bash
-#
+1;4205;0c#
 # Install development prerequisites for source distributions of Delphyne on
 # Ubuntu 16.04.
 
@@ -68,9 +68,9 @@ mercurial
 mesa-utils
 pkg-config
 protobuf-compiler
-pep8
 pylint3
 python3
+python3-pep8
 python3-setuptools
 qtbase5-dev
 ruby-ronn

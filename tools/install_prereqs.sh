@@ -1,5 +1,5 @@
 #!/bin/bash
-1;4205;0c#
+#
 # Install development prerequisites for source distributions of Delphyne on
 # Ubuntu 16.04.
 

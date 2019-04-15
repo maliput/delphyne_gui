@@ -68,9 +68,10 @@ mercurial
 mesa-utils
 pkg-config
 protobuf-compiler
-python3-pycodestyle
 pylint3
 python3
+pycodestyle
+python3-pycodestyle
 python3-setuptools
 qtbase5-dev
 ruby-ronn

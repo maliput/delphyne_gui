@@ -70,7 +70,8 @@ pkg-config
 protobuf-compiler
 pylint3
 python3
-python3-pep8
+pycodestyle
+python3-pycodestyle
 python3-setuptools
 qtbase5-dev
 ruby-ronn

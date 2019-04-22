@@ -112,6 +112,7 @@ include (${project_cmake_dir}/DissectVersion.cmake)
 
 message (STATUS "\n\n====== Finding 3rd Party Packages ======")
 include (${project_cmake_dir}/SearchForStuff.cmake)
+find_package(ament_cmake REQUIRED)
 message (STATUS "----------------------------------------\n")
 
 #####################################
@@ -200,14 +201,6 @@ if ( build_warnings )
   message(STATUS "END BUILD WARNINGS\n")
 endif (build_warnings)
 
-########### Add uninstall target ###############
-configure_file(
-  "${CMAKE_CURRENT_SOURCE_DIR}/cmake/cmake_uninstall.cmake.in"
-  "${CMAKE_CURRENT_BINARY_DIR}/cmake/cmake_uninstall.cmake"
-  IMMEDIATE @ONLY)
-add_custom_target(uninstall
-  "${CMAKE_COMMAND}" -P
-  "${CMAKE_CURRENT_BINARY_DIR}/cmake/cmake_uninstall.cmake")
 
 if (build_errors)
   message(STATUS "BUILD ERRORS: These must be resolved before compiling.")
@@ -255,16 +248,11 @@ else (build_errors)
   ${PROJECT_NAME_LOWER}")
 endif(build_errors)
 
+ament_environment_hooks(setup.bash.in)
+
 #################################################
 # Installs maliput_viewer.sh as a shortcut to run the visualizer.
 install (PROGRAMS tools/maliput_viewer.sh DESTINATION ${BIN_INSTALL_DIR})
 
-configure_file(
-  setup.bash.in
-  ${PROJECT_BINARY_DIR}/setup.bash
-  IMMEDIATE @ONLY
-)
-install(
-  PROGRAMS ${PROJECT_BINARY_DIR}/setup.bash
-  DESTINATION ${CMAKE_INSTALL_DATADIR}/${PROJECT_NAME}
-)
+ament_package(CONFIG_EXTRAS
+${CMAKE_CURRENT_SOURCE_DIR}/cmake/cmake_uninstall.cmake.in)

@@ -233,7 +233,9 @@ else (build_errors)
 
   set(TEST_TYPE "UNIT")
   add_subdirectory(visualizer)
-  add_subdirectory(test)
+  if (BUILD_TESTS)
+    add_subdirectory(test)
+  endif()
 
   ########################################
   # If present, load platform-specific build hooks.  This system is used,

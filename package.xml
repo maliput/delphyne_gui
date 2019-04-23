@@ -4,8 +4,14 @@
   <name>delphyne-gui</name>
   <version>0.1.0</version>
   <description>Delphyne GUI</description>
-  <maintainer email="complete@later.com">Complete later</maintainer>
-  <license>Apache License 2.0</license>
+  <maintainer email="daniel.stonier@tri.global">Daniel Stonier</maintainer>
+  <license>TODO</license>
+
+  <build_depend>libogre-1.9-dev</build_depend>
+  <build_depend>libqt5multimedia5</build_depend>
+  <build_depend>libqt5opengl5-dev</build_depend>
+  <build_depend>libqwt-qt5-dev</build_depend>
+  <build_depend>qtbase5-dev</build_depend>
 
   <build_depend>drake</build_depend>
   <build_depend>ignition-common2</build_depend>

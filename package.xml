@@ -7,24 +7,28 @@
   <maintainer email="daniel.stonier@tri.global">Daniel Stonier</maintainer>
   <license>TODO</license>
 
-  <build_depend>libogre-1.9-dev</build_depend>
+  <!-- Packages not present in rosdep DB -->
   <build_depend>libqt5multimedia5</build_depend>
-  <build_depend>libqt5opengl5-dev</build_depend>
+
+  <build_depend>libogre-dev</build_depend>
+  <build_depend>libqt5-opengl-dev</build_depend>
   <build_depend>libqwt-qt5-dev</build_depend>
   <build_depend>qtbase5-dev</build_depend>
 
-  <build_depend>drake</build_depend>
   <build_depend>ignition-common2</build_depend>
   <build_depend>ignition-math5</build_depend>
   <build_depend>ignition-msgs2</build_depend>
   <build_depend>ignition-transport5</build_depend>
+  <build_depend>ignition-rendering0</build_depend>
+  <build_depend>ignition-gui0</build_depend>
   <build_depend>delphyne</build_depend>
 
-  <build_export_depend>drake</build_export_depend>
   <build_export_depend>ignition-common2</build_export_depend>
   <build_export_depend>ignition-math5</build_export_depend>
   <build_export_depend>ignition-msgs2</build_export_depend>
   <build_export_depend>ignition-transport5</build_export_depend>
+  <build_export_depend>ignition-rendering0</build_export_depend>
+  <build_export_depend>ignition-gui0</build_export_depend>
   <build_export_depend>delphyne</build_export_depend>
 
   <exec_depend>ament_cmake</exec_depend>

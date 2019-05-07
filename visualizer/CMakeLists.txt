@@ -166,4 +166,6 @@ install (FILES
   ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/delphyne/roads)
 
 add_subdirectory(display_plugins)
-add_subdirectory(test)
+if(BUILD_TESTS)
+  add_subdirectory(test)
+endif()

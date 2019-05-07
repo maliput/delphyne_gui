@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format2.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="2">
+  <name>delphyne-gui</name>
+  <version>0.1.0</version>
+  <description>Delphyne GUI</description>
+  <maintainer email="daniel.stonier@tri.global">Daniel Stonier</maintainer>
+  <license>TODO</license>
+
+  <!-- Packages not present in rosdep DB -->
+  <build_depend>libqt5multimedia5</build_depend>
+
+  <build_depend>libogre-dev</build_depend>
+  <build_depend>libqt5-opengl-dev</build_depend>
+  <build_depend>libqwt-qt5-dev</build_depend>
+  <build_depend>qtbase5-dev</build_depend>
+
+  <build_depend>ignition-common2</build_depend>
+  <build_depend>ignition-math5</build_depend>
+  <build_depend>ignition-msgs2</build_depend>
+  <build_depend>ignition-transport5</build_depend>
+  <build_depend>ignition-rendering0</build_depend>
+  <build_depend>ignition-gui0</build_depend>
+  <build_depend>delphyne</build_depend>
+
+  <build_export_depend>ignition-common2</build_export_depend>
+  <build_export_depend>ignition-math5</build_export_depend>
+  <build_export_depend>ignition-msgs2</build_export_depend>
+  <build_export_depend>ignition-transport5</build_export_depend>
+  <build_export_depend>ignition-rendering0</build_export_depend>
+  <build_export_depend>ignition-gui0</build_export_depend>
+  <build_export_depend>delphyne</build_export_depend>
+
+  <exec_depend>ament_cmake</exec_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

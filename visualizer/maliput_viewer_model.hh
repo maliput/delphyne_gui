@@ -7,8 +7,8 @@
 #include <memory>
 #include <string>
 
-#include <drake/automotive/maliput/api/road_geometry.h>
-#include <drake/automotive/maliput/api/road_network.h>
+#include <maliput/api/road_geometry.h>
+#include <maliput/api/road_network.h>
 
 #include <ignition/common/Mesh.hh>
 
@@ -32,7 +32,7 @@ class MaliputMesh {
 
   /// \brief Holds a pointer to the material information. Note that this is
   /// defined on MaliputMeshBuilder.hh
-  std::unique_ptr<drake::maliput::mesh::Material> material{};
+  std::unique_ptr<maliput::mesh::Material> material{};
 };
 
 /// \brief Holds the information to build a label.
@@ -119,7 +119,7 @@ class MaliputViewerModel {
   /// \param[in] _geoMeshes A map of std::string <--> GeoMesh objects to
   ///            cd /convert.
   void ConvertMeshes(
-    const std::map<std::string, drake::maliput::mesh::GeoMesh>& _geoMeshes);
+    const std::map<std::string, maliput::mesh::GeoMesh>& _geoMeshes);
 
   /// \brief Populates this->labels map with this->roadGeometry lane and branch
   ///        point IDs.
@@ -132,10 +132,10 @@ class MaliputViewerModel {
   // has a pointer to a RoadGeometry.
   
   /// \brief Maliput RoadGeometry pointer.
-  std::unique_ptr<const drake::maliput::api::RoadGeometry> roadGeometry;
+  std::unique_ptr<const maliput::api::RoadGeometry> roadGeometry;
 
   /// \brief Maliput RoadNetwork pointer.
-  std::unique_ptr<const drake::maliput::api::RoadNetwork> roadNetwork;
+  std::unique_ptr<const maliput::api::RoadNetwork> roadNetwork;
 
   /// \brief Map of meshes to hold all the ignition meshes.
   std::map<std::string, std::unique_ptr<MaliputMesh>> maliputMeshes;

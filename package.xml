@@ -22,6 +22,8 @@
   <build_depend>ignition-rendering0</build_depend>
   <build_depend>ignition-gui0</build_depend>
   <build_depend>delphyne</build_depend>
+  <depend>maliput</depend>
+  <depend>multilane</depend>
 
   <build_export_depend>ignition-common2</build_export_depend>
   <build_export_depend>ignition-math5</build_export_depend>

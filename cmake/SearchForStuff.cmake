@@ -134,3 +134,5 @@ endif()
 ########################################
 # Find Delphyne
 find_package(delphyne REQUIRED)
+find_package(maliput REQUIRED)
+find_package(multilane REQUIRED)

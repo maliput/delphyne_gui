@@ -145,7 +145,7 @@ class RenderMaliputWidget : public QWidget {
   /// \return True when @p _maliputMaterial is valid and @p _ignitionMaterial
   /// can be filled.
   bool FillMaterial(
-    const drake::maliput::mesh::Material* _maliputMaterial,
+    const maliput::mesh::Material* _maliputMaterial,
     ignition::rendering::MaterialPtr& _ignitionMaterial) const;
 
   /// \brief Fills a material to be transparent.

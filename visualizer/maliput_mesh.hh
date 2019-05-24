@@ -19,17 +19,16 @@
 
 #include <delphyne/macros.h>
 
-#include <drake/automotive/maliput/api/branch_point.h>
-#include <drake/automotive/maliput/api/junction.h>
-#include <drake/automotive/maliput/api/lane.h>
-#include <drake/automotive/maliput/api/road_geometry.h>
-#include <drake/automotive/maliput/api/segment.h>
+#include <maliput/api/branch_point.h>
+#include <maliput/api/junction.h>
+#include <maliput/api/lane.h>
+#include <maliput/api/road_geometry.h>
+#include <maliput/api/segment.h>
 
 #include "fmt/ostream.h"
 
 #include <ignition/common/Console.hh>
 
-namespace drake {
 namespace maliput {
 namespace mesh {
 
@@ -303,6 +302,5 @@ class SrhFace {
 
 }  // namespace mesh
 }  // namespace maliput
-}  // namespace drake
 
 #endif

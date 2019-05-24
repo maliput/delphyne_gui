@@ -239,7 +239,7 @@ void RenderMaliputWidget::CreateRoadRootVisual() {
 
 /////////////////////////////////////////////////
 bool RenderMaliputWidget::FillMaterial(
-  const drake::maliput::mesh::Material* _maliputMaterial,
+  const maliput::mesh::Material* _maliputMaterial,
   ignition::rendering::MaterialPtr& _ignitionMaterial) const {
   if (!_maliputMaterial) {
     return false;

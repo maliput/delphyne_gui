@@ -7,10 +7,14 @@ set(maliput_mesh MaliputMesh)
 add_library(${maliput_mesh}
   maliput_mesh_builder.cc)
 
+ament_target_dependencies(${maliput_mesh}
+  "maliput")
+
 target_link_libraries(${maliput_mesh}
   ${drake_LIBRARIES}
   ${IGNITION-COMMON_LIBRARIES}
-  delphyne::public_headers)
+  delphyne::public_headers
+  maliput::api)
 
 install(TARGETS ${maliput_mesh} DESTINATION
   ${LIB_INSTALL_DIR} COMPONENT shlib)
@@ -43,6 +47,11 @@ add_library(${maliput_viewer_widget} SHARED
   ${LayerSelectionWidget_MOC}
   ${RenderMaliputWidget_MOC}
 )
+
+ament_target_dependencies(${maliput_viewer_widget}
+  "maliput"
+  "multilane")
+
 target_link_libraries(${maliput_viewer_widget}
   ${drake_LIBRARIES}
   ${global_attributes}
@@ -53,7 +62,10 @@ target_link_libraries(${maliput_viewer_widget}
   ${maliput_mesh}
   ${Qt5Core_LIBRARIES}
   ${Qt5Widgets_LIBRARIES}
-  delphyne::maliput_utilities)
+  delphyne::maliput_utilities
+  maliput::api
+  multilane::multilane
+  )
 
 install(TARGETS ${maliput_viewer_widget} DESTINATION
   ${LIB_INSTALL_DIR} COMPONENT shlib)

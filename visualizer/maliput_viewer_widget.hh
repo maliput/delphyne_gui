@@ -6,7 +6,7 @@
 #include <memory>
 #include <string>
 
-#include <drake/automotive/maliput/api/road_geometry.h>
+#include <maliput/api/road_geometry.h>
 
 #include <ignition/gui/Plugin.hh>
 

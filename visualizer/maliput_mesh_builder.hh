@@ -11,14 +11,13 @@
 #include <string>
 #include <vector>
 
-#include <drake/automotive/maliput/api/road_geometry.h>
-#include <drake/automotive/maliput/api/segment.h>
+#include <maliput/api/road_geometry.h>
+#include <maliput/api/segment.h>
 
 #include <ignition/common/Mesh.hh>
 
 #include "maliput_mesh.hh"
 
-namespace drake {
 namespace maliput {
 namespace mesh {
 
@@ -147,6 +146,5 @@ std::unique_ptr<Material> GetMaterialByName(const std::string& material_name);
 
 }  // namespace mesh
 }  // namespace maliput
-}  // namespace drake
 
 #endif

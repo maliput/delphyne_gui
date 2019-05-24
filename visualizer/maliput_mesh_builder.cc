@@ -16,12 +16,12 @@
 
 #include <delphyne/macros.h>
 
-#include <drake/automotive/maliput/api/branch_point.h>
-#include <drake/automotive/maliput/api/junction.h>
-#include <drake/automotive/maliput/api/lane.h>
-#include <drake/automotive/maliput/api/lane_data.h>
-#include <drake/automotive/maliput/api/road_geometry.h>
-#include <drake/automotive/maliput/api/segment.h>
+#include <maliput/api/branch_point.h>
+#include <maliput/api/junction.h>
+#include <maliput/api/lane.h>
+#include <maliput/api/lane_data.h>
+#include <maliput/api/road_geometry.h>
+#include <maliput/api/segment.h>
 
 #include <ignition/common/Console.hh>
 #include <ignition/common/SubMesh.hh>
@@ -29,7 +29,6 @@
 
 #include "maliput_mesh_builder.hh"
 
-namespace drake {
 namespace maliput {
 namespace mesh {
 namespace {
@@ -371,11 +370,11 @@ void RenderBranchPoint(
     // If distance in sr-plane is too close and distance along h-axis is
     // too close, then increase elevation and try again.
     for (const api::GeoPosition& previous_xyz : *previous_centers) {
-      const Vector3<double> delta_xyz = previous_xyz.xyz() - center_xyz.xyz();
-      const Vector3<double> delta_srh =
+      const drake::Vector3<double> delta_xyz = previous_xyz.xyz() - center_xyz.xyz();
+      const drake::Vector3<double> delta_srh =
           orientation.matrix().transpose() * delta_xyz;
 
-      if ((Vector2<double>(delta_srh.x(), delta_srh.y()).norm() < sr_margin) &&
+      if ((drake::Vector2<double>(delta_srh.x(), delta_srh.y()).norm() < sr_margin) &&
           (std::abs(delta_srh.z()) < h_margin)) {
         has_conflict = true;
         elevation += height;
@@ -849,7 +848,7 @@ std::unique_ptr<ignition::common::Mesh> Convert(const std::string& name,
   sub_mesh->SetPrimitiveType(ignition::common::SubMesh::TRIANGLES);
 
   auto geo_position_to_ign_vector = [](
-      const drake::maliput::api::GeoPosition& v) {
+      const maliput::api::GeoPosition& v) {
     return ignition::math::Vector3d(v.x(), v.y(), v.z());
   };
 
@@ -881,7 +880,7 @@ std::unique_ptr<ignition::common::Mesh> Convert(const std::string& name,
         ordered_vertices_indices;
     for (const IndexFace::Vertex& ifv : index_face.vertices()) {
       // Sets the correct normal.
-      const drake::maliput::api::GeoPosition normal =
+      const maliput::api::GeoPosition normal =
           geo_mesh.get_normal(ifv.normal_index).n();
       sub_mesh->SetNormal(ifv.vertex_index, geo_position_to_ign_vector(normal));
       // Adds the vertices to the vector so we can later order them.
@@ -915,4 +914,3 @@ std::unique_ptr<Material> GetMaterialByName(const std::string& material_name) {
 
 }  // namespace mesh
 }  // namespace maliput
-}  // namespace drake

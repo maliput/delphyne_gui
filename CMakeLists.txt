@@ -233,7 +233,7 @@ else (build_errors)
 
   set(TEST_TYPE "UNIT")
   add_subdirectory(visualizer)
-  if (BUILD_TESTS)
+  if (BUILD_TESTING)
     add_subdirectory(test)
   endif()
 
@@ -250,7 +250,7 @@ else (build_errors)
   ${PROJECT_NAME_LOWER}")
 endif(build_errors)
 
-ament_environment_hooks(setup.bash.in)
+ament_environment_hooks(setup.sh.in)
 
 #################################################
 # Installs maliput_viewer.sh as a shortcut to run the visualizer.

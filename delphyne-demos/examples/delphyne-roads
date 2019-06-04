@@ -1,0 +1,9 @@
+#!/usr/bin/env python3
+#
+# Copyright 2017 Toyota Research Institute
+#
+
+import delphynegui.demos.roads
+
+if __name__ == "__main__":
+    delphynegui.demos.roads.main()

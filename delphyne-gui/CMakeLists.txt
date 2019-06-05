@@ -256,5 +256,4 @@ ament_environment_hooks(setup.sh.in)
 # Installs maliput_viewer.sh as a shortcut to run the visualizer.
 install (PROGRAMS tools/maliput_viewer.sh DESTINATION ${BIN_INSTALL_DIR})
 
-ament_package(CONFIG_EXTRAS
-${CMAKE_CURRENT_SOURCE_DIR}/cmake/cmake_uninstall.cmake.in)
+ament_package()

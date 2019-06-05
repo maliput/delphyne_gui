@@ -24,7 +24,6 @@ find_package(pybind11 CONFIG REQUIRED)
 ##############################################################################
 
 # Pin down python 3.6
-find_package(PythonLibs 3.6 REQUIRED)
 find_package(PythonInterp 3.6 REQUIRED)
 
 # Unfortunately no easy way to get site-packages / dist-packages

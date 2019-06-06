@@ -13,7 +13,7 @@ node('delphyne-linux-bionic-unprovisioned') {
           }
         }
         stage('checkout_index') {
-          sh 'src/delphyne_gui/tools/ci/jenkins/checkout_index'
+          sh 'src/delphyne_gui/delphyne-gui/tools/ci/jenkins/checkout_index'
         }
         withEnv(['COLCON_BUILD_EXTRA_ARGS=--packages-up-to delphyne delphyne-gui delphyne-demos',
                  'COLCON_TEST_EXTRA_ARGS=--packages-select delphyne delphyne-gui delphyne-demos']) {

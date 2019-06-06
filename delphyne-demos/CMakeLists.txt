@@ -3,7 +3,7 @@
 ##############################################################################
 
 cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
-project(delphyne-demos LANGUAGES C CXX VERSION 3.0.0)
+project(delphyne-demos)
 
 ##############################################################################
 # Find 3rd Party Packages
@@ -11,12 +11,7 @@ project(delphyne-demos LANGUAGES C CXX VERSION 3.0.0)
 
 message(STATUS "\n\n====== Finding 3rd Party Packages ======\n")
 
-find_package(ament_cmake REQUIRED)
 find_package(ament_cmake_python REQUIRED)
-find_package(delphyne REQUIRED)
-find_package(delphyne-gui REQUIRED)
-
-find_package(pybind11 CONFIG REQUIRED)
 
 
 ##############################################################################

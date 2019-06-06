@@ -7,12 +7,8 @@
   <maintainer email="daniel.stonier@tri.global">Daniel Stonier</maintainer>
   <license>TODO</license>
 
-  <build_depend>delphyne</build_depend>
-  <build_depend>delphyne-gui</build_depend>
-
-  <build_export_depend>delphyne</build_export_depend>
-  <build_export_depend>delphyne-gui</build_export_depend>
-
+  <exec_depend>delphyne</exec_depend>
+  <exec_depend>delphye-gui</exec_depend>
   <exec_depend>ament_cmake</exec_depend>
 
   <export>

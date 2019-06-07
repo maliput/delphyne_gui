@@ -11,6 +11,7 @@ project(delphyne-demos)
 
 message(STATUS "\n\n====== Finding 3rd Party Packages ======\n")
 
+find_package(ament_cmake REQUIRED)
 find_package(ament_cmake_python REQUIRED)
 
 

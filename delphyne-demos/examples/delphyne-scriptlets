@@ -3,7 +3,7 @@
 # Copyright 2017 Toyota Research Institute
 #
 
-import delphynegui.demos.scriptlets
+import delphyne_gui.demos.scriptlets
 
 if __name__ == "__main__":
-    delphynegui.demos.scriptlets.main()
+    delphyne_gui.demos.scriptlets.main()

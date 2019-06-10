@@ -3,7 +3,7 @@
 # Copyright 2017 Toyota Research Institute
 #
 
-import delphynegui.demos.realtime
+import delphyne_gui.demos.realtime
 
 if __name__ == "__main__":
-    delphynegui.demos.realtime.main()
+    delphyne_gui.demos.realtime.main()

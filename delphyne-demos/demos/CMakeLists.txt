@@ -17,5 +17,5 @@ install(
     roads.py
     scriptlets.py
   DESTINATION
-    ${PYTHON_INSTALL_DIR}/delphynegui/demos
+    ${PYTHON_INSTALL_DIR}/delphyne_gui/demos
 )

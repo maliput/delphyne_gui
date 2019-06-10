@@ -3,7 +3,7 @@
 # Copyright 2017 Toyota Research Institute
 #
 
-import delphynegui.demos.keyop
+import delphyne_gui.demos.keyop
 
 if __name__ == "__main__":
-    delphynegui.demos.keyop.main()
+    delphyne_gui.demos.keyop.main()

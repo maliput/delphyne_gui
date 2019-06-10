@@ -3,7 +3,7 @@
 # Copyright 2018 Toyota Research Institute
 #
 
-import delphynegui.demos.mobil_perf
+import delphyne_gui.demos.mobil_perf
 
 if __name__ == "__main__":
-    delphynegui.demos.mobil_perf.main()
+    delphyne_gui.demos.mobil_perf.main()

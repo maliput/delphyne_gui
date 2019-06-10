@@ -3,7 +3,7 @@
 # Copyright 2017 Toyota Research Institute
 #
 
-import delphynegui.demos.dragway
+import delphyne_gui.demos.dragway
 
 if __name__ == "__main__":
-    delphynegui.demos.dragway.main()
+    delphyne_gui.demos.dragway.main()

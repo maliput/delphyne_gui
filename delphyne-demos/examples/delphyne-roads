@@ -3,7 +3,7 @@
 # Copyright 2017 Toyota Research Institute
 #
 
-import delphyne_gui.demos.roads
+import delphyne_demos.demos.roads
 
 if __name__ == "__main__":
-    delphyne_gui.demos.roads.main()
+    delphyne_demos.demos.roads.main()

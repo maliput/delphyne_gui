@@ -18,9 +18,10 @@ import pydrake.maliput.all as maliput
 
 import delphyne.maliput as maliput_helpers
 import delphyne.simulation as simulation
-import delphyne.utilities as utilities
+import delphyne.utilities
+import delphyne_gui.utilities
 
-from delphyne.utilities import launch_interactive_simulation
+from delphyne_gui.utilities import launch_interactive_simulation
 
 from . import helpers
 
@@ -61,7 +62,7 @@ def main():
     # The simulation builder
     builder = simulation.AgentSimulationBuilder()
 
-    filename = utilities.get_delphyne_gui_resource(
+    filename = delphyne_gui.utilities.get_delphyne_gui_resource(
         "roads/little_city.yaml"
     )
 
@@ -110,7 +111,7 @@ def main():
     railcar_speed = 5.0  # (m/s)
     for n in range(args.num_rail_cars):
         lane, lane_position = rail_car_lane_positions[n]
-        utilities.add_rail_car(
+        delphyne.utilities.add_rail_car(
             builder,
             name='rail{}'.format(n),
             lane=lane,
@@ -128,7 +129,7 @@ def main():
         x_position, y_position, _ = geo_position.xyz()
         heading = geo_orientation.rpy().yaw_angle()
 
-        utilities.add_mobil_car(
+        delphyne.utilities.add_mobil_car(
             builder,
             name="mobil" + str(m),
             scene_x=x_position,

@@ -15,7 +15,7 @@ import sys
 import delphyne.maliput as maliput
 import delphyne.simulation as simulation
 
-from delphyne.utilities import launch_interactive_simulation
+from delphyne_gui.utilities import launch_interactive_simulation
 
 from . import helpers
 

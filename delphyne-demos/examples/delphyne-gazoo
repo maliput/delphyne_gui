@@ -3,7 +3,7 @@
 # Copyright 2017 Toyota Research Institute
 #
 
-import delphyne_gui.demos.gazoo
+import delphyne_demos.demos.gazoo
 
 if __name__ == "__main__":
-    delphyne_gui.demos.gazoo.main()
+    delphyne_demos.demos.gazoo.main()

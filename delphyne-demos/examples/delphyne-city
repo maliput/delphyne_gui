@@ -3,7 +3,7 @@
 # Copyright 2018 Toyota Research Institute
 #
 
-import delphyne_gui.demos.city
+import delphyne_demos.demos.city
 
 if __name__ == "__main__":
-    delphyne_gui.demos.city.main()
+    delphyne_demos.demos.city.main()

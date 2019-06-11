@@ -18,7 +18,7 @@ from delphyne.simulation import (
 )
 import delphyne.utilities as utilities
 
-from delphyne.utilities import launch_interactive_simulation
+from delphyne_gui.utilities import launch_interactive_simulation
 
 from . import helpers
 

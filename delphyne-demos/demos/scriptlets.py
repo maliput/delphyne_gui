@@ -23,9 +23,10 @@ import time
 
 import delphyne.maliput as maliput
 import delphyne.simulation as simulation
-import delphyne.utilities as utilities
+import delphyne.utilities
+import delphyne_gui.utilities
 
-from delphyne.utilities import launch_interactive_simulation
+from delphyne_gui.utilities import launch_interactive_simulation
 
 from . import helpers
 
@@ -126,7 +127,8 @@ def main():
 
     builder = simulation.AgentSimulationBuilder()
 
-    filename = utilities.get_delphyne_gui_resource('roads/circuit.yaml')
+    filename = delphyne_gui.utilities.get_delphyne_gui_resource(
+        'roads/circuit.yaml')
 
     if not os.path.isfile(filename):
         print("Required file {} not found."
@@ -142,7 +144,7 @@ def main():
     )
 
     simple_car_name = "simple0"
-    utilities.add_simple_car(
+    delphyne.utilities.add_simple_car(
         builder,
         name=simple_car_name,
         position_x=0.0,
@@ -154,7 +156,7 @@ def main():
     railcar_s = 0.0      # (m)
     rail_car_name = "rail0"
     lane_1 = road_geometry.junction(2).segment(0).lane(0)
-    rail_car_blueprint = utilities.add_rail_car(
+    rail_car_blueprint = delphyne.utilities.add_rail_car(
         builder,
         name=rail_car_name,
         lane=lane_1,

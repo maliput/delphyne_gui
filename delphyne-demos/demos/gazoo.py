@@ -14,9 +14,10 @@ import os.path
 
 import delphyne.maliput as maliput
 import delphyne.simulation as simulation
-import delphyne.utilities as utilities
+import delphyne.utilities
+import delphyne_gui.utilities
 
-from delphyne.utilities import launch_interactive_simulation
+from delphyne_gui.utilities import launch_interactive_simulation
 
 from . import helpers
 
@@ -58,7 +59,8 @@ def main():
 
     builder = simulation.AgentSimulationBuilder()
 
-    filename = utilities.get_delphyne_gui_resource('roads/circuit.yaml')
+    filename = delphyne_gui.utilities.get_delphyne_gui_resource(
+        'roads/circuit.yaml')
 
     if not os.path.isfile(filename):
         print("Required file {} not found."
@@ -85,7 +87,7 @@ def main():
     railcar_s = 0.0      # (m)
     robot_id = 1
     lane_1 = road_geometry.junction(2).segment(0).lane(0)
-    utilities.add_rail_car(
+    delphyne.utilities.add_rail_car(
         builder,
         name=str(robot_id),
         lane=lane_1,
@@ -99,7 +101,7 @@ def main():
     railcar_s = 0.0      # (m)
     robot_id += 1
     lane_2 = road_geometry.junction(2).segment(0).lane(1)
-    utilities.add_rail_car(
+    delphyne.utilities.add_rail_car(
         builder,
         name=str(robot_id),
         lane=lane_2,
@@ -113,7 +115,7 @@ def main():
     railcar_s = 0.0      # (m)
     robot_id += 1
     lane_3 = road_geometry.junction(2).segment(0).lane(2)
-    utilities.add_rail_car(
+    delphyne.utilities.add_rail_car(
         builder,
         name=str(robot_id),
         lane=lane_3,
@@ -128,7 +130,7 @@ def main():
         y_offset = 5.0       # (m)
         velocity_base = 2.0  # (m/s)
         robot_id += 1
-        utilities.add_mobil_car(
+        delphyne.utilities.add_mobil_car(
             builder,
             name=str(robot_id),
             scene_x=-10.0 + x_offset * (1 + i / 3),

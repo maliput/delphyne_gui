@@ -3,7 +3,7 @@
 # Copyright 2019 Toyota Research Institute
 #
 
-import delphyne_gui.demos.mali
+import delphyne_demos.demos.mali
 
 if __name__ == "__main__":
-    delphyne_gui.demos.mali.main()
+    delphyne_demos.demos.mali.main()

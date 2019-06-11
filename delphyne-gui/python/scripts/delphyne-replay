@@ -3,7 +3,7 @@
 # Copyright 2018 Toyota Research Institute
 #
 
-import delphyne_demos.demos.crash
+import delphyne_gui.toolkit.replay
 
 if __name__ == "__main__":
-    delphyne_demos.demos.crash.main()
+    delphyne.toolkit.replay.main()

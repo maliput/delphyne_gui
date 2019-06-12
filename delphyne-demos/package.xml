@@ -8,7 +8,7 @@
   <license>TODO</license>
 
   <exec_depend>delphyne</exec_depend>
-  <exec_depend>delphye-gui</exec_depend>
+  <exec_depend>delphyne-gui</exec_depend>
   <exec_depend>ament_cmake</exec_depend>
 
   <export>

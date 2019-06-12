@@ -250,6 +250,7 @@ else (build_errors)
   ${PROJECT_NAME_LOWER}")
 endif(build_errors)
 
+add_subdirectory(python)
 ament_environment_hooks(setup.sh.in)
 
 #################################################

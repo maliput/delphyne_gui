@@ -21,11 +21,7 @@ import time
 import zipfile
 
 import delphyne.cmdline
-import delphyne_gui.launcher
-
-from delphyne.utilities import (
-    launch_visualizer
-)
+import delphyne_gui.utilities
 
 
 ##############################################################################
@@ -135,7 +131,7 @@ def main():
             replayer = "replayer"
             launch_manager.launch([replayer, topic_log_path])
             if not args.bare:
-                launch_visualizer(
+                delphyne_gui.utilities.launch_visualizer(
                     launch_manager, bundle_path=bundle_path,
                     # Injects PlaybackWidget below RenderWidget
                     # if the former is not present in the layout.

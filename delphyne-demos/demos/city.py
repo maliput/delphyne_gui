@@ -14,7 +14,7 @@ import os.path
 import random
 import sys
 
-import pydrake.maliput.all as maliput
+import maliput.api as maliput
 
 import delphyne.maliput as maliput_helpers
 import delphyne.simulation as simulation

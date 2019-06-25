@@ -6,4 +6,4 @@
 import delphyne_gui.toolkit.replay
 
 if __name__ == "__main__":
-    delphyne.toolkit.replay.main()
+    delphyne_gui.toolkit.replay.main()

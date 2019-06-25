@@ -21,12 +21,13 @@ if prereqs.tag_applies "ignition|all"; then
     prereqs.apt update
 
     prereqs.apt install --no-install-recommends \
-                libignition-common2-dev \
-                libignition-math5-dev \
+                libignition-common3-dev \
+                libignition-math6-dev \
                 libignition-msgs2-dev \
                 libignition-tools-dev \
+                libignition-cmake2-dev \
                 libignition-cmake1-dev \
-                libignition-rendering0-dev \
+                libignition-rendering2-dev \
                 libignition-gui0-dev
 fi
 

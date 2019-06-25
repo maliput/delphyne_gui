@@ -56,6 +56,12 @@ RenderMaliputWidget::~RenderMaliputWidget() {
     // For right now, disable this, but we should debug this and re-enable this
     // cleanup.
     // this->engine->Fini();
+    this->orbitViewControl.reset();
+    this->camera->RemoveChildren();
+    this->camera.reset();
+    this->scene->DestroyNodes();
+    this->scene->DestroySensors();
+    this->scene.reset();
   }
 }
 
@@ -156,11 +162,16 @@ void RenderMaliputWidget::CreateRenderWindow() {
     return;
   }
 
-  // Create sample scene
-  this->scene = engine->CreateScene("scene");
-  if (!this->scene) {
-    ignerr << "Failed to create scene" << std::endl;
-    return;
+  // Try to reutilize the scene if exists
+  this->scene = engine->SceneByName("scene");
+  if (!this->scene)
+  {
+    // Create a scene
+    this->scene = engine->CreateScene("scene");
+    if (!this->scene) {
+      ignerr << "Failed to create scene" << std::endl;
+      return;
+    }
   }
 
   // Lights.
@@ -297,7 +308,9 @@ void RenderMaliputWidget::RenderRoadMeshes(
       ignerr << "Failed to create material.\n";
       continue;
     }
-    material->SetCulling(ignition::rendering::CullMode::CM_NONE);
+    /* TODO: Enable once ignition-rendering2 supports culling
+    material->SetCulling(ignition::rendering::CullMode::CM_NONE);*/
+
     // Checks if the mesh to be rendered already exists or not.
     const auto meshExists = this->meshes.find(it.first);
     // If the mesh is disabled, there is no mesh for it so it must be set to
@@ -428,8 +441,6 @@ void RenderMaliputWidget::Clear() {
     this->rootVisual->RemoveChild(it.second);
   }
   meshes.clear();
-  // Clears the scene.
-  this->scene->Clear();
 }
 
 

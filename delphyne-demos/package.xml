@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format2.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="2">
+  <name>delphyne-demos</name>
+  <version>0.1.0</version>
+  <description>Delphyne Demos</description>
+  <maintainer email="daniel.stonier@tri.global">Daniel Stonier</maintainer>
+  <license>TODO</license>
+
+  <exec_depend>delphyne</exec_depend>
+  <exec_depend>delphyne-gui</exec_depend>
+  <exec_depend>ament_cmake</exec_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

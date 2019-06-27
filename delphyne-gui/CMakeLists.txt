@@ -257,4 +257,7 @@ ament_environment_hooks(setup.sh.in)
 # Installs maliput_viewer.sh as a shortcut to run the visualizer.
 install (PROGRAMS tools/maliput_viewer.sh DESTINATION ${BIN_INSTALL_DIR})
 
+# Installs prereqs.
+install (PROGRAMS prereqs DESTINATION ${CMAKE_INSTALL_DATADIR})
+
 ament_package()

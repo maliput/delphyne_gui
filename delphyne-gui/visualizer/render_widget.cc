@@ -17,11 +17,14 @@
 #include <ignition/common/SystemPaths.hh>
 #include <ignition/gui/Iface.hh>
 #include <ignition/gui/Plugin.hh>
+#include <ignition/math/Angle.hh>
 #include <ignition/math/Color.hh>
 #include <ignition/math/Helpers.hh>
 #include <ignition/math/Pose3.hh>
 #include <ignition/math/Vector3.hh>
+#include <ignition/math/Vector4.hh>
 #include <ignition/msgs.hh>
+#include <ignition/msgs/Utility.hh>
 #include <ignition/rendering/Camera.hh>
 #include <ignition/rendering/Light.hh>
 #include <ignition/rendering/Material.hh>
@@ -407,6 +410,28 @@ ignition::rendering::VisualPtr RenderWidget::RenderMesh(
 
   ignition::rendering::MeshPtr meshGeom = this->scene->CreateMesh(descriptor);
   mesh->AddGeometry(meshGeom);
+  /* Almost all roads are small or 0 in the z-axis.
+     We found that 100.0 is enough to have a big picture
+     of the whole scene for the camera.
+  */
+  constexpr double Z_OFFSET = 100.0;
+  ignition::math::Vector3d center;
+  ignition::math::Vector3d minXYZ;
+  ignition::math::Vector3d maxXYZ;
+  descriptor.mesh->AABB(center, minXYZ, maxXYZ);
+  double sphereRadius = center.Distance(minXYZ);
+  double fov = this->camera->HFOV().Radian();
+  /* Get distance required for camera to see a sphere where the center
+  of the sphere is the center of the bounding box */
+  double distance = (sphereRadius * 2.0) / tan(fov / 2.0);
+  if (distance > this->boundSphereRadius) {
+    this->camera->SetWorldPosition((center.Normalize() * distance) +
+        ignition::math::Vector3d(0.0, 0.0, Z_OFFSET));
+    this->camera->SetWorldRotation(
+      ignition::math::Matrix4d::LookAt(
+        this->camera->WorldPosition(), center).Pose().Rot());
+    this->boundSphereRadius = distance;
+  }
   if (mesh_uri.Query().Str().find("culling=off") != std::string::npos) {
     DELPHYNE_VALIDATE(mesh->GeometryCount() == 1, std::runtime_error,
                     "Expected one geometry.");

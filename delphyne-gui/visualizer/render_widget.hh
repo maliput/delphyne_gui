@@ -247,6 +247,10 @@ class RenderWidget : public ignition::gui::Plugin {
   /// \brief Store all the user settings.
   UserSettings userSettings;
 
+  /// \brief Radius used to calculate initial distance of the camera from the
+  /// scene
+  double boundSphereRadius = 0.0;
+
   /// \brief Are we casting shadows by default?
   bool kCastShadowsByDefault{true};
 };

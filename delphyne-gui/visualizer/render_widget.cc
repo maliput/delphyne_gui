@@ -410,28 +410,19 @@ ignition::rendering::VisualPtr RenderWidget::RenderMesh(
 
   ignition::rendering::MeshPtr meshGeom = this->scene->CreateMesh(descriptor);
   mesh->AddGeometry(meshGeom);
-  /* Almost all roads are small or 0 in the z-axis.
-     We found that 100.0 is enough to have a big picture
-     of the whole scene for the camera.
-  */
-  constexpr double Z_OFFSET = 100.0;
   ignition::math::Vector3d center;
   ignition::math::Vector3d minXYZ;
   ignition::math::Vector3d maxXYZ;
   descriptor.mesh->AABB(center, minXYZ, maxXYZ);
-  double sphereRadius = center.Distance(minXYZ);
-  double fov = this->camera->HFOV().Radian();
-  /* Get distance required for camera to see a sphere where the center
-  of the sphere is the center of the bounding box */
-  double distance = (sphereRadius * 2.0) / tan(fov / 2.0);
-  if (distance > this->boundSphereRadius) {
-    this->camera->SetWorldPosition((center.Normalize() * distance) +
-        ignition::math::Vector3d(0.0, 0.0, Z_OFFSET));
-    this->camera->SetWorldRotation(
-      ignition::math::Matrix4d::LookAt(
-        this->camera->WorldPosition(), center).Pose().Rot());
-    this->boundSphereRadius = distance;
-  }
+  minBBScene = ignition::math::Vector3d(
+    std::min(minXYZ.X() + _vis.pose().position().x(), minBBScene.X()),
+    std::min(minXYZ.Y() + _vis.pose().position().y(), minBBScene.Y()),
+    std::min(minXYZ.Z() + _vis.pose().position().z(), minBBScene.Z()));
+  maxBBScene = ignition::math::Vector3d(
+    std::max(maxXYZ.X() + _vis.pose().position().x(), maxBBScene.X()),
+    std::max(maxXYZ.Y() + _vis.pose().position().y(), maxBBScene.Y()),
+    std::max(maxXYZ.Z() + _vis.pose().position().z(), maxBBScene.Z()));
+
   if (mesh_uri.Query().Str().find("culling=off") != std::string::npos) {
     DELPHYNE_VALIDATE(mesh->GeometryCount() == 1, std::runtime_error,
                     "Expected one geometry.");
@@ -453,6 +444,31 @@ void RenderWidget::SetInitialScene(const ignition::msgs::Scene& _msg) {
   for (int i = 0; i < _msg.model_size(); ++i) {
     LoadModel(_msg.model(i));
   }
+
+  ignition::math::Vector3d center(
+    (minBBScene.X() + maxBBScene.X())/2.0,
+    (minBBScene.Y() + maxBBScene.Y())/2.0,
+    (minBBScene.Z() + maxBBScene.Z())/2.0);
+
+  /* Good results using this factor */
+  constexpr double FACTOR = 2.0;
+  /* Angle from the origin of the sphere. */
+  constexpr double ELEVATION_ANGLE_RAD = IGN_PI/180.0 * 20.0;
+
+  const double sphereRadius = center.Distance(minBBScene);
+  const double fov = this->camera->HFOV().Radian();
+  /* Get distance required for camera to see a sphere where the center
+  of the sphere is the center of the bounding box */
+  const double distance = (sphereRadius * FACTOR) / tan(fov / 2.0);
+  const double zPos = distance * sin(ELEVATION_ANGLE_RAD);
+  ignition::math::Vector3d cameraWorldPosition = center.Normalize();
+  this->camera->SetWorldPosition(ignition::math::Vector3d(
+    cameraWorldPosition.X() * distance,
+    cameraWorldPosition.Y() * distance,
+    zPos));
+  this->camera->SetWorldRotation(
+    ignition::math::Matrix4d::LookAt(
+      this->camera->WorldPosition(), center).Pose().Rot());
 
   this->node.Subscribe("visualizer/scene_update", &RenderWidget::OnUpdateScene,
                        this);

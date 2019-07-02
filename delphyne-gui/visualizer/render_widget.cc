@@ -450,22 +450,22 @@ void RenderWidget::SetInitialScene(const ignition::msgs::Scene& _msg) {
     (minBBScene.Y() + maxBBScene.Y())/2.0,
     (minBBScene.Z() + maxBBScene.Z())/2.0);
 
-  /* Good results using this factor */
-  constexpr double FACTOR = 2.0;
-  /* Angle from the origin of the sphere. */
-  constexpr double ELEVATION_ANGLE_RAD = IGN_PI/180.0 * 20.0;
-
   const double sphereRadius = center.Distance(minBBScene);
   const double fov = this->camera->HFOV().Radian();
+  /* Good results using this factor */
+  constexpr double kRadiusMultiplicativeIncrement = 1.9;
+  /* Angle from the origin of the sphere. */
+  constexpr double kElevation = IGN_PI/180.0 * 75.0;
   /* Get distance required for camera to see a sphere where the center
   of the sphere is the center of the bounding box */
-  const double distance = (sphereRadius * FACTOR) / tan(fov / 2.0);
-  const double zPos = distance * sin(ELEVATION_ANGLE_RAD);
-  ignition::math::Vector3d cameraWorldPosition = center.Normalize();
+  const double distance = (sphereRadius * kRadiusMultiplicativeIncrement) /
+                          tan(fov / 2.0);
+  const double azimuth = atan(
+    (maxBBScene.X() - minBBScene.X())/(maxBBScene.Y() - minBBScene.Y()));
   this->camera->SetWorldPosition(ignition::math::Vector3d(
-    cameraWorldPosition.X() * distance,
-    cameraWorldPosition.Y() * distance,
-    zPos));
+    distance * sin(kElevation) * cos(azimuth),
+    distance * sin(kElevation) * sin(azimuth),
+    distance * cos(kElevation)));
   this->camera->SetWorldRotation(
     ignition::math::Matrix4d::LookAt(
       this->camera->WorldPosition(), center).Pose().Rot());

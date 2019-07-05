@@ -2,8 +2,6 @@
 
 #include "render_maliput_widget.hh"
 
-#include <maliput-utilities/generate_obj.h>
-
 #include <ignition/common/Console.hh>
 #include <ignition/common/MeshManager.hh>
 #include <ignition/common/PluginMacros.hh>
@@ -27,6 +25,8 @@
 #include <ignition/rendering/RenderingIface.hh>
 #include <ignition/rendering/Scene.hh>
 #include <ignition/rendering/Text.hh>
+
+#include <maliput-utilities/generate_obj.h>
 
 using namespace delphyne;
 using namespace gui;
@@ -241,7 +241,7 @@ void RenderMaliputWidget::CreateRoadRootVisual() {
 
 /////////////////////////////////////////////////
 bool RenderMaliputWidget::FillMaterial(
-  const ::maliput::utility::Material* _maliputMaterial,
+  const maliput::utility::Material* _maliputMaterial,
   ignition::rendering::MaterialPtr& _ignitionMaterial) const {
   if (!_maliputMaterial) {
     return false;

@@ -14,8 +14,6 @@
 
 #include <ignition/common/Mesh.hh>
 
-#include "maliput_mesh_builder.hh"
-
 namespace delphyne {
 namespace gui {
 
@@ -33,7 +31,7 @@ class MaliputMesh {
 
   /// \brief Holds a pointer to the material information. Note that this is
   /// defined on MaliputMeshBuilder.hh
-  std::unique_ptr<::maliput::utility::Material> material{};
+  std::unique_ptr<maliput::utility::Material> material{};
 };
 
 /// \brief Holds the information to build a label.
@@ -121,7 +119,7 @@ class MaliputViewerModel {
   ///            cd /convert.
   void ConvertMeshes(
     const std::unordered_map<std::string,
-                             ::maliput::utility::mesh::GeoMesh>& _geoMeshes);
+                             maliput::utility::mesh::GeoMesh>& _geoMeshes);
 
   /// \brief Populates this->labels map with this->roadGeometry lane and branch
   ///        point IDs.

@@ -11,10 +11,10 @@
 #include <ignition/rendering/RenderTypes.hh>
 #include <ignition/rendering/RenderingIface.hh>
 #include <maliput-utilities/generate_obj.h>
+#include <maliput-utilities/mesh.h>
 
 #include <QtWidgets/QWidget>
 
-#include "maliput_mesh.hh"
 #include "maliput_viewer_model.hh"
 #include "orbit_view_control.hh"
 
@@ -146,7 +146,7 @@ class RenderMaliputWidget : public QWidget {
   /// \return True when @p _maliputMaterial is valid and @p _ignitionMaterial
   /// can be filled.
   bool FillMaterial(
-    const ::maliput::utility::Material* _maliputMaterial,
+    const maliput::utility::Material* _maliputMaterial,
     ignition::rendering::MaterialPtr& _ignitionMaterial) const;
 
   /// \brief Fills a material to be transparent.

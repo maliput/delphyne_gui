@@ -11,7 +11,7 @@
 #include <maliput-utilities/generate_obj.h>
 #include <maliput-utilities/mesh.h>
 
-#include "maliput_mesh_builder.hh"
+#include "maliput_mesh_converter.hh"
 
 using namespace delphyne;
 using namespace gui;
@@ -23,13 +23,13 @@ bool MaliputViewerModel::Load(const std::string& _maliputFilePath) {
   ignmsg << "About to load [" << _maliputFilePath << "] maliput file."
          << std::endl;
   LoadRoadGeometry(_maliputFilePath);
-  const ::maliput::api::RoadGeometry* rg = roadGeometry == nullptr ?
+  const maliput::api::RoadGeometry* rg = roadGeometry == nullptr ?
   roadNetwork->road_geometry() : roadGeometry.get();
   ignmsg << "Loaded [" << _maliputFilePath << "] maliput file." << std::endl;
   ignmsg << "Loading RoadGeometry meshes of "
          << rg->id().string() << std::endl;
-  std::unordered_map<std::string, ::maliput::utility::mesh::GeoMesh> geoMeshes =
-      ::maliput::utility::BuildMeshes(rg, ::maliput::utility::ObjFeatures());
+  std::unordered_map<std::string, maliput::utility::mesh::GeoMesh> geoMeshes =
+      maliput::utility::BuildMeshes(rg, maliput::utility::ObjFeatures());
   ignmsg << "Meshes loaded." << std::endl;
   this->ConvertMeshes(geoMeshes);
   ignmsg << "Meshes converted to ignition type." << std::endl;
@@ -71,14 +71,14 @@ void MaliputViewerModel::LoadRoadGeometry(const std::string& _maliputFilePath) {
   while (!fileStream.eof()) {
     std::getline(fileStream, line);
     if (line.find("<OpenDRIVE>") != std::string::npos) {
-      this->roadNetwork = delphyne::maliput::CreateMalidriveFromFile(
+      this->roadNetwork = delphyne::roads::CreateMalidriveFromFile(
         _maliputFilePath.substr(_maliputFilePath.find_last_of("/") + 1),
         _maliputFilePath);
       return;
     }
     else if (line.find("maliput_multilane_builder:") != std::string::npos) {
-      this->roadGeometry = ::maliput::multilane::LoadFile(
-          ::maliput::multilane::BuilderFactory(), _maliputFilePath);
+      this->roadGeometry = maliput::multilane::LoadFile(
+          maliput::multilane::BuilderFactory(), _maliputFilePath);
       return;
     }
   }
@@ -88,11 +88,11 @@ void MaliputViewerModel::LoadRoadGeometry(const std::string& _maliputFilePath) {
 
 /////////////////////////////////////////////////
 void MaliputViewerModel::ConvertMeshes(
-  const std::unordered_map<std::string, ::maliput::utility::mesh::GeoMesh>& _geoMeshes) {
+  const std::unordered_map<std::string, maliput::utility::mesh::GeoMesh>& _geoMeshes) {
   for (const auto& it : _geoMeshes) {
     auto maliputMesh = std::make_unique<MaliputMesh>();
     // Converts from drake to ignition mesh and sets the state.
-    maliputMesh->mesh = ::maliput::mesh::Convert(it.first, it.second);
+    maliputMesh->mesh = delphyne::mesh::Convert(it.first, it.second);
     if (maliputMesh->mesh == nullptr) {
       ignmsg << "Skipping mesh [" << it.first << "] because it is empty.\n";
       maliputMesh->enabled = false;
@@ -103,7 +103,7 @@ void MaliputViewerModel::ConvertMeshes(
       maliputMesh->visible = true;
     }
     // Retrieves the material
-    maliputMesh->material = ::maliput::utility::GetMaterialByName(it.first);
+    maliputMesh->material = maliput::utility::GetMaterialByName(it.first);
 
     this->maliputMeshes[it.first] = std::move(maliputMesh);
   }
@@ -125,12 +125,12 @@ static const double kBranchPointHeightOffset{3.};
 // \return An ignition::math::Vector3d with the world position of
 // @p laneEnd.lane at @p laneEnd.end extent.
 ignition::math::Vector3d LaneEndWorldPosition(
-    const ::maliput::api::LaneEnd& laneEnd) {
+    const maliput::api::LaneEnd& laneEnd) {
   const double s_position =
-      laneEnd.end == ::maliput::api::LaneEnd::Which::kStart
+      laneEnd.end == maliput::api::LaneEnd::Which::kStart
           ? 0.
           : laneEnd.lane->length();
-  const ::maliput::api::GeoPosition position =
+  const maliput::api::GeoPosition position =
       laneEnd.lane->ToGeoPosition({s_position, 0., 0.});
   return {position.x(), position.y(), position.z() + kBranchPointHeightOffset};
 }
@@ -140,7 +140,7 @@ ignition::math::Vector3d LaneEndWorldPosition(
 // Label's text is @p bp's ID.
 // \param bp A BranchPoint to build a label from.
 // \return A MaliputLabel with @p bp's information.
-MaliputLabel LabelFor(const ::maliput::api::BranchPoint& bp) {
+MaliputLabel LabelFor(const maliput::api::BranchPoint& bp) {
   MaliputLabel label;
   label.text = bp.id().string();
   if (bp.GetASide() && bp.GetASide()->size() != 0) {
@@ -159,10 +159,10 @@ MaliputLabel LabelFor(const ::maliput::api::BranchPoint& bp) {
 // Label's text is @p lane's ID.
 // \param lane A Lane to build a label from.
 // \return A MaliputLabel with @p lane's information.
-MaliputLabel LabelFor(const ::maliput::api::Lane& lane) {
+MaliputLabel LabelFor(const maliput::api::Lane& lane) {
   MaliputLabel label;
   label.text = lane.id().string();
-  const ::maliput::api::GeoPosition position =
+  const maliput::api::GeoPosition position =
       lane.ToGeoPosition({lane.length() / 2., 0., 0.});
   label.position.Set(position.x(), position.y(),
                      position.z() + kLaneHeightOffset);
@@ -174,20 +174,20 @@ MaliputLabel LabelFor(const ::maliput::api::Lane& lane) {
 void MaliputViewerModel::GenerateLabels() {
   // Traverses branch points to generate labels for them.
   this->labels[MaliputLabelType::kBranchPoint] = std::vector<MaliputLabel>();
-  const ::maliput::api::RoadGeometry* rg = roadGeometry == nullptr ?
+  const maliput::api::RoadGeometry* rg = roadGeometry == nullptr ?
   roadNetwork->road_geometry() : roadGeometry.get();
   for (int i = 0; i < rg->num_branch_points(); ++i) {
-    const ::maliput::api::BranchPoint* bp = rg->branch_point(i);
+    const maliput::api::BranchPoint* bp = rg->branch_point(i);
     this->labels[MaliputLabelType::kBranchPoint].push_back(LabelFor(*bp));
   }
 
   // Traverses lanes to generate labels for them.
   this->labels[MaliputLabelType::kLane] = std::vector<MaliputLabel>();
   for (int i = 0; i < rg->num_junctions(); ++i) {
-    const ::maliput::api::Junction* junction =
+    const maliput::api::Junction* junction =
         rg->junction(i);
     for (int j = 0; j < junction->num_segments(); ++j) {
-      const ::maliput::api::Segment* segment = junction->segment(j);
+      const maliput::api::Segment* segment = junction->segment(j);
       for (int k = 0; k < segment->num_lanes(); ++k) {
         this->labels[MaliputLabelType::kLane].push_back(
             LabelFor(*segment->lane(k)));

@@ -5,7 +5,7 @@ include (${project_cmake_dir}/Utils.cmake)
 set(maliput_mesh MaliputMesh)
 
 add_library(${maliput_mesh}
-  maliput_mesh_builder.cc)
+  maliput_mesh_converter.cc)
 
 ament_target_dependencies(${maliput_mesh}
   "maliput"

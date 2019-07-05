@@ -24,13 +24,14 @@
 #include <maliput/api/segment.h>
 #include <maliput-utilities/mesh.h>
 
-#include <ignition/common/Console.hh>
 #include <ignition/common/SubMesh.hh>
 #include <ignition/math/Vector3.hh>
 
-#include "maliput_mesh_builder.hh"
+#include "maliput_mesh_converter.hh"
 
-namespace maliput {
+using namespace maliput::utility::mesh;
+
+namespace delphyne {
 namespace mesh {
 namespace {
 
@@ -92,7 +93,7 @@ const std::string GenerateUniqueMeshName(const std::string& baseName) {
 }  // namespace
 
 std::unique_ptr<ignition::common::Mesh> Convert(const std::string& name,
-                                                const ::maliput::utility::mesh::GeoMesh& geo_mesh) {
+                                                const GeoMesh& geo_mesh) {
   // Checks before actually creating the mesh.
   if (geo_mesh.num_vertices() < 3 && geo_mesh.faces().size() < 1) {
     return nullptr;
@@ -132,7 +133,7 @@ std::unique_ptr<ignition::common::Mesh> Convert(const std::string& name,
 
 
   // Sets the indices based on how the faces were built.
-  for (const ::maliput::utility::mesh::IndexFace& index_face : geo_mesh.faces()) {
+  for (const IndexFace& index_face : geo_mesh.faces()) {
     // TODO(agalbachicar):    I'm assuming that IndexFace will not have more
     //                        than 4 vertices. The class supports more, however
     //                        proper triangulation code needs to be done so as
@@ -142,7 +143,7 @@ std::unique_ptr<ignition::common::Mesh> Convert(const std::string& name,
 
     std::vector<std::tuple<ignition::math::Vector3d, int>>
         ordered_vertices_indices;
-    for (const ::maliput::utility::mesh::IndexFace::Vertex& ifv : index_face.vertices()) {
+    for (const IndexFace::Vertex& ifv : index_face.vertices()) {
       // Sets the correct normal.
       const maliput::api::GeoPosition normal =
           geo_mesh.get_normal(ifv.normal_index).n();
@@ -170,4 +171,4 @@ std::unique_ptr<ignition::common::Mesh> Convert(const std::string& name,
 }
 
 }  // namespace mesh
-}  // namespace maliput
+}  // namespace delphyne

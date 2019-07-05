@@ -2,6 +2,8 @@
 
 #include "render_maliput_widget.hh"
 
+#include <maliput-utilities/generate_obj.h>
+
 #include <ignition/common/Console.hh>
 #include <ignition/common/MeshManager.hh>
 #include <ignition/common/PluginMacros.hh>
@@ -239,18 +241,18 @@ void RenderMaliputWidget::CreateRoadRootVisual() {
 
 /////////////////////////////////////////////////
 bool RenderMaliputWidget::FillMaterial(
-  const maliput::mesh::Material* _maliputMaterial,
+  const ::maliput::utility::Material* _maliputMaterial,
   ignition::rendering::MaterialPtr& _ignitionMaterial) const {
   if (!_maliputMaterial) {
     return false;
   }
 
-  _ignitionMaterial->SetDiffuse(_maliputMaterial->diffuse.X(),
-    _maliputMaterial->diffuse.Y(), _maliputMaterial->diffuse.Z());
-  _ignitionMaterial->SetAmbient(_maliputMaterial->ambient.X(),
-    _maliputMaterial->ambient.Y(), _maliputMaterial->ambient.Z());
-  _ignitionMaterial->SetSpecular(_maliputMaterial->specular.X(),
-    _maliputMaterial->specular.Y(), _maliputMaterial->specular.Z());
+  _ignitionMaterial->SetDiffuse(_maliputMaterial->diffuse(0, 0),
+    _maliputMaterial->diffuse(1, 0), _maliputMaterial->diffuse(2, 0));
+  _ignitionMaterial->SetAmbient(_maliputMaterial->ambient(0, 0),
+    _maliputMaterial->ambient(1, 0), _maliputMaterial->ambient(2, 0));
+  _ignitionMaterial->SetSpecular(_maliputMaterial->specular(0, 0),
+    _maliputMaterial->specular(1, 0), _maliputMaterial->specular(2, 0));
   _ignitionMaterial->SetShininess(_maliputMaterial->shinines);
   _ignitionMaterial->SetTransparency(_maliputMaterial->transparency);
 

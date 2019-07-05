@@ -8,6 +8,8 @@
 #include <ignition/common/Console.hh>
 #include <multilane/loader.h>
 #include <delphyne/maliput/road_builder.h>
+#include <maliput-utilities/generate_obj.h>
+#include <maliput-utilities/mesh.h>
 
 #include "maliput_mesh_builder.hh"
 
@@ -26,9 +28,8 @@ bool MaliputViewerModel::Load(const std::string& _maliputFilePath) {
   ignmsg << "Loaded [" << _maliputFilePath << "] maliput file." << std::endl;
   ignmsg << "Loading RoadGeometry meshes of "
          << rg->id().string() << std::endl;
-  std::map<std::string, ::maliput::mesh::GeoMesh> geoMeshes =
-      ::maliput::mesh::BuildMeshes(rg,
-                                        ::maliput::mesh::Features());
+  std::unordered_map<std::string, ::maliput::utility::mesh::GeoMesh> geoMeshes =
+      ::maliput::utility::BuildMeshes(rg, ::maliput::utility::ObjFeatures());
   ignmsg << "Meshes loaded." << std::endl;
   this->ConvertMeshes(geoMeshes);
   ignmsg << "Meshes converted to ignition type." << std::endl;
@@ -87,7 +88,7 @@ void MaliputViewerModel::LoadRoadGeometry(const std::string& _maliputFilePath) {
 
 /////////////////////////////////////////////////
 void MaliputViewerModel::ConvertMeshes(
-  const std::map<std::string, ::maliput::mesh::GeoMesh>& _geoMeshes) {
+  const std::unordered_map<std::string, ::maliput::utility::mesh::GeoMesh>& _geoMeshes) {
   for (const auto& it : _geoMeshes) {
     auto maliputMesh = std::make_unique<MaliputMesh>();
     // Converts from drake to ignition mesh and sets the state.
@@ -102,7 +103,7 @@ void MaliputViewerModel::ConvertMeshes(
       maliputMesh->visible = true;
     }
     // Retrieves the material
-    maliputMesh->material = ::maliput::mesh::GetMaterialByName(it.first);
+    maliputMesh->material = ::maliput::utility::GetMaterialByName(it.first);
 
     this->maliputMeshes[it.first] = std::move(maliputMesh);
   }

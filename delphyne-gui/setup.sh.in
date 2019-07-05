@@ -1,6 +1,4 @@
 #!/bin/sh
-# The setup script for Delphyne-gui.
-INSTALL_PREFIX=@CMAKE_INSTALL_PREFIX@
 
 # A function to add a new item (needle) to the passed environment variable, only
 # if the new item is not already in the environment variable.  The function
@@ -54,7 +52,10 @@ add_if_not_in_var() {
 
 # Path to various resources used by shell/python scripts and demos
 #   e.g. configuration files, protos, road geometries
-add_if_not_in_var DELPHYNE_GUI_RESOURCE_ROOT $INSTALL_PREFIX/share/delphyne
+add_if_not_in_var DELPHYNE_GUI_RESOURCE_ROOT $AMENT_CURRENT_PREFIX/share/delphyne
+
+# Path to visualizer plugins
+add_if_not_in_var VISUALIZER_PLUGIN_PATH $AMENT_CURRENT_PREFIX/lib
 
 # Path to display plugins
-add_if_not_in_var IGN_GUI_DISPLAY_PLUGIN_PATH $INSTALL_PREFIX/lib
+add_if_not_in_var IGN_GUI_DISPLAY_PLUGIN_PATH $AMENT_CURRENT_PREFIX/lib

@@ -9,7 +9,7 @@ The dragway demo.
 # Imports
 ##############################################################################
 
-import delphyne.maliput as maliput
+import delphyne.roads as delphyne_roads
 import delphyne.simulation as simulation
 import delphyne.utilities as utilities
 
@@ -42,7 +42,7 @@ def main():
     builder = simulation.AgentSimulationBuilder()
 
     dragway = builder.set_road_geometry(
-        maliput.create_dragway(
+        delphyne_roads.create_dragway(
             name="Automotive Demo Dragway",
             num_lanes=4,
             length=100.0,

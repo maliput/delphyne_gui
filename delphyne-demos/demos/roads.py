@@ -12,7 +12,7 @@ Load a simulation with one of a few sample maliput road networks.
 import os
 import sys
 
-import delphyne.maliput as maliput
+import delphyne.roads as delphyne_roads
 import delphyne.simulation as simulation
 
 from delphyne_gui.utilities import launch_interactive_simulation
@@ -106,7 +106,7 @@ def main():
 
     if args.road_type == "dragway":
         builder.set_road_geometry(
-            maliput.create_dragway(
+            delphyne_roads.create_dragway(
                 name="Demo Dragway",
                 num_lanes=args.lanes,
                 length=args.length,
@@ -116,11 +116,11 @@ def main():
             )
         )
     elif args.road_type == "onramp":
-        builder.set_road_geometry(maliput.create_on_ramp())
+        builder.set_road_geometry(delphyne_roads.create_on_ramp())
     elif args.road_type == "multilane":
         try:
             builder.set_road_geometry(
-                maliput.create_multilane_from_file(
+                delphyne_roads.create_multilane_from_file(
                     file_path=args.filename
                 )
             )
@@ -132,7 +132,7 @@ def main():
     elif args.road_type == "malidrive":
         try:
             builder.set_road_network(
-                maliput.create_malidrive_from_file(
+                delphyne_roads.create_malidrive_from_file(
                     name=args.name,
                     file_path=args.filename
                 )

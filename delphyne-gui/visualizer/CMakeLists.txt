@@ -65,7 +65,7 @@ target_link_libraries(${maliput_viewer_widget}
   ${maliput_mesh}
   ${Qt5Core_LIBRARIES}
   ${Qt5Widgets_LIBRARIES}
-  delphyne::maliput_utilities
+  delphyne::roads_utilities
   maliput::api
   multilane::multilane
   maliput-utilities::maliput-utilities

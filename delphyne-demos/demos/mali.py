@@ -12,7 +12,7 @@ The mali demo.
 
 import os.path
 
-import delphyne.maliput as maliput
+import delphyne.roads as delphyne_roads
 import delphyne.simulation as simulation
 import delphyne.utilities as utilities
 
@@ -150,7 +150,7 @@ def main():
         print("Unknown road {}.".format(args.road_name))
         quit()
 
-    features = maliput.ObjFeatures()
+    features = delphyne_roads.ObjFeatures()
     features.draw_arrows = True
     features.draw_elevation_bounds = False
     features.draw_stripes = True
@@ -159,7 +159,7 @@ def main():
 
     # The road network
     road_network = builder.set_road_network(
-        maliput.create_malidrive_from_file(
+        delphyne_roads.create_malidrive_from_file(
             name=os.path.splitext(
                 os.path.basename(road['file_path'])
             )[0], file_path=road['file_path']

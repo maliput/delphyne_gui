@@ -247,12 +247,12 @@ bool RenderMaliputWidget::FillMaterial(
     return false;
   }
 
-  _ignitionMaterial->SetDiffuse(_maliputMaterial->diffuse(0, 0),
-    _maliputMaterial->diffuse(1, 0), _maliputMaterial->diffuse(2, 0));
-  _ignitionMaterial->SetAmbient(_maliputMaterial->ambient(0, 0),
-    _maliputMaterial->ambient(1, 0), _maliputMaterial->ambient(2, 0));
-  _ignitionMaterial->SetSpecular(_maliputMaterial->specular(0, 0),
-    _maliputMaterial->specular(1, 0), _maliputMaterial->specular(2, 0));
+  _ignitionMaterial->SetDiffuse(_maliputMaterial->diffuse.x(),
+    _maliputMaterial->diffuse.y(), _maliputMaterial->diffuse.z());
+  _ignitionMaterial->SetAmbient(_maliputMaterial->ambient.x(),
+    _maliputMaterial->ambient.y(), _maliputMaterial->ambient.z());
+  _ignitionMaterial->SetSpecular(_maliputMaterial->specular.x(),
+    _maliputMaterial->specular.y(), _maliputMaterial->specular.z());
   _ignitionMaterial->SetShininess(_maliputMaterial->shinines);
   _ignitionMaterial->SetTransparency(_maliputMaterial->transparency);
 

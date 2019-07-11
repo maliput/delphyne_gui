@@ -29,8 +29,7 @@ class MaliputMesh {
   /// \brief Holds a pointer to the mesh.
   std::unique_ptr<ignition::common::Mesh> mesh{};
 
-  /// \brief Holds a pointer to the material information. Note that this is
-  /// defined on MaliputMeshBuilder.hh
+  /// \brief Holds a pointer to the material information.
   std::unique_ptr<maliput::utility::Material> material{};
 };
 
@@ -115,7 +114,8 @@ class MaliputViewerModel {
   /// \brief Converts @p _geoMeshes into a
   ///        std::map<std::string, std::unique_ptr<ignition::common::Mesh>>
   ///        filling the instance variable meshes.
-  /// \param[in] _geoMeshes A map of std::string <--> GeoMesh objects to
+  /// \param[in] _geoMeshes A unordered_map of
+  /// std::string <--> GeoMesh objects to
   ///            cd /convert.
   void ConvertMeshes(
     const std::unordered_map<std::string,

@@ -414,6 +414,7 @@ ignition::rendering::VisualPtr RenderWidget::RenderMesh(
   ignition::math::Vector3d minXYZ;
   ignition::math::Vector3d maxXYZ;
   descriptor.mesh->AABB(center, minXYZ, maxXYZ);
+  /* Position from messages have the world coordinates of the mesh. */
   minBBScene = ignition::math::Vector3d(
     std::min(minXYZ.X() + _vis.pose().position().x(), minBBScene.X()),
     std::min(minXYZ.Y() + _vis.pose().position().y(), minBBScene.Y()),
@@ -453,16 +454,16 @@ void RenderWidget::SetInitialScene(const ignition::msgs::Scene& _msg) {
   const double sphereRadius = center.Distance(minBBScene);
   const double fov = this->camera->HFOV().Radian();
   /* Angle from the origin of the sphere. */
-  constexpr double kElevation = IGN_PI/180.0 * 75.0;
+  constexpr double kInclinationAngle = IGN_PI/180.0 * 75.0;
   /* Get distance required for camera to see a sphere where the center
   of the sphere is the center of the bounding box */
   const double distance = sphereRadius / tan(fov / 2.0);
-  const double azimuth = atan(
+  const double azimuthAngle = atan(
     (maxBBScene.X() - minBBScene.X())/(maxBBScene.Y() - minBBScene.Y()));
   this->camera->SetWorldPosition(ignition::math::Vector3d(
-    center.X() + distance * sin(kElevation) * cos(azimuth),
-    center.Y() + distance * sin(kElevation) * sin(azimuth),
-    center.Z() + distance * cos(kElevation)));
+    center.X() + distance * sin(kInclinationAngle) * cos(azimuthAngle),
+    center.Y() + distance * sin(kInclinationAngle) * sin(azimuthAngle),
+    center.Z() + distance * cos(kInclinationAngle)));
   this->camera->SetWorldRotation(
     ignition::math::Matrix4d::LookAt(
       this->camera->WorldPosition(), center).Pose().Rot());

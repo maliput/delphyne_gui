@@ -453,13 +453,13 @@ void RenderWidget::SetInitialScene(const ignition::msgs::Scene& _msg) {
 
   const double sphereRadius = center.Distance(minBBScene);
   const double fov = this->camera->HFOV().Radian();
-  /* Angle from the origin of the sphere. */
-  constexpr double kInclinationAngle = IGN_PI/180.0 * 75.0;
-  /* Get distance required for camera to see a sphere where the center
-  of the sphere is the center of the bounding box */
-  const double distance = sphereRadius / tan(fov / 2.0);
-  const double azimuthAngle = atan(
-    (maxBBScene.X() - minBBScene.X())/(maxBBScene.Y() - minBBScene.Y()));
+  // Angle from the origin of the sphere.
+  constexpr double kInclinationAngle = IGN_PI/180.0 * 60.0;
+  // Get camera distance required for a sphere circumscribing the scene
+  // bounding box to fit withing the camera horizontal FOV.
+  const double distance = sphereRadius / sin(fov / 2.0);
+  const double azimuthAngle = atan((maxBBScene.X() - minBBScene.X())/
+                                   (maxBBScene.Y() - minBBScene.Y()));
   this->camera->SetWorldPosition(ignition::math::Vector3d(
     center.X() + distance * sin(kInclinationAngle) * cos(azimuthAngle),
     center.Y() + distance * sin(kInclinationAngle) * sin(azimuthAngle),

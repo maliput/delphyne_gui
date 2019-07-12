@@ -7,7 +7,7 @@
 
 #include <ignition/common/Console.hh>
 #include <multilane/loader.h>
-#include <delphyne/maliput/road_builder.h>
+#include <delphyne/roads/road_builder.h>
 #include <maliput-utilities/generate_obj.h>
 #include <maliput-utilities/mesh.h>
 

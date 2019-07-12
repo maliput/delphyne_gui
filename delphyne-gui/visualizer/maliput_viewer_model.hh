@@ -114,9 +114,7 @@ class MaliputViewerModel {
   /// \brief Converts @p _geoMeshes into a
   ///        std::map<std::string, std::unique_ptr<ignition::common::Mesh>>
   ///        filling the instance variable meshes.
-  /// \param[in] _geoMeshes A unordered_map of
-  /// std::string <--> GeoMesh objects to
-  ///            cd /convert.
+  /// \param[in] _geoMeshes An named collection of GeoMesh objects to convert.
   void ConvertMeshes(
     const std::unordered_map<std::string,
                              maliput::utility::mesh::GeoMesh>& _geoMeshes);

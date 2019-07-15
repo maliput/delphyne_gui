@@ -103,7 +103,8 @@ void MaliputViewerModel::ConvertMeshes(
       maliputMesh->visible = true;
     }
     // Retrieves the material
-    maliputMesh->material = maliput::utility::GetMaterialByName(it.first);
+    maliputMesh->material = std::make_unique<maliput::utility::Material>(
+      maliput::utility::GetMaterialByName(it.first));
 
     this->maliputMeshes[it.first] = std::move(maliputMesh);
   }

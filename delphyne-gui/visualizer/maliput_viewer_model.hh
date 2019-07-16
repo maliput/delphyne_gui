@@ -116,7 +116,7 @@ class MaliputViewerModel {
   ///        filling the instance variable meshes.
   /// \param[in] _geoMeshes An named collection of GeoMesh objects to convert.
   void ConvertMeshes(
-    const std::unordered_map<std::string,
+    const std::map<std::string,
                              maliput::utility::mesh::GeoMesh>& _geoMeshes);
 
   /// \brief Populates this->labels map with this->roadGeometry lane and branch

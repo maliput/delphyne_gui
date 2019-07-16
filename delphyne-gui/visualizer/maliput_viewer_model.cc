@@ -3,6 +3,7 @@
 #include "maliput_viewer_model.hh"
 
 #include <iostream>
+#include <map>
 #include <string>
 
 #include <ignition/common/Console.hh>
@@ -28,7 +29,7 @@ bool MaliputViewerModel::Load(const std::string& _maliputFilePath) {
   ignmsg << "Loaded [" << _maliputFilePath << "] maliput file." << std::endl;
   ignmsg << "Loading RoadGeometry meshes of "
          << rg->id().string() << std::endl;
-  std::unordered_map<std::string, maliput::utility::mesh::GeoMesh> geoMeshes =
+  std::map<std::string, maliput::utility::mesh::GeoMesh> geoMeshes =
       maliput::utility::BuildMeshes(rg, maliput::utility::ObjFeatures());
   ignmsg << "Meshes loaded." << std::endl;
   this->ConvertMeshes(geoMeshes);
@@ -88,7 +89,7 @@ void MaliputViewerModel::LoadRoadGeometry(const std::string& _maliputFilePath) {
 
 /////////////////////////////////////////////////
 void MaliputViewerModel::ConvertMeshes(
-  const std::unordered_map<std::string, maliput::utility::mesh::GeoMesh>& _geoMeshes) {
+  const std::map<std::string, maliput::utility::mesh::GeoMesh>& _geoMeshes) {
   for (const auto& it : _geoMeshes) {
     auto maliputMesh = std::make_unique<MaliputMesh>();
     // Converts from drake to ignition mesh and sets the state.

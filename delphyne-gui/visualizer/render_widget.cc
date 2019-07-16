@@ -456,7 +456,7 @@ void RenderWidget::SetInitialScene(const ignition::msgs::Scene& _msg) {
   // Angle from the origin of the sphere.
   constexpr double kInclinationAngle = IGN_PI/180.0 * 60.0;
   // Get camera distance required for a sphere circumscribing the scene
-  // bounding box to fit withing the camera horizontal FOV.
+  // bounding box to fit within the camera horizontal FOV.
   const double distance = sphereRadius / sin(fov / 2.0);
   const double azimuthAngle = atan((maxBBScene.X() - minBBScene.X())/
                                    (maxBBScene.Y() - minBBScene.Y()));

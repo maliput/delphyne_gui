@@ -17,11 +17,14 @@
 #include <ignition/common/SystemPaths.hh>
 #include <ignition/gui/Iface.hh>
 #include <ignition/gui/Plugin.hh>
+#include <ignition/math/Angle.hh>
 #include <ignition/math/Color.hh>
 #include <ignition/math/Helpers.hh>
 #include <ignition/math/Pose3.hh>
 #include <ignition/math/Vector3.hh>
+#include <ignition/math/Vector4.hh>
 #include <ignition/msgs.hh>
+#include <ignition/msgs/Utility.hh>
 #include <ignition/rendering/Camera.hh>
 #include <ignition/rendering/Light.hh>
 #include <ignition/rendering/Material.hh>
@@ -407,6 +410,20 @@ ignition::rendering::VisualPtr RenderWidget::RenderMesh(
 
   ignition::rendering::MeshPtr meshGeom = this->scene->CreateMesh(descriptor);
   mesh->AddGeometry(meshGeom);
+  ignition::math::Vector3d center;
+  ignition::math::Vector3d minXYZ;
+  ignition::math::Vector3d maxXYZ;
+  descriptor.mesh->AABB(center, minXYZ, maxXYZ);
+  /* Position from messages have the world coordinates of the mesh. */
+  minBBScene = ignition::math::Vector3d(
+    std::min(minXYZ.X() + _vis.pose().position().x(), minBBScene.X()),
+    std::min(minXYZ.Y() + _vis.pose().position().y(), minBBScene.Y()),
+    std::min(minXYZ.Z() + _vis.pose().position().z(), minBBScene.Z()));
+  maxBBScene = ignition::math::Vector3d(
+    std::max(maxXYZ.X() + _vis.pose().position().x(), maxBBScene.X()),
+    std::max(maxXYZ.Y() + _vis.pose().position().y(), maxBBScene.Y()),
+    std::max(maxXYZ.Z() + _vis.pose().position().z(), maxBBScene.Z()));
+
   if (mesh_uri.Query().Str().find("culling=off") != std::string::npos) {
     DELPHYNE_VALIDATE(mesh->GeometryCount() == 1, std::runtime_error,
                     "Expected one geometry.");
@@ -428,6 +445,28 @@ void RenderWidget::SetInitialScene(const ignition::msgs::Scene& _msg) {
   for (int i = 0; i < _msg.model_size(); ++i) {
     LoadModel(_msg.model(i));
   }
+
+  ignition::math::Vector3d center(
+    (minBBScene.X() + maxBBScene.X())/2.0,
+    (minBBScene.Y() + maxBBScene.Y())/2.0,
+    (minBBScene.Z() + maxBBScene.Z())/2.0);
+
+  const double sphereRadius = center.Distance(minBBScene);
+  const double fov = this->camera->HFOV().Radian();
+  // Angle from the origin of the sphere.
+  constexpr double kInclinationAngle = IGN_PI/180.0 * 60.0;
+  // Get camera distance required for a sphere circumscribing the scene
+  // bounding box to fit within the camera horizontal FOV.
+  const double distance = sphereRadius / sin(fov / 2.0);
+  const double azimuthAngle = atan((maxBBScene.X() - minBBScene.X())/
+                                   (maxBBScene.Y() - minBBScene.Y()));
+  this->camera->SetWorldPosition(ignition::math::Vector3d(
+    center.X() + distance * sin(kInclinationAngle) * cos(azimuthAngle),
+    center.Y() + distance * sin(kInclinationAngle) * sin(azimuthAngle),
+    center.Z() + distance * cos(kInclinationAngle)));
+  this->camera->SetWorldRotation(
+    ignition::math::Matrix4d::LookAt(
+      this->camera->WorldPosition(), center).Pose().Rot());
 
   this->node.Subscribe("visualizer/scene_update", &RenderWidget::OnUpdateScene,
                        this);

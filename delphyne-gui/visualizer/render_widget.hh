@@ -247,6 +247,12 @@ class RenderWidget : public ignition::gui::Plugin {
   /// \brief Store all the user settings.
   UserSettings userSettings;
 
+  /// \brief Min bounding box of the whole scene
+  ignition::math::Vector3d minBBScene;
+
+  /// \brief Max bounding box of the whole scene
+  ignition::math::Vector3d maxBBScene;
+
   /// \brief Are we casting shadows by default?
   bool kCastShadowsByDefault{true};
 };

@@ -117,7 +117,8 @@ class MaliputViewerModel {
   /// \param[in] _geoMeshes An named collection of GeoMesh objects to convert.
   void ConvertMeshes(
     const std::map<std::string,
-                             maliput::utility::mesh::GeoMesh>& _geoMeshes);
+      std::pair<maliput::utility::mesh::GeoMesh,
+                maliput::utility::Material>>& _geoMeshes);
 
   /// \brief Populates this->labels map with this->roadGeometry lane and branch
   ///        point IDs.

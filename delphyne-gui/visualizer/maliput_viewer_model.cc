@@ -29,8 +29,10 @@ bool MaliputViewerModel::Load(const std::string& _maliputFilePath) {
   ignmsg << "Loaded [" << _maliputFilePath << "] maliput file." << std::endl;
   ignmsg << "Loading RoadGeometry meshes of "
          << rg->id().string() << std::endl;
-  std::map<std::string, maliput::utility::mesh::GeoMesh> geoMeshes =
-      maliput::utility::BuildMeshes(rg, maliput::utility::ObjFeatures());
+  std::map<std::string,
+    std::pair<maliput::utility::mesh::GeoMesh,
+              maliput::utility::Material>> geoMeshes =
+    maliput::utility::BuildMeshes(rg, maliput::utility::ObjFeatures());
   ignmsg << "Meshes loaded." << std::endl;
   this->ConvertMeshes(geoMeshes);
   ignmsg << "Meshes converted to ignition type." << std::endl;
@@ -89,11 +91,13 @@ void MaliputViewerModel::LoadRoadGeometry(const std::string& _maliputFilePath) {
 
 /////////////////////////////////////////////////
 void MaliputViewerModel::ConvertMeshes(
-  const std::map<std::string, maliput::utility::mesh::GeoMesh>& _geoMeshes) {
+  const std::map<std::string,
+    std::pair<maliput::utility::mesh::GeoMesh,
+              maliput::utility::Material>>& _geoMeshes) {
   for (const auto& it : _geoMeshes) {
     auto maliputMesh = std::make_unique<MaliputMesh>();
     // Converts from drake to ignition mesh and sets the state.
-    maliputMesh->mesh = delphyne::mesh::Convert(it.first, it.second);
+    maliputMesh->mesh = delphyne::mesh::Convert(it.first, it.second.first);
     if (maliputMesh->mesh == nullptr) {
       ignmsg << "Skipping mesh [" << it.first << "] because it is empty.\n";
       maliputMesh->enabled = false;
@@ -105,7 +109,7 @@ void MaliputViewerModel::ConvertMeshes(
     }
     // Retrieves the material
     maliputMesh->material = std::make_unique<maliput::utility::Material>(
-      maliput::utility::GetMaterialByName(it.first));
+      it.second.second);
 
     this->maliputMeshes[it.first] = std::move(maliputMesh);
   }

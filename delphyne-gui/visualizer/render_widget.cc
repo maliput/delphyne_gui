@@ -151,6 +151,13 @@ RenderWidget::~RenderWidget() {
     // For right now, disable this, but we should debug this and re-enable this
     // cleanup.
     // this->engine->Fini();
+    this->orbitViewControl.reset();
+    this->camera->RemoveChildren();
+    this->camera.reset();
+    this->mainDirectionalLight.reset();
+    this->scene->DestroyNodes();
+    this->scene->DestroySensors();
+    this->scene.reset();
   }
 }
 
@@ -428,7 +435,8 @@ ignition::rendering::VisualPtr RenderWidget::RenderMesh(
     DELPHYNE_VALIDATE(mesh->GeometryCount() == 1, std::runtime_error,
                     "Expected one geometry.");
     auto subMesh = mesh->GeometryByIndex(0);
-    subMesh->Material()->SetCulling(ignition::rendering::CullMode::CM_NONE);
+    /* TODO: Enable once ignition-rendering2 supports culling
+    subMesh->Material()->SetCulling(ignition::rendering::CullMode::CM_NONE);*/
   }
 
   setPoseFromMessage(_vis, mesh);
@@ -628,11 +636,16 @@ void RenderWidget::CreateRenderWindow() {
     return;
   }
 
-  // Create sample scene
-  this->scene = engine->CreateScene("scene");
-  if (!this->scene) {
-    ignerr << "Failed to create scene" << std::endl;
-    return;
+  // Try to reutilize the scene if exists
+  this->scene = engine->SceneByName("scene");
+  if (!this->scene)
+  {
+    // Create a scene
+    this->scene = engine->CreateScene("scene");
+    if (!this->scene) {
+      ignerr << "Failed to create scene" << std::endl;
+      return;
+    }
   }
 
   // Lights.

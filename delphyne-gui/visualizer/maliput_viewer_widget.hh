@@ -11,7 +11,6 @@
 #include <ignition/gui/Plugin.hh>
 
 #include "layer_selection_widget.hh"
-#include "maliput_mesh.hh"
 #include "maliput_viewer_model.hh"
 #include "render_maliput_widget.hh"
 

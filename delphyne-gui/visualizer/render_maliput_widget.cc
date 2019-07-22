@@ -26,6 +26,8 @@
 #include <ignition/rendering/Scene.hh>
 #include <ignition/rendering/Text.hh>
 
+#include <maliput-utilities/generate_obj.h>
+
 using namespace delphyne;
 using namespace gui;
 
@@ -239,18 +241,18 @@ void RenderMaliputWidget::CreateRoadRootVisual() {
 
 /////////////////////////////////////////////////
 bool RenderMaliputWidget::FillMaterial(
-  const maliput::mesh::Material* _maliputMaterial,
+  const maliput::utility::Material* _maliputMaterial,
   ignition::rendering::MaterialPtr& _ignitionMaterial) const {
   if (!_maliputMaterial) {
     return false;
   }
 
-  _ignitionMaterial->SetDiffuse(_maliputMaterial->diffuse.X(),
-    _maliputMaterial->diffuse.Y(), _maliputMaterial->diffuse.Z());
-  _ignitionMaterial->SetAmbient(_maliputMaterial->ambient.X(),
-    _maliputMaterial->ambient.Y(), _maliputMaterial->ambient.Z());
-  _ignitionMaterial->SetSpecular(_maliputMaterial->specular.X(),
-    _maliputMaterial->specular.Y(), _maliputMaterial->specular.Z());
+  _ignitionMaterial->SetDiffuse(_maliputMaterial->diffuse.x(),
+    _maliputMaterial->diffuse.y(), _maliputMaterial->diffuse.z());
+  _ignitionMaterial->SetAmbient(_maliputMaterial->ambient.x(),
+    _maliputMaterial->ambient.y(), _maliputMaterial->ambient.z());
+  _ignitionMaterial->SetSpecular(_maliputMaterial->specular.x(),
+    _maliputMaterial->specular.y(), _maliputMaterial->specular.z());
   _ignitionMaterial->SetShininess(_maliputMaterial->shinines);
   _ignitionMaterial->SetTransparency(_maliputMaterial->transparency);
 

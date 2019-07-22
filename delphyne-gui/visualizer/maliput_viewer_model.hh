@@ -9,11 +9,10 @@
 
 #include <maliput/api/road_geometry.h>
 #include <maliput/api/road_network.h>
+#include <maliput-utilities/generate_obj.h>
+#include <maliput-utilities/mesh.h>
 
 #include <ignition/common/Mesh.hh>
-
-#include "maliput_mesh.hh"
-#include "maliput_mesh_builder.hh"
 
 namespace delphyne {
 namespace gui {
@@ -30,9 +29,8 @@ class MaliputMesh {
   /// \brief Holds a pointer to the mesh.
   std::unique_ptr<ignition::common::Mesh> mesh{};
 
-  /// \brief Holds a pointer to the material information. Note that this is
-  /// defined on MaliputMeshBuilder.hh
-  std::unique_ptr<maliput::mesh::Material> material{};
+  /// \brief Holds a pointer to the material information.
+  std::unique_ptr<maliput::utility::Material> material{};
 };
 
 /// \brief Holds the information to build a label.
@@ -116,10 +114,11 @@ class MaliputViewerModel {
   /// \brief Converts @p _geoMeshes into a
   ///        std::map<std::string, std::unique_ptr<ignition::common::Mesh>>
   ///        filling the instance variable meshes.
-  /// \param[in] _geoMeshes A map of std::string <--> GeoMesh objects to
-  ///            cd /convert.
+  /// \param[in] _geoMeshes An named collection of GeoMesh objects to convert.
   void ConvertMeshes(
-    const std::map<std::string, maliput::mesh::GeoMesh>& _geoMeshes);
+    const std::map<std::string,
+      std::pair<maliput::utility::mesh::GeoMesh,
+                maliput::utility::Material>>& _geoMeshes);
 
   /// \brief Populates this->labels map with this->roadGeometry lane and branch
   ///        point IDs.

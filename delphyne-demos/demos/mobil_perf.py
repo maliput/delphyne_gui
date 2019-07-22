@@ -11,7 +11,7 @@ The performance benchmark demo.
 
 import math
 
-import delphyne.maliput as maliput
+import delphyne.roads as delphyne_roads
 import delphyne.simulation as simulation
 import delphyne.utilities
 import delphyne_gui.utilities
@@ -44,7 +44,7 @@ def curved_lanes(args):
 
     # Loads Multilane road.
     road = builder.set_road_geometry(
-        maliput.create_multilane_from_file(
+        delphyne_roads.create_multilane_from_file(
             file_path=delphyne_gui.utilities.get_delphyne_gui_resource(
                 'roads/curved_lanes.yaml'
             )
@@ -91,7 +91,7 @@ def straight_lanes(args):
 
     # Loads Multilane road.
     road = builder.set_road_geometry(
-        maliput.create_multilane_from_file(
+        delphyne_roads.create_multilane_from_file(
             file_path=delphyne_gui.utilities.get_delphyne_resource(
                 '/roads/straight_lanes.yaml'
             )
@@ -132,7 +132,7 @@ def dragway(args):
     builder = simulation.AgentSimulationBuilder()
 
     road = builder.set_road_geometry(
-        maliput.create_dragway(
+        delphyne_roads.create_dragway(
             name="dragway",
             num_lanes=4,
             length=100.0,  # m

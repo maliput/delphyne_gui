@@ -21,7 +21,7 @@ import os.path
 import random
 import time
 
-import delphyne.maliput as maliput
+import delphyne.roads as delphyne_roads
 import delphyne.simulation as simulation
 import delphyne.utilities
 import delphyne_gui.utilities
@@ -138,7 +138,7 @@ def main():
 
     # The road geometry
     road_geometry = builder.set_road_geometry(
-        maliput.create_multilane_from_file(
+        delphyne_roads.create_multilane_from_file(
             file_path=filename
         )
     )

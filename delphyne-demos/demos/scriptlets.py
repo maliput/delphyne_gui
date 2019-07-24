@@ -21,12 +21,11 @@ import os.path
 import random
 import time
 
-import delphyne.roads as delphyne_roads
-import delphyne.simulation as simulation
-import delphyne.utilities
-import delphyne_gui.utilities
+import delphyne.trees
+import delphyne.behaviours
+import delphyne.decorators
 
-from delphyne_gui.utilities import launch_interactive_simulation
+import delphyne_gui.utilities
 
 from . import helpers
 
@@ -75,8 +74,16 @@ class SimulationStats(object):
             self.reset()
         self.start()
 
+    def pos_tick_handler(self, behaviour_tree):
+        if self._current_start_time is None:
+            self.start()
+        else:
+            self.record_tick()
 
-def random_print():
+'''
+behaviour_tree parameter is necessary to add it as a pos/pre tick handler
+'''
+def random_print(behaviour_tree):
     """Print a message at random, roughly every 500 calls"""
     if random.randint(1, 500) == 1:
         print("One in five hundred")
@@ -99,21 +106,27 @@ class TimeMonitor(object):
     A class to monitor the time on every callback and perform an action after
     ten seconds have elapsed.
     '''
-    def __init__(self, sim, agent):
-        self.simulation = sim
-        self.agent = agent
+    def __init__(self):
+        self.simulation = None
         self.changed_speed = False
 
-    def check_tick(self):
+    def set_simulation(self, simulation):
+        self.simulation = simulation
+
+    '''
+    Method required and called from the decorator.
+    '''
+    def do_action(self, decorated):
         '''
         The callback called on every simulator iteration.  It checks
         to see if the elapsed simulator_time is greater than 10 seconds, and
         once it is, it changes the speed of the agent.
         '''
-        if self.simulation.get_current_time() >= 10.0 \
+        if self.simulation is not None \
+           and self.simulation.get_current_time() >= 5.0 \
            and not self.changed_speed:
-            self.agent.set_speed(20.0)
-            self.changed_speed = True
+            self.simulation.get_mutable_agent_by_name(
+                decorated.name).set_speed(20.0)
 
 
 ##############################################################################
@@ -125,8 +138,6 @@ def main():
     """Keeping pylint entertained."""
     args = parse_arguments()
 
-    builder = simulation.AgentSimulationBuilder()
-
     filename = delphyne_gui.utilities.get_delphyne_gui_resource(
         'roads/circuit.yaml')
 
@@ -136,66 +147,60 @@ def main():
               .format(os.path.abspath(filename)))
         quit()
 
-    # The road geometry
-    road_geometry = builder.set_road_geometry(
-        delphyne_roads.create_multilane_from_file(
-            file_path=filename
+    scenario_subtree = delphyne.behaviours.maliput.Multilane(
+        file_path=filename,
+        name="circuit"
+    )
+
+    monitor = TimeMonitor()
+
+    rail_car = delphyne.behaviours.agents.RailCar(
+            name='rail0',
+            lane_id='l:s1_1',
+            longitudinal_position=0.0,
+            lateral_offset=0.0,
+            speed=4.0
         )
+    decorator = delphyne.decorators.additional_action.AdditionalAction(
+        child=rail_car, conditional_object=monitor)
+
+    scenario_subtree.add_children([
+        delphyne.behaviours.agents.SimpleCar(
+            name='simple0',
+            initial_x=0.0,
+            initial_y=0.0
+        ),
+        decorator
+    ])
+
+    simulation_tree = delphyne.trees.BehaviourTree(
+        root=scenario_subtree
     )
 
-    simple_car_name = "simple0"
-    delphyne.utilities.add_simple_car(
-        builder,
-        name=simple_car_name,
-        position_x=0.0,
-        position_y=0.0
-    )
-
-    # Setup railcar
-    railcar_speed = 4.0  # (m/s)
-    railcar_s = 0.0      # (m)
-    rail_car_name = "rail0"
-    lane_1 = road_geometry.junction(2).segment(0).lane(0)
-    rail_car_blueprint = delphyne.utilities.add_rail_car(
-        builder,
-        name=rail_car_name,
-        lane=lane_1,
-        position=railcar_s,
-        offset=0.0,
-        speed=railcar_speed
-    )
-
-    runner = simulation.SimulationRunner(
-        simulation=builder.build(),
-        time_step=0.001,  # (secs)
+    simulation_tree.setup(
         realtime_rate=args.realtime_rate,
-        paused=args.paused,
-        log=args.log,
+        start_paused=args.paused,
         logfile_name=args.logfile_name
     )
 
-    running_simulation = runner.get_simulation()
-    rail_car = rail_car_blueprint.get_mutable_agent(running_simulation)
-    monitor = TimeMonitor(running_simulation, rail_car)
+    monitor.set_simulation(simulation_tree.runner.get_simulation())
+
+    time_step = 0.001
 
     stats = SimulationStats()
-    with launch_interactive_simulation(runner, bare=args.bare) as launcher:
-        # Add a callback to record and print statistics
-        runner.add_step_callback(stats.record_tick)
-
-        # Add a second callback that prints a message roughly every 500 calls
-        runner.add_step_callback(random_print)
-
-        # Add a third callback to check on the time elapsed and change speed
-        runner.add_step_callback(monitor.check_tick)
-
-        stats.start()
-
+    simulation_tree.add_pre_tick_handler(random_print)
+    simulation_tree.add_post_tick_handler(stats.pos_tick_handler)
+    with delphyne_gui.utilities.launch_interactive_simulation(
+            simulation_tree.runner, bare=args.bare) as launcher:
         if args.duration < 0:
             # run indefinitely
-            runner.start()
+            print("Running simulation indefinitely.")
+            simulation_tree.tick_tock(
+                period=time_step)
         else:
             # run for a finite time
             print("Running simulation for {0} seconds.".format(
                 args.duration))
-            runner.run_async_for(args.duration, launcher.terminate)
+            simulation_tree.tick_tock(
+                period=time_step,
+                number_of_iterations=args.duration/time_step)

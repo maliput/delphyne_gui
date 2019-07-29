@@ -75,10 +75,7 @@ class SimulationStats(object):
         self.start()
 
     def pos_tick_handler(self, behaviour_tree):
-        if self._current_start_time is None:
-            self.start()
-        else:
-            self.record_tick()
+        self.record_tick()
 
 '''
 behaviour_tree parameter is necessary to add it as a pos/pre tick handler
@@ -195,12 +192,14 @@ def main():
         if args.duration < 0:
             # run indefinitely
             print("Running simulation indefinitely.")
+            stats.start()
             simulation_tree.tick_tock(
                 period=time_step)
         else:
             # run for a finite time
             print("Running simulation for {0} seconds.".format(
                 args.duration))
+            stats.start()
             simulation_tree.tick_tock(
                 period=time_step,
                 number_of_iterations=args.duration/time_step)

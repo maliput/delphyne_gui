@@ -23,7 +23,10 @@ import time
 
 import delphyne.trees
 import delphyne.behaviours
-import delphyne.decorators
+import py_trees.behaviour
+import py_trees.blackboard
+import py_trees.common
+import py_trees.decorators
 
 import delphyne_gui.utilities
 
@@ -33,6 +36,29 @@ from . import helpers
 # Supporting Classes & Methods
 ##############################################################################
 
+
+class ChangeSpeed(py_trees.behaviour.Behaviour):
+
+    def __init__(self, parent_name, speed=1.0,
+                 name=py_trees.common.Name.AUTO_GENERATED):
+        super().__init__(name)
+        self.speed = speed
+        self.parent_name = parent_name
+
+    def initialise(self):
+        self.status = py_trees.common.Status.RUNNING
+
+    def update(self):
+        return self.status
+
+    def stop(self, new_status):
+        if self.status == py_trees.common.Status.RUNNING and \
+        new_status == py_trees.common.Status.INVALID:
+            blackboard = py_trees.blackboard.Blackboard()
+            parent_attributes = blackboard.get(self.parent_name)
+            parent_attributes["speed"] = self.speed
+            blackboard.set(self.parent_name, parent_attributes, True)
+            self.status = py_trees.common.Status.SUCCESS
 
 class SimulationStats(object):
     """This is a simple class to keep statistics of the simulation, just
@@ -98,34 +124,6 @@ callback (scriptlet) to be triggered at each tick of the simulation.
     return parser.parse_args()
 
 
-class TimeMonitor(object):
-    '''
-    A class to monitor the time on every callback and perform an action after
-    ten seconds have elapsed.
-    '''
-    def __init__(self):
-        self.simulation = None
-        self.changed_speed = False
-
-    def set_simulation(self, simulation):
-        self.simulation = simulation
-
-    '''
-    Method required and called from the decorator.
-    '''
-    def do_action(self, decorated):
-        '''
-        The callback called on every simulator iteration.  It checks
-        to see if the elapsed simulator_time is greater than 10 seconds, and
-        once it is, it changes the speed of the agent.
-        '''
-        if self.simulation is not None \
-           and self.simulation.get_current_time() >= 5.0 \
-           and not self.changed_speed:
-            self.simulation.get_mutable_agent_by_name(
-                decorated.name).set_speed(20.0)
-
-
 ##############################################################################
 # Main
 ##############################################################################
@@ -149,8 +147,6 @@ def main():
         name="circuit"
     )
 
-    monitor = TimeMonitor()
-
     rail_car = delphyne.behaviours.agents.RailCar(
             name='rail0',
             lane_id='l:s1_1',
@@ -158,8 +154,16 @@ def main():
             lateral_offset=0.0,
             speed=4.0
         )
-    decorator = delphyne.decorators.additional_action.AdditionalAction(
-        child=rail_car, conditional_object=monitor)
+
+    change_speed = ChangeSpeed('rail0', 20.0)
+
+    timeout_decorator = py_trees.decorators.Timeout(
+        child=change_speed,
+        duration=5.0)
+
+    one_shot_decorator = py_trees.decorators.OneShot(
+        child=timeout_decorator,
+        policy=py_trees.common.OneShotPolicy.ON_COMPLETION)
 
     scenario_subtree.add_children([
         delphyne.behaviours.agents.SimpleCar(
@@ -167,7 +171,8 @@ def main():
             initial_x=0.0,
             initial_y=0.0
         ),
-        decorator
+        rail_car,
+        one_shot_decorator
     ])
 
     simulation_tree = delphyne.trees.BehaviourTree(
@@ -179,8 +184,6 @@ def main():
         start_paused=args.paused,
         logfile_name=args.logfile_name
     )
-
-    monitor.set_simulation(simulation_tree.runner.get_simulation())
 
     time_step = 0.001
 

@@ -29,10 +29,12 @@ bool MaliputViewerModel::Load(const std::string& _maliputFilePath) {
   ignmsg << "Loaded [" << _maliputFilePath << "] maliput file." << std::endl;
   ignmsg << "Loading RoadGeometry meshes of "
          << rg->id().string() << std::endl;
+  maliput::utility::ObjFeatures features;
+  features.off_grid_mesh_generation = true;
   std::map<std::string,
     std::pair<maliput::utility::mesh::GeoMesh,
               maliput::utility::Material>> geoMeshes =
-    maliput::utility::BuildMeshes(rg, maliput::utility::ObjFeatures());
+    maliput::utility::BuildMeshes(rg, features);
   ignmsg << "Meshes loaded." << std::endl;
   this->ConvertMeshes(geoMeshes);
   ignmsg << "Meshes converted to ignition type." << std::endl;

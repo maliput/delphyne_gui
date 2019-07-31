@@ -12,9 +12,9 @@ The gazoo demo.
 
 import os.path
 
-import delphyne.roads as delphyne_roads
-import delphyne.simulation as simulation
-import delphyne.utilities
+import delphyne.trees
+import delphyne.behaviours
+import delphyne.decorators
 import delphyne_gui.utilities
 
 from delphyne_gui.utilities import launch_interactive_simulation
@@ -57,8 +57,6 @@ def main():
 
     mobil_cars_num = args.num_cars
 
-    builder = simulation.AgentSimulationBuilder()
-
     filename = delphyne_gui.utilities.get_delphyne_gui_resource(
         'roads/circuit.yaml')
 
@@ -68,60 +66,56 @@ def main():
               .format(os.path.abspath(filename)))
         quit()
 
-    features = delphyne_roads.ObjFeatures()
-    features.draw_arrows = True
-    features.draw_elevation_bounds = False
-    features.draw_stripes = True
-    features.draw_lane_haze = False
-    features.draw_branch_points = False
-
     # The road geometry
-    road_geometry = builder.set_road_geometry(
-        delphyne_roads.create_multilane_from_file(
-            file_path=filename
-        ), features
+    scenario_subtree = delphyne.behaviours.maliput.Multilane(
+        file_path=filename,
+        name="circuit",
     )
 
     # Setup railcar 1
     railcar_speed = 4.0  # (m/s)
     railcar_s = 0.0      # (m)
     robot_id = 1
-    lane_1 = road_geometry.junction(2).segment(0).lane(0)
-    delphyne.utilities.add_rail_car(
-        builder,
-        name=str(robot_id),
-        lane=lane_1,
-        position=railcar_s,
-        offset=0.0,
-        speed=railcar_speed
+    lane_1 = "l:s1_0"
+    
+    scenario_subtree.add_child(
+        delphyne.behaviours.agents.RailCar(
+            name=str(robot_id),
+            lane_id=lane_1,
+            longitudinal_position=railcar_s,
+            lateral_offset=0.0,
+            speed=railcar_speed
+        )        
     )
-
+    
     # Setup railcar 2
     railcar_speed = 8.0  # (m/s)
     railcar_s = 0.0      # (m)
     robot_id += 1
-    lane_2 = road_geometry.junction(2).segment(0).lane(1)
-    delphyne.utilities.add_rail_car(
-        builder,
-        name=str(robot_id),
-        lane=lane_2,
-        position=railcar_s,
-        offset=0.0,
-        speed=railcar_speed
+    lane_2 = "l:s1_1"
+    scenario_subtree.add_child(
+        delphyne.behaviours.agents.RailCar(
+            name=str(robot_id),
+            lane_id=lane_2,
+            longitudinal_position=railcar_s,
+            lateral_offset=0.0,
+            speed=railcar_speed
+        )        
     )
 
     # Setup railcar 3
     railcar_speed = 7.0  # (m/s)
     railcar_s = 0.0      # (m)
     robot_id += 1
-    lane_3 = road_geometry.junction(2).segment(0).lane(2)
-    delphyne.utilities.add_rail_car(
-        builder,
-        name=str(robot_id),
-        lane=lane_3,
-        position=railcar_s,
-        offset=0.0,
-        speed=railcar_speed
+    lane_3 = "l:s1_2"
+    scenario_subtree.add_child(
+        delphyne.behaviours.agents.RailCar(
+            name=str(robot_id),
+            lane_id=lane_3,
+            longitudinal_position=railcar_s,
+            lateral_offset=0.0,
+            speed=railcar_speed
+        )        
     )
 
     # Setup MOBIL cars.
@@ -130,29 +124,37 @@ def main():
         y_offset = 5.0       # (m)
         velocity_base = 2.0  # (m/s)
         robot_id += 1
-        delphyne.utilities.add_mobil_car(
-            builder,
-            name=str(robot_id),
-            scene_x=-10.0 + x_offset * (1 + i / 3),
-            scene_y=0.0 + y_offset * (i % 3),
-            heading=0.0,
-            speed=velocity_base * i
+        scenario_subtree.add_child(
+            delphyne.behaviours.agents.MobilCar(
+                name=str(robot_id),
+                initial_x=-10.0 + x_offset * (1 + i / 3),
+                initial_y=0.0 + y_offset * (i % 3),
+                direction_of_travel=0.0,
+                speed=velocity_base * i
+            )        
         )
 
-    runner = simulation.SimulationRunner(
-        simulation=builder.build(),
-        time_step=0.015,  # (secs)
-        realtime_rate=args.realtime_rate,
-        paused=args.paused,
-        log=args.log,
-        logfile_name=args.logfile_name)
+    simulation_tree = delphyne.trees.BehaviourTree(
+        root=scenario_subtree        
+    )
 
-    with launch_interactive_simulation(runner, bare=args.bare) as launcher:
+    simulation_tree.setup(
+        realtime_rate=args.realtime_rate,
+        start_paused=args.paused,
+        logfile_name=args.logfile_name
+    )
+
+    time_step=0.015
+    with launch_interactive_simulation(
+        simulation_tree.runner, bare=args.bare
+    ) as launcher :
         if args.duration < 0:
             # run indefinitely
-            runner.start()
+            print("Running simulation indefinitely.")
+            simulation_tree.tick_tock(period=time_step)
         else:
             # run for a finite time
-            print("Running simulation for {0} seconds.".format(
-                args.duration))
-            runner.run_async_for(args.duration, launcher.terminate)
+            print("Running simulation for {0} seconds.".format(args.duration))
+            simulation_tree.tick_tock(
+                period=time_step, number_of_iterations=args.duration/time_step        
+            )

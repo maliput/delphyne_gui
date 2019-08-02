@@ -78,6 +78,12 @@ void OrbitViewControl::OnMouseWheel(const QWheelEvent* _e) {
 }
 
 //////////////////////////////////////////////////
+const ignition::rendering::RayQueryResult& OrbitViewControl::GetQueryResult()
+  const {
+  return this->target;
+}
+
+//////////////////////////////////////////////////
 void OrbitViewControl::OnMouseButtonAction(const QMouseEvent* _e,
                                            const ButtonState_t& _state) {
   if (!this->camera) {

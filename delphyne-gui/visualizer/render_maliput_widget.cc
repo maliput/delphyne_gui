@@ -512,6 +512,15 @@ void RenderMaliputWidget::mousePressEvent(QMouseEvent* _e) {
   }
 
   this->orbitViewControl->OnMousePress(_e);
+  if (_e->button() == Qt::LeftButton)
+  {
+    const ignition::rendering::RayQueryResult& rayResult =
+    this->orbitViewControl->GetQueryResult();
+    if (rayResult.distance > 0 && this->camera->Scene()->VisualById(
+                                        rayResult.objectId) != nullptr) {
+      emit VisualClicked(rayResult);
+    }
+  }
 
   this->UpdateViewport();
 }

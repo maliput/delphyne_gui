@@ -9,6 +9,7 @@
 #include <maliput/api/road_geometry.h>
 
 #include <ignition/gui/Plugin.hh>
+#include <ignition/rendering/RayQuery.hh>
 
 #include "layer_selection_widget.hh"
 #include "maliput_viewer_model.hh"
@@ -37,7 +38,6 @@ class MaliputViewerWidget : public ignition::gui::Plugin {
   /// \return NULL.
   virtual QPaintEngine* paintEngine() const;
 
-
  protected slots:
   /// \brief Updates the model based on the @p key mesh name and @p newValue and
   /// the mesh on the GUI.
@@ -54,6 +54,10 @@ class MaliputViewerWidget : public ignition::gui::Plugin {
   /// \brief Clears the visualizer, loads the new set of meshes and text labels.
   /// \param filePath The path to the YAML file to load and visualize.
   void OnNewMultilaneFile(const std::string& filePath);
+
+  /// \brief Prints the ID of the lane if any was selected.
+  /// \param[in] rayResult Ray that contains the point where the click hit.
+  void OnVisualClicked(ignition::rendering::RayQueryResult rayResult);
 
  protected:
   /// \brief Overridden method to receive Qt paint event.

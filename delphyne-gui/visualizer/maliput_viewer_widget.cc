@@ -2,6 +2,10 @@
 
 #include "maliput_viewer_widget.hh"
 
+#include <maliput/api/lane.h>
+#include <ignition/common/Console.hh>
+#include <ignition/rendering/RayQuery.hh>
+
 #include "global_attributes.hh"
 
 using namespace delphyne;
@@ -83,6 +87,21 @@ void MaliputViewerWidget::VisualizeFileName(const std::string& filePath) {
 }
 
 /////////////////////////////////////////////////
+void MaliputViewerWidget::OnVisualClicked(
+  ignition::rendering::RayQueryResult rayResult) {
+
+  if (this->model)
+  {
+    const maliput::api::Lane* lane = this->model->GetLaneFromWorldPosition(
+      rayResult.point);
+    if (lane)
+    {
+      ignerr << "Clicked lane ID: " << lane->id().string() << "\n";
+    }
+  }
+}
+
+/////////////////////////////////////////////////
 QPaintEngine* MaliputViewerWidget::paintEngine() const { return nullptr; }
 
 /////////////////////////////////////////////////
@@ -99,6 +118,12 @@ void MaliputViewerWidget::BuildGUI() {
   this->layerSelectionWidget = new LayerSelectionWidget(this);
   this->labelSelectionWidget = new LabelSelectionWidget(this);
   this->renderWidget = new RenderMaliputWidget(this);
+
+  QObject::connect(
+    this->renderWidget,
+    SIGNAL(VisualClicked(ignition::rendering::RayQueryResult)),
+    this,
+    SLOT(OnVisualClicked(ignition::rendering::RayQueryResult)));
 
   auto verticalLayout = new QVBoxLayout(this);
   verticalLayout->addWidget(this->maliputFileSelectionWidget);

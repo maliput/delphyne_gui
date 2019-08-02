@@ -8,6 +8,7 @@
 #include <string>
 
 #include <ignition/math/Pose3.hh>
+#include <ignition/rendering/RayQuery.hh>
 #include <ignition/rendering/RenderTypes.hh>
 #include <ignition/rendering/RenderingIface.hh>
 #include <maliput-utilities/generate_obj.h>
@@ -78,6 +79,8 @@ class RenderMaliputWidget : public QWidget {
   /// \brief Overridden method to receive Qt paint event.
   /// \param[in] _e The event that happened.
   virtual void paintEvent(QPaintEvent* _e);
+
+  signals: void VisualClicked(ignition::rendering::RayQueryResult rayResult);
 
  protected:
   /// \brief Overridden method to receive Qt show event.

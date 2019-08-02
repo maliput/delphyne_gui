@@ -77,6 +77,8 @@ class OrbitViewControl {
   /// \param[in] _e The Qt mouse event.
   void OnMouseWheel(const QWheelEvent* _e);
 
+  const ignition::rendering::RayQueryResult& GetQueryResult() const;
+
  private:
   /// \brief Update the camera view.
   void Update();

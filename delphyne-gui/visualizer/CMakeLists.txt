@@ -91,7 +91,7 @@ target_link_libraries(${render_widget}
   ${Qt5Core_LIBRARIES}
   ${Qt5Widgets_LIBRARIES}
   delphyne::protobuf_messages
-  delphyne::delphyne-utilities)
+  delphyne::utility)
 
 install(TARGETS ${render_widget} DESTINATION ${LIB_INSTALL_DIR} COMPONENT shlib)
 
@@ -159,7 +159,7 @@ target_link_libraries(visualizer
   ${Qt5Core_LIBRARIES}
   ${Qt5Widgets_LIBRARIES}
   ${global_attributes}
-  delphyne::delphyne-utilities
+  delphyne::utility
 )
 
 install (TARGETS visualizer DESTINATION ${BIN_INSTALL_DIR})

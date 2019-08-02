@@ -77,6 +77,8 @@ class OrbitViewControl {
   /// \param[in] _e The Qt mouse event.
   void OnMouseWheel(const QWheelEvent* _e);
 
+  /// \brief Getter for the ray cast result obtained when the user
+  /// clicks any part of the screen.
   const ignition::rendering::RayQueryResult& GetQueryResult() const;
 
  private:

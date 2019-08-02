@@ -80,6 +80,7 @@ class RenderMaliputWidget : public QWidget {
   /// \param[in] _e The event that happened.
   virtual void paintEvent(QPaintEvent* _e);
 
+  /// \brief Signal that gets fired when a click happens on a visual (mesh)
   signals: void VisualClicked(ignition::rendering::RayQueryResult rayResult);
 
  protected:

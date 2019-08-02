@@ -244,11 +244,11 @@ void MaliputViewerModel::SetTextLabelState(
 }
 
 const maliput::api::Lane* MaliputViewerModel::GetLaneFromWorldPosition(
-    const ignition::math::Vector3d& point) {
+    const ignition::math::Vector3d& _point) {
 
   const maliput::api::RoadGeometry* rg = this->roadGeometry ?
     this->roadGeometry.get() : this->roadNetwork->road_geometry();
-  const maliput::api::GeoPosition geo_pos(point.X(), point.Y(), point.Z());
+  const maliput::api::GeoPosition geo_pos(_point.X(), _point.Y(), _point.Z());
   return rg->ToRoadPosition(geo_pos, nullptr, nullptr, nullptr).lane;
 }
 

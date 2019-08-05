@@ -30,6 +30,7 @@ import py_trees.decorators
 
 import delphyne_gui.utilities
 
+from delphyne.blackboard import blackboard_helper as bb_helper
 from . import helpers
 
 ##############################################################################
@@ -37,28 +38,34 @@ from . import helpers
 ##############################################################################
 
 
-class ChangeSpeed(py_trees.behaviour.Behaviour):
+class DelayChangeSpeed(py_trees.behaviour.Behaviour):
 
-    def __init__(self, parent_name, speed=1.0,
+    """
+    Change speed of agent_name after 10 seconds passed in the simulation.
+    """
+    def __init__(self, agent_name, speed=1.0,
                  name=py_trees.common.Name.AUTO_GENERATED):
         super().__init__(name)
         self.speed = speed
-        self.parent_name = parent_name
+        self.agent_name = agent_name
+        self.speed_changed = False
 
     def initialise(self):
         self.status = py_trees.common.Status.RUNNING
 
     def update(self):
+        simulation = bb_helper.get_simulation()
+        if simulation is not None and not self.speed_changed and \
+            simulation.get_current_time() >= 10.0:
+            print("Speed up!")
+            blackboard = py_trees.blackboard.Blackboard()
+            parent_attributes = blackboard.get(self.agent_name)
+            parent_attributes["speed"] = self.speed
+            blackboard.set(self.agent_name, parent_attributes, True)
+            self.speed_changed = True
+            self.status = py_trees.common.Status.SUCCESS
         return self.status
 
-    def stop(self, new_status):
-        if self.status == py_trees.common.Status.RUNNING and \
-        new_status == py_trees.common.Status.INVALID:
-            blackboard = py_trees.blackboard.Blackboard()
-            parent_attributes = blackboard.get(self.parent_name)
-            parent_attributes["speed"] = self.speed
-            blackboard.set(self.parent_name, parent_attributes, True)
-            self.status = py_trees.common.Status.SUCCESS
 
 class SimulationStats(object):
     """This is a simple class to keep statistics of the simulation, just
@@ -103,11 +110,12 @@ class SimulationStats(object):
     def pos_tick_handler(self, behaviour_tree):
         self.record_tick()
 
-'''
-behaviour_tree parameter is necessary to add it as a pos/pre tick handler
-'''
+
 def random_print(behaviour_tree):
-    """Print a message at random, roughly every 500 calls"""
+    """
+    Print a message at random, roughly every 500 calls.
+    behaviour_tree parameter is necessary to add it as a pos/pre tick handler
+    """
     if random.randint(1, 500) == 1:
         print("One in five hundred")
 
@@ -155,14 +163,10 @@ def main():
             speed=4.0
         )
 
-    change_speed = ChangeSpeed('rail0', 20.0)
-
-    timeout_decorator = py_trees.decorators.Timeout(
-        child=change_speed,
-        duration=5.0)
+    change_speed = DelayChangeSpeed(agent_name='rail0', speed=20.0)
 
     one_shot_decorator = py_trees.decorators.OneShot(
-        child=timeout_decorator,
+        child=change_speed,
         policy=py_trees.common.OneShotPolicy.ON_COMPLETION)
 
     scenario_subtree.add_children([
@@ -196,13 +200,11 @@ def main():
             # run indefinitely
             print("Running simulation indefinitely.")
             stats.start()
-            simulation_tree.tick_tock(
-                period=time_step)
+            simulation_tree.tick_tock(period=time_step)
         else:
             # run for a finite time
             print("Running simulation for {0} seconds.".format(
                 args.duration))
             stats.start()
-            simulation_tree.tick_tock(
-                period=time_step,
+            simulation_tree.tick_tock(period=time_step,
                 number_of_iterations=args.duration/time_step)

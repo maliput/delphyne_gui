@@ -105,10 +105,10 @@ class MaliputViewerModel {
   void SetTextLabelState(MaliputLabelType _type, bool _isVisible);
 
   /// \brief Get the lane associated with a point in world space if exists.
-  /// \param[in] _point World position of point that intersected with a plane
+  /// \param[in] _position World position of point that intersected with a plane
   /// \return Lane associated with that position or nullptr if not found.
   const maliput::api::Lane* GetLaneFromWorldPosition(
-    const ignition::math::Vector3d& _point);
+    const ignition::math::Vector3d& _position);
 
  private:
   /// \brief Loads a maliput RoadGeometry of multilane from

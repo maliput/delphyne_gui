@@ -7,6 +7,9 @@
 #include <memory>
 #include <string>
 
+#include <ignition/math/Vector3.hh>
+
+#include <maliput/api/lane.h>
 #include <maliput/api/road_geometry.h>
 #include <maliput/api/road_network.h>
 #include <maliput-utilities/generate_obj.h>
@@ -100,6 +103,12 @@ class MaliputViewerModel {
   /// \param[in] _type Labels type.
   /// \param[in] _isVisible The new visualization status of the text label.
   void SetTextLabelState(MaliputLabelType _type, bool _isVisible);
+
+  /// \brief Get the lane associated with a point in world space if exists.
+  /// \param[in] _position World position of point that intersected with a plane
+  /// \return Lane associated with that position or nullptr if not found.
+  const maliput::api::Lane* GetLaneFromWorldPosition(
+    const ignition::math::Vector3d& _position);
 
  private:
   /// \brief Loads a maliput RoadGeometry of multilane from

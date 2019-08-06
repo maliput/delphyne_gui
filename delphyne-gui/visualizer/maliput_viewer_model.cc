@@ -7,8 +7,10 @@
 #include <string>
 
 #include <ignition/common/Console.hh>
+#include <ignition/rendering/RayQuery.hh>
 #include <multilane/loader.h>
 #include <delphyne/roads/road_builder.h>
+#include <maliput/api/lane_data.h>
 #include <maliput-utilities/generate_obj.h>
 #include <maliput-utilities/mesh.h>
 
@@ -239,6 +241,16 @@ void MaliputViewerModel::SetTextLabelState(
           std::string("_type is not a valid MaliputLabelType."));
       break;
   }
+}
+
+const maliput::api::Lane* MaliputViewerModel::GetLaneFromWorldPosition(
+    const ignition::math::Vector3d& _position) {
+
+  const maliput::api::RoadGeometry* rg = this->roadGeometry ?
+    this->roadGeometry.get() : this->roadNetwork->road_geometry();
+  const maliput::api::GeoPosition geo_pos(_position.X(),
+    _position.Y(), _position.Z());
+  return rg->ToRoadPosition(geo_pos, nullptr, nullptr, nullptr).lane;
 }
 
 ///////////////////////////////////////////////////////

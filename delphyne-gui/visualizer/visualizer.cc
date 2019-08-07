@@ -47,6 +47,19 @@ int main(int argc, const char* argv[]) {
     delphyne::gui::GlobalAttributes::ParseArguments(argc - 1, &(argv[1]));
   }
 
+  // If we run the visualizer as a child process (like a demo written in
+  // python), we need to ensure that it's not using a block buffer
+  // to display everything that goes to the stdout in realtime. 
+  if (delphyne::gui::GlobalAttributes::HasArgument("use-line-buffer"))
+  {
+    std::string use_line_buffer_arg =
+      delphyne::gui::GlobalAttributes::GetArgument("use-line-buffer");
+    if (use_line_buffer_arg == "yes")
+    {
+      setlinebuf(stdout);
+    }
+  }
+
   // Parse custom config file from args.
   delphyne::utility::PackageManager* package_manager =
       delphyne::utility::PackageManager::Instance();

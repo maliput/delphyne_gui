@@ -67,6 +67,8 @@ def launch_visualizer(launcher_manager, layout_filename=None,
             os.path.join("layouts", layout_filename)
         )
         ign_visualizer_args.append(layout_key + layout_path)
+    # Force line buffering for child process.
+    ign_visualizer_args.append("--use-line-buffer=yes")
     if plugin_injection:
         ign_visualizer_args.append("--inject-plugin=" + plugin_injection)
     if bundle_path:

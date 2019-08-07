@@ -16,13 +16,13 @@
 
 #include <delphyne/macros.h>
 
+#include <maliput-utilities/mesh.h>
 #include <maliput/api/branch_point.h>
 #include <maliput/api/junction.h>
 #include <maliput/api/lane.h>
 #include <maliput/api/lane_data.h>
 #include <maliput/api/road_geometry.h>
 #include <maliput/api/segment.h>
-#include <maliput-utilities/mesh.h>
 
 #include <ignition/common/SubMesh.hh>
 #include <ignition/math/Vector3.hh>
@@ -47,18 +47,15 @@ namespace {
 // order.
 // @throws std::runtime_error When `unordered_vector`' size is zero.
 std::vector<std::tuple<ignition::math::Vector3d, int>> PolarSort(
-    const std::vector<std::tuple<ignition::math::Vector3d, int>>&
-        unordered_vector) {
+    const std::vector<std::tuple<ignition::math::Vector3d, int>>& unordered_vector) {
   DELPHYNE_DEMAND(unordered_vector.size() > 0);
 
-  std::vector<std::tuple<ignition::math::Vector3d, int>> ordered_vector =
-      unordered_vector;
+  std::vector<std::tuple<ignition::math::Vector3d, int>> ordered_vector = unordered_vector;
 
   // Computes the center.
   std::vector<ignition::math::Vector3d> points;
   ignition::math::Vector3d center;
-  for(const std::tuple<ignition::math::Vector3d, int>& vertex_index :
-      unordered_vector) {
+  for (const std::tuple<ignition::math::Vector3d, int>& vertex_index : unordered_vector) {
     center += std::get<0>(vertex_index);
   }
   center /= static_cast<double>(points.size());
@@ -67,13 +64,11 @@ std::vector<std::tuple<ignition::math::Vector3d, int>> PolarSort(
   //                       plane of all the points in the face instead of the
   //                       plane z=0. We need the normal of the plane to do
   //                       so.
-  std::sort(ordered_vector.begin(), ordered_vector.end(),
-      [center](const std::tuple<ignition::math::Vector3d, int>& a,
-               const std::tuple<ignition::math::Vector3d, int>& b) {
-        double a_y = std::atan2(std::get<0>(a).Y() - center.Y(),
-                                      std::get<0>(a).X() - center.X());
-        double b_y = std::atan2(std::get<0>(b).Y() - center.Y(),
-                                std::get<0>(b).X() - center.X());
+  std::sort(
+      ordered_vector.begin(), ordered_vector.end(),
+      [center](const std::tuple<ignition::math::Vector3d, int>& a, const std::tuple<ignition::math::Vector3d, int>& b) {
+        double a_y = std::atan2(std::get<0>(a).Y() - center.Y(), std::get<0>(a).X() - center.X());
+        double b_y = std::atan2(std::get<0>(b).Y() - center.Y(), std::get<0>(b).X() - center.X());
         if (a_y < 0) a_y += 2 * M_PI;
         if (b_y < 0) b_y += 2 * M_PI;
         return a_y < b_y;
@@ -92,8 +87,7 @@ const std::string GenerateUniqueMeshName(const std::string& baseName) {
 
 }  // namespace
 
-std::unique_ptr<ignition::common::Mesh> Convert(const std::string& name,
-                                                const GeoMesh& geo_mesh) {
+std::unique_ptr<ignition::common::Mesh> Convert(const std::string& name, const GeoMesh& geo_mesh) {
   // Checks before actually creating the mesh.
   if (geo_mesh.num_vertices() < 3 && geo_mesh.faces().size() < 1) {
     return nullptr;
@@ -112,8 +106,7 @@ std::unique_ptr<ignition::common::Mesh> Convert(const std::string& name,
   auto sub_mesh = std::make_unique<ignition::common::SubMesh>();
   sub_mesh->SetPrimitiveType(ignition::common::SubMesh::TRIANGLES);
 
-  auto geo_position_to_ign_vector = [](
-      const maliput::api::GeoPosition& v) {
+  auto geo_position_to_ign_vector = [](const maliput::api::GeoPosition& v) {
     return ignition::math::Vector3d(v.x(), v.y(), v.z());
   };
 
@@ -125,12 +118,10 @@ std::unique_ptr<ignition::common::Mesh> Convert(const std::string& name,
   // Note that geo_mesh may not have the same number of vertices as normals
   // given that it keeps no duplicates.
   for (int i = 0; i < geo_mesh.num_vertices(); ++i) {
-    sub_mesh->AddVertex(
-        geo_position_to_ign_vector(geo_mesh.get_vertex(i).v()));
+    sub_mesh->AddVertex(geo_position_to_ign_vector(geo_mesh.get_vertex(i).v()));
     sub_mesh->AddNormal({0, 0, 1});
     sub_mesh->AddTexCoord({0, 0});
   }
-
 
   // Sets the indices based on how the faces were built.
   for (const IndexFace& index_face : geo_mesh.faces()) {
@@ -138,20 +129,16 @@ std::unique_ptr<ignition::common::Mesh> Convert(const std::string& name,
     //                        than 4 vertices. The class supports more, however
     //                        proper triangulation code needs to be done so as
     //                        to support it.
-    DELPHYNE_DEMAND(index_face.vertices().size() == 3 ||
-                    index_face.vertices().size() == 4);
+    DELPHYNE_DEMAND(index_face.vertices().size() == 3 || index_face.vertices().size() == 4);
 
-    std::vector<std::tuple<ignition::math::Vector3d, int>>
-        ordered_vertices_indices;
+    std::vector<std::tuple<ignition::math::Vector3d, int>> ordered_vertices_indices;
     for (const IndexFace::Vertex& ifv : index_face.vertices()) {
       // Sets the correct normal.
-      const maliput::api::GeoPosition normal =
-          geo_mesh.get_normal(ifv.normal_index).n();
+      const maliput::api::GeoPosition normal = geo_mesh.get_normal(ifv.normal_index).n();
       sub_mesh->SetNormal(ifv.vertex_index, geo_position_to_ign_vector(normal));
       // Adds the vertices to the vector so we can later order them.
       ordered_vertices_indices.push_back(
-          std::make_tuple<ignition::math::Vector3d, int>(
-              sub_mesh->Vertex(ifv.vertex_index), int(ifv.vertex_index)));
+          std::make_tuple<ignition::math::Vector3d, int>(sub_mesh->Vertex(ifv.vertex_index), int(ifv.vertex_index)));
     }
     ordered_vertices_indices = PolarSort(ordered_vertices_indices);
 

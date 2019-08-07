@@ -15,54 +15,60 @@
 
 #include "agent_info_display.hh"
 
-namespace delphyne
-{
-namespace gui
-{
-namespace display_plugins
-{
-  struct AgentInfoText
-  {
-    /// \brief The text display
-    ignition::rendering::TextPtr text;
-    ignition::rendering::VisualPtr textVis;
-    bool visible{true};
-  };
+namespace delphyne {
+namespace gui {
+namespace display_plugins {
+struct AgentInfoText {
+  /// \brief The text display
+  ignition::rendering::TextPtr text;
+  ignition::rendering::VisualPtr textVis;
+  bool visible{true};
+};
 
-  class AgentInfoDisplayPrivate
-  {
-    /// \brief Message holding latest agent states
-    public: ignition::msgs::AgentState_V msg;
+class AgentInfoDisplayPrivate {
+  /// \brief Message holding latest agent states
+ public:
+  ignition::msgs::AgentState_V msg;
 
-    /// \brief Mutex to protect msg
-    public: std::recursive_mutex mutex;
+  /// \brief Mutex to protect msg
+ public:
+  std::recursive_mutex mutex;
 
-    public: QStackedLayout *stackedLayout;
+ public:
+  QStackedLayout* stackedLayout;
 
-    public: QWidget *widget;
+ public:
+  QWidget* widget;
 
-    public: QSignalMapper *signalMapper;
+ public:
+  QSignalMapper* signalMapper;
 
-    /// \brief A transport node.
-    public: ignition::transport::Node node;
+  /// \brief A transport node.
+ public:
+  ignition::transport::Node node;
 
-    public: std::map<std::string, std::shared_ptr<AgentInfoText>> agentInfoText;
+ public:
+  std::map<std::string, std::shared_ptr<AgentInfoText>> agentInfoText;
 
-    /// \brief Text size in pixels
-    public: unsigned int textSize = 15;
+  /// \brief Text size in pixels
+ public:
+  unsigned int textSize = 15;
 
-    /// \brief Horizontal padding away from the image border
-    public: int horizontalPadding = 20;
+  /// \brief Horizontal padding away from the image border
+ public:
+  int horizontalPadding = 20;
 
-    /// \brief Vertical padding away from the image border
-    public: int verticalPadding = 20;
+  /// \brief Vertical padding away from the image border
+ public:
+  int verticalPadding = 20;
 
-    /// \brief Color of the text
-    public: ignition::math::Color textColor = ignition::math::Color::White;
-  };
-}
-}
-}
+  /// \brief Color of the text
+ public:
+  ignition::math::Color textColor = ignition::math::Color::White;
+};
+}  // namespace display_plugins
+}  // namespace gui
+}  // namespace delphyne
 
 static constexpr double charHeight = 0.3;
 
@@ -73,8 +79,7 @@ using namespace display_plugins;
 /////////////////////////////////////////////////
 AgentInfoDisplay::AgentInfoDisplay() : DisplayPlugin(), dataPtr(new AgentInfoDisplayPrivate) {
   this->title = "Agent Info";
-  this->dataPtr->node.Subscribe("agents/state", &AgentInfoDisplay::OnAgentState,
-                                this);
+  this->dataPtr->node.Subscribe("agents/state", &AgentInfoDisplay::OnAgentState, this);
 
   this->dataPtr->signalMapper = new QSignalMapper(this);
   connect(this->dataPtr->signalMapper, SIGNAL(mapped(QString)), this, SLOT(ToggleText(QString)));
@@ -83,8 +88,7 @@ AgentInfoDisplay::AgentInfoDisplay() : DisplayPlugin(), dataPtr(new AgentInfoDis
 /////////////////////////////////////////////////
 AgentInfoDisplay::~AgentInfoDisplay() {}
 
-std::string AgentInfoDisplay::NameFromAgent(const ignition::msgs::AgentState& agent)
-{
+std::string AgentInfoDisplay::NameFromAgent(const ignition::msgs::AgentState& agent) {
   // The names that we get from the agents are of the form:
   //
   // "/agent/0/state"
@@ -108,7 +112,7 @@ void AgentInfoDisplay::ToggleText(const QString& _agentName) {
 }
 
 /////////////////////////////////////////////////
-QWidget *AgentInfoDisplay::CreateCustomProperties() const {
+QWidget* AgentInfoDisplay::CreateCustomProperties() const {
   // This is more complicated than one might hope, mostly due to types.
   // We really want a "stacked" layout so that we can dynamically add in a new
   // layout once we get data from the ignition subscription.  To acheive that,
@@ -138,10 +142,8 @@ QWidget *AgentInfoDisplay::CreateCustomProperties() const {
 }
 
 /////////////////////////////////////////////////
-std::shared_ptr<AgentInfoText> AgentInfoDisplay::CreateAgentText(const std::string& _agentName,
-                                                                 QVBoxLayout *_layout,
-                                                                 std::shared_ptr<ignition::rendering::Scene> _scenePtr)
-{
+std::shared_ptr<AgentInfoText> AgentInfoDisplay::CreateAgentText(
+    const std::string& _agentName, QVBoxLayout* _layout, std::shared_ptr<ignition::rendering::Scene> _scenePtr) {
   auto visibleCheck = new QCheckBox(QString::fromStdString(_agentName), this);
   visibleCheck->setChecked(true);
   _layout->addWidget(visibleCheck);
@@ -170,10 +172,8 @@ std::shared_ptr<AgentInfoText> AgentInfoDisplay::CreateAgentText(const std::stri
 }
 
 /////////////////////////////////////////////////
-void AgentInfoDisplay::UpdateAgentLabel(const ignition::msgs::AgentState& _agent,
-                                        const std::string& _agentName,
-                                        std::shared_ptr<AgentInfoText> _agentInfoText)
-{
+void AgentInfoDisplay::UpdateAgentLabel(const ignition::msgs::AgentState& _agent, const std::string& _agentName,
+                                        std::shared_ptr<AgentInfoText> _agentInfoText) {
   double x = 0.0;
   double y = 0.0;
   double z = 0.0;
@@ -201,18 +201,16 @@ void AgentInfoDisplay::UpdateAgentLabel(const ignition::msgs::AgentState& _agent
   }
 
   std::stringstream ss;
-  ss << _agentName << ":\n pos:(x:" << std::setprecision(2) << x << ",y:" << y
-     << ",z:" << z << ",yaw:" << yaw << ")"
+  ss << _agentName << ":\n pos:(x:" << std::setprecision(2) << x << ",y:" << y << ",z:" << z << ",yaw:" << yaw << ")"
      << "\n vel:(x:" << vx << ",y:" << vy << ",z:" << vz << ")";
   _agentInfoText->text->SetTextString(ss.str());
   _agentInfoText->textVis->SetLocalPose(ignition::math::Pose3d(x, y, z + 2.6, roll, pitch, yaw));
 }
 
 /////////////////////////////////////////////////
-QVBoxLayout *AgentInfoDisplay::CreateLayout()
-{
+QVBoxLayout* AgentInfoDisplay::CreateLayout() {
   // Step 1 from above
-  QVBoxLayout *layout = new QVBoxLayout();
+  QVBoxLayout* layout = new QVBoxLayout();
   layout->setContentsMargins(0, 0, 0, 0);
   layout->setSpacing(0);
 
@@ -239,7 +237,7 @@ void AgentInfoDisplay::ProcessMsg() {
     return;
   }
 
-  QVBoxLayout *layout{nullptr};
+  QVBoxLayout* layout{nullptr};
 
   if (this->dataPtr->stackedLayout->count() == 0) {
     // This is the first message; create the widgets and the hovering text that we'll use
@@ -273,5 +271,4 @@ void AgentInfoDisplay::OnAgentState(const ignition::msgs::AgentState_V& _msg) {
 }
 
 // Register this plugin
-IGN_COMMON_REGISTER_SINGLE_PLUGIN(delphyne::gui::display_plugins::AgentInfoDisplay,
-                                  ignition::gui::DisplayPlugin)
+IGN_COMMON_REGISTER_SINGLE_PLUGIN(delphyne::gui::display_plugins::AgentInfoDisplay, ignition::gui::DisplayPlugin)

@@ -5,8 +5,8 @@
 
 #include <memory>
 
-#include <ignition/gui/DisplayPlugin.hh>
 #include <ignition/gui/qt.h>
+#include <ignition/gui/DisplayPlugin.hh>
 
 namespace delphyne {
 namespace gui {
@@ -27,8 +27,8 @@ class OriginDisplay : public ignition::gui::DisplayPlugin {
  public:
   virtual void Initialize(const tinyxml2::XMLElement* _pluginElem) override;
 };
-}
-}
-}
+}  // namespace display_plugins
+}  // namespace gui
+}  // namespace delphyne
 
 #endif

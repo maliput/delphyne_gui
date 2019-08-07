@@ -9,11 +9,11 @@
 
 #include <ignition/math/Vector3.hh>
 
+#include <maliput-utilities/generate_obj.h>
+#include <maliput-utilities/mesh.h>
 #include <maliput/api/lane.h>
 #include <maliput/api/road_geometry.h>
 #include <maliput/api/road_network.h>
-#include <maliput-utilities/generate_obj.h>
-#include <maliput-utilities/mesh.h>
 
 #include <ignition/common/Mesh.hh>
 
@@ -72,7 +72,6 @@ MaliputLabelType FromString(const std::string& _type);
 /// Holds the information, as a map of meshes and materials.
 class MaliputViewerModel {
  public:
-
   /// \brief Constructor.
   MaliputViewerModel() = default;
 
@@ -107,8 +106,7 @@ class MaliputViewerModel {
   /// \brief Get the lane associated with a point in world space if exists.
   /// \param[in] _position World position of point that intersected with a plane
   /// \return Lane associated with that position or nullptr if not found.
-  const maliput::api::Lane* GetLaneFromWorldPosition(
-    const ignition::math::Vector3d& _position);
+  const maliput::api::Lane* GetLaneFromWorldPosition(const ignition::math::Vector3d& _position);
 
  private:
   /// \brief Loads a maliput RoadGeometry of multilane from
@@ -125,9 +123,7 @@ class MaliputViewerModel {
   ///        filling the instance variable meshes.
   /// \param[in] _geoMeshes An named collection of GeoMesh objects to convert.
   void ConvertMeshes(
-    const std::map<std::string,
-      std::pair<maliput::utility::mesh::GeoMesh,
-                maliput::utility::Material>>& _geoMeshes);
+      const std::map<std::string, std::pair<maliput::utility::mesh::GeoMesh, maliput::utility::Material>>& _geoMeshes);
 
   /// \brief Populates this->labels map with this->roadGeometry lane and branch
   ///        point IDs.
@@ -138,7 +134,7 @@ class MaliputViewerModel {
 
   // To support both malidrive and multilane files, we have both. roadNetwork
   // has a pointer to a RoadGeometry.
-  
+
   /// \brief Maliput RoadGeometry pointer.
   std::unique_ptr<const maliput::api::RoadGeometry> roadGeometry;
 
@@ -152,6 +148,6 @@ class MaliputViewerModel {
   std::map<MaliputLabelType, std::vector<MaliputLabel>> labels;
 };
 
-}
-}
+}  // namespace gui
+}  // namespace delphyne
 #endif

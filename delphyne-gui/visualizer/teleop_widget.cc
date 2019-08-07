@@ -18,11 +18,7 @@ Q_DECLARE_METATYPE(ignition::msgs::Boolean)
 
 /////////////////////////////////////////////////
 TeleopWidget::TeleopWidget(QWidget* parent)
-    : Plugin(),
-      currentThrottle(0.0),
-      currentBrake(0.0),
-      currentSteeringAngle(0.0),
-      driving(false) {
+    : Plugin(), currentThrottle(0.0), currentBrake(0.0), currentSteeringAngle(0.0), driving(false) {
   qRegisterMetaType<ignition::msgs::Boolean>();
 
   this->title = "TeleopWidget";
@@ -61,8 +57,7 @@ void TeleopWidget::LoadConfig(const tinyxml2::XMLElement* _pluginElem) {
   // Read configuration
   if (_pluginElem) {
     if (auto channelElem = _pluginElem->FirstChildElement("car_number")) {
-      std::string channelName =
-          "teleop/" + std::string(channelElem->GetText());
+      std::string channelName = "teleop/" + std::string(channelElem->GetText());
       this->lineedit->setText(QString::fromStdString(channelName));
     }
   }
@@ -80,8 +75,7 @@ void TeleopWidget::StartDriving() {
     auto lcmChannel = this->lineedit->text().toStdString();
     auto ignTopic = "/" + lcmChannel;
     this->publisher_.reset(new ignition::transport::Node::Publisher());
-    *(this->publisher_) =
-        this->node_.Advertise<ignition::msgs::AutomotiveDrivingCommand>(ignTopic);
+    *(this->publisher_) = this->node_.Advertise<ignition::msgs::AutomotiveDrivingCommand>(ignTopic);
     this->button->setText("Stop Driving");
     this->lineedit->setEnabled(false);
     this->driving = true;
@@ -97,8 +91,7 @@ void TeleopWidget::mousePressEvent(QMouseEvent* _event) { setFocus(); }
 
 /////////////////////////////////////////////////
 static void sec_and_nsec_now(int64_t& sec, int32_t& nsec) {
-  std::chrono::time_point<std::chrono::system_clock, std::chrono::nanoseconds>
-      now = std::chrono::system_clock::now();
+  std::chrono::time_point<std::chrono::system_clock, std::chrono::nanoseconds> now = std::chrono::system_clock::now();
   std::chrono::nanoseconds epoch = now.time_since_epoch();
   int64_t count = epoch.count();
 
@@ -130,8 +123,7 @@ void TeleopWidget::timerEvent(QTimerEvent* event) {
         }
       }
 
-      if (last_throttle != this->currentThrottle ||
-          last_brake != this->currentBrake || this->newSteeringAngle) {
+      if (last_throttle != this->currentThrottle || last_brake != this->currentBrake || this->newSteeringAngle) {
         ignition::msgs::AutomotiveDrivingCommand ignMsg;
 
         // We don't set the header here since the bridge completely ignores it
@@ -149,10 +141,8 @@ void TeleopWidget::timerEvent(QTimerEvent* event) {
 
         this->publisher_->Publish(ignMsg);
 
-        this->steeringAngleLabel->setText(
-            QString("%1").arg(this->currentSteeringAngle));
-        this->throttleValueLabel->setText(
-            QString("%1").arg(this->currentThrottle));
+        this->steeringAngleLabel->setText(QString("%1").arg(this->currentSteeringAngle));
+        this->throttleValueLabel->setText(QString("%1").arg(this->currentThrottle));
         this->brakeValueLabel->setText(QString("%1").arg(this->currentBrake));
 
         this->newSteeringAngle = false;
@@ -249,8 +239,7 @@ void TeleopWidget::keyReleaseEvent(QKeyEvent* _event) {
       this->throttleKeyPressed = false;
     } else if (_event->key() == Qt::Key_Down) {
       this->brakeKeyPressed = false;
-    } else if (_event->key() == Qt::Key_Left ||
-               _event->key() == Qt::Key_Right) {
+    } else if (_event->key() == Qt::Key_Left || _event->key() == Qt::Key_Right) {
       // do nothing
       // this avoids the accel/brake values of not going down
       // to zero after release when steering at the same time
@@ -261,5 +250,4 @@ void TeleopWidget::keyReleaseEvent(QKeyEvent* _event) {
   return;
 }
 
-IGN_COMMON_REGISTER_SINGLE_PLUGIN(delphyne::gui::TeleopWidget,
-                                  ignition::gui::Plugin)
+IGN_COMMON_REGISTER_SINGLE_PLUGIN(delphyne::gui::TeleopWidget, ignition::gui::Plugin)

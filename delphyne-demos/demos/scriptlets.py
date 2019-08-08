@@ -38,7 +38,7 @@ from . import helpers
 ##############################################################################
 
 
-class DelayChangeSpeed(py_trees.behaviour.Behaviour):
+class DelayedChangeSpeed(py_trees.behaviour.Behaviour):
 
     """
     Change speed of agent_name after 10 seconds passed in the simulation.
@@ -48,21 +48,18 @@ class DelayChangeSpeed(py_trees.behaviour.Behaviour):
         super().__init__(name)
         self.speed = speed
         self.agent_name = agent_name
-        self.speed_changed = False
 
     def initialise(self):
         self.status = py_trees.common.Status.RUNNING
 
     def update(self):
         simulation = bb_helper.get_simulation()
-        if simulation is not None and not self.speed_changed and \
-            simulation.get_current_time() >= 10.0:
+        if simulation is not None and simulation.get_current_time() >= 10.0:
             print("Speed up!")
             blackboard = py_trees.blackboard.Blackboard()
-            parent_attributes = blackboard.get(self.agent_name)
-            parent_attributes["speed"] = self.speed
-            blackboard.set(self.agent_name, parent_attributes, True)
-            self.speed_changed = True
+            agent_attributes = blackboard.get(self.agent_name)
+            agent_attributes["speed"] = self.speed
+            blackboard.set(self.agent_name, agent_attributes, True)
             self.status = py_trees.common.Status.SUCCESS
         return self.status
 
@@ -163,10 +160,8 @@ def main():
             speed=4.0
         )
 
-    change_speed = DelayChangeSpeed(agent_name='rail0', speed=20.0)
-
     one_shot_decorator = py_trees.decorators.OneShot(
-        child=change_speed,
+        child=DelayedChangeSpeed(agent_name='rail0', speed=20.0),
         policy=py_trees.common.OneShotPolicy.ON_COMPLETION)
 
     scenario_subtree.add_children([

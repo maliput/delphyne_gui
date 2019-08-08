@@ -162,3 +162,4 @@ def main():
             simulation_tree.tick_tock(
                 period=time_step, number_of_iterations=args.duration/time_step
             )
+            launcher.terminate()

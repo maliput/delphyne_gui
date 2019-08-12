@@ -39,17 +39,14 @@ in collision course.
     return parser.parse_args()
 
 
-def on_agent_collision(_, agent_collisions):
+def check_for_agent_collisions(simulation_subtree):
     """
-    Callback on collision between agents in simulation.
-
-    :param _: Current simulation runner, unused.
-    :type _: :class:`delphyne.simulation.SimulationRunner`
-    :param agents_in_collision: List of agents (e.g. cars) currently
-                                in collision.
-    :type agents_in_collision: list[tuple[:class:`delphyne.agents.AgentBase`,
-                                          :class:`delphyne.agents.AgentBase`]]
+    Pre tick handler that checks for collisions between agents in simulation.
     """
+    simulation = simulation_subtree.runner.get_simulation()
+    agent_collisions = simulation.get_collisions()
+    if not agent_collisions:
+        return
     print("Collisions have been detected!")
     for collision in agent_collisions:
         agent1, agent2 = collision.agents
@@ -68,7 +65,45 @@ def on_agent_collision(_, agent_collisions):
         ))
         agent2_pose = agent2.get_pose()
         print("    It now rests at {}.".format(agent2_pose.translation()))
+    simulation_subtree.runner.pause_simulation()
     print("\nSimulation paused.")
+
+
+def create_crash_scenario_subtree():
+    scenario_subtree = delphyne.behaviours.maliput.Road()
+
+    scenario_subtree.add_children([
+        delphyne.behaviours.agents.SimpleCar(
+            name="racer0",
+            initial_x=0.0,      # scene x-coordinate (m)
+            initial_y=-50.0,    # scene y-coordinate (m)
+            heading=math.pi/2,  # heading (radians)
+            speed=5.0           # speed in the direction of travel (m/s)
+        ),
+        delphyne.behaviours.agents.SimpleCar(
+            name="racer1",
+            initial_x=-50.0,  # scene x-coordinate (m)
+            initial_y=0.0,    # scene y-coordinate (m)
+            heading=0.0,      # heading (radians)
+            speed=5.1         # speed in the direction of travel (m/s)
+        ),
+        delphyne.behaviours.agents.SimpleCar(
+            name="racer2",
+            initial_x=0.0,       # scene x-coordinate (m)
+            initial_y=50.0,      # scene y-coordinate (m)
+            heading=-math.pi/2,  # heading (radians)
+            speed=5.0            # speed in the direction of travel (m/s)
+        ),
+        delphyne.behaviours.agents.SimpleCar(
+            name="racer3",
+            initial_x=50.0,   # scene x-coordinate (m)
+            initial_y=0.0,    # scene y-coordinate (m)
+            heading=math.pi,  # heading (radians)
+            speed=5.1         # speed in the direction of travel (m/s)
+        ),
+    ])
+
+    return scenario_subtree
 
 
 ##############################################################################
@@ -80,58 +115,30 @@ def main():
     """Keeping pylint entertained."""
     args = parse_arguments()
 
-    builder = AgentSimulationBuilder()
-
-    utilities.add_simple_car(
-        builder,
-        name="racer0",
-        position_x=0.0,  # scene x-coordinate (m)
-        position_y=-50.0,  # scene y-coordinate (m)
-        heading=math.pi/2,    # heading (radians)
-        speed=5.0     # speed in the direction of travel (m/s)
+    simulation_tree = delphyne.trees.BehaviourTree(
+        root=create_crash_scenario_subtree()
     )
-
-    utilities.add_simple_car(
-        builder,
-        name="racer1",
-        position_x=-50.0,  # scene x-coordinate (m)
-        position_y=0.0,     # scene y-coordinate (m)
-        heading=0.0,    # heading (radians)
-        speed=5.1     # speed in the direction of travel (m/s)
-    )
-
-    utilities.add_simple_car(
-        builder,
-        name="racer2",
-        position_x=0.0,  # scene x-coordinate (m)
-        position_y=50.0,  # scene y-coordinate (m)
-        heading=-math.pi/2,    # heading (radians)
-        speed=5.0     # speed in the direction of travel (m/s)
-    )
-
-    utilities.add_simple_car(
-        builder,
-        name="racer3",
-        position_x=50.0,  # scene x-coordinate (m)
-        position_y=0.0,     # scene y-coordinate (m)
-        heading=math.pi,    # heading (radians)
-        speed=5.1     # speed in the direction of travel (m/s)
-    )
-
-    runner = SimulationRunner(
-        simulation=builder.build(),
-        time_step=0.001,  # (secs)
+    simulation_tree.setup(
         realtime_rate=args.realtime_rate,
-        paused=args.paused,
-        log=args.log,
-        logfile_name=args.logfile_name)
+        start_paused=args.paused,
+        logfile_name=args.logfile_name,
+    )
 
-    with launch_interactive_simulation(runner, bare=args.bare):
-        # Adds a callback to check for agent collisions.
-        runner.add_collision_callback(
-            lambda agents_in_collision: on_agent_collision(
-                runner, agents_in_collision
+    # Adds a callback to check for agent collisions.
+    simulation_tree.add_pre_tick_handler(check_for_agent_collisions)
+
+    time_step = 0.01
+    with launch_interactive_simulation(
+        simulation_tree.runner, bare=args.bare
+    ) as launcher:
+        if args.duration < 0:
+            # run indefinitely
+            print("Running simulation indefinitely.")
+            simulation_tree.tick_tock(period=time_step)
+        else:
+            # run for a finite time
+            print("Running simulation for {0} seconds.".format(args.duration))
+            simulation_tree.tick_tock(
+                period=time_step, number_of_iterations=args.duration/time_step
             )
-        )
-        runner.enable_collisions()
-        runner.start()
+        launcher.terminate()

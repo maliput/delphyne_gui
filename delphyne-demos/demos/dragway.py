@@ -31,7 +31,7 @@ def parse_arguments():
 
 
 def create_dragway_scenario_subtree():
-    scenario_subtree = delphyne.behaviours.maliput.Dragway(
+    scenario_subtree = delphyne.behaviours.roads.Dragway(
         name="dragway",
         num_lanes=4,
         length=100.0,

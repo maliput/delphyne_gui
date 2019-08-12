@@ -7,12 +7,12 @@
 #include <memory>
 #include <string>
 
-#include <maliput-utilities/generate_obj.h>
-#include <maliput-utilities/mesh.h>
 #include <ignition/math/Pose3.hh>
 #include <ignition/rendering/RayQuery.hh>
 #include <ignition/rendering/RenderTypes.hh>
 #include <ignition/rendering/RenderingIface.hh>
+#include <maliput-utilities/generate_obj.h>
+#include <maliput-utilities/mesh.h>
 
 #include <QtWidgets/QWidget>
 

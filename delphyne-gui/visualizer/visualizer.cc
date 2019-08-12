@@ -11,10 +11,10 @@
 #include <ignition/common/Util.hh>
 
 #ifndef Q_MOC_RUN
-#include <ignition/gui/qt.h>
 #include <ignition/gui/Dock.hh>
 #include <ignition/gui/Iface.hh>
 #include <ignition/gui/MainWindow.hh>
+#include <ignition/gui/qt.h>
 #endif
 
 #include "delphyne-gui/config.hh"

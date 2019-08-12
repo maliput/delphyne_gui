@@ -7,8 +7,8 @@
 #include <string>
 #include <vector>
 
-#include <maliput-utilities/mesh.h>
 #include <ignition/common/Mesh.hh>
+#include <maliput-utilities/mesh.h>
 
 namespace delphyne {
 namespace mesh {

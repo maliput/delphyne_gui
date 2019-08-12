@@ -2,9 +2,9 @@
 
 #include "maliput_viewer_widget.hh"
 
-#include <maliput/api/lane.h>
 #include <ignition/common/Console.hh>
 #include <ignition/rendering/RayQuery.hh>
+#include <maliput/api/lane.h>
 
 #include "global_attributes.hh"
 

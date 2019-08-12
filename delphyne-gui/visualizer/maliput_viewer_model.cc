@@ -7,12 +7,12 @@
 #include <string>
 
 #include <delphyne/roads/road_builder.h>
+#include <ignition/common/Console.hh>
+#include <ignition/rendering/RayQuery.hh>
 #include <maliput-utilities/generate_obj.h>
 #include <maliput-utilities/mesh.h>
 #include <maliput/api/lane_data.h>
 #include <multilane/loader.h>
-#include <ignition/common/Console.hh>
-#include <ignition/rendering/RayQuery.hh>
 
 #include "maliput_mesh_converter.hh"
 

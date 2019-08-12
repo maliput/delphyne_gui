@@ -5,8 +5,8 @@
 
 #include <memory>
 
-#include <ignition/gui/qt.h>
 #include <ignition/gui/DisplayPlugin.hh>
+#include <ignition/gui/qt.h>
 
 namespace delphyne {
 namespace gui {

@@ -1,12 +1,12 @@
 // Copyright 2017 Toyota Research Institute
 
-#include <tinyxml2.h>
 #include <array>
 #include <cstdlib>
 #include <iterator>
 #include <sstream>
 #include <string>
 #include <utility>
+#include <tinyxml2.h>
 
 #include <delphyne/utility/package.h>
 
@@ -239,9 +239,7 @@ std::string RenderWidget::ConfigStr() const {
 }
 
 /////////////////////////////////////////////////
-void RenderWidget::OnSetScene(const ignition::msgs::Scene& request) {
-  { emit this->NewInitialScene(request); }
-}
+void RenderWidget::OnSetScene(const ignition::msgs::Scene& request) { emit this->NewInitialScene(request); }
 
 /////////////////////////////////////////////////
 void RenderWidget::OnUpdateScene(const ignition::msgs::Model_V& _msg) { emit this->NewDraw(_msg); }
@@ -426,8 +424,11 @@ void RenderWidget::SetInitialScene(const ignition::msgs::Scene& _msg) {
     LoadModel(_msg.model(i));
   }
 
-  ignition::math::Vector3d center((minBBScene.X() + maxBBScene.X()) / 2.0, (minBBScene.Y() + maxBBScene.Y()) / 2.0,
+  // clang-format off
+  ignition::math::Vector3d center((minBBScene.X() + maxBBScene.X()) / 2.0,
+                                  (minBBScene.Y() + maxBBScene.Y()) / 2.0,
                                   (minBBScene.Z() + maxBBScene.Z()) / 2.0);
+  // clang-format on
 
   const double sphereRadius = center.Distance(minBBScene);
   const double fov = this->camera->HFOV().Radian();

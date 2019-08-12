@@ -1,19 +1,19 @@
 // Copyright 2018 Toyota Research Institute
 
-#include <tinyxml2.h>
 #include <chrono>
 #include <cstdint>
 #include <cstdlib>
 #include <string>
 #include <utility>
+#include <tinyxml2.h>
 
 #include <delphyne/macros.h>
 #include <delphyne/protobuf/playback_status.pb.h>
 
-#include <ignition/gui/qt.h>
 #include <ignition/common/Console.hh>
 #include <ignition/common/PluginMacros.hh>
 #include <ignition/gui/Plugin.hh>
+#include <ignition/gui/qt.h>
 #include <ignition/msgs.hh>
 
 #include "playback_widget.hh"

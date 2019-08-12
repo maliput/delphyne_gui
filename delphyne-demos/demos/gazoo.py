@@ -44,7 +44,7 @@ See also https://toyotagazooracing.com/
 
 def create_gazoo_scenario_subtree(filename, mobil_cars_num):
     # The road geometry
-    scenario_subtree = delphyne.behaviours.maliput.Multilane(
+    scenario_subtree = delphyne.behaviours.roads.Multilane(
         file_path=filename,
         name="circuit",
     )

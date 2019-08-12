@@ -12,11 +12,8 @@ The crash demo.
 import math
 import numpy as np
 
-from delphyne.simulation import (
-    AgentSimulationBuilder,
-    SimulationRunner
-)
-import delphyne.utilities as utilities
+import delphyne.trees
+import delphyne.behaviours
 
 from delphyne_gui.utilities import launch_interactive_simulation
 
@@ -70,7 +67,7 @@ def check_for_agent_collisions(simulation_subtree):
 
 
 def create_crash_scenario_subtree():
-    scenario_subtree = delphyne.behaviours.maliput.Road()
+    scenario_subtree = delphyne.behaviours.roads.Road()
 
     scenario_subtree.add_children([
         delphyne.behaviours.agents.SimpleCar(

@@ -47,9 +47,7 @@ def create_dragway_scenario_subtree():
         ),
         delphyne.behaviours.agents.MobilCar(
             name='mobil-car',
-            initial_x=0.0,
-            initial_y=-0.5 * 3.7,
-            initial_heading=0.0,
+            initial_pose=(0.0, -0.5 * 3.7, 0.0),
             speed=1.0
         ),
         delphyne.behaviours.agents.RailCar(

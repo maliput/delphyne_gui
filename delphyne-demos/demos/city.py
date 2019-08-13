@@ -86,7 +86,7 @@ def main():
               .format(os.path.abspath(filename)))
         sys.exit()
 
-    scenario_subtree = delphyne.behaviours.maliput.Multilane(
+    scenario_subtree = delphyne.behaviours.roads.Multilane(
         file_path=filename,
         name="little_city"
     )

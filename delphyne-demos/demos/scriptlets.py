@@ -147,7 +147,7 @@ def main():
               .format(os.path.abspath(filename)))
         quit()
 
-    scenario_subtree = delphyne.behaviours.maliput.Multilane(
+    scenario_subtree = delphyne.behaviours.roads.Multilane(
         file_path=filename,
         name="circuit"
     )

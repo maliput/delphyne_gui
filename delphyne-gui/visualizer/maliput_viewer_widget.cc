@@ -64,6 +64,7 @@ void MaliputViewerWidget::OnNewMultilaneFile(const std::string& filePath) {
   // Loads the new file.
   this->model = std::make_unique<MaliputViewerModel>();
   this->model->Load(filePath);
+  this->rulesVisualizerWiget->ClearText();
   this->rulesVisualizerWiget->ClearLaneList();
   std::vector<QString> lane_ids = this->model->GetAllLaneIds<
     std::vector<QString>>();
@@ -162,7 +163,7 @@ void MaliputViewerWidget::paintEvent(QPaintEvent* _e) {
 }
 
 void MaliputViewerWidget::OnRulesForLaneRequested(QString laneId) {
-  this->rulesVisualizerWiget->ReceiveRules(laneId,
+  emit this->rulesVisualizerWiget->ReceiveRules(laneId,
     this->model->GetRulesOfLane<QString>(laneId.toStdString()));
 }
 

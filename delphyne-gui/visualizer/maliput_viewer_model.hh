@@ -431,12 +431,27 @@ class MaliputViewerModel {
   /// \return Lane associated with that position or nullptr if not found.
   const maliput::api::Lane* GetLaneFromWorldPosition(const ignition::math::Vector3d& _position);
 
+  /// \brief Get a N amount of lanes from the owned road geometry.
+  /// \param[in] _amount_of_lanes Amount of lanes desired to get from the owned
+  /// road geometry
+  /// \return Container that holds a class capable to be constructed using
+  /// const char* and also needs to have a size, push_back and reserve
+  /// method implemented
   template<typename Container>
   Container GetNLanes(size_t _amount_of_lanes) const;
 
+  /// \brief Get all the lanes that the road geometry posses.
+  /// \return Container that holds a class capable to be constructed using
+  /// const char* and also needs to have a push_back and reserve
+  /// method implemented
   template<typename Container>
   Container GetAllLaneIds() const;
 
+  /// \brief Get all the rules for a given lane
+  /// \param[in] _laneId Id of the desired lane to get the rules
+  /// \return String class that it can be constructed with a const char* and has
+  /// operator+ overriden, where each rule is separated by brackets.
+  /// Ex: [Right of way Rule]\n.
   template<typename String>
   String GetRulesOfLane(const std::string& _laneId) const;
 
@@ -464,14 +479,27 @@ class MaliputViewerModel {
   /// \brief Frees and clears the roadGeometry, maliputMeshes and labels.
   void Clear();
 
+  /// \brief Get the right of way rules for a given LaneSRange.
+  /// \param[in] _laneSRange Object that contains a lane id and a range in the s
+  /// coordinate.
+  /// \return String class that it can be constructed with a const char* and has
+  /// operator+ overriden.
   template<typename String>
   String GetRightOfWayRules(
     const maliput::api::rules::LaneSRange& _laneSRange) const;
 
+  /// \brief Get the max speed rules for a given lane id.
+  /// \param[in] _laneId Id of the lane to get the max speed limit.
+  /// \return String class that it can be constructed with a const char* and has
+  /// operator+ overriden.
   template<typename String>
   String GetMaxSpeedLimitRules(
     const maliput::api::LaneId& _laneId) const;
 
+  /// \brief Get the direction usage rules for a given lane id.
+  /// \param[in] _laneId Id of the lane to get the direction usage rules.
+  /// \return String class that it can be constructed with a const char* and has
+  /// operator+ overriden.
   template<typename String>
   String GetDirectionUsageRules(
     const maliput::api::LaneId& _laneId) const;

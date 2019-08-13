@@ -14,7 +14,7 @@ namespace delphyne {
 namespace gui {
 
 /// \class RulesVisualizerWidget
-/// \brief This is a class that implements a simple visualizer for loaded lanes
+/// \brief A class that implements a simple visualizer for loaded lanes
 /// with their rules associated.
 class RulesVisualizerWidget : public QWidget {
   Q_OBJECT
@@ -26,31 +26,35 @@ class RulesVisualizerWidget : public QWidget {
   /// \brief Default Destructor.
   virtual ~RulesVisualizerWidget() = default;
 
+  /// \brief Add lane id to ListWidget.
   void AddLaneId(const QString& lane_id);
+  /// \brief Append text to TextBrowser adding a newline at the end.
   void AddText(const QString& text);
+  /// \brief Clear the ListWidget.
   void ClearLaneList();
+  /// \brief Clear the text in TextBrowser.
   void ClearText();
 
   signals:
 
+  /// \brief Signal used to request rules for a given lane id
   void RequestRulesForLane(QString lane_id);
-  /* TODO: Add corresponding arguments */
+  /// \brief Signal connected internally to handle rules for a given lane
   void ReceiveRules(QString lane_id, QString rules);
 
  private slots:
 
+  /// \brief Slot connected when the user clicks an item from the ListWidget.
+  /// Emits RequestRulesForLane signal
   void OnItemClicked(QListWidgetItem* item);
-  /* TODO: Maybe use a signal between maliput viewer and this plugin for
-  the mouse raycast and the road network? */
-  //void OnMouseClicked();
-
-  /* TODO: Add corresponding arguments */
+  /// \brief Slot connected to ReceiveRules signal. Clears the text browser
+  /// and populates it with the rules for the requested lane.
   void OnRulesReceived(QString lane_id, QString rules);
 
  private:
 
-  QLabel* lanes_label;
-  QLabel* rules_label;
+  QLabel* lanes_label = nullptr;
+  QLabel* rules_label = nullptr;
   QListWidget* lanes_list = nullptr;
   QTextBrowser* rules_log_text_browser = nullptr;
 

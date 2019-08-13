@@ -27,7 +27,6 @@ RulesVisualizerWidget::RulesVisualizerWidget(QWidget* parent) {
     SLOT(OnItemClicked(QListWidgetItem*))
     );
 
-  /* TODO: Add corresponding arguments to signal and slot. */
   QObject::connect(
     this,
     SIGNAL(ReceiveRules(QString, QString)),
@@ -64,7 +63,7 @@ void RulesVisualizerWidget::ClearText() {
 }
 
 void RulesVisualizerWidget::OnItemClicked(QListWidgetItem* item) {
-    RequestRulesForLane(item->text());
+    emit RequestRulesForLane(item->text());
 }
 
 void RulesVisualizerWidget::OnRulesReceived(QString lane_id, QString rules) {

@@ -38,16 +38,19 @@ set(maliput_viewer_widget MaliputViewerWidget)
 QT5_WRAP_CPP(${maliput_viewer_widget}_MOC maliput_viewer_widget.hh)
 QT5_WRAP_CPP(LayerSelectionWidget_MOC layer_selection_widget.hh)
 QT5_WRAP_CPP(RenderMaliputWidget_MOC render_maliput_widget.hh)
+QT5_WRAP_CPP(RulesVisualizerWidget_MOC rules_visualizer_widget.hh)
 add_library(${maliput_viewer_widget} SHARED
   ${CMAKE_CURRENT_SOURCE_DIR}/layer_selection_widget.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/maliput_viewer_widget.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/render_maliput_widget.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/rules_visualizer_widget.cc
   maliput_viewer_model.cc
   orbit_view_control.cc
   render_maliput_widget.cc
   ${${maliput_viewer_widget}_MOC}
   ${LayerSelectionWidget_MOC}
   ${RenderMaliputWidget_MOC}
+  ${RulesVisualizerWidget_MOC}
 )
 
 ament_target_dependencies(${maliput_viewer_widget}

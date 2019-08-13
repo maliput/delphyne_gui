@@ -19,6 +19,111 @@
 using namespace delphyne;
 using namespace gui;
 
+// Returns a vector of all possible direction usage values. Item order
+// matches maliput::api::rules::DirectionUsageRule::Type enumeration.
+const std::vector<std::string> DirectionUsageRuleNames() {
+  return {"WithS", "AgainstS", "Bidirectional", "BidirectionalTurnOnly",
+          "NoUse", "Parking"};
+};
+
+// Serializes `road_position` into `out`.
+std::ostream& operator<<(
+    std::ostream& out,
+    const maliput::api::RoadPosition& road_position) {
+  return out << "(lane: " << road_position.lane->id().string()
+             << ", lane_pos: " << road_position.pos << ")";
+}
+
+// Serializes `road_position_result` into `out`.
+std::ostream& operator<<(
+    std::ostream& out,
+    const maliput::api::RoadPositionResult& road_position_result) {
+  return out << "(road_pos:" << road_position_result.road_position
+             << ", nearest_pos: " << road_position_result.nearest_position
+             << ", distance: " << road_position_result.distance << ")";
+}
+
+// Serializes `state_type` into `out`.
+std::ostream& operator <<(
+    std::ostream& out,
+    const maliput::api::rules::RightOfWayRule::State::Type& state_type) {
+  switch(state_type) {
+    case maliput::api::rules::RightOfWayRule::State::Type::kGo:
+      out << "go";
+      break;
+    case maliput::api::rules::RightOfWayRule::State::Type::kStop:
+      out << "stop";
+      break;
+    case maliput::api::rules::RightOfWayRule::State::Type::kStopThenGo:
+      out << "stop then go";
+      break;
+    default:
+      out << "unknown";
+      break;
+  }
+  return out;
+}
+
+// Serializes `state` into `out`.
+std::ostream& operator <<(
+    std::ostream& out,
+    const maliput::api::rules::RightOfWayRule::State& state) {
+  out << "State(id: " << state.id().string()
+      << ", type: '" << state.type() << "'"
+      << ", yield group: [";
+  for (const auto& right_of_way_rule_id : state.yield_to()) {
+    out << right_of_way_rule_id.string() << ", ";
+  }
+  out << "])";
+  return out;
+}
+
+// Serializes `s_range` into `out`.
+std::ostream& operator <<(
+    std::ostream& out,
+    const maliput::api::rules::SRange& s_range) {
+  return out << "[" << s_range.s0() << ", " << s_range.s1() << "]";
+}
+
+// Serializes `lane_s_range` into `out`.
+std::ostream& operator <<(
+    std::ostream& out,
+    const maliput::api::rules::LaneSRange& lane_s_range) {
+  return out << "Range(lane_id: " << lane_s_range.lane_id().string()
+             << ", s_range:" << lane_s_range.s_range() << ")";
+}
+
+// Serializes `lane_s_route` into `out`.
+std::ostream& operator <<(
+    std::ostream& out,
+    const maliput::api::rules::LaneSRoute& lane_s_route) {
+  out << "Route(ranges: [";
+  for (const auto& range : lane_s_route.ranges()) {
+    out << range << ", ";
+  }
+  return out << "])";
+}
+
+// Serializes `zone_type` into `out`.
+std::ostream& operator <<(
+    std::ostream& out,
+    const maliput::api::rules::RightOfWayRule::ZoneType& zone_type) {
+  switch (zone_type) {
+    case maliput::api::rules::RightOfWayRule::ZoneType::kStopExcluded:
+      out << "stop excluded";
+      break;
+    case maliput::api::rules::RightOfWayRule::ZoneType::kStopAllowed:
+      out << "stop allowed";
+      break;
+    default:
+      out << "unknown";
+      break;
+  }
+  return out;
+}
+
+
+
 /////////////////////////////////////////////////
 bool MaliputViewerModel::Load(const std::string& _maliputFilePath) {
   this->Clear();

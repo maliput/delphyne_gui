@@ -109,7 +109,7 @@ class OrbitViewControl {
   /// and read.
   std::mutex mouseMutex;
 };
-}
-}
+}  // namespace gui
+}  // namespace delphyne
 
 #endif

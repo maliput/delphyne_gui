@@ -5,10 +5,10 @@
 
 #include <string>
 
-#include <QtWidgets/QWidget>
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QPushButton>
+#include <QtWidgets/QWidget>
 
 namespace delphyne {
 namespace gui {
@@ -18,7 +18,6 @@ class LayerSelectionWidget : public QWidget {
   Q_OBJECT
 
  public:
-
   /// \brief Default constructor.
   explicit LayerSelectionWidget(QWidget* parent = 0);
 
@@ -108,6 +107,6 @@ class MaliputFileSelectionWidget : public QWidget {
   std::string fileDialogOpenPath{};
 };
 
-}
-}
+}  // namespace gui
+}  // namespace delphyne
 #endif

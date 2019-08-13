@@ -24,36 +24,47 @@ class AgentInfoDisplay : public ignition::gui::DisplayPlugin {
   Q_OBJECT
 
   /// \brief Constructor
-  public: AgentInfoDisplay();
+ public:
+  AgentInfoDisplay();
 
   /// \brief Destructor
-  public: virtual ~AgentInfoDisplay();
+ public:
+  virtual ~AgentInfoDisplay();
 
-  private slots: void ProcessMsg();
+ private slots:
+  void ProcessMsg();
 
-  private slots: void ToggleText(const QString& _agentName);
+ private slots:
+  void ToggleText(const QString& _agentName);
 
   // Documentation inherited
-  public: QWidget *CreateCustomProperties() const override;
+ public:
+  QWidget* CreateCustomProperties() const override;
 
-  private: void OnAgentState(const ignition::msgs::AgentState_V& _msg);
+ private:
+  void OnAgentState(const ignition::msgs::AgentState_V& _msg);
 
-  private: std::string NameFromAgent(const ignition::msgs::AgentState& agent);
+ private:
+  std::string NameFromAgent(const ignition::msgs::AgentState& agent);
 
-  private: std::shared_ptr<AgentInfoText> CreateAgentText(const std::string& _agentName,
-                                                          QVBoxLayout *_layout,
-                                                          std::shared_ptr<ignition::rendering::Scene> _scenePtr);
-  private: void UpdateAgentLabel(const ignition::msgs::AgentState& _agent,
-                                 const std::string& _agentName,
-                                 std::shared_ptr<AgentInfoText> _agentInfoText);
-  private: QVBoxLayout *CreateLayout();
+ private:
+  std::shared_ptr<AgentInfoText> CreateAgentText(const std::string& _agentName, QVBoxLayout* _layout,
+                                                 std::shared_ptr<ignition::rendering::Scene> _scenePtr);
+
+ private:
+  void UpdateAgentLabel(const ignition::msgs::AgentState& _agent, const std::string& _agentName,
+                        std::shared_ptr<AgentInfoText> _agentInfoText);
+
+ private:
+  QVBoxLayout* CreateLayout();
 
   /// \internal
   /// \brief Pointer to private data.
-  private: std::unique_ptr<AgentInfoDisplayPrivate> dataPtr;
+ private:
+  std::unique_ptr<AgentInfoDisplayPrivate> dataPtr;
 };
-}
-}
-}
+}  // namespace display_plugins
+}  // namespace gui
+}  // namespace delphyne
 
 #endif

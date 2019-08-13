@@ -27,10 +27,8 @@ namespace mesh {
 /// @return A std::unique_ptr<ignition::common::Mesh> with the equivalent mesh
 /// construction. The pointer will be nullptr when the mesh has not the correct
 /// vertices requirements.
-std::unique_ptr<ignition::common::Mesh> Convert(
-    const std::string& name,
-    const maliput::utility::mesh::GeoMesh& geo_mesh);
-
+std::unique_ptr<ignition::common::Mesh> Convert(const std::string& name,
+                                                const maliput::utility::mesh::GeoMesh& geo_mesh);
 
 }  // namespace mesh
 }  // namespace delphyne

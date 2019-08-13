@@ -27,8 +27,8 @@ class OriginDisplay : public ignition::gui::DisplayPlugin {
  public:
   virtual void Initialize(const tinyxml2::XMLElement* _pluginElem) override;
 };
-}
-}
-}
+}  // namespace display_plugins
+}  // namespace gui
+}  // namespace delphyne
 
 #endif

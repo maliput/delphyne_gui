@@ -30,8 +30,8 @@ class Model;
 class Model_V;
 class Scene;
 class Visual;
-}
-}
+}  // namespace msgs
+}  // namespace ignition
 
 namespace delphyne {
 namespace gui {
@@ -133,8 +133,7 @@ class RenderWidget : public ignition::gui::Plugin {
  private:
   /// \brief Set the initial scene
   /// \param[in] request The scene to be loaded
-  void OnSetScene(
-      const ignition::msgs::Scene& request);
+  void OnSetScene(const ignition::msgs::Scene& request);
 
   /// \brief Internal method to create the render window the first time
   /// RenderWidget::showEvent is called.
@@ -152,8 +151,7 @@ class RenderWidget : public ignition::gui::Plugin {
   /// \param[in] _vis The input message containing the visual specs.
   /// \param[out] _visual The new visual.
   /// \param[out] _material The new material.
-  bool CreateVisual(const ignition::msgs::Visual& _vis,
-                    ignition::rendering::VisualPtr& _visual,
+  bool CreateVisual(const ignition::msgs::Visual& _vis, ignition::rendering::VisualPtr& _visual,
                     ignition::rendering::MaterialPtr& _material) const;
 
   /// \brief Creates a root visual for a given link
@@ -161,43 +159,36 @@ class RenderWidget : public ignition::gui::Plugin {
   /// \param[in] _link The robot link
   /// \param[in] _robotID The robot uuid
   /// \return The root visual
-  ignition::rendering::VisualPtr CreateLinkRootVisual(
-      ignition::msgs::Link& _link, const uint32_t _robotID);
+  ignition::rendering::VisualPtr CreateLinkRootVisual(ignition::msgs::Link& _link, const uint32_t _robotID);
 
   /// \brief Helper function used during the last phase of rendering.
   /// \param[in] _vis The input message containing the visual specs.
   /// \param[in] _scale The scale vector.
   /// \param[in] _material The material.
   /// \param[in, out] _visual The visual that is going to be rendered.
-  ignition::rendering::VisualPtr Render(
-      const ignition::msgs::Visual& _vis,
-      const ignition::math::Vector3d& _scale,
-      const ignition::rendering::MaterialPtr& _material,
-      ignition::rendering::VisualPtr& _visual);
+  ignition::rendering::VisualPtr Render(const ignition::msgs::Visual& _vis, const ignition::math::Vector3d& _scale,
+                                        const ignition::rendering::MaterialPtr& _material,
+                                        ignition::rendering::VisualPtr& _visual);
 
   /// \brief Render a new box.
   /// \param[in] _vis the visual containing the properties of the object.
   /// \return A pointer to the new visual.
-  ignition::rendering::VisualPtr RenderBox(
-      const ignition::msgs::Visual& _vis,
-      ignition::rendering::VisualPtr& _visual,
-      ignition::rendering::MaterialPtr& _material);
+  ignition::rendering::VisualPtr RenderBox(const ignition::msgs::Visual& _vis, ignition::rendering::VisualPtr& _visual,
+                                           ignition::rendering::MaterialPtr& _material);
 
   /// \brief Render a new sphere.
   /// \param[in] _vis the visual containing the properties of the object.
   /// \return A pointer to the new visual.
-  ignition::rendering::VisualPtr RenderSphere(
-      const ignition::msgs::Visual& _vis,
-      ignition::rendering::VisualPtr& _visual,
-      ignition::rendering::MaterialPtr& _material);
+  ignition::rendering::VisualPtr RenderSphere(const ignition::msgs::Visual& _vis,
+                                              ignition::rendering::VisualPtr& _visual,
+                                              ignition::rendering::MaterialPtr& _material);
 
   /// \brief Render a new cylinder.
   /// \param[in] _vis the visual containing the properties of the object.
   /// \return A pointer to the new visual.
-  ignition::rendering::VisualPtr RenderCylinder(
-      const ignition::msgs::Visual& _vis,
-      ignition::rendering::VisualPtr& _visual,
-      ignition::rendering::MaterialPtr& _material);
+  ignition::rendering::VisualPtr RenderCylinder(const ignition::msgs::Visual& _vis,
+                                                ignition::rendering::VisualPtr& _visual,
+                                                ignition::rendering::MaterialPtr& _material);
 
   /// \brief Render a new mesh.
   /// \param[in] _vis the visual containing the properties of the object.
@@ -238,8 +229,7 @@ class RenderWidget : public ignition::gui::Plugin {
   /// The key is the model Id.
   /// The value is another map, where the key is the link name, and the
   /// value is a root visual of which all the link's visuals are childs
-  std::map<uint32_t, std::map<std::string, ignition::rendering::VisualPtr>>
-      allVisuals;
+  std::map<uint32_t, std::map<std::string, ignition::rendering::VisualPtr>> allVisuals;
 
   /// \brief A pointer to the rendering engine
   ignition::rendering::RenderEngine* engine;
@@ -256,7 +246,7 @@ class RenderWidget : public ignition::gui::Plugin {
   /// \brief Are we casting shadows by default?
   bool kCastShadowsByDefault{true};
 };
-}
-}
+}  // namespace gui
+}  // namespace delphyne
 
 #endif

@@ -8,7 +8,7 @@
 
 namespace delphyne {
 namespace gui {
-namespace test{
+namespace test {
 
 //////////////////////////////////////////////////
 
@@ -16,11 +16,7 @@ namespace test{
 TEST(GlobalAttributes, SampleUsage) {
   EXPECT_FALSE(GlobalAttributes::HasArgument("foo"));
 
-  const char* arguments[] = {
-    "--foo=bar",
-    "--bar=foo",
-    "--sample_param=123param"
-  };
+  const char* arguments[] = {"--foo=bar", "--bar=foo", "--sample_param=123param"};
   EXPECT_NO_THROW(GlobalAttributes::ParseArguments(3, arguments));
 
   EXPECT_TRUE(GlobalAttributes::HasArgument("foo"));
@@ -37,20 +33,19 @@ TEST(GlobalAttributes, SampleUsage) {
 /// throw.
 TEST(GlobalAttributes, WrongParameters) {
   const char* wrong_arguments[] = {
-    "--=", // Short string.
-    "--b=", // Short string.
-    "--foobar", // Missing "=".
-    "foo=bar", // Missing "--".
-    "--foo= bar", // Whitespace.
-    "--foo=\tbar", // Tabulation.
-    "--foo=\nbar", // Newline.
-    "--foo=\rbar", // Carry return.
-    "--=bar", // Missing key.
-    "--foo=", // Missing value.
+      "--=",          // Short string.
+      "--b=",         // Short string.
+      "--foobar",     // Missing "=".
+      "foo=bar",      // Missing "--".
+      "--foo= bar",   // Whitespace.
+      "--foo=\tbar",  // Tabulation.
+      "--foo=\nbar",  // Newline.
+      "--foo=\rbar",  // Carry return.
+      "--=bar",       // Missing key.
+      "--foo=",       // Missing value.
   };
   for (int i = 0; i < 9; ++i) {
-    EXPECT_THROW(GlobalAttributes::ParseArguments(
-      1, &(wrong_arguments[i])), std::runtime_error);
+    EXPECT_THROW(GlobalAttributes::ParseArguments(1, &(wrong_arguments[i])), std::runtime_error);
   }
 }
 
@@ -60,6 +55,6 @@ int main(int argc, char** argv) {
   return RUN_ALL_TESTS();
 }
 
-}
-}
-}
+}  // namespace test
+}  // namespace gui
+}  // namespace delphyne

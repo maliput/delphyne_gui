@@ -31,13 +31,11 @@ class TeleopWidget : public ignition::gui::Plugin {
   /// \brief Notify that the response to the asynchronous service call
   /// to the bridge returned.
  signals:
-  void RepeatingDriveTopic(const ignition::msgs::Boolean& response,
-                           const bool result);
+  void RepeatingDriveTopic(const ignition::msgs::Boolean& response, const bool result);
 
   /// \brief Callback to finish start driving
  public slots:
-  void DriveTopicComplete(const ignition::msgs::Boolean& response,
-                          const bool result);
+  void DriveTopicComplete(const ignition::msgs::Boolean& response, const bool result);
 
  protected:
   virtual void keyPressEvent(QKeyEvent* _event) override;
@@ -113,7 +111,7 @@ class TeleopWidget : public ignition::gui::Plugin {
   /// \brief Compute and set a valid steering angle value
   void computeClampAndSetSteeringAngle(double sign);
 };
-}
-}
+}  // namespace gui
+}  // namespace delphyne
 
 #endif

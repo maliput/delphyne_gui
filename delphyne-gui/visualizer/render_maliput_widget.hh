@@ -54,8 +54,7 @@ class RenderMaliputWidget : public QWidget {
   // ign-cmake dependency should be switched to 'Components' branch. So, once
   // everything is stable on default or in a release branch, we should modify
   // this method to properly set the transparency.
-  void RenderRoadMeshes(
-    const std::map<std::string, std::unique_ptr<MaliputMesh>>& _maliputMeshes);
+  void RenderRoadMeshes(const std::map<std::string, std::unique_ptr<MaliputMesh>>& _maliputMeshes);
 
   /// \brief Builds visuals for each label inside @p _labels that is enabled.
   /// \details When labels are disabled but were previously created, their
@@ -70,8 +69,7 @@ class RenderMaliputWidget : public QWidget {
   // ign-cmake dependency should be switched to 'Components' branch. So, once
   // everything is stable on default or in a release branch, we should modify
   // this method to properly set the transparency.
-  void RenderLabels(
-    const std::map<MaliputLabelType, std::vector<MaliputLabel>>& _labels);
+  void RenderLabels(const std::map<MaliputLabelType, std::vector<MaliputLabel>>& _labels);
 
   /// \brief Clears all the references to text labels, meshes and the scene.
   void Clear();
@@ -81,7 +79,8 @@ class RenderMaliputWidget : public QWidget {
   virtual void paintEvent(QPaintEvent* _e);
 
   /// \brief Signal that gets fired when a click happens on a visual (mesh)
-  signals: void VisualClicked(ignition::rendering::RayQueryResult rayResult);
+ signals:
+  void VisualClicked(ignition::rendering::RayQueryResult rayResult);
 
  protected:
   /// \brief Overridden method to receive Qt show event.
@@ -118,7 +117,8 @@ class RenderMaliputWidget : public QWidget {
   virtual QPaintEngine* paintEngine() const;
 
   // Documentation inherited
-  protected slots: void ShowContextMenu(const QPoint &_pos);
+ protected slots:
+  void ShowContextMenu(const QPoint& _pos);
 
  private:
   /// \brief Internal method to create the render window the first time
@@ -131,12 +131,8 @@ class RenderMaliputWidget : public QWidget {
   /// \param[in] _verticalCellCount the number of vertical layers.
   /// \param[in] _material the material used to draw the lines.
   /// \param[in] _pose the pose of the grid.
-  void RenderGrid(
-      const unsigned int _cellCount,
-      const double _cellLength,
-      const unsigned int _verticalCellCount,
-      const ignition::rendering::MaterialPtr& _material,
-      const ignition::math::Pose3d& _pose);
+  void RenderGrid(const unsigned int _cellCount, const double _cellLength, const unsigned int _verticalCellCount,
+                  const ignition::rendering::MaterialPtr& _material, const ignition::math::Pose3d& _pose);
 
   /// \brief Render a 50x50 grid over the ground plane.
   void RenderGroundPlaneGrid();
@@ -149,24 +145,20 @@ class RenderMaliputWidget : public QWidget {
   /// \param[in] _ignitionMaterial A valid ignition::rendering::MaterialPtr.
   /// \return True when @p _maliputMaterial is valid and @p _ignitionMaterial
   /// can be filled.
-  bool FillMaterial(
-    const maliput::utility::Material* _maliputMaterial,
-    ignition::rendering::MaterialPtr& _ignitionMaterial) const;
+  bool FillMaterial(const maliput::utility::Material* _maliputMaterial,
+                    ignition::rendering::MaterialPtr& _ignitionMaterial) const;
 
   /// \brief Fills a material to be transparent.
   /// \param[in] _material Material to be transparent.
-  void CreateTransparentMaterial(
-    ignition::rendering::MaterialPtr& _material) const;
+  void CreateTransparentMaterial(ignition::rendering::MaterialPtr& _material) const;
 
   /// \brief Fills a material for a lane label.
   /// \param[in] _material Material to be filled.
-  void CreateLaneLabelMaterial(
-    ignition::rendering::MaterialPtr& _material) const;
+  void CreateLaneLabelMaterial(ignition::rendering::MaterialPtr& _material) const;
 
   /// \brief Fills a material for a branch point label.
   /// \param[in] _material Material to be filled.
-  void CreateBranchPointLabelMaterial(
-    ignition::rendering::MaterialPtr& _material) const;
+  void CreateBranchPointLabelMaterial(ignition::rendering::MaterialPtr& _material) const;
 
   /// \brief Creates a bare visual and adds it as a child of the scene's root
   /// visual.
@@ -213,7 +205,7 @@ class RenderMaliputWidget : public QWidget {
   std::map<std::string, ignition::rendering::VisualPtr> textLabels;
 };
 
-}
-}
+}  // namespace gui
+}  // namespace delphyne
 
 #endif

@@ -11,10 +11,10 @@
 #include <ignition/common/Util.hh>
 
 #ifndef Q_MOC_RUN
-#include <ignition/gui/MainWindow.hh>
-#include <ignition/gui/qt.h>
 #include <ignition/gui/Dock.hh>
 #include <ignition/gui/Iface.hh>
+#include <ignition/gui/MainWindow.hh>
+#include <ignition/gui/qt.h>
 #endif
 
 #include "delphyne-gui/config.hh"
@@ -23,8 +23,8 @@
 
 /// Constants.
 static const char versionStr[] = "Visualizer 0.1.0";
-static const std::string initialConfigFile = ignition::common::joinPaths(
-    DELPHYNE_INITIAL_CONFIG_PATH, "layout_with_teleop.config");
+static const std::string initialConfigFile =
+    ignition::common::joinPaths(DELPHYNE_INITIAL_CONFIG_PATH, "layout_with_teleop.config");
 
 /////////////////////////////////////////////////
 /// \brief Get the path of the default configuration file for Delphyne.
@@ -32,8 +32,7 @@ static const std::string initialConfigFile = ignition::common::joinPaths(
 std::string defaultConfigPath() {
   std::string homePath;
   ignition::common::env("HOME", homePath);
-  std::string defaultConfigPath =
-      ignition::common::joinPaths(homePath, ".delphyne", "delphyne.config");
+  std::string defaultConfigPath = ignition::common::joinPaths(homePath, ".delphyne", "delphyne.config");
 
   return defaultConfigPath;
 }
@@ -61,15 +60,12 @@ int main(int argc, const char* argv[]) {
   }
 
   // Parse custom config file from args.
-  delphyne::utility::PackageManager* package_manager =
-      delphyne::utility::PackageManager::Instance();
+  delphyne::utility::PackageManager* package_manager = delphyne::utility::PackageManager::Instance();
   if (delphyne::gui::GlobalAttributes::HasArgument("package")) {
     package_manager->Use(
-        std::make_unique<delphyne::utility::BundledPackage>(
-            delphyne::gui::GlobalAttributes::GetArgument("package")));
+        std::make_unique<delphyne::utility::BundledPackage>(delphyne::gui::GlobalAttributes::GetArgument("package")));
   } else {
-    package_manager->Use(
-        std::make_unique<delphyne::utility::SystemPackage>());
+    package_manager->Use(std::make_unique<delphyne::utility::SystemPackage>());
   }
 
   Q_INIT_RESOURCE(resources);
@@ -88,10 +84,8 @@ int main(int argc, const char* argv[]) {
   ignition::gui::addPluginPath(PLUGIN_INSTALL_PATH);
 
   // Attempt to load window layout from parsed arguments.
-  bool layout_loaded =
-      delphyne::gui::GlobalAttributes::HasArgument("layout") &&
-      ignition::gui::loadConfig(
-          delphyne::gui::GlobalAttributes::GetArgument("layout"));
+  bool layout_loaded = delphyne::gui::GlobalAttributes::HasArgument("layout") &&
+                       ignition::gui::loadConfig(delphyne::gui::GlobalAttributes::GetArgument("layout"));
   // If no layout was found, attempt to use the default config file.
   layout_loaded = layout_loaded || ignition::gui::loadDefaultConfig();
   // If that's not available either, load it from initial config file.
@@ -103,22 +97,17 @@ int main(int argc, const char* argv[]) {
   // horizontal splits and `receiver/injected` for vertical
   // splits.
   std::regex injectionPattern{"(\\w+)\\s*(/|-)\\s*(\\w+)"};
-  std::vector<std::tuple<std::string, std::string,
-                         Qt::Orientation>> pluginInjectionList;
+  std::vector<std::tuple<std::string, std::string, Qt::Orientation>> pluginInjectionList;
   if (delphyne::gui::GlobalAttributes::HasArgument("inject-plugin")) {
-    const std::string injectPluginArg =
-        delphyne::gui::GlobalAttributes::GetArgument("inject-plugin");
+    const std::string injectPluginArg = delphyne::gui::GlobalAttributes::GetArgument("inject-plugin");
     std::smatch match;
     if (std::regex_search(injectPluginArg, match, injectionPattern)) {
       const std::string& receiverPluginName = match[1];
-      const Qt::Orientation splitOrientation =
-          match[2] == "/" ? Qt::Vertical : Qt::Horizontal;
+      const Qt::Orientation splitOrientation = match[2] == "/" ? Qt::Vertical : Qt::Horizontal;
       const std::string& injectedPluginName = match[3];
-      pluginInjectionList.push_back(std::make_tuple(
-          receiverPluginName, injectedPluginName, splitOrientation));
+      pluginInjectionList.push_back(std::make_tuple(receiverPluginName, injectedPluginName, splitOrientation));
     } else {
-      ignerr << "Ill formed --inject-plugin="
-             << injectPluginArg << " argument."
+      ignerr << "Ill formed --inject-plugin=" << injectPluginArg << " argument."
              << " Missing '@'." << std::endl;
     }
   }
@@ -130,24 +119,16 @@ int main(int argc, const char* argv[]) {
   win->setWindowTitle(versionStr);
 
   for (auto pluginInjectionEntry : pluginInjectionList) {
-    const std::string& receiverPluginName =
-        std::get<0>(pluginInjectionEntry);
-    auto receiverWidget =
-        win->findChild<ignition::gui::Dock*>(
-            QString(receiverPluginName.c_str()));
+    const std::string& receiverPluginName = std::get<0>(pluginInjectionEntry);
+    auto receiverWidget = win->findChild<ignition::gui::Dock*>(QString(receiverPluginName.c_str()));
     if (!receiverWidget) {
-      ignerr << "Unknown " << receiverPluginName
-             << " plugin for injection. Skipping."
-             << std::endl;
+      ignerr << "Unknown " << receiverPluginName << " plugin for injection. Skipping." << std::endl;
       continue;
     }
-    const std::string& injectedPluginName =
-        std::get<1>(pluginInjectionEntry);
-    auto injectedWidget =
-        win->findChild<ignition::gui::Dock*>(
-            QString(injectedPluginName.c_str()));
+    const std::string& injectedPluginName = std::get<1>(pluginInjectionEntry);
+    auto injectedWidget = win->findChild<ignition::gui::Dock*>(QString(injectedPluginName.c_str()));
     if (injectedWidget != nullptr) {
-      ignmsg << "Injected "<< injectedPluginName << " plugin"
+      ignmsg << "Injected " << injectedPluginName << " plugin"
              << " already found. Skipping." << std::endl;
       continue;
     }
@@ -155,13 +136,9 @@ int main(int argc, const char* argv[]) {
       continue;
     }
     ignition::gui::addPluginsToWindow();
-    injectedWidget = win->findChild<ignition::gui::Dock*>(
-        QString(injectedPluginName.c_str()));
-    const Qt::Orientation& splitOrientation =
-        std::get<2>(pluginInjectionEntry);
-    win->splitDockWidget(receiverWidget,
-                         injectedWidget,
-                         splitOrientation);
+    injectedWidget = win->findChild<ignition::gui::Dock*>(QString(injectedPluginName.c_str()));
+    const Qt::Orientation& splitOrientation = std::get<2>(pluginInjectionEntry);
+    win->splitDockWidget(receiverWidget, injectedWidget, splitOrientation);
   }
 
   ignition::gui::runMainWindow();

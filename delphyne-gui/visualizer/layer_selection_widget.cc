@@ -11,27 +11,19 @@ using namespace delphyne;
 using namespace gui;
 
 ///////////////////////////////////////////////////////
-LayerSelectionWidget::LayerSelectionWidget(QWidget* parent) :
-    QWidget(parent) {
+LayerSelectionWidget::LayerSelectionWidget(QWidget* parent) : QWidget(parent) {
   // Build the widget.
   this->Build();
   // Connects all the check box events.
-  QObject::connect(this->asphaltCheckBox, SIGNAL(stateChanged(int)), this,
-    SLOT(onAsphaltValueChanged(int)));
-  QObject::connect(this->laneCheckBox, SIGNAL(stateChanged(int)), this,
-    SLOT(onLaneValueChanged(int)));
-  QObject::connect(this->markerCheckBox, SIGNAL(stateChanged(int)), this,
-    SLOT(onMarkerValueChanged(int)));
-  QObject::connect(this->hboundCheckBox, SIGNAL(stateChanged(int)), this,
-    SLOT(onHBoundsValueChanged(int)));
-  QObject::connect(this->branchPointCheckBox, SIGNAL(stateChanged(int)), this,
-    SLOT(onBranchPointValueChanged(int)));
-  QObject::connect(this->grayedAsphaltCheckBox, SIGNAL(stateChanged(int)),
-    this, SLOT(onGrayedAsphaltValueChanged(int)));
-  QObject::connect(this->grayedLaneCheckBox, SIGNAL(stateChanged(int)), this,
-    SLOT(onGrayedLaneValueChanged(int)));
-  QObject::connect(this->grayedMarkerCheckBox, SIGNAL(stateChanged(int)), this,
-    SLOT(onGrayedMarkerValueChanged(int)));
+  QObject::connect(this->asphaltCheckBox, SIGNAL(stateChanged(int)), this, SLOT(onAsphaltValueChanged(int)));
+  QObject::connect(this->laneCheckBox, SIGNAL(stateChanged(int)), this, SLOT(onLaneValueChanged(int)));
+  QObject::connect(this->markerCheckBox, SIGNAL(stateChanged(int)), this, SLOT(onMarkerValueChanged(int)));
+  QObject::connect(this->hboundCheckBox, SIGNAL(stateChanged(int)), this, SLOT(onHBoundsValueChanged(int)));
+  QObject::connect(this->branchPointCheckBox, SIGNAL(stateChanged(int)), this, SLOT(onBranchPointValueChanged(int)));
+  QObject::connect(this->grayedAsphaltCheckBox, SIGNAL(stateChanged(int)), this,
+                   SLOT(onGrayedAsphaltValueChanged(int)));
+  QObject::connect(this->grayedLaneCheckBox, SIGNAL(stateChanged(int)), this, SLOT(onGrayedLaneValueChanged(int)));
+  QObject::connect(this->grayedMarkerCheckBox, SIGNAL(stateChanged(int)), this, SLOT(onGrayedMarkerValueChanged(int)));
 }
 
 ///////////////////////////////////////////////////////
@@ -60,7 +52,7 @@ void LayerSelectionWidget::Build() {
   this->grayedLaneCheckBox->setCheckable(false);
   this->grayedMarkerCheckBox->setCheckable(false);
 
-  auto *layout = new QVBoxLayout(this);
+  auto* layout = new QVBoxLayout(this);
   layout->addWidget(asphaltCheckBox);
   layout->addWidget(laneCheckBox);
   layout->addWidget(markerCheckBox);
@@ -69,10 +61,10 @@ void LayerSelectionWidget::Build() {
   layout->addWidget(grayedAsphaltCheckBox);
   layout->addWidget(grayedLaneCheckBox);
   layout->addWidget(grayedMarkerCheckBox);
-  auto *groupBox = new QGroupBox("Layers", this);
+  auto* groupBox = new QGroupBox("Layers", this);
   groupBox->setLayout(layout);
 
-  auto *widgetLayout = new QVBoxLayout(this);
+  auto* widgetLayout = new QVBoxLayout(this);
   widgetLayout->addWidget(groupBox);
   widgetLayout->addStretch();
   this->setLayout(widgetLayout);
@@ -84,9 +76,7 @@ void LayerSelectionWidget::onAsphaltValueChanged(int state) {
 }
 
 ///////////////////////////////////////////////////////
-void LayerSelectionWidget::onLaneValueChanged(int state) {
-  emit valueChanged("lane", this->laneCheckBox->isChecked());
-}
+void LayerSelectionWidget::onLaneValueChanged(int state) { emit valueChanged("lane", this->laneCheckBox->isChecked()); }
 
 ///////////////////////////////////////////////////////
 void LayerSelectionWidget::onMarkerValueChanged(int state) {
@@ -123,10 +113,8 @@ LabelSelectionWidget::LabelSelectionWidget(QWidget* parent) : QWidget(parent) {
   // Build the widget.
   this->Build();
   // Connects all the check box events.
-  QObject::connect(this->laneCheckBox, SIGNAL(stateChanged(int)), this,
-    SLOT(onLaneValueChanged(int)));
-  QObject::connect(this->branchPointCheckBox, SIGNAL(stateChanged(int)), this,
-    SLOT(onBranchPointValueChanged(int)));
+  QObject::connect(this->laneCheckBox, SIGNAL(stateChanged(int)), this, SLOT(onLaneValueChanged(int)));
+  QObject::connect(this->branchPointCheckBox, SIGNAL(stateChanged(int)), this, SLOT(onBranchPointValueChanged(int)));
 }
 
 ///////////////////////////////////////////////////////
@@ -139,8 +127,7 @@ void LabelSelectionWidget::onLaneValueChanged(int state) {
 
 ///////////////////////////////////////////////////////
 void LabelSelectionWidget::onBranchPointValueChanged(int state) {
-  emit valueChanged("branchpoint_text_label",
-                    this->branchPointCheckBox->isChecked());
+  emit valueChanged("branchpoint_text_label", this->branchPointCheckBox->isChecked());
 }
 
 ///////////////////////////////////////////////////////
@@ -152,33 +139,30 @@ void LabelSelectionWidget::Build() {
   this->laneCheckBox->setChecked(true);
   this->branchPointCheckBox->setChecked(true);
 
-  auto *layout = new QVBoxLayout(this);
+  auto* layout = new QVBoxLayout(this);
   layout->addWidget(laneCheckBox);
   layout->addWidget(branchPointCheckBox);
 
-  auto *groupBox = new QGroupBox("Labels", this);
+  auto* groupBox = new QGroupBox("Labels", this);
   groupBox->setLayout(layout);
 
-  auto *widgetLayout = new QVBoxLayout(this);
+  auto* widgetLayout = new QVBoxLayout(this);
   widgetLayout->addWidget(groupBox);
   widgetLayout->addStretch();
   this->setLayout(widgetLayout);
 }
 
 ///////////////////////////////////////////////////////
-MaliputFileSelectionWidget::MaliputFileSelectionWidget(QWidget* parent)
-    : QWidget(parent) {
+MaliputFileSelectionWidget::MaliputFileSelectionWidget(QWidget* parent) : QWidget(parent) {
   if (!QDir::homePath().isEmpty()) {
-    this->fileDialogOpenPath =
-        QDir::toNativeSeparators(QDir::homePath()).toStdString();
+    this->fileDialogOpenPath = QDir::toNativeSeparators(QDir::homePath()).toStdString();
   } else {
     this->fileDialogOpenPath = "/";
   }
   // Build the widget.
   this->Build();
   // Connects all the check box events.
-  QObject::connect(this->loadButton, SIGNAL(released()), this,
-                   SLOT(onLoadButtonPressed()));
+  QObject::connect(this->loadButton, SIGNAL(released()), this, SLOT(onLoadButtonPressed()));
 }
 
 ///////////////////////////////////////////////////////
@@ -191,10 +175,9 @@ void MaliputFileSelectionWidget::SetFileNameLabel(const std::string& fileName) {
 
 ///////////////////////////////////////////////////////
 void MaliputFileSelectionWidget::onLoadButtonPressed() {
-  QString fileName = QFileDialog::getOpenFileName(
-      this, tr("Open Maliput XODR or YAML"),
-      QString::fromStdString(this->fileDialogOpenPath),
-      tr("XODR Files (*.XODR);;YAML files (*.YAML)"));
+  QString fileName = QFileDialog::getOpenFileName(this, tr("Open Maliput XODR or YAML"),
+                                                  QString::fromStdString(this->fileDialogOpenPath),
+                                                  tr("XODR Files (*.XODR);;YAML files (*.YAML)"));
   if (!fileName.isEmpty()) {
     this->fileDialogOpenPath = fileName.toStdString();
   }

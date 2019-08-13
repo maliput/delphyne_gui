@@ -2,9 +2,9 @@
 
 #include "maliput_viewer_widget.hh"
 
-#include <maliput/api/lane.h>
 #include <ignition/common/Console.hh>
 #include <ignition/rendering/RayQuery.hh>
+#include <maliput/api/lane.h>
 
 #include "global_attributes.hh"
 
@@ -12,8 +12,7 @@ using namespace delphyne;
 using namespace gui;
 
 /////////////////////////////////////////////////
-MaliputViewerWidget::MaliputViewerWidget(QWidget* parent)
-    : Plugin() {
+MaliputViewerWidget::MaliputViewerWidget(QWidget* parent) : Plugin() {
   // Loads the GUI.
   this->BuildGUI();
   // Loads the maliput file path if any and parses it.
@@ -21,28 +20,23 @@ MaliputViewerWidget::MaliputViewerWidget(QWidget* parent)
   if (GlobalAttributes::HasArgument("xodr_file")) {
     this->model->Load(GlobalAttributes::GetArgument("xodr_file"));
     this->VisualizeFileName(GlobalAttributes::GetArgument("xodr_file"));
-  }
-  else if (GlobalAttributes::HasArgument("yaml_file")){
+  } else if (GlobalAttributes::HasArgument("yaml_file")) {
     this->model->Load(GlobalAttributes::GetArgument("yaml_file"));
     this->VisualizeFileName(GlobalAttributes::GetArgument("yaml_file"));
   }
 
-  QObject::connect(this->layerSelectionWidget,
-    SIGNAL(valueChanged(const std::string&, bool)), this,
-    SLOT(OnLayerMeshChanged(const std::string&, bool)));
+  QObject::connect(this->layerSelectionWidget, SIGNAL(valueChanged(const std::string&, bool)), this,
+                   SLOT(OnLayerMeshChanged(const std::string&, bool)));
 
-  QObject::connect(this->labelSelectionWidget,
-    SIGNAL(valueChanged(const std::string&, bool)), this,
-    SLOT(OnTextLabelChanged(const std::string&, bool)));
+  QObject::connect(this->labelSelectionWidget, SIGNAL(valueChanged(const std::string&, bool)), this,
+                   SLOT(OnTextLabelChanged(const std::string&, bool)));
 
-  QObject::connect(this->maliputFileSelectionWidget,
-                   SIGNAL(maliputFileChanged(const std::string&)), this,
+  QObject::connect(this->maliputFileSelectionWidget, SIGNAL(maliputFileChanged(const std::string&)), this,
                    SLOT(OnNewMultilaneFile(const std::string&)));
 }
 
 /////////////////////////////////////////////////
-void MaliputViewerWidget::OnLayerMeshChanged(const std::string& key,
-  bool newValue) {
+void MaliputViewerWidget::OnLayerMeshChanged(const std::string& key, bool newValue) {
   // Updates the model.
   this->model->SetLayerState(key, newValue);
   // Replicates into the GUI.
@@ -50,8 +44,7 @@ void MaliputViewerWidget::OnLayerMeshChanged(const std::string& key,
 }
 
 /////////////////////////////////////////////////
-void MaliputViewerWidget::OnTextLabelChanged(
-    const std::string& key, bool newValue) {
+void MaliputViewerWidget::OnTextLabelChanged(const std::string& key, bool newValue) {
   // Updates the model.
   this->model->SetTextLabelState(FromString(key), newValue);
   // Replicates into the GUI.
@@ -81,21 +74,15 @@ void MaliputViewerWidget::OnNewMultilaneFile(const std::string& filePath) {
 void MaliputViewerWidget::VisualizeFileName(const std::string& filePath) {
   const auto filePathDividerPosition = filePath.rfind("/");
   if (filePathDividerPosition != std::string::npos) {
-    this->maliputFileSelectionWidget->SetFileNameLabel(
-        filePath.substr(filePathDividerPosition + 1));
+    this->maliputFileSelectionWidget->SetFileNameLabel(filePath.substr(filePathDividerPosition + 1));
   }
 }
 
 /////////////////////////////////////////////////
-void MaliputViewerWidget::OnVisualClicked(
-  ignition::rendering::RayQueryResult rayResult) {
-
-  if (this->model)
-  {
-    const maliput::api::Lane* lane = this->model->GetLaneFromWorldPosition(
-      rayResult.point);
-    if (lane)
-    {
+void MaliputViewerWidget::OnVisualClicked(ignition::rendering::RayQueryResult rayResult) {
+  if (this->model) {
+    const maliput::api::Lane* lane = this->model->GetLaneFromWorldPosition(rayResult.point);
+    if (lane) {
       ignerr << "Clicked lane ID: " << lane->id().string() << "\n";
     }
   }
@@ -119,11 +106,8 @@ void MaliputViewerWidget::BuildGUI() {
   this->labelSelectionWidget = new LabelSelectionWidget(this);
   this->renderWidget = new RenderMaliputWidget(this);
 
-  QObject::connect(
-    this->renderWidget,
-    SIGNAL(VisualClicked(ignition::rendering::RayQueryResult)),
-    this,
-    SLOT(OnVisualClicked(ignition::rendering::RayQueryResult)));
+  QObject::connect(this->renderWidget, SIGNAL(VisualClicked(ignition::rendering::RayQueryResult)), this,
+                   SLOT(OnVisualClicked(ignition::rendering::RayQueryResult)));
 
   auto verticalLayout = new QVBoxLayout(this);
   verticalLayout->addWidget(this->maliputFileSelectionWidget);
@@ -155,5 +139,4 @@ void MaliputViewerWidget::paintEvent(QPaintEvent* _e) {
 }
 
 /////////////////////////////////////////////////
-IGN_COMMON_REGISTER_SINGLE_PLUGIN(delphyne::gui::MaliputViewerWidget,
-                                  ignition::gui::Plugin)
+IGN_COMMON_REGISTER_SINGLE_PLUGIN(delphyne::gui::MaliputViewerWidget, ignition::gui::Plugin)

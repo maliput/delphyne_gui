@@ -3,8 +3,8 @@
 #ifndef DELPHYNE_GUI_PLAYBACKWIDGET_HH
 #define DELPHYNE_GUI_PLAYBACKWIDGET_HH
 
-#include <cmath>
 #include <chrono>
+#include <cmath>
 #include <map>
 #include <memory>
 #include <string>
@@ -22,8 +22,8 @@ namespace ignition {
 namespace msgs {
 class Duration;
 class PlaybackStatus;
-}
-}
+}  // namespace msgs
+}  // namespace ignition
 
 namespace delphyne {
 namespace gui {
@@ -147,7 +147,7 @@ class PlaybackWidget : public ignition::gui::Plugin {
   // An ignition transport node.
   ignition::transport::Node node_;
 };
-}
-}
+}  // namespace gui
+}  // namespace delphyne
 
 #endif

@@ -30,11 +30,9 @@ std::chrono::nanoseconds TimeToChrono(const ignition::msgs::Time& src) {
           std::chrono::nanoseconds(src.has_nsec() ? src.nsec() : 0));
 }
 
-void ChronoToDuration(const std::chrono::nanoseconds& src,
-                      ignition::msgs::Duration* dst) {
+void ChronoToDuration(const std::chrono::nanoseconds& src, ignition::msgs::Duration* dst) {
   DELPHYNE_DEMAND(dst != nullptr);
-  std::chrono::seconds src_in_seconds =
-      std::chrono::duration_cast<std::chrono::seconds>(src);
+  std::chrono::seconds src_in_seconds = std::chrono::duration_cast<std::chrono::seconds>(src);
   dst->set_sec(std::floor(src_in_seconds.count()));
   dst->set_nsec((src - src_in_seconds).count());
 }
@@ -42,15 +40,10 @@ void ChronoToDuration(const std::chrono::nanoseconds& src,
 }  // namespace
 
 /////////////////////////////////////////////////
-PlaybackWidget::PlaybackWidget(QWidget* parent)
-    : Plugin()  {
-  qRegisterMetaType<ignition::msgs::PlaybackStatus>();
-}
+PlaybackWidget::PlaybackWidget(QWidget* parent) : Plugin() { qRegisterMetaType<ignition::msgs::PlaybackStatus>(); }
 
 /////////////////////////////////////////////////
-PlaybackWidget::~PlaybackWidget() {
-
-}
+PlaybackWidget::~PlaybackWidget() {}
 
 /////////////////////////////////////////////////
 void PlaybackWidget::LoadConfig(const tinyxml2::XMLElement* _pluginElem) {
@@ -60,27 +53,23 @@ void PlaybackWidget::LoadConfig(const tinyxml2::XMLElement* _pluginElem) {
   // Creates all child widgets.
   rewind_button_ = new QPushButton(QIcon(":/icons/rewind.svg"), "");
   rewind_button_->setToolTip("Rewind");
-  this->connect(rewind_button_, SIGNAL(clicked()),
-                this, SLOT(OnRewindButtonPush()));
+  this->connect(rewind_button_, SIGNAL(clicked()), this, SLOT(OnRewindButtonPush()));
 
   pause_button_ = new QPushButton(QIcon(":/icons/pause.svg"), "");
   pause_button_->setToolTip("Pause");
   pause_button_->setCheckable(true);
   pause_button_->setAutoExclusive(true);
-  this->connect(pause_button_, SIGNAL(clicked()),
-                this, SLOT(OnPauseButtonPush()));
+  this->connect(pause_button_, SIGNAL(clicked()), this, SLOT(OnPauseButtonPush()));
 
   play_button_ = new QPushButton(QIcon(":/icons/play.svg"), "");
   play_button_->setToolTip("Play");
   play_button_->setCheckable(true);
   play_button_->setAutoExclusive(true);
-  this->connect(play_button_, SIGNAL(clicked()),
-                this, SLOT(OnPlayButtonPush()));
+  this->connect(play_button_, SIGNAL(clicked()), this, SLOT(OnPlayButtonPush()));
 
   step_button_ = new QPushButton(QIcon(":/icons/step.svg"), "");
   step_button_->setToolTip("Step forward");
-  this->connect(step_button_, SIGNAL(clicked()),
-                this, SLOT(OnStepButtonPush()));
+  this->connect(step_button_, SIGNAL(clicked()), this, SLOT(OnStepButtonPush()));
 
   time_step_spinbox_ = new QSpinBox();
   // Max value gets overwritten as soon as the time range is known.
@@ -95,12 +84,9 @@ void PlaybackWidget::LoadConfig(const tinyxml2::XMLElement* _pluginElem) {
   timeline_slider_->setMinimum(0);
   timeline_slider_->setTracking(true);
   timeline_slider_->setOrientation(Qt::Horizontal);
-  this->connect(timeline_slider_, SIGNAL(sliderPressed()),
-                this, SLOT(OnTimelinePress()));
-  this->connect(timeline_slider_, SIGNAL(sliderMoved(int)),
-                this, SLOT(OnTimelineMove(int)));
-  this->connect(timeline_slider_, SIGNAL(sliderReleased()),
-                this, SLOT(OnTimelineRelease()));
+  this->connect(timeline_slider_, SIGNAL(sliderPressed()), this, SLOT(OnTimelinePress()));
+  this->connect(timeline_slider_, SIGNAL(sliderMoved(int)), this, SLOT(OnTimelineMove(int)));
+  this->connect(timeline_slider_, SIGNAL(sliderReleased()), this, SLOT(OnTimelineRelease()));
 
   duration_label_ = new QLabel;
 
@@ -120,15 +106,12 @@ void PlaybackWidget::LoadConfig(const tinyxml2::XMLElement* _pluginElem) {
 
   // Connects update slot with status subscription through an
   // auxiliary signal.
-  this->connect(
-      this, SIGNAL(OnStatusChange(const ignition::msgs::PlaybackStatus&)),
-      this, SLOT(Update(const ignition::msgs::PlaybackStatus&)));
+  this->connect(this, SIGNAL(OnStatusChange(const ignition::msgs::PlaybackStatus&)), this,
+                SLOT(Update(const ignition::msgs::PlaybackStatus&)));
 
-  if (!node_.Subscribe(
-          kStatusTopicName, &PlaybackWidget::OnStatusMessage, this)) {
+  if (!node_.Subscribe(kStatusTopicName, &PlaybackWidget::OnStatusMessage, this)) {
     ignerr << "Error subscribing to topic "
-           << "[" << kStatusTopicName << "]"
-           << std::endl;
+           << "[" << kStatusTopicName << "]" << std::endl;
   }
 
   // Spins up a timer to monitor backend responsiveness.
@@ -138,33 +121,27 @@ void PlaybackWidget::LoadConfig(const tinyxml2::XMLElement* _pluginElem) {
 /////////////////////////////////////////////////
 void PlaybackWidget::OnRewindButtonPush() {
   ignition::msgs::Duration msg;
-  msg.set_sec(0); msg.set_nsec(0);
+  msg.set_sec(0);
+  msg.set_nsec(0);
   this->RequestSeek(msg);
 }
 
 /////////////////////////////////////////////////
-void PlaybackWidget::OnPauseButtonPush() {
-  this->RequestPause();
-}
+void PlaybackWidget::OnPauseButtonPush() { this->RequestPause(); }
 
 /////////////////////////////////////////////////
-void PlaybackWidget::OnPlayButtonPush() {
-  this->RequestResume();
-}
+void PlaybackWidget::OnPlayButtonPush() { this->RequestResume(); }
 
 /////////////////////////////////////////////////
 void PlaybackWidget::OnStepButtonPush() {
-  const std::chrono::milliseconds time_step(
-      time_step_spinbox_->value());
+  const std::chrono::milliseconds time_step(time_step_spinbox_->value());
   ignition::msgs::Duration time_step_msg;
   ChronoToDuration(time_step, &time_step_msg);
   this->RequestStep(time_step_msg);
 }
 
 /////////////////////////////////////////////////
-void PlaybackWidget::OnTimelinePress() {
-  timeline_interaction_ = true;
-}
+void PlaybackWidget::OnTimelinePress() { timeline_interaction_ = true; }
 
 /////////////////////////////////////////////////
 void PlaybackWidget::OnTimelineMove(int slider_location) {
@@ -174,23 +151,17 @@ void PlaybackWidget::OnTimelineMove(int slider_location) {
 }
 
 /////////////////////////////////////////////////
-void PlaybackWidget::OnTimelineRelease() {
-  timeline_interaction_ = false;
-}
+void PlaybackWidget::OnTimelineRelease() { timeline_interaction_ = false; }
 
 /////////////////////////////////////////////////
 void PlaybackWidget::timerEvent(QTimerEvent* event) {
-  const std::chrono::nanoseconds current_time =
-      std::chrono::steady_clock::now().time_since_epoch();
+  const std::chrono::nanoseconds current_time = std::chrono::steady_clock::now().time_since_epoch();
   // Disables the entire widget if playback status updates have stopped coming.
   this->setEnabled(current_time - last_update_time_ < kStatusUpdateMaxDelay);
 }
 
 /////////////////////////////////////////////////
-void PlaybackWidget::OnStatusMessage(
-    const ignition::msgs::PlaybackStatus& msg) {
-  emit this->OnStatusChange(msg);
-}
+void PlaybackWidget::OnStatusMessage(const ignition::msgs::PlaybackStatus& msg) { emit this->OnStatusChange(msg); }
 
 /////////////////////////////////////////////////
 void PlaybackWidget::Update(const ignition::msgs::PlaybackStatus& status) {
@@ -203,8 +174,7 @@ void PlaybackWidget::Update(const ignition::msgs::PlaybackStatus& status) {
   const std::chrono::nanoseconds start_time = TimeToChrono(status.start_time());
   const std::chrono::nanoseconds end_time = TimeToChrono(status.end_time());
   const std::chrono::nanoseconds time_range = end_time - start_time;
-  const std::chrono::nanoseconds current_time =
-      TimeToChrono(status.current_time());
+  const std::chrono::nanoseconds current_time = TimeToChrono(status.current_time());
   const std::chrono::nanoseconds elapsed_time = current_time - start_time;
   const std::chrono::milliseconds time_step(time_step_spinbox_->value());
   if (!timeline_interaction_) {
@@ -212,44 +182,34 @@ void PlaybackWidget::Update(const ignition::msgs::PlaybackStatus& status) {
     timeline_slider_->setMaximum(time_range / time_step);
     timeline_slider_->setValue(elapsed_time / time_step);
     // Sets timeline scale (or in other words, its tick duration).
-    const int slider_range =
-        timeline_slider_->maximum() - timeline_slider_->minimum();
+    const int slider_range = timeline_slider_->maximum() - timeline_slider_->minimum();
     timeline_scale_ = time_range / slider_range;
   }
   using seconds = std::chrono::duration<double>;
-  constexpr int kFieldWidth{0};  // Default.
+  constexpr int kFieldWidth{0};      // Default.
   constexpr char kFieldFormat{'f'};  // No scientific notation.
   constexpr int kFieldPrecision{3};  // Up to three (3) places after
                                      // the decimal dot.
   // Uses time label to track playback time, in seconds
   // since the Epoch..
   time_label_->setText(
-      QString("Time: %1").arg(
-          std::chrono::duration_cast<seconds>(
-              current_time).count(), kFieldWidth,
-          kFieldFormat, kFieldPrecision));
+      QString("Time: %1")
+          .arg(std::chrono::duration_cast<seconds>(current_time).count(), kFieldWidth, kFieldFormat, kFieldPrecision));
   // Uses duration label to track playback duration, in seconds.
   duration_label_->setText(
       QString("%1 s / %2 s")
-      .arg(std::chrono::duration_cast<seconds>(
-          elapsed_time).count(), kFieldWidth,
-          kFieldFormat, kFieldPrecision)
-      .arg(std::chrono::duration_cast<seconds>(
-          time_range).count(), kFieldWidth,
-          kFieldFormat, kFieldPrecision));
+          .arg(std::chrono::duration_cast<seconds>(elapsed_time).count(), kFieldWidth, kFieldFormat, kFieldPrecision)
+          .arg(std::chrono::duration_cast<seconds>(time_range).count(), kFieldWidth, kFieldFormat, kFieldPrecision));
   // Updates maximum value in time step spinbox with the actual lenght of the
   // playback. This runs only once since the widget gets enabled afterwards.
-  if(!this->isEnabled()) {
-    time_step_spinbox_->setMaximum(
-        std::chrono::duration_cast<std::chrono::milliseconds>(time_range)
-            .count());
+  if (!this->isEnabled()) {
+    time_step_spinbox_->setMaximum(std::chrono::duration_cast<std::chrono::milliseconds>(time_range).count());
   }
 
   // Enables the entire widget.
   this->setEnabled(true);
   // Tracks time of update.
-  last_update_time_ =
-      std::chrono::steady_clock::now().time_since_epoch();
+  last_update_time_ = std::chrono::steady_clock::now().time_since_epoch();
 }
 
 /////////////////////////////////////////////////
@@ -285,5 +245,4 @@ void PlaybackWidget::RequestSeek(const ignition::msgs::Duration& seek_offset) {
 }  // namespace gui
 }  // namespace delphyne
 
-IGN_COMMON_REGISTER_SINGLE_PLUGIN(delphyne::gui::PlaybackWidget,
-                                  ignition::gui::Plugin)
+IGN_COMMON_REGISTER_SINGLE_PLUGIN(delphyne::gui::PlaybackWidget, ignition::gui::Plugin)

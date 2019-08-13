@@ -40,8 +40,7 @@ void OriginDisplay::Initialize(const tinyxml2::XMLElement* /*_pluginElem*/) {
     double roll = 0.0;
     double pitch = IGN_PI_2;
     double yaw = 0.0;
-    const ignition::math::Pose3d kAxisPoseX(xPosition, yPosition, zPosition,
-                                            roll, pitch, yaw);
+    const ignition::math::Pose3d kAxisPoseX(xPosition, yPosition, zPosition, roll, pitch, yaw);
     axes[0]->SetLocalPose(kAxisPoseX);
     axes[0]->SetMaterial("Default/TransRed");
 
@@ -52,8 +51,7 @@ void OriginDisplay::Initialize(const tinyxml2::XMLElement* /*_pluginElem*/) {
     roll = IGN_PI_2;
     pitch = 0.0;
     yaw = 0.0;
-    const ignition::math::Pose3d kAxisPoseY(xPosition, yPosition, zPosition,
-                                            roll, pitch, yaw);
+    const ignition::math::Pose3d kAxisPoseY(xPosition, yPosition, zPosition, roll, pitch, yaw);
     axes[1]->SetLocalPose(kAxisPoseY);
     axes[1]->SetMaterial("Default/TransGreen");
 
@@ -64,8 +62,7 @@ void OriginDisplay::Initialize(const tinyxml2::XMLElement* /*_pluginElem*/) {
     roll = 0.0;
     pitch = 0.0;
     yaw = 0.0;
-    const ignition::math::Pose3d kAxisPoseZ(xPosition, yPosition, zPosition,
-                                            roll, pitch, yaw);
+    const ignition::math::Pose3d kAxisPoseZ(xPosition, yPosition, zPosition, roll, pitch, yaw);
     axes[2]->SetLocalPose(kAxisPoseZ);
     axes[2]->SetMaterial("Default/TransBlue");
 
@@ -79,5 +76,4 @@ void OriginDisplay::Initialize(const tinyxml2::XMLElement* /*_pluginElem*/) {
 }
 
 // Register this plugin
-IGN_COMMON_REGISTER_SINGLE_PLUGIN(delphyne::gui::display_plugins::OriginDisplay,
-                                  ignition::gui::DisplayPlugin)
+IGN_COMMON_REGISTER_SINGLE_PLUGIN(delphyne::gui::display_plugins::OriginDisplay, ignition::gui::DisplayPlugin)

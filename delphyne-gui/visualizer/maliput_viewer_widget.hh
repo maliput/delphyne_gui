@@ -91,10 +91,9 @@ class MaliputViewerWidget : public ignition::gui::Plugin {
   /// \brief Flag used to record the first paint event and sync on the road
   /// meshes when required.
   bool first_run_{false};
-
 };
 
-}
-}
+}  // namespace gui
+}  // namespace delphyne
 
 #endif

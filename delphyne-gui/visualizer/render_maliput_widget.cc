@@ -32,8 +32,7 @@ using namespace delphyne;
 using namespace gui;
 
 /////////////////////////////////////////////////
-RenderMaliputWidget::RenderMaliputWidget(QWidget* parent) :
-    engine(nullptr) {
+RenderMaliputWidget::RenderMaliputWidget(QWidget* parent) : engine(nullptr) {
   this->setAttribute(Qt::WA_OpaquePaintEvent, true);
   this->setAttribute(Qt::WA_PaintOnScreen, true);
   this->setAttribute(Qt::WA_NoSystemBackground, true);
@@ -68,12 +67,10 @@ RenderMaliputWidget::~RenderMaliputWidget() {
 }
 
 /////////////////////////////////////////////////
-void RenderMaliputWidget::RenderGrid(
-      const unsigned int _cellCount,
-      const double _cellLength,
-      const unsigned int _verticalCellCount,
-      const ignition::rendering::MaterialPtr& _material,
-      const ignition::math::Pose3d& _pose) {
+void RenderMaliputWidget::RenderGrid(const unsigned int _cellCount, const double _cellLength,
+                                     const unsigned int _verticalCellCount,
+                                     const ignition::rendering::MaterialPtr& _material,
+                                     const ignition::math::Pose3d& _pose) {
   auto gridGeom = this->scene->CreateGrid();
   if (!gridGeom) {
     ignerr << "Unable to create grid geometry" << std::endl;
@@ -108,11 +105,10 @@ void RenderMaliputWidget::RenderGroundPlaneGrid() {
     gridMaterial->SetSpecular(lightRed, lightGreen, lightBlue);
 
     const unsigned int kCellCount = 50u;
-    const double       kCellLength = 1;
+    const double kCellLength = 1;
     const unsigned int kVerticalCellCount = 0u;
 
-    this->RenderGrid(kCellCount, kCellLength, kVerticalCellCount,
-      gridMaterial, ignition::math::Pose3d::Zero);
+    this->RenderGrid(kCellCount, kCellLength, kVerticalCellCount, gridMaterial, ignition::math::Pose3d::Zero);
   } else {
     ignerr << "Failed to create material for the grid" << std::endl;
   }
@@ -136,12 +132,10 @@ void RenderMaliputWidget::RenderOrigin() {
     axis->AddGeometry(scene->CreateCylinder());
   }
 
-  const ignition::math::Pose3d kAxisPoseX(kAxisHalfLength, 0, 0, 0, IGN_PI_2,
-                                          0);
+  const ignition::math::Pose3d kAxisPoseX(kAxisHalfLength, 0, 0, 0, IGN_PI_2, 0);
   axes[0]->SetLocalPose(kAxisPoseX);
   axes[0]->SetMaterial("Default/TransRed");
-  const ignition::math::Pose3d kAxisPoseY(0, kAxisHalfLength, 0, IGN_PI_2, 0,
-                                          0);
+  const ignition::math::Pose3d kAxisPoseY(0, kAxisHalfLength, 0, IGN_PI_2, 0, 0);
   axes[1]->SetLocalPose(kAxisPoseY);
   axes[1]->SetMaterial("Default/TransGreen");
   const ignition::math::Pose3d kAxisPoseZ(0, 0, kAxisHalfLength, 0, 0, 0);
@@ -156,8 +150,7 @@ void RenderMaliputWidget::RenderOrigin() {
 /////////////////////////////////////////////////
 void RenderMaliputWidget::CreateRenderWindow() {
   std::string engineName = "ogre";
-  ignition::rendering::RenderEngineManager* manager =
-      ignition::rendering::RenderEngineManager::Instance();
+  ignition::rendering::RenderEngineManager* manager = ignition::rendering::RenderEngineManager::Instance();
   this->engine = manager->Engine(engineName);
   if (!this->engine) {
     ignerr << "Engine '" << engineName << "' is not supported" << std::endl;
@@ -166,8 +159,7 @@ void RenderMaliputWidget::CreateRenderWindow() {
 
   // Try to reutilize the scene if exists
   this->scene = engine->SceneByName("scene");
-  if (!this->scene)
-  {
+  if (!this->scene) {
     // Create a scene
     this->scene = engine->CreateScene("scene");
     if (!this->scene) {
@@ -208,8 +200,7 @@ void RenderMaliputWidget::CreateRenderWindow() {
   // Step away from the center of the scene
   auto position = this->userSettings.userCameraPose.Pos();
   this->camera->SetLocalPosition(position.X(), position.Y(), position.Z());
-  this->camera->SetAspectRatio(static_cast<double>(this->width()) /
-                               this->height());
+  this->camera->SetAspectRatio(static_cast<double>(this->width()) / this->height());
   this->camera->SetHFOV(IGN_DTOR(60));
   root->AddChild(this->camera);
 
@@ -251,19 +242,23 @@ void RenderMaliputWidget::CreateRoadRootVisual() {
 }
 
 /////////////////////////////////////////////////
-bool RenderMaliputWidget::FillMaterial(
-  const maliput::utility::Material* _maliputMaterial,
-  ignition::rendering::MaterialPtr& _ignitionMaterial) const {
+bool RenderMaliputWidget::FillMaterial(const maliput::utility::Material* _maliputMaterial,
+                                       ignition::rendering::MaterialPtr& _ignitionMaterial) const {
   if (!_maliputMaterial) {
     return false;
   }
 
+  // clang-format off
   _ignitionMaterial->SetDiffuse(_maliputMaterial->diffuse.x(),
-    _maliputMaterial->diffuse.y(), _maliputMaterial->diffuse.z());
+                                _maliputMaterial->diffuse.y(),
+                                _maliputMaterial->diffuse.z());
   _ignitionMaterial->SetAmbient(_maliputMaterial->ambient.x(),
-    _maliputMaterial->ambient.y(), _maliputMaterial->ambient.z());
+                                _maliputMaterial->ambient.y(),
+                                _maliputMaterial->ambient.z());
   _ignitionMaterial->SetSpecular(_maliputMaterial->specular.x(),
-    _maliputMaterial->specular.y(), _maliputMaterial->specular.z());
+                                 _maliputMaterial->specular.y(),
+                                 _maliputMaterial->specular.z());
+  // clang-format on
   _ignitionMaterial->SetShininess(_maliputMaterial->shinines);
   _ignitionMaterial->SetTransparency(_maliputMaterial->transparency);
 
@@ -271,8 +266,7 @@ bool RenderMaliputWidget::FillMaterial(
 }
 
 /////////////////////////////////////////////////
-void RenderMaliputWidget::CreateTransparentMaterial(
-  ignition::rendering::MaterialPtr& _material) const {
+void RenderMaliputWidget::CreateTransparentMaterial(ignition::rendering::MaterialPtr& _material) const {
   _material->SetDiffuse(0., 0., 0., 0.);
   _material->SetAmbient(0., 0., 0., 0.);
   _material->SetSpecular(0., 0., 0., 0.);
@@ -281,8 +275,7 @@ void RenderMaliputWidget::CreateTransparentMaterial(
 }
 
 /////////////////////////////////////////////////
-void RenderMaliputWidget::CreateLaneLabelMaterial(
-    ignition::rendering::MaterialPtr& _material) const {
+void RenderMaliputWidget::CreateLaneLabelMaterial(ignition::rendering::MaterialPtr& _material) const {
   _material->SetDiffuse(0.8, 0.8, 0.0);
   _material->SetAmbient(1.0, 1.0, 0.0);
   _material->SetSpecular(1.0, 1.0, 0.5);
@@ -291,8 +284,7 @@ void RenderMaliputWidget::CreateLaneLabelMaterial(
 }
 
 /////////////////////////////////////////////////
-void RenderMaliputWidget::CreateBranchPointLabelMaterial(
-    ignition::rendering::MaterialPtr& _material) const {
+void RenderMaliputWidget::CreateBranchPointLabelMaterial(ignition::rendering::MaterialPtr& _material) const {
   _material->SetDiffuse(0.0, 0.7, 0.0);
   _material->SetAmbient(1.0, 1.0, 0.0);
   _material->SetSpecular(1.0, 1.0, 0.5);
@@ -301,8 +293,7 @@ void RenderMaliputWidget::CreateBranchPointLabelMaterial(
 }
 
 /////////////////////////////////////////////////
-void RenderMaliputWidget::RenderRoadMeshes(
-  const std::map<std::string, std::unique_ptr<MaliputMesh>>& _maliputMeshes) {
+void RenderMaliputWidget::RenderRoadMeshes(const std::map<std::string, std::unique_ptr<MaliputMesh>>& _maliputMeshes) {
   for (const auto& it : _maliputMeshes) {
     // Creates a material for the visual.
     ignition::rendering::MaterialPtr material = this->scene->CreateMaterial();
@@ -340,8 +331,7 @@ void RenderMaliputWidget::RenderRoadMeshes(
         // Loads the mesh into the visual.
         ignition::rendering::MeshDescriptor descriptor(it.second->mesh.get());
         descriptor.Load();
-        ignition::rendering::MeshPtr meshGeom =
-          this->scene->CreateMesh(descriptor);
+        ignition::rendering::MeshPtr meshGeom = this->scene->CreateMesh(descriptor);
         visual->AddGeometry(meshGeom);
         // Adds the mesh to the parent root visual.
         this->rootVisual->AddChild(visual);
@@ -362,8 +352,7 @@ void RenderMaliputWidget::RenderRoadMeshes(
 }
 
 /////////////////////////////////////////////////
-void RenderMaliputWidget::RenderLabels(
-    const std::map<MaliputLabelType, std::vector<MaliputLabel>>& _labels) {
+void RenderMaliputWidget::RenderLabels(const std::map<MaliputLabelType, std::vector<MaliputLabel>>& _labels) {
   for (const auto& it : _labels) {
     for (const MaliputLabel& label : it.second) {
       // Creates a material for the visual.
@@ -394,16 +383,14 @@ void RenderMaliputWidget::RenderLabels(
           }
           // Adds the visual to the map for later reference.
           this->textLabels[label.text] = visual;
-          visual->SetLocalPose(ignition::math::Pose3d(
-              label.position, ignition::math::Quaterniond()));
+          visual->SetLocalPose(ignition::math::Pose3d(label.position, ignition::math::Quaterniond()));
           // Creates the text geometry.
           ignition::rendering::TextPtr textGeometry = this->scene->CreateText();
           textGeometry->SetFontName("Liberation Sans");
           textGeometry->SetTextString(label.text);
           textGeometry->SetShowOnTop(true);
-          textGeometry->SetTextAlignment(
-              ignition::rendering::TextHorizontalAlign::CENTER,
-              ignition::rendering::TextVerticalAlign::CENTER);
+          textGeometry->SetTextAlignment(ignition::rendering::TextHorizontalAlign::CENTER,
+                                         ignition::rendering::TextVerticalAlign::CENTER);
           visual->AddGeometry(textGeometry);
           // Adds the mesh to the parent root visual.
           this->rootVisual->AddChild(visual);
@@ -418,8 +405,7 @@ void RenderMaliputWidget::RenderLabels(
           } else if (it.first == MaliputLabelType::kBranchPoint) {
             CreateBranchPointLabelMaterial(material);
           } else {
-            ignerr << "Unsupported label type for: " << label.text
-                   << std::endl;
+            ignerr << "Unsupported label type for: " << label.text << std::endl;
           }
         } else {
           CreateTransparentMaterial(material);
@@ -445,7 +431,6 @@ void RenderMaliputWidget::Clear() {
   meshes.clear();
 }
 
-
 /////////////////////////////////////////////////
 void RenderMaliputWidget::showEvent(QShowEvent* _e) {
   QApplication::flush();
@@ -468,7 +453,7 @@ QPaintEngine* RenderMaliputWidget::paintEngine() const { return nullptr; }
 // Replace inherited implementation with a do-nothing one, so that the
 // context menu doesn't appear and we get back the zoom in/out using the
 // right mouse button.
-void RenderMaliputWidget::ShowContextMenu(const QPoint &_pos) {}
+void RenderMaliputWidget::ShowContextMenu(const QPoint& _pos) {}
 
 /////////////////////////////////////////////////
 void RenderMaliputWidget::paintEvent(QPaintEvent* _e) {
@@ -486,8 +471,7 @@ void RenderMaliputWidget::resizeEvent(QResizeEvent* _e) {
   }
 
   this->renderWindow->OnResize(_e->size().width(), _e->size().height());
-  this->camera->SetAspectRatio(static_cast<double>(this->width()) /
-                               this->height());
+  this->camera->SetAspectRatio(static_cast<double>(this->width()) / this->height());
   // This is a bit janky. We need to update ign-rendering so that the
   // vertical FOV is auto updated when the aspect ratio is changed
   this->camera->SetHFOV(IGN_DTOR(60));
@@ -512,12 +496,9 @@ void RenderMaliputWidget::mousePressEvent(QMouseEvent* _e) {
   }
 
   this->orbitViewControl->OnMousePress(_e);
-  if (_e->button() == Qt::LeftButton)
-  {
-    const ignition::rendering::RayQueryResult& rayResult =
-      this->orbitViewControl->GetQueryResult();
-    if (rayResult.distance > 0 && this->camera->Scene()->VisualById(
-                                        rayResult.objectId) != nullptr) {
+  if (_e->button() == Qt::LeftButton) {
+    const ignition::rendering::RayQueryResult& rayResult = this->orbitViewControl->GetQueryResult();
+    if (rayResult.distance > 0 && this->camera->Scene()->VisualById(rayResult.objectId) != nullptr) {
       emit VisualClicked(rayResult);
     }
   }

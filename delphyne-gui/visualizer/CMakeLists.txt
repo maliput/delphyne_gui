@@ -47,6 +47,7 @@ add_library(${maliput_viewer_widget} SHARED
   maliput_viewer_model.cc
   orbit_view_control.cc
   render_maliput_widget.cc
+  arrow_mesh.cc
   ${${maliput_viewer_widget}_MOC}
   ${LayerSelectionWidget_MOC}
   ${RenderMaliputWidget_MOC}

@@ -28,6 +28,10 @@
 
 #include <maliput-utilities/generate_obj.h>
 
+#include <memory>
+
+#include "arrow_mesh.hh"
+
 using namespace delphyne;
 using namespace gui;
 
@@ -57,6 +61,7 @@ RenderMaliputWidget::~RenderMaliputWidget() {
     // For right now, disable this, but we should debug this and re-enable this
     // cleanup.
     // this->engine->Fini();
+    this->arrow.reset();
     this->orbitViewControl.reset();
     this->camera->RemoveChildren();
     this->camera.reset();
@@ -418,6 +423,23 @@ void RenderMaliputWidget::RenderLabels(const std::map<MaliputLabelType, std::vec
 }
 
 /////////////////////////////////////////////////
+void RenderMaliputWidget::RenderArrow() {
+  if (arrow == nullptr) {
+    arrow = std::make_unique<ArrowMesh>(this->scene, 0.5);
+  }
+}
+
+void RenderMaliputWidget::PutArrowAt(double _distance, const ignition::math::Vector3d& _worldPosition) {
+  DELPHYNE_DEMAND(this->arrow != nullptr);
+  this->arrow->SelectAt(_distance, _worldPosition);
+}
+
+void RenderMaliputWidget::SetArrowVisibility(bool _visible) {
+  DELPHYNE_DEMAND(arrow != nullptr);
+  arrow->SetVisibility(_visible);
+}
+
+/////////////////////////////////////////////////
 void RenderMaliputWidget::Clear() {
   // Clears the text labels.
   for (auto it : textLabels) {
@@ -460,6 +482,9 @@ void RenderMaliputWidget::paintEvent(QPaintEvent* _e) {
   if (this->renderWindow && this->camera) {
     this->camera->Update();
   }
+  if (arrow) {
+    arrow->Update();
+  }
 
   _e->accept();
 }
@@ -500,9 +525,10 @@ void RenderMaliputWidget::mousePressEvent(QMouseEvent* _e) {
     const ignition::rendering::RayQueryResult& rayResult = this->orbitViewControl->GetQueryResult();
     if (rayResult.distance > 0 && this->camera->Scene()->VisualById(rayResult.objectId) != nullptr) {
       emit VisualClicked(rayResult);
+    } else {
+      SetArrowVisibility(false);
     }
   }
-
   this->UpdateViewport();
 }
 
@@ -535,6 +561,11 @@ void RenderMaliputWidget::wheelEvent(QWheelEvent* _e) {
   }
 
   this->orbitViewControl->OnMouseWheel(_e);
+  const ignition::rendering::RayQueryResult& rayResult = this->orbitViewControl->GetQueryResult();
+  if (rayResult.distance > 0 && this->camera->Scene()->VisualById(rayResult.objectId) != nullptr) {
+    const double distance = this->camera->WorldPosition().Distance(this->orbitViewControl->GetQueryResult().point);
+    this->PutArrowAt(distance, this->orbitViewControl->GetQueryResult().point);
+  }
 
   this->UpdateViewport();
 }

@@ -71,6 +71,7 @@ void MaliputViewerWidget::OnNewMultilaneFile(const std::string& filePath) {
     this->rulesVisualizerWiget->AddLaneId(lane_ids[i]);
   }
 
+  this->renderWidget->RenderArrow();
   this->renderWidget->RenderRoadMeshes(this->model->Meshes());
   this->renderWidget->RenderLabels(this->model->Labels());
 
@@ -93,6 +94,10 @@ void MaliputViewerWidget::OnVisualClicked(ignition::rendering::RayQueryResult ra
       const std::string& lane_id = lane->id().string();
       ignmsg << "Clicked lane ID: " << lane_id << "\n";
       OnRulesForLaneRequested(QString(lane_id.c_str()));
+      this->renderWidget->PutArrowAt(rayResult.distance, rayResult.point);
+      this->renderWidget->SetArrowVisibility(true);
+    } else {
+      this->renderWidget->SetArrowVisibility(false);
     }
   }
 }

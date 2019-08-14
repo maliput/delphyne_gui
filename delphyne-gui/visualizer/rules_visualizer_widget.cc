@@ -12,8 +12,8 @@
 namespace delphyne {
 namespace gui {
 
-RulesVisualizerWidget::RulesVisualizerWidget(QWidget* parent) {
-
+RulesVisualizerWidget::RulesVisualizerWidget(QWidget* parent) :
+    QWidget(parent) {
   QVBoxLayout *layout = new QVBoxLayout(this);
   this->rules_log_text_browser = new QTextBrowser(this);
   this->rules_label = new QLabel("Rules", this);

@@ -66,8 +66,7 @@ void MaliputViewerWidget::OnNewMultilaneFile(const std::string& filePath) {
   this->model->Load(filePath);
   this->rulesVisualizerWiget->ClearText();
   this->rulesVisualizerWiget->ClearLaneList();
-  std::vector<QString> lane_ids = this->model->GetAllLaneIds<
-    std::vector<QString>>();
+  const auto lane_ids = this->model->GetAllLaneIds<std::vector<QString>>();
   for (size_t i = 0; i < lane_ids.size(); ++i)
   {
     this->rulesVisualizerWiget->AddLaneId(lane_ids[i]);
@@ -94,7 +93,7 @@ void MaliputViewerWidget::OnVisualClicked(ignition::rendering::RayQueryResult ra
     const maliput::api::Lane* lane = this->model->GetLaneFromWorldPosition(rayResult.point);
     if (lane)
     {
-      const std::string lane_id = lane->id().string();
+      const std::string& lane_id = lane->id().string();
       ignmsg << "Clicked lane ID: " << lane_id << "\n";
       OnRulesForLaneRequested(QString(lane_id.c_str()));
     }

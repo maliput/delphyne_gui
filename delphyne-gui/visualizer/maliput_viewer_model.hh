@@ -431,29 +431,32 @@ class MaliputViewerModel {
   /// \return Lane associated with that position or nullptr if not found.
   const maliput::api::Lane* GetLaneFromWorldPosition(const ignition::math::Vector3d& _position);
 
-  /// \brief Get a N amount of lanes from the owned road geometry.
-  /// \param[in] _amount_of_lanes Amount of lanes desired to get from the owned
-  /// road geometry
-  /// \return Container that holds a class capable to be constructed using
-  /// const char* and also needs to have a size, push_back and reserve
-  /// method implemented
-  template<typename Container>
-  Container GetNLanes(size_t _amount_of_lanes) const;
+  /// \brief Get N lanes from the underlying road geometry.
+  /// \param[in] _n Amount of lanes desired to get from the underlying
+  /// road geometry.
+  /// \tparam ContainerType Class where the holded type is 
+  /// capable to be constructed using const char*. Also the container
+  /// needs to have a size, push_back and reserve method implemented.
+  /// \return ContainerType that contains N lane ids.
+  template<typename ContainerType>
+  ContainerType GetNLanes(size_t _n) const;
 
   /// \brief Get all the lanes that the road geometry posses.
-  /// \return Container that holds a class capable to be constructed using
-  /// const char* and also needs to have a push_back and reserve
-  /// method implemented
-  template<typename Container>
-  Container GetAllLaneIds() const;
+  /// \tparam ContainerType Class where the holded type is 
+  /// capable to be constructed using const char*. Also the container
+  /// needs to have a size, push_back and reserve method implemented.
+  /// \return ContainerType that contains all lane ids.
+  template<typename ContainerType>
+  ContainerType GetAllLaneIds() const;
 
-  /// \brief Get all the rules for a given lane
-  /// \param[in] _laneId Id of the desired lane to get the rules
-  /// \return String class that it can be constructed with a const char* and has
-  /// operator+ overriden, where each rule is separated by brackets.
+  /// \brief Get all the rules for a given lane.
+  /// \param[in] _laneId Id of the desired lane to get the rules from.
+  /// \tparam StringType class that 
+  /// can be constructed with a const char* and has operator+ overriden.
+  /// \return StringType where each rule is separated by brackets.
   /// Ex: [Right of way Rule]\n.
-  template<typename String>
-  String GetRulesOfLane(const std::string& _laneId) const;
+  template<typename StringType>
+  StringType GetRulesOfLane(const std::string& _laneId) const;
 
  private:
   /// \brief Loads a maliput RoadGeometry of multilane from
@@ -482,26 +485,29 @@ class MaliputViewerModel {
   /// \brief Get the right of way rules for a given LaneSRange.
   /// \param[in] _laneSRange Object that contains a lane id and a range in the s
   /// coordinate.
-  /// \return String class that it can be constructed with a const char* and has
-  /// operator+ overriden.
-  template<typename String>
-  String GetRightOfWayRules(
+  /// \tparam StringType class that 
+  /// can be constructed with a const char* and has operator+ overriden.
+  /// \return StringType where all right of way of rules are specified.
+  template<typename StringType>
+  StringType GetRightOfWayRules(
     const maliput::api::rules::LaneSRange& _laneSRange) const;
 
   /// \brief Get the max speed rules for a given lane id.
-  /// \param[in] _laneId Id of the lane to get the max speed limit.
-  /// \return String class that it can be constructed with a const char* and has
-  /// operator+ overriden.
-  template<typename String>
-  String GetMaxSpeedLimitRules(
+  /// \param[in] _laneId Id of the lane to get the max speed limit rules from.
+  /// \tparam StringType class that 
+  /// can be constructed with a const char* and has operator+ overriden.
+  /// \return StringType where all max speed limimt rules are specified.
+  template<typename StringType>
+  StringType GetMaxSpeedLimitRules(
     const maliput::api::LaneId& _laneId) const;
 
   /// \brief Get the direction usage rules for a given lane id.
-  /// \param[in] _laneId Id of the lane to get the direction usage rules.
-  /// \return String class that it can be constructed with a const char* and has
-  /// operator+ overriden.
-  template<typename String>
-  String GetDirectionUsageRules(
+  /// \param[in] _laneId Id of the lane to get the direction usage rules from.
+  /// \tparam StringType class that 
+  /// can be constructed with a const char* and has operator+ overriden.
+  /// \return StringType where all direction usage rules are specified.
+  template<typename StringType>
+  StringType GetDirectionUsageRules(
     const maliput::api::LaneId& _laneId) const;
 
   // To support both malidrive and multilane files, we have both. roadNetwork
@@ -520,19 +526,18 @@ class MaliputViewerModel {
   std::map<MaliputLabelType, std::vector<MaliputLabel>> labels;
 };
 
-template<typename Container>
-Container MaliputViewerModel::GetNLanes(size_t _amount_of_lanes) const {
-
+template<typename ContainerType>
+ContainerType MaliputViewerModel::GetNLanes(size_t _n) const {
   const maliput::api::RoadGeometry* rg = this->roadGeometry ?
     this->roadGeometry.get() : this->roadNetwork->road_geometry();
   const std::unordered_map<
     maliput::api::LaneId, const maliput::api::Lane*>& all_lanes =
       rg->ById().GetLanes();
-  Container lanes;
-  lanes.reserve(_amount_of_lanes);
+  ContainerType lanes;
+  lanes.reserve(_n);
   for (const auto& lane : all_lanes)
   {
-    if (static_cast<size_t>(lanes.size()) == _amount_of_lanes)
+    if (static_cast<size_t>(lanes.size()) == _n)
     {
       break;
     }
@@ -541,14 +546,14 @@ Container MaliputViewerModel::GetNLanes(size_t _amount_of_lanes) const {
   return lanes;
 }
 
-template<typename Container>
-Container MaliputViewerModel::GetAllLaneIds() const {
+template<typename ContainerType>
+ContainerType MaliputViewerModel::GetAllLaneIds() const {
   const maliput::api::RoadGeometry* rg = this->roadGeometry ?
-  this->roadGeometry.get() : this->roadNetwork->road_geometry();
+    this->roadGeometry.get() : this->roadNetwork->road_geometry();
   const std::unordered_map<
     maliput::api::LaneId, const maliput::api::Lane*>& all_lanes =
       rg->ById().GetLanes();
-  Container lanes;
+  ContainerType lanes;
   lanes.reserve(all_lanes.size());
   for (const auto& lane : all_lanes)
   {
@@ -557,17 +562,17 @@ Container MaliputViewerModel::GetAllLaneIds() const {
   return lanes;
 }
 
-template<typename String>
-String MaliputViewerModel::GetRulesOfLane(const std::string& _laneId) const {
+template<typename StringType>
+StringType MaliputViewerModel::GetRulesOfLane(const std::string& _laneId) const {
   if (this->roadNetwork == nullptr) {
-    return String("There are no rules for this road");
+    return StringType("There are no rules for this road");
   }
   maliput::api::LaneId id(_laneId);
   const maliput::api::RoadGeometry::IdIndex& roadIndex =
     this->roadNetwork->road_geometry()->ById();
   maliput::api::rules::LaneSRange laneSRange(id,
     maliput::api::rules::SRange(0., roadIndex.GetLane(id)->length()));
-  String rules =
+  StringType rules =
            "[Right of way rules]\n" +
            GetRightOfWayRules<String>(laneSRange) + "\n" +
            "[Max speed limit rules]\n" +
@@ -577,33 +582,31 @@ String MaliputViewerModel::GetRulesOfLane(const std::string& _laneId) const {
   return rules;
 }
 
-template<typename String>
-String MaliputViewerModel::GetRightOfWayRules(
+template<typename StringType>
+StringType MaliputViewerModel::GetRightOfWayRules(
     const maliput::api::rules::LaneSRange& _laneSRange) const {
   std::ostringstream rightOfWayRules;
   RoadNetworkQuery query(&rightOfWayRules, roadNetwork.get());
   query.GetRightOfWay(_laneSRange);
-  return String(rightOfWayRules.str().c_str());
+  return StringType(rightOfWayRules.str().c_str());
 }
 
-template<typename String>
-String MaliputViewerModel::GetMaxSpeedLimitRules(
+template<typename StringType>
+StringType MaliputViewerModel::GetMaxSpeedLimitRules(
   const maliput::api::LaneId& _laneId) const {
-
   std::ostringstream speedLimitRules;
   RoadNetworkQuery query(&speedLimitRules, roadNetwork.get());
   query.GetMaxSpeedLimit(_laneId);
   return String(speedLimitRules.str().c_str());
 }
 
-template<typename String>
-String MaliputViewerModel::GetDirectionUsageRules(
+template<typename StringType>
+StringType MaliputViewerModel::GetDirectionUsageRules(
   const maliput::api::LaneId& _laneId) const {
-
   std::ostringstream directionUsageRules;
   RoadNetworkQuery query(&directionUsageRules, roadNetwork.get());
   query.GetDirectionUsage(_laneId);
-  return String(directionUsageRules.str().c_str());
+  return StringType(directionUsageRules.str().c_str());
 }
 
 }  // namespace gui

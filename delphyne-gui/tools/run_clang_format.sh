@@ -16,8 +16,6 @@ check_program_installed() {
 
 check_program_installed ament_clang_format
 
-REGEX='.*/.*\.\(c\|cc\|cpp\|cxx\|h\|hh\|hpp\|hxx\)$'
-
 declare -i CLANGFORMATFAILED=0
 
 pushd $REPO_DIR

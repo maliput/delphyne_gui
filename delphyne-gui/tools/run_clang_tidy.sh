@@ -16,8 +16,6 @@ check_program_installed() {
 
 check_program_installed ament_clang_tidy
 
-REGEX='.*/.*\.\(c\|cc\|cpp\|cxx\|h\|hh\|hpp\|hxx\)$'
-
 declare -i CLANGTIDYFAILED=0
 
 pushd $REPO_DIR

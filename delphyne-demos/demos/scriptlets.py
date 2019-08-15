@@ -23,6 +23,7 @@ import time
 
 import delphyne.trees
 import delphyne.behaviours
+import delphyne.blackboard
 import py_trees.behaviour
 import py_trees.blackboard
 import py_trees.common
@@ -30,7 +31,6 @@ import py_trees.decorators
 
 import delphyne_gui.utilities
 
-from delphyne.blackboard import blackboard_helper as bb_helper
 from . import helpers
 
 ##############################################################################
@@ -38,11 +38,23 @@ from . import helpers
 ##############################################################################
 
 
-class DelayedChangeSpeed(py_trees.behaviour.Behaviour):
+def parse_arguments():
+    "Argument passing and demo documentation."
+    parser = helpers.create_argument_parser(
+        "Scriptlets",
+        """
+This is a minimal example demonstrating the inclusion of a python
+callback (scriptlet) to be triggered at each tick of the simulation.
+        """
+    )
+    return parser.parse_args()
 
+
+class DelayedChangeSpeed(py_trees.behaviour.Behaviour):
     """
-    Change speed of agent_name after 10 seconds passed in the simulation.
+    Change speed of agent after 10 seconds have passed in simulation.
     """
+
     def __init__(self, agent_name, speed=1.0,
                  name=py_trees.common.Name.AUTO_GENERATED):
         super().__init__(name)
@@ -53,19 +65,19 @@ class DelayedChangeSpeed(py_trees.behaviour.Behaviour):
         self.status = py_trees.common.Status.RUNNING
 
     def update(self):
-        simulation = bb_helper.get_simulation()
+        simulation = delphyne.blackboard.state.get_simulation()
         if simulation is not None and simulation.get_current_time() >= 10.0:
             print("Speed up!")
-            blackboard = py_trees.blackboard.Blackboard()
-            agent_attributes = blackboard.get(self.agent_name)
-            agent_attributes["speed"] = self.speed
-            blackboard.set(self.agent_name, agent_attributes, True)
+            delphyne.blackboard.state.set_attribute_for_agent(
+                self.agent_name, "speed", self.speed
+            )
             self.status = py_trees.common.Status.SUCCESS
         return self.status
 
 
 class SimulationStats(object):
-    """This is a simple class to keep statistics of the simulation, just
+    """
+    This is a simple class to keep statistics of the simulation, just
     averaging the time it takes to execute a simulation step from the outside
     world. Every 1000 measures, the values are printed to stdout.
     """
@@ -117,16 +129,37 @@ def random_print(behaviour_tree):
         print("One in five hundred")
 
 
-def parse_arguments():
-    "Argument passing and demo documentation."
-    parser = helpers.create_argument_parser(
-        "Scriptlets",
-        """
-This is a minimal example demonstrating the inclusion of a python
-callback (scriptlet) to be triggered at each tick of the simulation.
-        """
+def create_scriptlets_scenario_subtree():
+    file_path = delphyne_gui.utilities.get_delphyne_gui_resource(
+        'roads/circuit.yaml'
     )
-    return parser.parse_args()
+
+    if not os.path.isfile(file_path):
+        print("Required file {} not found."
+              " Please, make sure to install the latest delphyne-gui."
+              .format(os.path.abspath(file_path)))
+        quit()
+
+    scenario_subtree = delphyne.behaviours.roads.Multilane(
+        file_path=file_path, name="circuit"
+    )
+
+    scenario_subtree.add_children([
+        delphyne.behaviours.agents.SimpleCar(name='simple0'),
+        delphyne.behaviours.agents.RailCar(
+            name='rail0',
+            lane_id='l:s1_1',
+            longitudinal_position=0.0,
+            lateral_offset=0.0,
+            speed=4.0
+        ),
+        py_trees.decorators.OneShot(
+            child=DelayedChangeSpeed(agent_name='rail0', speed=20.0),
+            policy=py_trees.common.OneShotPolicy.ON_COMPLETION
+        ),
+    ])
+
+    return scenario_subtree
 
 
 ##############################################################################
@@ -138,44 +171,8 @@ def main():
     """Keeping pylint entertained."""
     args = parse_arguments()
 
-    filename = delphyne_gui.utilities.get_delphyne_gui_resource(
-        'roads/circuit.yaml')
-
-    if not os.path.isfile(filename):
-        print("Required file {} not found."
-              " Please, make sure to install the latest delphyne-gui."
-              .format(os.path.abspath(filename)))
-        quit()
-
-    scenario_subtree = delphyne.behaviours.roads.Multilane(
-        file_path=filename,
-        name="circuit"
-    )
-
-    rail_car = delphyne.behaviours.agents.RailCar(
-            name='rail0',
-            lane_id='l:s1_1',
-            longitudinal_position=0.0,
-            lateral_offset=0.0,
-            speed=4.0
-        )
-
-    one_shot_decorator = py_trees.decorators.OneShot(
-        child=DelayedChangeSpeed(agent_name='rail0', speed=20.0),
-        policy=py_trees.common.OneShotPolicy.ON_COMPLETION)
-
-    scenario_subtree.add_children([
-        delphyne.behaviours.agents.SimpleCar(
-            name='simple0',
-            initial_x=0.0,
-            initial_y=0.0
-        ),
-        rail_car,
-        one_shot_decorator
-    ])
-
     simulation_tree = delphyne.trees.BehaviourTree(
-        root=scenario_subtree
+        root=create_scriptlets_scenario_subtree()
     )
 
     simulation_tree.setup(
@@ -203,3 +200,4 @@ def main():
             stats.start()
             simulation_tree.tick_tock(period=time_step,
                 number_of_iterations=args.duration/time_step)
+        launcher.terminate()

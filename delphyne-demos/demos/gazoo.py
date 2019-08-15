@@ -4,8 +4,8 @@
 #
 """
 The gazoo demo.
-```
 """
+
 ##############################################################################
 # Imports
 ##############################################################################
@@ -104,8 +104,11 @@ def create_gazoo_scenario_subtree(filename, mobil_cars_num):
         scenario_subtree.add_child(
             delphyne.behaviours.agents.MobilCar(
                 name=str(robot_id),
-                initial_x=-10.0 + x_offset * (1 + i / 3),
-                initial_y=0.0 + y_offset * (i % 3),
+                initial_pose=(
+                    -10.0 + x_offset * (1 + i / 3),
+                     0.0 + y_offset * (i % 3),
+                     0.0
+                ),
                 direction_of_travel=0.0,
                 speed=velocity_base * i
             )
@@ -148,7 +151,7 @@ def main():
         logfile_name=args.logfile_name
     )
 
-    time_step = 0.015
+    time_step = 0.1
     with launch_interactive_simulation(
         simulation_tree.runner, bare=args.bare
     ) as launcher:
@@ -162,4 +165,4 @@ def main():
             simulation_tree.tick_tock(
                 period=time_step, number_of_iterations=args.duration/time_step
             )
-            launcher.terminate()
+        launcher.terminate()

@@ -10,14 +10,14 @@ The city demo.
 # Imports
 ##############################################################################
 
+import functools
 import os.path
 import random
 import sys
 
 import delphyne.trees
 import delphyne.behaviours
-import delphyne.decorators
-import delphyne.blackboard.blackboard_helper as bb_helper
+import delphyne.blackboard
 
 import delphyne_gui.utilities
 
@@ -54,50 +54,49 @@ MOBIL controlled cars running in a closed-loop maliput road.
 # Main
 ##############################################################################
 
-def random_lane(road_geometry):
-    lane_provider = bb_helper.LaneAndLocationProvider(
-        distance_between_agents=6.0)
-    return lane_provider.random_lane(road_geometry)
 
-def random_position_for_mobil_car(road_geometry):
-    lane_provider = bb_helper.LaneAndLocationProvider(
-        distance_between_agents=6.0)
+def lane_position_to_geo_pose2d(road_geometry, lane_id, lane_position):
+
+    from delphyne.blackboard.providers import resolve
+    lane_id = resolve(lane_id, road_geometry)
+    lane_position = resolve(lane_position, road_geometry, lane_id)
+
     road_index = road_geometry.ById()
-    lane_id = random_lane(road_geometry)
-    lane_position = lane_provider.random_position(road_geometry, lane_id)
     lane = road_index.GetLane(lane_id)
     geo_position = lane.ToGeoPosition(lane_position)
     geo_orientation = lane.GetOrientation(lane_position)
     initial_x, initial_y, _ = geo_position.xyz()
     initial_heading = geo_orientation.rpy().yaw_angle()
-    return (initial_x, initial_y, initial_heading)
+    return initial_x, initial_y, initial_heading
 
-def main():
-    """Keeping pylint entertained."""
-    args = parse_arguments()
 
-    filename = delphyne_gui.utilities.get_delphyne_gui_resource(
+def create_city_scenario_subtree(num_rail_cars, num_mobil_cars):
+    file_path = delphyne_gui.utilities.get_delphyne_gui_resource(
         "roads/little_city.yaml"
     )
 
-    if not os.path.isfile(filename):
+    if not os.path.isfile(file_path):
         print("Required file {} not found."
               " Please, make sure to install the latest delphyne-gui."
-              .format(os.path.abspath(filename)))
+              .format(os.path.abspath(file_path)))
         sys.exit()
 
+
     scenario_subtree = delphyne.behaviours.roads.Multilane(
-        file_path=filename,
-        name="little_city"
+        file_path=file_path, name="little_city"
+    )
+
+    provider = delphyne.blackboard.providers.LaneLocationProvider(
+        distance_between_agents=6.0, seed=1
     )
 
     # Sets up all railcars.
     railcar_speed = 5.0  # (m/s)
-    for n in range(args.num_rail_cars):
+    for n in range(num_rail_cars):
         scenario_subtree.add_child(
             delphyne.behaviours.agents.RailCar(
                 name='rail{}'.format(n),
-                lane_id=random_lane,
+                lane_id=provider.random_lane,
                 longitudinal_position=0.0,
                 lateral_offset=0.0,
                 speed=4.0
@@ -106,17 +105,30 @@ def main():
 
     # Sets up all MOBIL cars.
     mobilcar_speed = 4.0  # (m/s)
-    for m in range(args.num_mobil_cars):
+    for m in range(num_mobil_cars):
         scenario_subtree.add_child(
             delphyne.behaviours.agents.MobilCar(
                 name='mobil{}'.format(m),
                 speed=mobilcar_speed,
-                initial_pose=random_position_for_mobil_car
+                initial_pose=functools.partial(
+                    lane_position_to_geo_pose2d,
+                    lane_id=provider.random_lane,
+                    lane_position=provider.random_lane_position
+                )
             )
         )
 
+    return scenario_subtree
+
+
+def main():
+    """Keeping pylint entertained."""
+    args = parse_arguments()
+
     simulation_tree = delphyne.trees.BehaviourTree(
-        root=scenario_subtree
+        root=create_city_scenario_subtree(
+            args.num_rail_cars, args.num_mobil_cars
+        )
     )
 
     simulation_tree.setup(
@@ -139,3 +151,4 @@ def main():
             simulation_tree.tick_tock(
                 period=time_step, number_of_iterations=args.duration/time_step
             )
+        launcher.terminate()

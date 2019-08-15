@@ -42,8 +42,7 @@ def create_dragway_scenario_subtree():
     scenario_subtree.add_children([
         delphyne.behaviours.agents.SimpleCar(
             name='simple-car',
-            initial_x=0.0,
-            initial_y=1.5 * 3.7
+            initial_pose=(0.0, 1.5 * 3.7, 0.)
         ),
         delphyne.behaviours.agents.MobilCar(
             name='mobil-car',
@@ -106,3 +105,4 @@ def main():
             simulation_tree.tick_tock(
                 period=time_step, number_of_iterations=args.duration/time_step
             )
+        launcher.terminate()

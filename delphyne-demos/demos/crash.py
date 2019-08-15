@@ -39,6 +39,8 @@ in collision course.
 def check_for_agent_collisions(simulation_subtree):
     """
     Pre tick handler that checks for collisions between agents in simulation.
+
+    TODO(hidmic): make it a behaviour?
     """
     simulation = simulation_subtree.runner.get_simulation()
     agent_collisions = simulation.get_collisions()
@@ -72,31 +74,31 @@ def create_crash_scenario_subtree():
     scenario_subtree.add_children([
         delphyne.behaviours.agents.SimpleCar(
             name="racer0",
-            initial_x=0.0,      # scene x-coordinate (m)
-            initial_y=-50.0,    # scene y-coordinate (m)
-            heading=math.pi/2,  # heading (radians)
-            speed=5.0           # speed in the direction of travel (m/s)
+            # scene coordinates (m, m, radians)
+            initial_pose=(0.0, -50.0, math.pi/2),
+            # speed in the direction of travel (m/s)
+            speed=5.0
         ),
         delphyne.behaviours.agents.SimpleCar(
             name="racer1",
-            initial_x=-50.0,  # scene x-coordinate (m)
-            initial_y=0.0,    # scene y-coordinate (m)
-            heading=0.0,      # heading (radians)
-            speed=5.1         # speed in the direction of travel (m/s)
+            # scene coordinates (m, m, radians)
+            initial_pose=(-50.0, 0.0, 0.),
+            # speed in the direction of travel (m/s)
+            speed=5.1
         ),
         delphyne.behaviours.agents.SimpleCar(
             name="racer2",
-            initial_x=0.0,       # scene x-coordinate (m)
-            initial_y=50.0,      # scene y-coordinate (m)
-            heading=-math.pi/2,  # heading (radians)
-            speed=5.0            # speed in the direction of travel (m/s)
+            # scene coordinates (m, m, radians)
+            initial_pose=(0.0, 50.0, -math.pi/2),
+            # speed in the direction of travel (m/s)
+            speed=5.0
         ),
         delphyne.behaviours.agents.SimpleCar(
             name="racer3",
-            initial_x=50.0,   # scene x-coordinate (m)
-            initial_y=0.0,    # scene y-coordinate (m)
-            heading=math.pi,  # heading (radians)
-            speed=5.1         # speed in the direction of travel (m/s)
+            # scene coordinates (m, m, radians)
+            initial_pose=(50.0, 0.0, math.pi),
+            # speed in the direction of travel (m/s)
+            speed=5.1
         ),
     ])
 
@@ -124,7 +126,7 @@ def main():
     # Adds a callback to check for agent collisions.
     simulation_tree.add_pre_tick_handler(check_for_agent_collisions)
 
-    time_step = 0.01
+    time_step = 0.1
     with launch_interactive_simulation(
         simulation_tree.runner, bare=args.bare
     ) as launcher:

@@ -20,21 +20,9 @@ REGEX='.*/.*\.\(c\|cc\|cpp\|cxx\|h\|hh\|hpp\|hxx\)$'
 
 declare -i CLANGFORMATFAILED=0
 
-# Exclude Dirs:
-#  - build/style helper scripts in ./tools
-#  - test helper scripts in test/utils
-#  - entry points in python/examples
-if [ "$CLANGFORMATFAILED" -eq "0" ]; then
-  pushd $REPO_DIR    
-  # Run ament_clang_format
-  find -regex $REGEX -not \( -path "./test/gtest/*" \) \
-       -printf '%h\n' | sort | uniq |                     \
-       xargs ament_clang_format --config=./../.clang-format $1 || CLANGFORMATFAILED=1
-  popd
-else
-  echo $'\n*** ament_clang_format failed, not doing style formatting ***'
-  exit 1
-fi
+pushd $REPO_DIR
+ament_clang_format --config=./../.clang-format $1 || CLANGFORMATFAILED=1
+popd
 
 if [ "$CLANGFORMATFAILED" -ne "0" ]; then
   echo $'\n*** ament_clang_format failed ***'

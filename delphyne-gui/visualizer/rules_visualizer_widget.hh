@@ -38,17 +38,17 @@ class RulesVisualizerWidget : public QWidget {
   signals:
 
   /// \brief Signal used to request rules for a given lane id
-  void RequestRulesForLane(QString lane_id);
-  /// \brief Signal connected internally to handle rules for a given lane
+  void RequestRulesForLaneId(QString lane_id);
+  /// \brief Signal connected internally to handle rules for a given lane id
   void ReceiveRules(QString lane_id, QString rules);
 
  private slots:
 
   /// \brief Slot connected when the user clicks an item from the ListWidget.
-  /// Emits RequestRulesForLane signal
+  /// Emits RequestRulesForLaneId signal
   void OnItemClicked(QListWidgetItem* item);
   /// \brief Slot connected to ReceiveRules signal. Clears the text browser
-  /// and populates it with the rules for the requested lane.
+  /// and populates it with the rules for the requested lane id.
   void OnRulesReceived(QString lane_id, QString rules);
 
  private:
@@ -57,8 +57,6 @@ class RulesVisualizerWidget : public QWidget {
   QLabel* rules_label = nullptr;
   QListWidget* lanes_list = nullptr;
   QTextBrowser* rules_log_text_browser = nullptr;
-
-
 };
 }
 }

@@ -63,7 +63,7 @@ void RulesVisualizerWidget::ClearText() {
 }
 
 void RulesVisualizerWidget::OnItemClicked(QListWidgetItem* item) {
-    emit RequestRulesForLane(item->text());
+    emit RequestRulesForLaneId(item->text());
 }
 
 void RulesVisualizerWidget::OnRulesReceived(QString lane_id, QString rules) {

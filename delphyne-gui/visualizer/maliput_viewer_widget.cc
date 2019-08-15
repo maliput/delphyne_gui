@@ -66,7 +66,7 @@ void MaliputViewerWidget::OnNewMultilaneFile(const std::string& filePath) {
   this->model->Load(filePath);
   this->rulesVisualizerWiget->ClearText();
   this->rulesVisualizerWiget->ClearLaneList();
-  const auto lane_ids = this->model->GetAllLaneIds<std::vector<QString>>();
+  const auto lane_ids = this->model->GetAllLaneIds<std::vector, QString>();
   for (size_t i = 0; i < lane_ids.size(); ++i)
   {
     this->rulesVisualizerWiget->AddLaneId(lane_ids[i]);
@@ -124,7 +124,7 @@ void MaliputViewerWidget::BuildGUI() {
 
   QObject::connect(
     this->rulesVisualizerWiget,
-    SIGNAL(RequestRulesForLane(QString)),
+    SIGNAL(RequestRulesForLaneId(QString)),
     this,
     SLOT(OnRulesForLaneRequested(QString))
     );

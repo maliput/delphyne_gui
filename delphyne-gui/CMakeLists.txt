@@ -236,7 +236,6 @@ else (build_errors)
   if (BUILD_TESTING)
     add_subdirectory(test)
     add_test(NAME CLANGFORMAT COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/tools/run_clang_format.sh)
-    # add_test(NAME CLANGTIDY COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/tools/run_clang_tidy.sh)
   endif()
 
   ########################################

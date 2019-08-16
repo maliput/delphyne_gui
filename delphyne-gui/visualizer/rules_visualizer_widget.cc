@@ -67,6 +67,9 @@ void RulesVisualizerWidget::OnItemClicked(QListWidgetItem* item) {
 }
 
 void RulesVisualizerWidget::OnRulesReceived(QString lane_id, QString rules) {
+    QList<QListWidgetItem *> items = this->lanes_list->findItems(lane_id, Qt::MatchExactly);
+    DELPHYNE_DEMAND(items.size() == 1);
+    items[0]->setSelected(true);
     this->ClearText();
     this->AddText(rules);
 }

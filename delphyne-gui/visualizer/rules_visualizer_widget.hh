@@ -21,7 +21,7 @@ class RulesVisualizerWidget : public QWidget {
 
  public:
   /// \brief Default constructor.
-  explicit RulesVisualizerWidget(QWidget* parent = 0);
+  explicit RulesVisualizerWidget(QWidget* parent = nullptr);
 
   /// \brief Default Destructor.
   virtual ~RulesVisualizerWidget() = default;
@@ -53,10 +53,10 @@ class RulesVisualizerWidget : public QWidget {
 
  private:
 
-  QLabel* lanes_label = nullptr;
-  QLabel* rules_label = nullptr;
-  QListWidget* lanes_list = nullptr;
-  QTextBrowser* rules_log_text_browser = nullptr;
+  QLabel* lanes_label{nullptr};
+  QLabel* rules_label{nullptr};
+  QListWidget* lanes_list{nullptr};
+  QTextBrowser* rules_log_text_browser{nullptr};
 };
 }
 }

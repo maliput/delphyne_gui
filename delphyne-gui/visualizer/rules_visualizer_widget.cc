@@ -73,6 +73,9 @@ void RulesVisualizerWidget::OnRulesReceived(QString lane_id, QString rules) {
     this->lanes_list->scrollToItem(items[0]);
     this->ClearText();
     this->AddText(rules);
+    QTextCursor cursor = this->rules_log_text_browser->textCursor();
+    cursor.setPosition(0);
+    this->rules_log_text_browser->setTextCursor(cursor);
 }
 
 } // namespace gui

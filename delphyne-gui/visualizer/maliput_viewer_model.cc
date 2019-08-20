@@ -24,7 +24,7 @@ using namespace gui;
 const std::vector<std::string> DirectionUsageRuleNames() {
   return {"WithS", "AgainstS", "Bidirectional", "BidirectionalTurnOnly",
           "NoUse", "Parking"};
-};
+}
 
 // Serializes `road_position` into `out`.
 std::ostream& operator<<(

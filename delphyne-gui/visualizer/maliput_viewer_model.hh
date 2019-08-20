@@ -221,19 +221,19 @@ class MaliputViewerModel {
   /// \param[in] _n Amount of lanes desired to get from the underlying
   /// road geometry.
   /// \tparam ContainerType Class that needs to have a size, push_back and reserve method implemented.
-  /// See std::vector declaration for each one of those methods.
-  /// \tparam StringType Class that needs to be constructible with a const char* and has operator+ overriden
+  /// See std::vector declaration for each one of those methods. Its holded type needs to support
+  /// const char* construction and operator+ overriden
   /// \return Container that contains N lane ids.
-  template<template<class> class ContainerType, class StringType>
-  ContainerType<StringType> GetNLanes(size_t _n) const;
+  template<typename ContainerType>
+  ContainerType GetNLanes(size_t _n) const;
 
   /// \brief Get all the lanes that the road geometry posses.
   /// \tparam ContainerType Class that needs to have a size, push_back and reserve method implemented.
-  /// See std::vector declaration for each one of those methods.
-  /// \tparam StringType Class that needs to be constructible with a const char* and has operator+ overriden
+  /// See std::vector declaration for each one of those methods. Its holded type needs to support
+  /// const char* construction and operator+ overriden
   /// \return All lane ids from the underlying road geometry
-  template<template<class> class ContainerType, class StringType>
-  ContainerType<StringType> GetAllLaneIds() const;
+  template<typename ContainerType>
+  ContainerType GetAllLaneIds() const;
 
   /// \brief Get all the rules for a given lane.
   /// \param[in] _laneId Id of the desired lane to get the rules from.
@@ -308,14 +308,14 @@ class MaliputViewerModel {
   std::map<MaliputLabelType, std::vector<MaliputLabel>> labels;
 };
 
-template<template<class> class ContainerType, class StringType>
-ContainerType<StringType> MaliputViewerModel::GetNLanes(size_t _n) const {
+template<typename ContainerType>
+ContainerType MaliputViewerModel::GetNLanes(size_t _n) const {
   const maliput::api::RoadGeometry* rg = this->roadGeometry ?
     this->roadGeometry.get() : this->roadNetwork->road_geometry();
   const std::unordered_map<
     maliput::api::LaneId, const maliput::api::Lane*>& all_lanes =
       rg->ById().GetLanes();
-  ContainerType<StringType> lanes;
+  ContainerType lanes;
   lanes.reserve(_n);
   for (const auto& lane : all_lanes)
   {
@@ -328,14 +328,14 @@ ContainerType<StringType> MaliputViewerModel::GetNLanes(size_t _n) const {
   return lanes;
 }
 
-template<template<class> class ContainerType, class StringType>
-ContainerType<StringType> MaliputViewerModel::GetAllLaneIds() const {
+template<typename ContainerType>
+ContainerType MaliputViewerModel::GetAllLaneIds() const {
   const maliput::api::RoadGeometry* rg = this->roadGeometry ?
     this->roadGeometry.get() : this->roadNetwork->road_geometry();
   const std::unordered_map<
     maliput::api::LaneId, const maliput::api::Lane*>& all_lanes =
       rg->ById().GetLanes();
-  ContainerType<StringType> lanes;
+  ContainerType lanes;
   lanes.reserve(all_lanes.size());
   for (const auto& lane : all_lanes)
   {

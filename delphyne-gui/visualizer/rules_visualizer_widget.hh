@@ -5,10 +5,10 @@
 
 #include <string>
 
-#include <QtWidgets/QWidget>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QListWidget>
 #include <QtWidgets/QTextBrowser>
+#include <QtWidgets/QWidget>
 
 namespace delphyne {
 namespace gui {
@@ -35,7 +35,7 @@ class RulesVisualizerWidget : public QWidget {
   /// \brief Clear the text in TextBrowser.
   void ClearText();
 
-  signals:
+ signals:
 
   /// \brief Signal used to request rules for a given lane id
   void RequestRulesForLaneId(QString lane_id);
@@ -52,7 +52,6 @@ class RulesVisualizerWidget : public QWidget {
   void OnRulesReceived(QString lane_id, QString rules);
 
  private:
-
   QLabel* lanes_label{nullptr};
   QLabel* rules_label{nullptr};
   QListWidget* lanes_list{nullptr};
@@ -61,4 +60,4 @@ class RulesVisualizerWidget : public QWidget {
 }
 }
 
-#endif // DELPHYNE_GUI_RULES_VISUALIZER_WIDGET_HH
+#endif  // DELPHYNE_GUI_RULES_VISUALIZER_WIDGET_HH

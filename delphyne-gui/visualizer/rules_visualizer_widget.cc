@@ -4,35 +4,25 @@
 
 #include <delphyne/macros.h>
 
-#include <ignition/gui/qt.h>
 #include <QtWidgets/QListWidget>
 #include <QtWidgets/QTextBrowser>
 #include <QtWidgets/QVBoxLayout>
+#include <ignition/gui/qt.h>
 
 namespace delphyne {
 namespace gui {
 
-RulesVisualizerWidget::RulesVisualizerWidget(QWidget* parent) :
-    QWidget(parent) {
-  QVBoxLayout *layout = new QVBoxLayout(this);
+RulesVisualizerWidget::RulesVisualizerWidget(QWidget* parent) : QWidget(parent) {
+  QVBoxLayout* layout = new QVBoxLayout(this);
   this->rules_log_text_browser = new QTextBrowser(this);
   this->rules_label = new QLabel("Rules", this);
   this->lanes_label = new QLabel("Lanes", this);
   this->lanes_list = new QListWidget(this);
 
-  QObject::connect(
-    this->lanes_list,
-    SIGNAL(itemClicked(QListWidgetItem*)),
-    this,
-    SLOT(OnItemClicked(QListWidgetItem*))
-    );
+  QObject::connect(this->lanes_list, SIGNAL(itemClicked(QListWidgetItem*)), this,
+                   SLOT(OnItemClicked(QListWidgetItem*)));
 
-  QObject::connect(
-    this,
-    SIGNAL(ReceiveRules(QString, QString)),
-    this,
-    SLOT(OnRulesReceived(QString, QString))
-    );
+  QObject::connect(this, SIGNAL(ReceiveRules(QString, QString)), this, SLOT(OnRulesReceived(QString, QString)));
 
   layout->addWidget(this->lanes_label);
   layout->addWidget(this->lanes_list);
@@ -43,40 +33,38 @@ RulesVisualizerWidget::RulesVisualizerWidget(QWidget* parent) :
 }
 
 void RulesVisualizerWidget::AddLaneId(const QString& lane_id) {
-    DELPHYNE_DEMAND(this->lanes_list != nullptr);
-    this->lanes_list->addItem(lane_id);
+  DELPHYNE_DEMAND(this->lanes_list != nullptr);
+  this->lanes_list->addItem(lane_id);
 }
 
 void RulesVisualizerWidget::AddText(const QString& text) {
-    DELPHYNE_DEMAND(this->rules_log_text_browser != nullptr);
-    this->rules_log_text_browser->append(text + "\n");
+  DELPHYNE_DEMAND(this->rules_log_text_browser != nullptr);
+  this->rules_log_text_browser->append(text + "\n");
 }
 
 void RulesVisualizerWidget::ClearLaneList() {
-    DELPHYNE_DEMAND(this->lanes_list != nullptr);
-    this->lanes_list->clear();
+  DELPHYNE_DEMAND(this->lanes_list != nullptr);
+  this->lanes_list->clear();
 }
 
 void RulesVisualizerWidget::ClearText() {
-    DELPHYNE_DEMAND(this->rules_log_text_browser != nullptr);
-    this->rules_log_text_browser->clear();
+  DELPHYNE_DEMAND(this->rules_log_text_browser != nullptr);
+  this->rules_log_text_browser->clear();
 }
 
-void RulesVisualizerWidget::OnItemClicked(QListWidgetItem* item) {
-    emit RequestRulesForLaneId(item->text());
-}
+void RulesVisualizerWidget::OnItemClicked(QListWidgetItem* item) { emit RequestRulesForLaneId(item->text()); }
 
 void RulesVisualizerWidget::OnRulesReceived(QString lane_id, QString rules) {
-    QList<QListWidgetItem *> items = this->lanes_list->findItems(lane_id, Qt::MatchExactly);
-    DELPHYNE_DEMAND(items.size() == 1);
-    items[0]->setSelected(true);
-    this->lanes_list->scrollToItem(items[0]);
-    this->ClearText();
-    this->AddText(rules);
-    QTextCursor cursor = this->rules_log_text_browser->textCursor();
-    cursor.setPosition(0);
-    this->rules_log_text_browser->setTextCursor(cursor);
+  QList<QListWidgetItem*> items = this->lanes_list->findItems(lane_id, Qt::MatchExactly);
+  DELPHYNE_DEMAND(items.size() == 1);
+  items[0]->setSelected(true);
+  this->lanes_list->scrollToItem(items[0]);
+  this->ClearText();
+  this->AddText(rules);
+  QTextCursor cursor = this->rules_log_text_browser->textCursor();
+  cursor.setPosition(0);
+  this->rules_log_text_browser->setTextCursor(cursor);
 }
 
-} // namespace gui
-} // namespace delphyne
+}  // namespace gui
+}  // namespace delphyne

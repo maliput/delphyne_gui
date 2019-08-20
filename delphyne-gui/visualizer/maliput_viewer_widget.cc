@@ -67,8 +67,7 @@ void MaliputViewerWidget::OnNewMultilaneFile(const std::string& filePath) {
   this->rulesVisualizerWiget->ClearText();
   this->rulesVisualizerWiget->ClearLaneList();
   const auto lane_ids = this->model->GetAllLaneIds<std::vector<QString>>();
-  for (size_t i = 0; i < lane_ids.size(); ++i)
-  {
+  for (size_t i = 0; i < lane_ids.size(); ++i) {
     this->rulesVisualizerWiget->AddLaneId(lane_ids[i]);
   }
 
@@ -88,11 +87,9 @@ void MaliputViewerWidget::VisualizeFileName(const std::string& filePath) {
 
 /////////////////////////////////////////////////
 void MaliputViewerWidget::OnVisualClicked(ignition::rendering::RayQueryResult rayResult) {
-  if (this->model)
-  {
+  if (this->model) {
     const maliput::api::Lane* lane = this->model->GetLaneFromWorldPosition(rayResult.point);
-    if (lane)
-    {
+    if (lane) {
       const std::string& lane_id = lane->id().string();
       ignmsg << "Clicked lane ID: " << lane_id << "\n";
       OnRulesForLaneRequested(QString(lane_id.c_str()));
@@ -122,12 +119,8 @@ void MaliputViewerWidget::BuildGUI() {
   QObject::connect(this->renderWidget, SIGNAL(VisualClicked(ignition::rendering::RayQueryResult)), this,
                    SLOT(OnVisualClicked(ignition::rendering::RayQueryResult)));
 
-  QObject::connect(
-    this->rulesVisualizerWiget,
-    SIGNAL(RequestRulesForLaneId(QString)),
-    this,
-    SLOT(OnRulesForLaneRequested(QString))
-    );
+  QObject::connect(this->rulesVisualizerWiget, SIGNAL(RequestRulesForLaneId(QString)), this,
+                   SLOT(OnRulesForLaneRequested(QString)));
 
   auto verticalLayout = new QVBoxLayout(this);
   verticalLayout->addWidget(this->maliputFileSelectionWidget);
@@ -136,8 +129,7 @@ void MaliputViewerWidget::BuildGUI() {
   verticalLayout->addWidget(this->rulesVisualizerWiget);
   auto controlGroup = new QGroupBox("Control panel", this);
   controlGroup->setLayout(verticalLayout);
-  controlGroup->setSizePolicy(QSizePolicy::Policy::Fixed,
-    QSizePolicy::Policy::Fixed);
+  controlGroup->setSizePolicy(QSizePolicy::Policy::Fixed, QSizePolicy::Policy::Fixed);
 
   auto horizontalLayout = new QHBoxLayout(this);
   horizontalLayout->addWidget(this->renderWidget);
@@ -162,8 +154,7 @@ void MaliputViewerWidget::paintEvent(QPaintEvent* _e) {
 }
 
 void MaliputViewerWidget::OnRulesForLaneRequested(QString laneId) {
-  emit this->rulesVisualizerWiget->ReceiveRules(laneId,
-    this->model->GetRulesOfLane<QString>(laneId.toStdString()));
+  emit this->rulesVisualizerWiget->ReceiveRules(laneId, this->model->GetRulesOfLane<QString>(laneId.toStdString()));
 }
 
 /////////////////////////////////////////////////

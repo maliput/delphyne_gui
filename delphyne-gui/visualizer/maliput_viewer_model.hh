@@ -203,24 +203,25 @@ class MaliputViewerModel {
   /// \brief Get N lanes from the underlying road geometry.
   /// \param[in] _n Amount of lanes desired to get from the underlying
   /// road geometry.
-  /// \tparam ContainerType Class that needs to have a size, push_back and reserve method implemented.
-  /// See std::vector declaration for each one of those methods. Its holded type needs to support
-  /// const char* construction and operator+ overriden
+  /// \tparam ContainerType A container class that must implement size(), push_back() and reserve() methods.
+  /// See std::vector for further reference on each one of these methods. Its elements' type must be a string class
+  /// that must be constructible with a single const char* argument and must support concatenation via operator+.
   /// \return Container that contains N lane ids.
   template <typename ContainerType>
   ContainerType GetNLanes(size_t _n) const;
 
   /// \brief Get all the lanes that the road geometry posses.
-  /// \tparam ContainerType Class that needs to have a size, push_back and reserve method implemented.
-  /// See std::vector declaration for each one of those methods. Its holded type needs to support
-  /// const char* construction and operator+ overriden
+  /// \tparam ContainerType A container class that must implement size(), push_back() and reserve() methods.
+  /// See std::vector for further reference on each one of these methods. Its elements' type must be a string class
+  /// that must be constructible with a single const char* argument and must support concatenation via operator+.
   /// \return All lane ids from the underlying road geometry
   template <typename ContainerType>
   ContainerType GetAllLaneIds() const;
 
   /// \brief Get all the rules for a given lane.
   /// \param[in] _laneId Id of the desired lane to get the rules from.
-  /// \tparam StringType Class that needs to be constructible with a const char* and has operator+ overriden
+  /// \tparam StringType A string class that must be constructible with a single const char* argument and
+  /// must support concatenation via operator+.
   /// \return rules separated by brackets.
   /// Ex: [Right of way Rule]\n.
   template <typename StringType>
@@ -253,21 +254,24 @@ class MaliputViewerModel {
   /// \brief Get the right of way rules for a given LaneSRange.
   /// \param[in] _laneSRange Object that contains a lane id and a range in the s
   /// coordinate.
-  /// \tparam StringType Class that needs to be constructible with a const char* and has operator+ overriden
+  /// \tparam StringType A string class that must be constructible with a single const char* argument and
+  /// must support concatenation via operator+.
   /// \return Right of way rules as a StringType representation.
   template <typename StringType>
   StringType GetRightOfWayRules(const maliput::api::rules::LaneSRange& _laneSRange) const;
 
   /// \brief Get the max speed rules for a given lane id.
   /// \param[in] _laneId Id of the lane to get the max speed limit rules from.
-  /// \tparam StringType Class that needs to be constructible with a const char* and has operator+ overriden
+  /// \tparam StringType A string class that must be constructible with a single const char* argument and
+  /// must support concatenation via operator+.
   /// \return Max speed limit rules as a StringType representation.
   template <typename StringType>
   StringType GetMaxSpeedLimitRules(const maliput::api::LaneId& _laneId) const;
 
   /// \brief Get the direction usage rules for a given lane id.
   /// \param[in] _laneId Id of the lane to get the direction usage rules from.
-  /// \tparam StringType Class that needs to be constructible with a const char* and has operator+ overriden
+  /// \tparam StringType A string class that must be constructible with a single const char* argument and
+  /// must support concatenation via operator+.
   /// \return Direction usage rules as a StringType representation.
   template <typename StringType>
   StringType GetDirectionUsageRules(const maliput::api::LaneId& _laneId) const;

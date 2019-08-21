@@ -151,7 +151,7 @@ def main():
         logfile_name=args.logfile_name
     )
 
-    time_step = 0.1
+    time_step = 0.01
     with launch_interactive_simulation(
         simulation_tree.runner, bare=args.bare
     ) as launcher:

@@ -126,7 +126,7 @@ def main():
     # Adds a callback to check for agent collisions.
     simulation_tree.add_pre_tick_handler(check_for_agent_collisions)
 
-    time_step = 0.1
+    time_step = 0.01
     with launch_interactive_simulation(
         simulation_tree.runner, bare=args.bare
     ) as launcher:

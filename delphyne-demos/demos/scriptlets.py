@@ -181,7 +181,7 @@ def main():
         logfile_name=args.logfile_name
     )
 
-    time_step = 0.001
+    time_step = 0.01
 
     stats = SimulationStats()
     simulation_tree.add_pre_tick_handler(random_print)

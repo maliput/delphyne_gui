@@ -48,13 +48,10 @@ int main(int argc, const char* argv[]) {
 
   // If we run the visualizer as a child process (like a demo written in
   // python), we need to ensure that it's not using a block buffer
-  // to display everything that goes to the stdout in realtime. 
-  if (delphyne::gui::GlobalAttributes::HasArgument("use-line-buffer"))
-  {
-    std::string use_line_buffer_arg =
-      delphyne::gui::GlobalAttributes::GetArgument("use-line-buffer");
-    if (use_line_buffer_arg == "yes")
-    {
+  // to display everything that goes to the stdout in realtime.
+  if (delphyne::gui::GlobalAttributes::HasArgument("use-line-buffer")) {
+    std::string use_line_buffer_arg = delphyne::gui::GlobalAttributes::GetArgument("use-line-buffer");
+    if (use_line_buffer_arg == "yes") {
       setlinebuf(stdout);
     }
   }

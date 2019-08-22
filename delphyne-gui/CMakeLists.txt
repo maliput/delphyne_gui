@@ -235,6 +235,7 @@ else (build_errors)
   add_subdirectory(visualizer)
   if (BUILD_TESTING)
     add_subdirectory(test)
+    add_test(NAME CLANGFORMAT COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/tools/run_clang_format.sh)
   endif()
 
   ########################################

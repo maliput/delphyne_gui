@@ -57,7 +57,7 @@ class RulesVisualizerWidget : public QWidget {
   QListWidget* lanes_list{nullptr};
   QTextBrowser* rules_log_text_browser{nullptr};
 };
-}
-}
+}  // namespace gui
+}  // namespace delphyne
 
 #endif  // DELPHYNE_GUI_RULES_VISUALIZER_WIDGET_HH

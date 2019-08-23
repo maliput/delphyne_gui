@@ -64,14 +64,15 @@ std::vector<std::tuple<ignition::math::Vector3d, int>> PolarSort(
   //                       plane of all the points in the face instead of the
   //                       plane z=0. We need the normal of the plane to do
   //                       so.
-  std::sort(ordered_vector.begin(), ordered_vector.end(), [center](const std::tuple<ignition::math::Vector3d, int>& a,
-                                                                   const std::tuple<ignition::math::Vector3d, int>& b) {
-    double a_y = std::atan2(std::get<0>(a).Y() - center.Y(), std::get<0>(a).X() - center.X());
-    double b_y = std::atan2(std::get<0>(b).Y() - center.Y(), std::get<0>(b).X() - center.X());
-    if (a_y < 0) a_y += 2 * M_PI;
-    if (b_y < 0) b_y += 2 * M_PI;
-    return a_y < b_y;
-  });
+  std::sort(
+      ordered_vector.begin(), ordered_vector.end(),
+      [center](const std::tuple<ignition::math::Vector3d, int>& a, const std::tuple<ignition::math::Vector3d, int>& b) {
+        double a_y = std::atan2(std::get<0>(a).Y() - center.Y(), std::get<0>(a).X() - center.X());
+        double b_y = std::atan2(std::get<0>(b).Y() - center.Y(), std::get<0>(b).X() - center.X());
+        if (a_y < 0) a_y += 2 * M_PI;
+        if (b_y < 0) b_y += 2 * M_PI;
+        return a_y < b_y;
+      });
   return ordered_vector;
 }
 

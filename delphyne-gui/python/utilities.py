@@ -10,7 +10,7 @@
 import os
 import time
 
-import delphyne
+import delphyne.utilities
 
 from . import launcher
 

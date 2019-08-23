@@ -10,15 +10,15 @@ The city demo.
 # Imports
 ##############################################################################
 
+import functools
 import os.path
 import random
 import sys
 
-import maliput.api as maliput
+import delphyne.trees
+import delphyne.behaviours
+import delphyne.blackboard
 
-import delphyne.roads as delphyne_roads
-import delphyne.simulation as simulation
-import delphyne.utilities
 import delphyne_gui.utilities
 
 from delphyne_gui.utilities import launch_interactive_simulation
@@ -55,103 +55,100 @@ MOBIL controlled cars running in a closed-loop maliput road.
 ##############################################################################
 
 
-def main():
-    """Keeping pylint entertained."""
-    args = parse_arguments()
+def lane_position_to_geo_pose2d(road_geometry, lane_id, lane_position):
 
-    # The simulation builder
-    builder = simulation.AgentSimulationBuilder()
+    from delphyne.blackboard.providers import resolve
+    lane_id = resolve(lane_id, road_geometry)
+    lane_position = resolve(lane_position, road_geometry, lane_id)
 
-    filename = delphyne_gui.utilities.get_delphyne_gui_resource(
+    road_index = road_geometry.ById()
+    lane = road_index.GetLane(lane_id)
+    geo_position = lane.ToGeoPosition(lane_position)
+    geo_orientation = lane.GetOrientation(lane_position)
+    initial_x, initial_y, _ = geo_position.xyz()
+    initial_heading = geo_orientation.rpy().yaw_angle()
+    return initial_x, initial_y, initial_heading
+
+
+def create_city_scenario_subtree(num_rail_cars, num_mobil_cars):
+    file_path = delphyne_gui.utilities.get_delphyne_gui_resource(
         "roads/little_city.yaml"
     )
 
-    if not os.path.isfile(filename):
+    if not os.path.isfile(file_path):
         print("Required file {} not found."
               " Please, make sure to install the latest delphyne-gui."
-              .format(os.path.abspath(filename)))
+              .format(os.path.abspath(file_path)))
         sys.exit()
 
-    # The road geometry
-    road = builder.set_road_geometry(
-        delphyne_roads.create_multilane_from_file(
-            file_path=filename
-        )
+
+    scenario_subtree = delphyne.behaviours.roads.Multilane(
+        file_path=file_path, name="little_city"
     )
 
-    # Gets all lanes in the road.
-    lanes = (road.junction(i).segment(j).lane(k)
-             for i in range(road.num_junctions())
-             for j in range(road.junction(i).num_segments())
-             for k in range(road.junction(i).segment(j).num_lanes()))
-
-    # Determines all available spots for car positioning.
-    car_distance = 6.0  # m
-    lane_positions = [
-        (lane, maliput.LanePosition(s=i * car_distance, r=0., h=0.))
-        for lane in lanes for i in range(int(lane.length() / car_distance))
-    ]
-
-    # Ensures there's at least one spot for each car.
-    maximum_car_count = len(lane_positions)
-    total_car_count = args.num_rail_cars + args.num_mobil_cars
-    if total_car_count > maximum_car_count:
-        print(("No room for so many cars!"
-               " Maximum car count is {}").format(
-                   maximum_car_count))
-        quit()
-
-    # Allocates a lane position for each car in a pseudo-random fashion.
-    random.seed(23)
-    car_lane_positions = random.sample(lane_positions, total_car_count)
-    rail_car_lane_positions = car_lane_positions[:args.num_rail_cars]
-    mobil_car_lane_positions = car_lane_positions[args.num_rail_cars:]
+    provider = delphyne.blackboard.providers.LaneLocationProvider(
+        distance_between_agents=6.0, seed=1
+    )
 
     # Sets up all railcars.
     railcar_speed = 5.0  # (m/s)
-    for n in range(args.num_rail_cars):
-        lane, lane_position = rail_car_lane_positions[n]
-        delphyne.utilities.add_rail_car(
-            builder,
-            name='rail{}'.format(n),
-            lane=lane,
-            position=lane_position.srh()[0],
-            offset=0.0,  # m
-            speed=railcar_speed
+    for n in range(num_rail_cars):
+        scenario_subtree.add_child(
+            delphyne.behaviours.agents.RailCar(
+                name='rail{}'.format(n),
+                lane_id=provider.random_lane,
+                longitudinal_position=0.0,
+                lateral_offset=0.0,
+                speed=4.0
+            )
         )
 
     # Sets up all MOBIL cars.
     mobilcar_speed = 4.0  # (m/s)
-    for m in range(args.num_mobil_cars):
-        lane, lane_position = mobil_car_lane_positions[m]
-        geo_position = lane.ToGeoPosition(lane_position)
-        geo_orientation = lane.GetOrientation(lane_position)
-        x_position, y_position, _ = geo_position.xyz()
-        heading = geo_orientation.rpy().yaw_angle()
-
-        delphyne.utilities.add_mobil_car(
-            builder,
-            name="mobil" + str(m),
-            scene_x=x_position,
-            scene_y=y_position,
-            heading=heading,
-            speed=mobilcar_speed,
+    for m in range(num_mobil_cars):
+        scenario_subtree.add_child(
+            delphyne.behaviours.agents.MobilCar(
+                name='mobil{}'.format(m),
+                speed=mobilcar_speed,
+                initial_pose=functools.partial(
+                    lane_position_to_geo_pose2d,
+                    lane_id=provider.random_lane,
+                    lane_position=provider.random_lane_position
+                )
+            )
         )
 
-    runner = simulation.SimulationRunner(
-        simulation=builder.build(),
-        time_step=0.01,  # (secs)
-        realtime_rate=args.realtime_rate,
-        paused=args.paused,
-        log=args.log,
-        logfile_name=args.logfile_name)
+    return scenario_subtree
 
-    with launch_interactive_simulation(runner, bare=args.bare) as launcher:
+
+def main():
+    """Keeping pylint entertained."""
+    args = parse_arguments()
+
+    simulation_tree = delphyne.trees.BehaviourTree(
+        root=create_city_scenario_subtree(
+            args.num_rail_cars, args.num_mobil_cars
+        )
+    )
+
+    simulation_tree.setup(
+        realtime_rate=args.realtime_rate,
+        start_paused=args.paused,
+        logfile_name=args.logfile_name,
+    )
+
+    time_step = 0.01
+    with launch_interactive_simulation(
+        simulation_tree.runner, bare=args.bare
+    ) as launcher:
         if args.duration < 0:
             # run indefinitely
-            runner.start()
+            print("Running simulation indefinitely.")
+            simulation_tree.tick_tock(period=time_step)
         else:
             # run for a finite time
-            print("Running simulation for {0} seconds.".format(
-                args.duration))
-            runner.run_async_for(args.duration, launcher.terminate)
+            print("Running simulation for {0} seconds.".format(args.duration))
+            simulation_tree.tick_tock(
+                period=time_step, number_of_iterations=args.duration/time_step
+            )
+        launcher.terminate()

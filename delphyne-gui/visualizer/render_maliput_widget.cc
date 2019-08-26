@@ -27,6 +27,7 @@
 #include <ignition/rendering/Text.hh>
 
 #include <maliput-utilities/generate_obj.h>
+#include <maliput/api/lane.h>
 
 #include <memory>
 
@@ -234,6 +235,8 @@ void RenderMaliputWidget::CreateRenderWindow() {
   this->CreateRoadRootVisual();
 
   this->orbitViewControl.reset(new OrbitViewControl(this->camera));
+
+  this->outliner = std::make_unique<Outliner>(this->scene, 0.3, 0.5, 0.1, 1500, 0.1);
 }
 
 /////////////////////////////////////////////////
@@ -440,6 +443,13 @@ void RenderMaliputWidget::SetArrowVisibility(bool _visible) {
 }
 
 /////////////////////////////////////////////////
+void RenderMaliputWidget::HideOutline() {
+  if (this->outliner) {
+    this->outliner->SetVisibility(false);
+  }
+}
+
+/////////////////////////////////////////////////
 void RenderMaliputWidget::Clear() {
   // Clears the text labels.
   for (auto it : textLabels) {
@@ -450,8 +460,15 @@ void RenderMaliputWidget::Clear() {
   for (auto it : meshes) {
     this->rootVisual->RemoveChild(it.second);
   }
+  HideOutline();
+  if (this->arrow) {
+    SetArrowVisibility(false);
+  }
   meshes.clear();
 }
+
+/////////////////////////////////////////////////
+void RenderMaliputWidget::Outline(const maliput::api::Lane* _lane) { this->outliner->OutlineLane(_lane); }
 
 /////////////////////////////////////////////////
 void RenderMaliputWidget::showEvent(QShowEvent* _e) {
@@ -527,6 +544,7 @@ void RenderMaliputWidget::mousePressEvent(QMouseEvent* _e) {
       emit VisualClicked(rayResult);
     } else {
       SetArrowVisibility(false);
+      HideOutline();
     }
   }
   this->UpdateViewport();

@@ -94,10 +94,12 @@ void MaliputViewerWidget::OnVisualClicked(ignition::rendering::RayQueryResult ra
       const std::string& lane_id = lane->id().string();
       ignmsg << "Clicked lane ID: " << lane_id << "\n";
       OnRulesForLaneRequested(QString(lane_id.c_str()));
+      this->renderWidget->Outline(lane);
       this->renderWidget->PutArrowAt(rayResult.distance, rayResult.point);
       this->renderWidget->SetArrowVisibility(true);
     } else {
       this->renderWidget->SetArrowVisibility(false);
+      this->renderWidget->HideOutline();
     }
   }
 }
@@ -159,6 +161,8 @@ void MaliputViewerWidget::paintEvent(QPaintEvent* _e) {
 }
 
 void MaliputViewerWidget::OnRulesForLaneRequested(QString laneId) {
+  const maliput::api::Lane* lane = this->model->GetLaneFromId(laneId.toStdString());
+  this->renderWidget->Outline(lane);
   emit this->rulesVisualizerWiget->ReceiveRules(laneId, this->model->GetRulesOfLane<QString>(laneId.toStdString()));
 }
 

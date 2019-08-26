@@ -200,6 +200,11 @@ class MaliputViewerModel {
   /// \return Lane associated with that position or nullptr if not found.
   const maliput::api::Lane* GetLaneFromWorldPosition(const ignition::math::Vector3d& _position);
 
+  /// \brief Get the lane associated with an id.
+  /// \param[in] _id Id of the lane.
+  /// \return Lane associated with given id or nullptr if invalid id.
+  const maliput::api::Lane* GetLaneFromId(const std::string& _id);
+
   /// \brief Get N lanes from the underlying road geometry.
   /// \param[in] _n Amount of lanes desired to get from the underlying
   /// road geometry.

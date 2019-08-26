@@ -19,6 +19,7 @@
 #include "arrow_mesh.hh"
 #include "maliput_viewer_model.hh"
 #include "orbit_view_control.hh"
+#include "outliner.hh"
 
 namespace delphyne {
 namespace gui {
@@ -84,8 +85,15 @@ class RenderMaliputWidget : public QWidget {
   /// \param[in] _visible Visibility of the arrow.
   void SetArrowVisibility(bool _visible);
 
+  /// \brief Hide the entire outline of a lane.
+  void HideOutline();
+
   /// \brief Clears all the references to text labels, meshes and the scene.
   void Clear();
+
+  /// \brief Outlines a given lane.
+  /// \param[in] _lane Lane to outline.
+  void Outline(const maliput::api::Lane* _lane);
 
   /// \brief Overridden method to receive Qt paint event.
   /// \param[in] _e The event that happened.
@@ -204,6 +212,9 @@ class RenderMaliputWidget : public QWidget {
 
   /// \brief Arrow that points the location clicked in the visualizer.
   std::unique_ptr<ArrowMesh> arrow;
+
+  /// \brief Outliner used for outlining clicked lanes in the visualizer.
+  std::unique_ptr<Outliner> outliner;
 
   /// \brief A pointer to the rendering engine
   ignition::rendering::RenderEngine* engine;

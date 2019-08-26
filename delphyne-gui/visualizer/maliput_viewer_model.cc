@@ -494,6 +494,12 @@ const maliput::api::Lane* MaliputViewerModel::GetLaneFromWorldPosition(const ign
   return rg->ToRoadPosition(geo_pos, nullptr, nullptr, nullptr).lane;
 }
 
+const maliput::api::Lane* MaliputViewerModel::GetLaneFromId(const std::string& _id) {
+  const maliput::api::RoadGeometry* rg =
+      this->roadGeometry ? this->roadGeometry.get() : this->roadNetwork->road_geometry();
+  return rg->ById().GetLane(maliput::api::LaneId(_id));
+}
+
 ///////////////////////////////////////////////////////
 MaliputLabelType delphyne::gui::FromString(const std::string& _type) {
   if (_type == "lane_text_label") {

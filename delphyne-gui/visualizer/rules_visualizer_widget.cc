@@ -2,11 +2,12 @@
 
 #include "rules_visualizer_widget.hh"
 
-#include <delphyne/macros.h>
-
 #include <QtWidgets/QListWidget>
 #include <QtWidgets/QTextBrowser>
+#include <QtWidgets/QTreeWidget>
 #include <QtWidgets/QVBoxLayout>
+#include <delphyne/macros.h>
+#include <ignition/common/Console.hh>
 #include <ignition/gui/qt.h>
 
 namespace delphyne {
@@ -18,12 +19,16 @@ RulesVisualizerWidget::RulesVisualizerWidget(QWidget* parent) : QWidget(parent) 
   this->rules_label = new QLabel("Rules", this);
   this->lanes_label = new QLabel("Lanes", this);
   this->lanes_list = new QListWidget(this);
+  this->phase_tree = new QTreeWidget(this);
+  this->phase_tree->setColumnCount(1);
+  this->phase_tree->setHeaderLabel("Phase ring");
 
   QObject::connect(this->lanes_list, SIGNAL(itemClicked(QListWidgetItem*)), this,
-                   SLOT(OnItemClicked(QListWidgetItem*)));
+                   SLOT(OnLaneItemClicked(QListWidgetItem*)));
 
   QObject::connect(this, SIGNAL(ReceiveRules(QString, QString)), this, SLOT(OnRulesReceived(QString, QString)));
 
+  layout->addWidget(this->phase_tree);
   layout->addWidget(this->lanes_label);
   layout->addWidget(this->lanes_list);
   layout->addWidget(this->rules_label);
@@ -52,7 +57,50 @@ void RulesVisualizerWidget::ClearText() {
   this->rules_log_text_browser->clear();
 }
 
-void RulesVisualizerWidget::OnItemClicked(QListWidgetItem* item) { emit RequestRulesForLaneId(item->text()); }
+void RulesVisualizerWidget::ConstructPhaseRingTree(
+    std::unordered_map<std::string, std::vector<QString>>&& phases_per_ring) {
+  DELPHYNE_DEMAND(this->phase_tree != nullptr);
+  this->phase_tree->clear();
+  for (auto& phase_ring_n_phases : phases_per_ring) {
+    QTreeWidgetItem* phase_ring_item = new QTreeWidgetItem(this->phase_tree);
+    phase_ring_item->setText(0, QString::fromStdString(phase_ring_n_phases.first));
+    phase_ring_item->setFlags(phase_ring_item->flags() & (~Qt::ItemIsSelectable));
+    this->phase_tree->addTopLevelItem(phase_ring_item);
+    std::vector<QString>& phases = phase_ring_n_phases.second;
+    for (size_t i = 0; i < phases.size(); ++i) {
+      QTreeWidgetItem* phase_item = new QTreeWidgetItem();
+      phase_item->setText(0, std::move(phases[i]));
+      phase_ring_item->addChild(phase_item);
+    }
+  }
+}
+
+QString RulesVisualizerWidget::GetSelectedLaneId() const {
+  QListWidgetItem* currentItem = this->lanes_list->currentItem();
+  if (currentItem) {
+    return currentItem->text();
+  }
+  return QString();
+}
+
+PhaseRingPhaseIds RulesVisualizerWidget::GetSelectedPhaseRingAndPhaseId() const {
+  PhaseRingPhaseIds phase_ring_phase_ids;
+  QList<QTreeWidgetItem*> selected_items = this->phase_tree->selectedItems();
+  if (selected_items.size() > 0) {
+    // We asume that we only have 1 level of depth in the tree. Example:
+    // |_PhaseRing1
+    // |__Phase1
+    // |__Phase2
+    // |_PhaseRing2
+    // |__Phase1
+    QTreeWidgetItem* parent = selected_items[0]->parent();
+    phase_ring_phase_ids.phase_ring_id = parent->text(0);
+    phase_ring_phase_ids.phase_id = selected_items[0]->text(0);
+  }
+  return phase_ring_phase_ids;
+}
+
+void RulesVisualizerWidget::OnLaneItemClicked(QListWidgetItem* item) { emit RequestRules(); }
 
 void RulesVisualizerWidget::OnRulesReceived(QString lane_id, QString rules) {
   QList<QListWidgetItem*> items = this->lanes_list->findItems(lane_id, Qt::MatchExactly);

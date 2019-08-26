@@ -5,6 +5,7 @@
 #include <QtCore/QDir>
 #include <QtWidgets/QFileDialog>
 #include <QtWidgets/QGroupBox>
+#include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QVBoxLayout>
 
 using namespace delphyne;
@@ -163,6 +164,9 @@ MaliputFileSelectionWidget::MaliputFileSelectionWidget(QWidget* parent) : QWidge
   this->Build();
   // Connects all the check box events.
   QObject::connect(this->loadButton, SIGNAL(released()), this, SLOT(onLoadButtonPressed()));
+  QObject::connect(this->roadRulebookButton, SIGNAL(released()), this, SLOT(onRoadRulebookButtonPressed()));
+  QObject::connect(this->trafficLightRulesButton, SIGNAL(released()), this, SLOT(onTrafficLightrulesButtonPressed()));
+  QObject::connect(this->phaseRingButton, SIGNAL(released()), this, SLOT(onPhaseRingButtonPressed()));
 }
 
 ///////////////////////////////////////////////////////
@@ -177,20 +181,67 @@ void MaliputFileSelectionWidget::SetFileNameLabel(const std::string& fileName) {
 void MaliputFileSelectionWidget::onLoadButtonPressed() {
   QString fileName = QFileDialog::getOpenFileName(this, tr("Open Maliput XODR or YAML"),
                                                   QString::fromStdString(this->fileDialogOpenPath),
-                                                  tr("XODR Files (*.XODR);;YAML files (*.YAML)"));
+                                                  tr("XODR Files (*.xodr);;YAML files (*.yaml)"));
   if (!fileName.isEmpty()) {
     this->fileDialogOpenPath = fileName.toStdString();
   }
-  emit maliputFileChanged(fileName.toStdString());
+  emit maliputFileChanged(fileName.toStdString(), this->roadRulebookLineEdit->text().toStdString(),
+                          this->trafficLightRulesLineEdit->text().toStdString(),
+                          this->phaseRingLineEdit->text().toStdString());
+}
+
+void MaliputFileSelectionWidget::onRoadRulebookButtonPressed() {
+  QString fileName = QFileDialog::getOpenFileName(
+      this, tr("Open Road Rulebook YAML"), QString::fromStdString(this->fileDialogOpenPath), tr("YAML files (*.yaml)"));
+  this->roadRulebookLineEdit->setText(fileName);
+}
+
+void MaliputFileSelectionWidget::onTrafficLightrulesButtonPressed() {
+  QString fileName =
+      QFileDialog::getOpenFileName(this, tr("Open Traffic Lights Rulebook YAML"),
+                                   QString::fromStdString(this->fileDialogOpenPath), tr("YAML files (*.yaml)"));
+  this->trafficLightRulesLineEdit->setText(fileName);
+}
+
+void MaliputFileSelectionWidget::onPhaseRingButtonPressed() {
+  QString fileName =
+      QFileDialog::getOpenFileName(this, tr("Open Traffic Lights Rulebook YAML"),
+                                   QString::fromStdString(this->fileDialogOpenPath), tr("YAML files (*.yaml)"));
+  this->phaseRingLineEdit->setText(fileName);
 }
 
 ///////////////////////////////////////////////////////
 void MaliputFileSelectionWidget::Build() {
   this->loadButton = new QPushButton("Load", this);
   this->fileNameLabel = new QLabel("", this);
+  this->roadRulebookLineEdit = new QLineEdit(this);
+  this->trafficLightRulesLineEdit = new QLineEdit(this);
+  this->phaseRingLineEdit = new QLineEdit(this);
+  this->roadRulebookButton = new QPushButton("Select road rulebook", this);
+  this->trafficLightRulesButton = new QPushButton("Select traffic lights book", this);
+  this->phaseRingButton = new QPushButton("Select phase ring book", this);
+
+  QWidget* roadRulebookWidgetContainer = new QWidget(this);
+  QHBoxLayout* roadRulebookLayout = new QHBoxLayout(roadRulebookWidgetContainer);
+  roadRulebookLayout->addWidget(roadRulebookLineEdit);
+  roadRulebookLayout->addWidget(roadRulebookButton);
+
+  QWidget* trafficLightRulebookWidgetContainer = new QWidget(this);
+  QHBoxLayout* trafficLightRulesLayout = new QHBoxLayout(trafficLightRulebookWidgetContainer);
+  trafficLightRulesLayout->addWidget(trafficLightRulesLineEdit);
+  trafficLightRulesLayout->addWidget(trafficLightRulesButton);
+
+  QWidget* phaseRingWidgetContainer = new QWidget(this);
+  QHBoxLayout* phaseRingLayout = new QHBoxLayout(phaseRingWidgetContainer);
+  phaseRingLayout->addWidget(phaseRingLineEdit);
+  phaseRingLayout->addWidget(phaseRingButton);
 
   auto* layout = new QVBoxLayout(this);
   layout->addWidget(fileNameLabel);
   layout->addWidget(loadButton);
+  layout->addWidget(roadRulebookWidgetContainer);
+  layout->addWidget(trafficLightRulebookWidgetContainer);
+  layout->addWidget(phaseRingWidgetContainer);
+
   this->setLayout(layout);
 }

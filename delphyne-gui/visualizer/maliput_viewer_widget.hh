@@ -14,6 +14,7 @@
 #include "layer_selection_widget.hh"
 #include "maliput_viewer_model.hh"
 #include "render_maliput_widget.hh"
+#include "rules_visualizer_widget.hh"
 
 namespace delphyne {
 namespace gui {
@@ -59,6 +60,8 @@ class MaliputViewerWidget : public ignition::gui::Plugin {
   /// \param[in] rayResult Ray that contains the point where the click hit.
   void OnVisualClicked(ignition::rendering::RayQueryResult rayResult);
 
+  void OnRulesForLaneRequested(QString laneId);
+
  protected:
   /// \brief Overridden method to receive Qt paint event.
   /// \param[in] _e The event that happened.
@@ -84,6 +87,9 @@ class MaliputViewerWidget : public ignition::gui::Plugin {
 
   /// \brief World render widget.
   RenderMaliputWidget* renderWidget{nullptr};
+
+  /// \brief Rules visualizer widget.
+  RulesVisualizerWidget* rulesVisualizerWiget{nullptr};
 
   /// \brief Model that holds the meshes and the visualization status.
   std::unique_ptr<MaliputViewerModel> model{};

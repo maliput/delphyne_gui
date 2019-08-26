@@ -92,7 +92,7 @@ void Outliner::OutlineLane(const maliput::api::Lane* _lane) {
   MoveCubeAtMidPointInSRightSide(_lane, 0., max_s, cubesRightSide);
 
   size_t cubesToHide = lastCubesUsed != 0 ? lastCubesUsed : cubes.size();
-  for (size_t cubesUnused = cubesUsed + 1; cubesUnused < cubesToHide; ++cubesUnused) {
+  for (size_t cubesUnused = cubesUsed; cubesUnused < cubesToHide; ++cubesUnused) {
     cubes[cubesUnused]->SetVisible(false);
   }
   lastCubesUsed = cubesUsed;

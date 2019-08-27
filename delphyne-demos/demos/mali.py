@@ -12,6 +12,8 @@ The mali demo.
 
 import os.path
 
+import delphyne.trees
+import delphyne.behaviours
 import delphyne.roads as delphyne_roads
 import delphyne.simulation as simulation
 import delphyne.utilities as utilities
@@ -120,6 +122,35 @@ def get_malidrive_resource(path):
     return ''
 
 
+class BasicLaneProvider():
+
+    def __init__(self, lane_id=None):
+        self.lane_id = lane_id
+
+    def get_lane(self, road_geometry):
+        if self.lane_id is None:
+            self.lane_id = road_geometry.junction(0).segment(0).lane(0)
+        return self.lane_id
+
+
+def create_mali_scenario_subtree(file_path, features,
+        lane_position, direction_of_travel, lane_provider):
+    scenario_subtree = delphyne.behaviours.roads.Malidrive(
+        file_path=file_path,
+        features=features,
+        name=os.path.splitext(os.path.basename(file_path))[0]
+        )
+    scenario_subtree.add_child(
+        delphyne.behaviours.agents.RailCar(
+            name='car',
+            lane_id=lane_provider.get_lane,
+            longitudinal_position=lane_position,
+            lateral_offset=0.0,
+            speed=15.0,
+            direction_of_travel=direction_of_travel
+            ))
+    return scenario_subtree
+
 ##############################################################################
 # Main
 ##############################################################################
@@ -128,8 +159,6 @@ def get_malidrive_resource(path):
 def main():
     """Keeping pylint entertained."""
     args = parse_arguments()
-
-    builder = simulation.AgentSimulationBuilder()
 
     if os.path.isfile(args.road_name):
         road = {
@@ -150,6 +179,11 @@ def main():
         print("Unknown road {}.".format(args.road_name))
         quit()
 
+    if 'lane_id' in road:
+        lane_provider = BasicLaneProvider(road['lane_id'])
+    else:
+        lane_provider = BasicLaneProvider()
+
     features = delphyne_roads.ObjFeatures()
     features.draw_arrows = True
     features.draw_elevation_bounds = False
@@ -157,48 +191,26 @@ def main():
     features.draw_lane_haze = False
     features.draw_branch_points = False
 
-    # The road network
-    road_network = builder.set_road_network(
-        delphyne_roads.create_malidrive_from_file(
-            name=os.path.splitext(
-                os.path.basename(road['file_path'])
-            )[0], file_path=road['file_path']
-        ), features
-    )
+    simulation_tree = delphyne.trees.BehaviourTree(
+        root=create_mali_scenario_subtree(road['file_path'], features,
+            road['lane_position'], road['moving_forward'], lane_provider))
 
-    # Find a lane
-    road_geometry = road_network.road_geometry()
-    if 'lane_id' in road:
-        lane = road_geometry.ById().GetLane(road['lane_id'])
-    else:
-        lane = road_geometry.junction(0).segment(0).lane(0)
-
-    # Setup a car
-    railcar_speed = 15.0  # (m/s)
-    utilities.add_rail_car(
-        builder,
-        name='car',
-        lane=lane,
-        position=road['lane_position'],
-        offset=0.0,
-        speed=railcar_speed,
-        direction_of_travel=road['moving_forward']
-    )
-
-    runner = simulation.SimulationRunner(
-        simulation=builder.build(),
-        time_step=0.015,  # (secs)
+    simulation_tree.setup(
         realtime_rate=args.realtime_rate,
-        paused=args.paused,
-        log=args.log,
-        logfile_name=args.logfile_name)
+        start_paused=args.paused,
+        logfile_name=args.logfile_name
+    )
+    time_step = 0.01
 
-    with launch_interactive_simulation(runner, bare=args.bare) as launcher:
+    with launch_interactive_simulation(simulation_tree.runner, bare=args.bare) as launcher:
         if args.duration < 0:
             # run indefinitely
-            runner.start()
+            print("Running simulation indefinitely.")
+            simulation_tree.tick_tock(period=time_step)
         else:
             # run for a finite time
             print("Running simulation for {0} seconds.".format(
                 args.duration))
-            runner.run_async_for(args.duration, launcher.terminate)
+            simulation_tree.tick_tock(period=time_step,
+                number_of_iterations=args.duration/time_step)
+        launcher.terminate()

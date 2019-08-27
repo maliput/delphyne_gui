@@ -4,6 +4,7 @@
 
 #include <delphyne/macros.h>
 
+#include <ignition/common/Console.hh>
 #include <ignition/math/Helpers.hh>
 #include <ignition/math/Matrix4.hh>
 #include <ignition/math/Vector3.hh>
@@ -21,7 +22,6 @@ Outliner::Outliner(ignition::rendering::ScenePtr& _scene, double _scaleX, double
                    size_t _poolSize, double _minTolerance)
     : cubes(_poolSize),
       lastLaneOutlined(nullptr),
-      cubesUsed(0),
       lastCubesUsed(0),
       minTolerance(_minTolerance < _scaleX * 2.0 ? _scaleX : _minTolerance) {
   DELPHYNE_DEMAND(_poolSize > 3);
@@ -39,17 +39,17 @@ void Outliner::OutlineLane(const maliput::api::Lane* _lane) {
   lastLaneOutlined = _lane;
   const double max_s = _lane->length();
 
-  maliput::api::RBounds initialRBounds = _lane->lane_bounds(0.);
-  maliput::api::RBounds endRBounds = _lane->lane_bounds(max_s);
+  const maliput::api::RBounds initialRBounds = _lane->lane_bounds(0.);
+  const maliput::api::RBounds endRBounds = _lane->lane_bounds(max_s);
 
-  maliput::api::GeoPosition initialRMinGeoPos =
+  const maliput::api::GeoPosition initialRMinGeoPos =
       _lane->ToGeoPosition(maliput::api::LanePosition(0., initialRBounds.min(), 0.));
-  maliput::api::GeoPosition initialRMaxGeoPos =
+  const maliput::api::GeoPosition initialRMaxGeoPos =
       _lane->ToGeoPosition(maliput::api::LanePosition(0., initialRBounds.max(), 0.));
 
-  maliput::api::GeoPosition endRMinGeoPos =
+  const maliput::api::GeoPosition endRMinGeoPos =
       _lane->ToGeoPosition(maliput::api::LanePosition(max_s, endRBounds.min(), 0.));
-  maliput::api::GeoPosition endRMaxGeoPos =
+  const maliput::api::GeoPosition endRMaxGeoPos =
       _lane->ToGeoPosition(maliput::api::LanePosition(max_s, endRBounds.max(), 0.));
 
   // Set cubes in the extremes of the lane.
@@ -63,46 +63,33 @@ void Outliner::OutlineLane(const maliput::api::Lane* _lane) {
   cubes[3]->SetWorldPosition(endRMaxGeoPos.x(), endRMaxGeoPos.y(), endRMaxGeoPos.z());
   cubes[3]->SetVisible(true);
 
-  cubesUsed = 4;
+  size_t cubesUsed = 4;
   size_t remainingCubes = cubes.size() - cubesUsed;
 
-  MoveCubeAtMidPointInR(initialRMinGeoPos, initialRMaxGeoPos, remainingCubes);
+  MoveCubeAtMidPointInR(initialRMinGeoPos, initialRMaxGeoPos, &cubesUsed, &remainingCubes);
 
-  MoveCubeAtMidPointInR(endRMinGeoPos, endRMaxGeoPos, remainingCubes);
+  MoveCubeAtMidPointInR(endRMinGeoPos, endRMaxGeoPos, &cubesUsed, &remainingCubes);
 
   size_t cubesLeftSide = std::ceil(remainingCubes / 2);
   size_t cubesRightSide = remainingCubes - cubesLeftSide;
+  double oldTolerance = minTolerance;
 
   // If we have less cubes to cover the lane, increase the tolerance.
-  double newToleranceForLeftSide = max_s / cubesLeftSide;
-  double oldTolerance = minTolerance;
-  if (newToleranceForLeftSide < minTolerance) {
-    cubesLeftSide = static_cast<size_t>(max_s / minTolerance);
-  } else {
-    minTolerance = newToleranceForLeftSide;
-  }
-  MoveCubeAtMidPointInSLeftSide(_lane, 0., max_s, cubesLeftSide);
+  minTolerance = GetNewToleranceToPopulateLane(max_s, cubesLeftSide);
+  cubesLeftSide = static_cast<size_t>(max_s / minTolerance);
+  MoveCubeAtMidPointInS(_lane, 0., max_s, true, &cubesUsed, &cubesLeftSide);
 
-  double newToleranceForRightSide = max_s / cubesRightSide;
-  if (newToleranceForRightSide < minTolerance) {
-    cubesRightSide = static_cast<size_t>(max_s / minTolerance);
-  } else {
-    minTolerance = newToleranceForRightSide;
-  }
-  MoveCubeAtMidPointInSRightSide(_lane, 0., max_s, cubesRightSide);
+  minTolerance = GetNewToleranceToPopulateLane(max_s, cubesRightSide);
+  cubesRightSide = static_cast<size_t>(max_s / minTolerance);
+  MoveCubeAtMidPointInS(_lane, 0., max_s, false, &cubesUsed, &cubesRightSide);
 
-  size_t cubesToHide = lastCubesUsed != 0 ? lastCubesUsed : cubes.size();
-  for (size_t cubesUnused = cubesUsed; cubesUnused < cubesToHide; ++cubesUnused) {
-    cubes[cubesUnused]->SetVisible(false);
-  }
+  SetVisibilityOfCubesStartingFromTo(cubesUsed, lastCubesUsed != 0 ? lastCubesUsed : cubes.size(), false);
   lastCubesUsed = cubesUsed;
   minTolerance = oldTolerance;
 }
 
 void Outliner::SetVisibility(bool _visible) {
-  for (size_t i = 0; i < lastCubesUsed; ++i) {
-    cubes[i]->SetVisible(_visible);
-  }
+  SetVisibilityOfCubesStartingFromTo(0, lastCubesUsed, _visible);
   lastCubesUsed = 0;
   lastLaneOutlined = nullptr;
 }
@@ -121,69 +108,54 @@ void Outliner::CreateCubes(ignition::rendering::ScenePtr& _scene, double _scaleX
   }
 }
 
+double Outliner::GetNewToleranceToPopulateLane(double _laneLength, size_t _cubesUsedForSide) {
+  const double newToleranceForLaneSide = _laneLength / _cubesUsedForSide;
+  return newToleranceForLaneSide < minTolerance ? minTolerance : newToleranceForLaneSide;
+}
+
 void Outliner::MoveCubeAtMidPointInR(const maliput::api::GeoPosition& _minRGeoPos,
-                                     const maliput::api::GeoPosition& _maxRGeoPos, size_t& _maxAmountOfCubesToUse) {
-  maliput::api::GeoPosition midPoint = (_maxRGeoPos + _minRGeoPos);
-  midPoint.set_x(midPoint.x() / 2.0);
-  midPoint.set_y(midPoint.y() / 2.0);
-  midPoint.set_z(midPoint.z() / 2.0);
-  if ((_maxRGeoPos - midPoint).length() > minTolerance && cubesUsed < cubes.size() && _maxAmountOfCubesToUse != 0) {
-    cubes[cubesUsed]->SetWorldPosition(midPoint.x(), midPoint.y(), midPoint.z());
-    cubes[cubesUsed]->SetVisible(true);
-    ++cubesUsed;
-    --_maxAmountOfCubesToUse;
-    MoveCubeAtMidPointInR(_minRGeoPos, midPoint, _maxAmountOfCubesToUse);
-    MoveCubeAtMidPointInR(midPoint, _maxRGeoPos, _maxAmountOfCubesToUse);
+                                     const maliput::api::GeoPosition& _maxRGeoPos, size_t* _cubesUsed,
+                                     size_t* _maxAmountOfCubesToUse) {
+  maliput::api::GeoPosition midPoint = maliput::api::GeoPosition::FromXyz((_maxRGeoPos.xyz() + _minRGeoPos.xyz()) / 2);
+  if ((_maxRGeoPos - midPoint).length() > minTolerance && *_cubesUsed < cubes.size() && *_maxAmountOfCubesToUse != 0) {
+    cubes[*_cubesUsed]->SetWorldPosition(midPoint.x(), midPoint.y(), midPoint.z());
+    cubes[*_cubesUsed]->SetVisible(true);
+    ++(*_cubesUsed);
+    --(*_maxAmountOfCubesToUse);
+    MoveCubeAtMidPointInR(_minRGeoPos, midPoint, _cubesUsed, _maxAmountOfCubesToUse);
+    MoveCubeAtMidPointInR(midPoint, _maxRGeoPos, _cubesUsed, _maxAmountOfCubesToUse);
   }
 }
 
-void Outliner::MoveCubeAtMidPointInSLeftSide(const maliput::api::Lane* _lane, double min_s, double max_s,
-                                             size_t& _maxAmountOfCubesToUse) {
+void Outliner::MoveCubeAtMidPointInS(const maliput::api::Lane* _lane, double min_s, double max_s, bool _left_side,
+                                     size_t* _cubesUsed, size_t* _maxAmountOfCubesToUse) {
   const double mid_s = (max_s + min_s) / 2.0;
   maliput::api::RBounds midRBounds = _lane->lane_bounds(mid_s);
+  const double r_bound = _left_side ? midRBounds.min() : midRBounds.max();
 
-  maliput::api::GeoPosition leftMidPoint =
-      _lane->ToGeoPosition(maliput::api::LanePosition(mid_s, midRBounds.min(), 0.));
+  maliput::api::GeoPosition midPoint =
+      _lane->ToGeoPosition(maliput::api::LanePosition(mid_s, r_bound, 0.));
   maliput::api::GeoPosition extremePoint =
-      _lane->ToGeoPosition(maliput::api::LanePosition(max_s, midRBounds.min(), 0.));
+      _lane->ToGeoPosition(maliput::api::LanePosition(max_s, r_bound, 0.));
 
-  if ((leftMidPoint - extremePoint).length() > minTolerance && cubesUsed < cubes.size() &&
-      _maxAmountOfCubesToUse != 0) {
-    ignition::math::Vector3d leftMidPointMathVector(leftMidPoint.x(), leftMidPoint.y(), leftMidPoint.z());
+  if ((midPoint - extremePoint).length() > minTolerance && *_cubesUsed < cubes.size() &&
+      *_maxAmountOfCubesToUse != 0) {
+    ignition::math::Vector3d rightMidPointMathVector(midPoint.x(), midPoint.y(), midPoint.z());
     ignition::math::Vector3d extremeMidPointMathVector(extremePoint.x(), extremePoint.y(), extremePoint.z());
-    cubes[cubesUsed]->SetWorldPosition(leftMidPoint.x(), leftMidPoint.y(), leftMidPoint.z());
-    cubes[cubesUsed]->SetWorldRotation(
-        ignition::math::Matrix4d::LookAt(leftMidPointMathVector, extremeMidPointMathVector).Pose().Rot());
-    cubes[cubesUsed]->SetVisible(true);
-    ++cubesUsed;
-    --_maxAmountOfCubesToUse;
-    MoveCubeAtMidPointInSLeftSide(_lane, mid_s, max_s, _maxAmountOfCubesToUse);
-    MoveCubeAtMidPointInSLeftSide(_lane, min_s, mid_s, _maxAmountOfCubesToUse);
-  }
-}
-
-void Outliner::MoveCubeAtMidPointInSRightSide(const maliput::api::Lane* _lane, double min_s, double max_s,
-                                              size_t& _maxAmountOfCubesToUse) {
-  const double mid_s = (max_s + min_s) / 2.0;
-  maliput::api::RBounds midRBounds = _lane->lane_bounds(mid_s);
-
-  maliput::api::GeoPosition rightMidPoint =
-      _lane->ToGeoPosition(maliput::api::LanePosition(mid_s, midRBounds.max(), 0.));
-  maliput::api::GeoPosition extremePoint =
-      _lane->ToGeoPosition(maliput::api::LanePosition(max_s, midRBounds.max(), 0.));
-
-  if ((rightMidPoint - extremePoint).length() > minTolerance && cubesUsed < cubes.size() &&
-      _maxAmountOfCubesToUse != 0) {
-    ignition::math::Vector3d rightMidPointMathVector(rightMidPoint.x(), rightMidPoint.y(), rightMidPoint.z());
-    ignition::math::Vector3d extremeMidPointMathVector(extremePoint.x(), extremePoint.y(), extremePoint.z());
-    cubes[cubesUsed]->SetWorldPosition(rightMidPoint.x(), rightMidPoint.y(), rightMidPoint.z());
-    cubes[cubesUsed]->SetWorldRotation(
+    cubes[*_cubesUsed]->SetWorldPosition(midPoint.x(), midPoint.y(), midPoint.z());
+    cubes[*_cubesUsed]->SetWorldRotation(
         ignition::math::Matrix4d::LookAt(rightMidPointMathVector, extremeMidPointMathVector).Pose().Rot());
-    cubes[cubesUsed]->SetVisible(true);
-    ++cubesUsed;
-    --_maxAmountOfCubesToUse;
-    MoveCubeAtMidPointInSRightSide(_lane, mid_s, max_s, _maxAmountOfCubesToUse);
-    MoveCubeAtMidPointInSRightSide(_lane, min_s, mid_s, _maxAmountOfCubesToUse);
+    cubes[*_cubesUsed]->SetVisible(true);
+    ++(*_cubesUsed);
+    --(*_maxAmountOfCubesToUse);
+    MoveCubeAtMidPointInS(_lane, mid_s, max_s, _left_side, _cubesUsed, _maxAmountOfCubesToUse);
+    MoveCubeAtMidPointInS(_lane, min_s, mid_s, _left_side, _cubesUsed, _maxAmountOfCubesToUse);
+  }
+}
+
+void Outliner::SetVisibilityOfCubesStartingFromTo(size_t _startFrom, size_t _to, bool _visible) {
+  for (size_t i = _startFrom; i < _to; ++i) {
+    cubes[i]->SetVisible(_visible);
   }
 }
 

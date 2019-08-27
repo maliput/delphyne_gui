@@ -46,39 +46,41 @@ class Outliner {
   void CreateCubes(ignition::rendering::ScenePtr& _scene, double _scaleX, double _scaleY, double _scaleZ,
                    ignition::rendering::MaterialPtr& _material);
 
+  /// \brief Get a new tolerance between cubes based on the lane's distance and the amount of cubes available for each
+  /// side
+  /// \param[in] _langeLength Length of the lane in s coordinate
+  /// \param[in] _cubesUsedForSide Amount of cubes available to populate a side of the lane.
+  double GetNewToleranceToPopulateLane(double _laneLength, size_t _cubesUsedForSide);
+
   /// \brief Sets cubes world position and rotation in the middle of two points considering only the r coordinate
   /// and assuming a straight line.
   /// \param[in] _minRGeoPos World position of the left extreme point.
   /// \param[in] _maxRGeoPos World position of the right extreme point.
   /// \param[in] _maxAmountOfCubesToUse Amount permitted of cubes to place in the lane.
   void MoveCubeAtMidPointInR(const maliput::api::GeoPosition& _minRGeoPos, const maliput::api::GeoPosition& _maxRGeoPos,
-                             size_t& _maxAmountOfCubesToUse);
+                             size_t* _cubesUsed, size_t* _maxAmountOfCubesToUse);
 
-  /// \brief Sets cubes world position and rotation in the minimun left bound of a given lane for a given range in the
+  /// \brief Sets cubes world position and rotation in the maximum given bound of a given lane for a given range in the
   /// s coordinate.
   /// \param[in] _lane Lane to be covered in the left side by red cubes.
   /// \param[in] _min_s min s coordinate to get the mid s point.
   /// \param[in] _max_s max s coordinate to get the mid s point.
+  /// \param[in] _left_side which side of the lane should be populated.
   /// \param[in] _maxAmountOfCubesToUse Amount permitted of cubes to place in the lane.
-  void MoveCubeAtMidPointInSLeftSide(const maliput::api::Lane* _lane, double _min_s, double _max_s,
-                                     size_t& _maxAmountOfCubesToUse);
+  void MoveCubeAtMidPointInS(const maliput::api::Lane* _lane, double _min_s, double _max_s, bool _left_side,
+                             size_t* _cubesUsed, size_t* _maxAmountOfCubesToUse);
 
-  /// \brief Sets cubes world position and rotation in the maximum right bound of a given lane for a given range in the
-  /// s coordinate.
-  /// \param[in] _lane Lane to be covered in the left side by red cubes.
-  /// \param[in] _min_s min s coordinate to get the mid s point.
-  /// \param[in] _max_s max s coordinate to get the mid s point.
-  /// \param[in] _maxAmountOfCubesToUse Amount permitted of cubes to place in the lane.
-  void MoveCubeAtMidPointInSRightSide(const maliput::api::Lane* _lane, double _min_s, double _max_s,
-                                      size_t& _maxAmountOfCubesToUse);
+  /// \brief Sets cubes visibility from and to a given point.
+  /// \param[in] _startFrom From which cube should we start changing the visibility.
+  /// \param[in] _to Until which cube should we change the visibility.
+  /// \param[in] _visible Boolean that determines the visibility of the cubes.
+  void SetVisibilityOfCubesStartingFromTo(size_t _startFrom, size_t _to, bool _visible);
 
   /// \brief Cubes used for rendering the outline in roads.
   std::vector<ignition::rendering::VisualPtr> cubes;
 
   /// \brief Cache lane pointer to avoid setting the outline twice.
   const maliput::api::Lane* lastLaneOutlined;
-  /// \brief Keep track of cubes used for the outlining.
-  size_t cubesUsed;
   /// \brief Cache cubes used for the last lane so we hide the leftovers only.
   size_t lastCubesUsed;
 

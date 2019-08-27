@@ -202,7 +202,7 @@ class MaliputViewerModel {
 
   /// \brief Get the lane associated with an id.
   /// \param[in] _id Id of the lane.
-  /// \return Lane associated with given id or nullptr if invalid id.
+  /// \return Lane associated with given id or nullptr if id is invalid.
   const maliput::api::Lane* GetLaneFromId(const std::string& _id);
 
   /// \brief Get N lanes from the underlying road geometry.

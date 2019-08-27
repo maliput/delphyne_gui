@@ -230,6 +230,17 @@ class RenderMaliputWidget : public QWidget {
 
   /// \brief Map of text labels visual pointers.
   std::map<std::string, ignition::rendering::VisualPtr> textLabels;
+
+  /// \brief Scale in the X axis for the cubes used in the outliner.
+  static constexpr double kOutlinerScaleX = 0.3;
+  /// \brief Scale in the Y axis for the cubes used in the outliner.
+  static constexpr double kOutlinerScaleY = 0.5;
+  /// \brief Scale in the Z axis for the cubes used in the outliner.
+  static constexpr double kOutlinerScaleZ = 0.1;
+  /// \brief Tolerance used for the outliner.
+  static constexpr double kOutlinerMinTolerance = 0.6;
+  /// \brief Max amount of cubes used for the outliner.
+  static constexpr size_t kOutlinerPoolSize = 1500;
 };
 
 }  // namespace gui

@@ -70,7 +70,7 @@ void Outliner::OutlineLane(const maliput::api::Lane* _lane) {
 
   MoveCubeAtMidPointInR(endRMinGeoPos, endRMaxGeoPos, remainingCubes);
 
-  size_t cubesLeftSide = (remainingCubes / 2) + remainingCubes % 2;
+  size_t cubesLeftSide = std::ceil(remainingCubes / 2);
   size_t cubesRightSide = remainingCubes - cubesLeftSide;
 
   // If we have less cubes to cover the lane, increase the tolerance.

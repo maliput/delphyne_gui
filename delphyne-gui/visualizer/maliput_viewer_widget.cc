@@ -161,8 +161,7 @@ void MaliputViewerWidget::paintEvent(QPaintEvent* _e) {
 }
 
 void MaliputViewerWidget::OnRulesForLaneRequested(QString laneId) {
-  const maliput::api::Lane* lane = this->model->GetLaneFromId(laneId.toStdString());
-  this->renderWidget->Outline(lane);
+  this->renderWidget->Outline(this->model->GetLaneFromId(laneId.toStdString()));
   emit this->rulesVisualizerWiget->ReceiveRules(laneId, this->model->GetRulesOfLane<QString>(laneId.toStdString()));
 }
 

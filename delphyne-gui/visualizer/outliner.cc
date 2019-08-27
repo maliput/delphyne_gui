@@ -133,13 +133,10 @@ void Outliner::MoveCubeAtMidPointInS(const maliput::api::Lane* _lane, double min
   maliput::api::RBounds midRBounds = _lane->lane_bounds(mid_s);
   const double r_bound = _left_side ? midRBounds.min() : midRBounds.max();
 
-  maliput::api::GeoPosition midPoint =
-      _lane->ToGeoPosition(maliput::api::LanePosition(mid_s, r_bound, 0.));
-  maliput::api::GeoPosition extremePoint =
-      _lane->ToGeoPosition(maliput::api::LanePosition(max_s, r_bound, 0.));
+  maliput::api::GeoPosition midPoint = _lane->ToGeoPosition(maliput::api::LanePosition(mid_s, r_bound, 0.));
+  maliput::api::GeoPosition extremePoint = _lane->ToGeoPosition(maliput::api::LanePosition(max_s, r_bound, 0.));
 
-  if ((midPoint - extremePoint).length() > minTolerance && *_cubesUsed < cubes.size() &&
-      *_maxAmountOfCubesToUse != 0) {
+  if ((midPoint - extremePoint).length() > minTolerance && *_cubesUsed < cubes.size() && *_maxAmountOfCubesToUse != 0) {
     ignition::math::Vector3d rightMidPointMathVector(midPoint.x(), midPoint.y(), midPoint.z());
     ignition::math::Vector3d extremeMidPointMathVector(extremePoint.x(), extremePoint.y(), extremePoint.z());
     cubes[*_cubesUsed]->SetWorldPosition(midPoint.x(), midPoint.y(), midPoint.z());

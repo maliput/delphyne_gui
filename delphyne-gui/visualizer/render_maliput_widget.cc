@@ -237,7 +237,7 @@ void RenderMaliputWidget::CreateRenderWindow() {
   this->orbitViewControl.reset(new OrbitViewControl(this->camera));
 
   this->outliner = std::make_unique<Outliner>(this->scene, kOutlinerScaleX, kOutlinerScaleY, kOutlinerScaleZ,
-    kOutlinerPoolSize, kOutlinerMinTolerance);
+                                              kOutlinerPoolSize, kOutlinerMinTolerance);
 }
 
 /////////////////////////////////////////////////

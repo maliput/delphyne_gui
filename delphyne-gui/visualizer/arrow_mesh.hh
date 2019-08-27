@@ -35,20 +35,12 @@ class ArrowMesh {
   void Update();
 
  private:
-  /// \brief Creates a red cylinder that will be below the arrow to emphasize the click position.
-  void CreateCylinder(ignition::rendering::ScenePtr& _scene);
 
   /// \brief Bounding box of the cone in construction time.
   ignition::math::Vector3d minArrowBoundingBox;
 
-  /// \brief Bounding box of the cylinder in construction time
-  ignition::math::Vector3d minCylinderBoundingBox;
-
   /// \brief Visual pointer of the created cone.
   ignition::rendering::VisualPtr arrow;
-
-  /// \brief Small cylinder that will be below the arrow to emphasize the click position.
-  ignition::rendering::VisualPtr cylinder;
 
   /// \brief Units that the tip of the cone should be from the clicked position.
   const double zOffset;

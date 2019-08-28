@@ -137,11 +137,10 @@ void Outliner::MoveCubeAtMidPointInS(const maliput::api::Lane* _lane, double min
   maliput::api::GeoPosition extremePoint = _lane->ToGeoPosition(maliput::api::LanePosition(max_s, r_bound, 0.));
 
   if ((midPoint - extremePoint).length() > minTolerance && *_cubesUsed < cubes.size() && *_maxAmountOfCubesToUse != 0) {
-    ignition::math::Vector3d rightMidPointMathVector(midPoint.x(), midPoint.y(), midPoint.z());
     ignition::math::Vector3d extremeMidPointMathVector(extremePoint.x(), extremePoint.y(), extremePoint.z());
     cubes[*_cubesUsed]->SetWorldPosition(midPoint.x(), midPoint.y(), midPoint.z());
     cubes[*_cubesUsed]->SetWorldRotation(
-        ignition::math::Matrix4d::LookAt(rightMidPointMathVector, extremeMidPointMathVector).Pose().Rot());
+        ignition::math::Matrix4d::LookAt(cubes[*_cubesUsed]->WorldPosition(), extremeMidPointMathVector).Pose().Rot());
     cubes[*_cubesUsed]->SetVisible(true);
     ++(*_cubesUsed);
     --(*_maxAmountOfCubesToUse);

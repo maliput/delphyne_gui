@@ -16,8 +16,6 @@ import sys
 
 import delphyne.trees
 import delphyne.behaviours
-import delphyne.simulation as simulation
-import delphyne.utilities as utilities
 
 from delphyne_gui.utilities import launch_interactive_simulation
 
@@ -76,10 +74,7 @@ to `1.6` to depict how dynamic real-time rate impacts on the simulation.
 def create_realtime_scenario_subtree():
     scenario_subtree = delphyne.behaviours.roads.Road()
     scenario_subtree.add_child(
-        delphyne.behaviours.agents.SimpleCar(
-            name=str(0),
-            speed=0.0)
-        )
+        delphyne.behaviours.agents.SimpleCar(name=str(0), speed=0.0))
     return scenario_subtree
 
 ##############################################################################

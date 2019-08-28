@@ -14,6 +14,8 @@ Manipulating the rate of time at startup and in runtime.
 import os
 import sys
 
+import delphyne.trees
+import delphyne.behaviours
 import delphyne.simulation as simulation
 import delphyne.utilities as utilities
 
@@ -31,20 +33,19 @@ class RealtimeRateChanger(object):
     """Simple class that hooks to the simulation callback and dynamically
     changes the real-time rate"""
 
-    def __init__(self, runner, initial_steps):
-        self._runner = runner
+    def __init__(self, initial_steps):
         self._steps = initial_steps
 
-    def tick(self):
+    def tick(self, behaviour_tree):
         """Process simulation step"""
         if self._steps == 0:
-            last_round_realtime_rate = self._runner.get_stats(
+            last_round_realtime_rate = behaviour_tree.runner.get_stats(
             ).get_current_realtime_rate()
-            rate = self._runner.get_realtime_rate() + 0.2
+            rate = behaviour_tree.runner.get_realtime_rate() + 0.2
             if rate >= 1.6:
                 rate = 0.6
-            self._steps = int(rate * 3000)
-            self._runner.set_realtime_rate(rate)
+            self._steps = int(rate * 400)
+            behaviour_tree.runner.set_realtime_rate(rate)
             print("Running at real-time rate {0} for {1} steps."
                   " Last real-time measure was {2}"
                   .format(rate, self._steps, last_round_realtime_rate))
@@ -72,6 +73,15 @@ to `1.6` to depict how dynamic real-time rate impacts on the simulation.
         """.format(os.path.basename(sys.argv[0])))
     return parser.parse_args()
 
+def create_realtime_scenario_subtree():
+    scenario_subtree = delphyne.behaviours.roads.Road()
+    scenario_subtree.add_child(
+        delphyne.behaviours.agents.SimpleCar(
+            name=str(0),
+            speed=0.0)
+        )
+    return scenario_subtree
+
 ##############################################################################
 # Main
 ##############################################################################
@@ -84,39 +94,35 @@ def main():
     args = parse_arguments()
 
     # Since this is the first time the simulator runs we compensate for the
-    # startup time by running it 4 times longer than the dynamically changing
+    # startup time by running it 2 times longer than the dynamically changing
     # loop.
-    initial_steps = int(args.realtime_rate * 12000)
+    initial_steps = int(args.realtime_rate * 800)
+    rate_changer = RealtimeRateChanger(initial_steps)
 
-    builder = simulation.AgentSimulationBuilder()
+    simulation_tree = delphyne.trees.BehaviourTree(
+        root=create_realtime_scenario_subtree())
 
-    utilities.add_simple_car(
-        builder,
-        name=str(0),
-        position_x=0.0,
-        position_y=0.0
-    )
-
-    runner = simulation.SimulationRunner(
-        simulation=builder.build(),
-        time_step=0.001,  # (secs)
+    simulation_tree.setup(
         realtime_rate=args.realtime_rate,
-        paused=args.paused,
-        log=args.log,
+        start_paused=args.paused,
         logfile_name=args.logfile_name
     )
 
-    rate_changer = RealtimeRateChanger(runner, initial_steps)
-
-    runner.add_step_callback(rate_changer.tick)
+    simulation_tree.add_post_tick_handler(rate_changer.tick)
+    time_step = 0.01
 
     print("Running at real-time rate {0} for {1} steps"
-          .format(runner.get_realtime_rate(), initial_steps))
+          .format(simulation_tree.runner.get_realtime_rate(), initial_steps))
 
-    with launch_interactive_simulation(runner, bare=args.bare) as launcher:
+    with launch_interactive_simulation(simulation_tree.runner, bare=args.bare) as launcher:
         if args.duration < 0:
             # run indefinitely
-            runner.start()
+            print("Running simulation indefinitely.")
+            simulation_tree.tick_tock(period=time_step)
         else:
             # run for a finite time
-            runner.run_async_for(args.duration, launcher.terminate)
+            print("Running simulation for {0} seconds.".format(
+                args.duration))
+            simulation_tree.tick_tock(period=time_step,
+                number_of_iterations=args.duration/time_step)
+        launcher.terminate()

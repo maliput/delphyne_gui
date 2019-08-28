@@ -43,9 +43,7 @@ void ArrowMesh::SelectAt(double _distanceFromCamera, const ignition::math::Vecto
   currentTick = 0;
 }
 
-void ArrowMesh::SetVisibility(bool _visible) {
-  this->arrow->SetVisible(_visible);
-}
+void ArrowMesh::SetVisibility(bool _visible) { this->arrow->SetVisible(_visible); }
 
 void ArrowMesh::Update() {
   ignition::math::Vector3d worldPosition = this->arrow->WorldPosition();

@@ -35,7 +35,6 @@ class ArrowMesh {
   void Update();
 
  private:
-
   /// \brief Bounding box of the cone in construction time.
   ignition::math::Vector3d minArrowBoundingBox;
 

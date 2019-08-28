@@ -15,7 +15,6 @@ import os.path
 import delphyne.trees
 import delphyne.behaviours
 import delphyne.roads as delphyne_roads
-import delphyne.simulation as simulation
 import delphyne.utilities as utilities
 
 from delphyne_gui.utilities import launch_interactive_simulation
@@ -136,19 +135,19 @@ class BasicLaneProvider():
 def create_mali_scenario_subtree(file_path, features,
         lane_position, direction_of_travel, lane_provider):
     scenario_subtree = delphyne.behaviours.roads.Malidrive(
-        file_path=file_path,
-        features=features,
-        name=os.path.splitext(os.path.basename(file_path))[0]
-        )
+            file_path=file_path,
+            features=features,
+            name=os.path.splitext(os.path.basename(file_path))[0])
     scenario_subtree.add_child(
         delphyne.behaviours.agents.RailCar(
-            name='car',
-            lane_id=lane_provider.get_lane,
-            longitudinal_position=lane_position,
-            lateral_offset=0.0,
-            speed=15.0,
-            direction_of_travel=direction_of_travel
-            ))
+                name='car',
+                lane_id=lane_provider.get_lane,
+                longitudinal_position=lane_position,
+                lateral_offset=0.0,
+                speed=15.0,
+                direction_of_travel=direction_of_travel
+            )
+        )
     return scenario_subtree
 
 ##############################################################################

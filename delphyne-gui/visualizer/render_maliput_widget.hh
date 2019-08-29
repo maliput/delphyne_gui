@@ -16,6 +16,7 @@
 
 #include <QtWidgets/QWidget>
 
+#include "arrow_mesh.hh"
 #include "maliput_viewer_model.hh"
 #include "orbit_view_control.hh"
 
@@ -70,6 +71,18 @@ class RenderMaliputWidget : public QWidget {
   // everything is stable on default or in a release branch, we should modify
   // this method to properly set the transparency.
   void RenderLabels(const std::map<MaliputLabelType, std::vector<MaliputLabel>>& _labels);
+
+  /// \brief Create and render an arrow that will be positioned slightly above the selected road.
+  void RenderArrow();
+
+  /// \brief Move the arrow based on the distance travelled by the camera's ray distance.
+  /// \param[in] _distance Distance travelled from the camera's world position to the clicked object.
+  /// \param[in] _worldPosition Position where the camera's ray hit.
+  void PutArrowAt(double _distance, const ignition::math::Vector3d& _worldPosition);
+
+  /// \brief Change visibility of the arrow mesh.
+  /// \param[in] _visible Visibility of the arrow.
+  void SetArrowVisibility(bool _visible);
 
   /// \brief Clears all the references to text labels, meshes and the scene.
   void Clear();
@@ -188,6 +201,9 @@ class RenderMaliputWidget : public QWidget {
 
   /// \brief Controls the view of the scene.
   std::unique_ptr<OrbitViewControl> orbitViewControl;
+
+  /// \brief Arrow that points the location clicked in the visualizer.
+  std::unique_ptr<ArrowMesh> arrow;
 
   /// \brief A pointer to the rendering engine
   ignition::rendering::RenderEngine* engine;

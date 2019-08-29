@@ -75,6 +75,8 @@ class MaliputViewerWidget : public ignition::gui::Plugin {
   /// \brief Builds the widgets of the GUI.
   void BuildGUI();
 
+  void RenderArrow();
+
   /// \brief Widget to hold and modify the visualization status of each layer.
   LayerSelectionWidget* layerSelectionWidget{nullptr};
 

@@ -177,6 +177,21 @@ void MaliputFileSelectionWidget::SetFileNameLabel(const std::string& fileName) {
   this->fileNameLabel->setText(QString::fromStdString(fileName));
 }
 
+void MaliputFileSelectionWidget::ClearLineEdits(bool keepOldTextsAsPlaceholders) {
+  if (keepOldTextsAsPlaceholders) {
+    this->roadRulebookLineEdit->setPlaceholderText(GetFileName(this->roadRulebookLineEdit->text()));
+    this->trafficLightRulesLineEdit->setPlaceholderText(GetFileName(this->trafficLightRulesLineEdit->text()));
+    this->phaseRingLineEdit->setPlaceholderText(GetFileName(this->phaseRingLineEdit->text()));
+  } else {
+    this->roadRulebookLineEdit->setPlaceholderText(QString());
+    this->trafficLightRulesLineEdit->setPlaceholderText(QString());
+    this->phaseRingLineEdit->setPlaceholderText(QString());
+  }
+  this->roadRulebookLineEdit->clear();
+  this->trafficLightRulesLineEdit->clear();
+  this->phaseRingLineEdit->clear();
+}
+
 ///////////////////////////////////////////////////////
 void MaliputFileSelectionWidget::onLoadButtonPressed() {
   QString fileName = QFileDialog::getOpenFileName(this, tr("Open Maliput XODR or YAML"),
@@ -244,4 +259,12 @@ void MaliputFileSelectionWidget::Build() {
   layout->addWidget(phaseRingWidgetContainer);
 
   this->setLayout(layout);
+}
+
+QString MaliputFileSelectionWidget::GetFileName(const QString& filePath) {
+  int lastIndexOf = filePath.lastIndexOf("/");
+  if (lastIndexOf != -1) {
+    return filePath.mid(lastIndexOf + 1);
+  }
+  return QString();
 }

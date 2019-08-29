@@ -54,8 +54,8 @@ class MaliputViewerWidget : public ignition::gui::Plugin {
 
   /// \brief Clears the visualizer, loads the new set of meshes and text labels.
   /// \param filePath The path to the YAML file to load and visualize.
-  void OnNewMultilaneFile(const std::string& filePath, const std::string& roadRulebookFilePath,
-                          const std::string& trafficLightRulesFilePath, const std::string& phaseRingFilePath);
+  void OnNewRoadNetwork(const std::string& filePath, const std::string& roadRulebookFilePath,
+                        const std::string& trafficLightRulesFilePath, const std::string& phaseRingFilePath);
 
   /// \brief Prints the ID of the lane if any was selected.
   /// \param[in] rayResult Ray that contains the point where the click hit.

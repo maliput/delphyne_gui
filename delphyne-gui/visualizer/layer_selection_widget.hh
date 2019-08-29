@@ -92,6 +92,11 @@ class MaliputFileSelectionWidget : public QWidget {
   /// Sets @p fileName into the label to display the loaded file.
   void SetFileNameLabel(const std::string& fileName);
 
+  /// \brief Clear rules line edits.
+  /// \param[in] keepOldTextsAsPlaceholders Use the last file opened as a placeholder to remember the user which file
+  /// he used.
+  void ClearLineEdits(bool keepOldTextsAsPlaceholders = true);
+
  public slots:
   void onLoadButtonPressed();
 
@@ -108,6 +113,10 @@ class MaliputFileSelectionWidget : public QWidget {
   /// \brief Builds the GUI with a button to load a file dialog and a label to
   /// display the name of the loaded file.
   void Build();
+
+  /// \brief Get the file name for a given path.
+  /// \returns QString containing the file name or empty QString if file name couldn't be gathered from filePath
+  QString GetFileName(const QString& filePath);
 
   QPushButton* loadButton{nullptr};
   QLabel* fileNameLabel{nullptr};

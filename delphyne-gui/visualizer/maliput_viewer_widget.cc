@@ -35,7 +35,7 @@ MaliputViewerWidget::MaliputViewerWidget(QWidget* parent) : Plugin() {
   QObject::connect(
       this->maliputFileSelectionWidget,
       SIGNAL(maliputFileChanged(const std::string&, const std::string&, const std::string&, const std::string&)), this,
-      SLOT(OnNewMultilaneFile(const std::string&, const std::string&, const std::string&, const std::string&)));
+      SLOT(OnNewRoadNetwork(const std::string&, const std::string&, const std::string&, const std::string&)));
 }
 
 /////////////////////////////////////////////////
@@ -55,9 +55,9 @@ void MaliputViewerWidget::OnTextLabelChanged(const std::string& key, bool newVal
 }
 
 /////////////////////////////////////////////////
-void MaliputViewerWidget::OnNewMultilaneFile(const std::string& filePath, const std::string& roadRulebookFilePath,
-                                             const std::string& trafficLightRulesFilePath,
-                                             const std::string& phaseRingFilePath) {
+void MaliputViewerWidget::OnNewRoadNetwork(const std::string& filePath, const std::string& roadRulebookFilePath,
+                                           const std::string& trafficLightRulesFilePath,
+                                           const std::string& phaseRingFilePath) {
   if (filePath.empty()) {
     return;
   }
@@ -81,6 +81,7 @@ void MaliputViewerWidget::OnNewMultilaneFile(const std::string& filePath, const 
   this->renderWidget->RenderLabels(this->model->Labels());
 
   this->VisualizeFileName(filePath);
+  this->maliputFileSelectionWidget->ClearLineEdits(true);
 }
 
 /////////////////////////////////////////////////

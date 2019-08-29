@@ -102,7 +102,7 @@ std::ostream& operator<<(std::ostream& out, const maliput::api::rules::RightOfWa
   return out;
 }
 
-/////////////////////////////////////////////////
+/// Redirects `geo_position` and `radius` to RoadGeometry::FindRoadPosition().
 void RoadNetworkQuery::FindRoadPositions(const maliput::api::GeoPosition& geo_position, double radius) {
   const std::vector<maliput::api::RoadPositionResult> results =
       rn_->road_geometry()->FindRoadPositions(geo_position, radius);
@@ -113,7 +113,7 @@ void RoadNetworkQuery::FindRoadPositions(const maliput::api::GeoPosition& geo_po
   }
 }
 
-/////////////////////////////////////////////////
+/// Redirects `lane_position` to `lane_id`'s Lane::ToGeoPosition().
 void RoadNetworkQuery::ToGeoPosition(const maliput::api::LaneId& lane_id,
                                      const maliput::api::LanePosition& lane_position) {
   const maliput::api::Lane* lane = rn_->road_geometry()->ById().GetLane(lane_id);
@@ -138,7 +138,7 @@ void RoadNetworkQuery::ToGeoPosition(const maliput::api::LaneId& lane_id,
   (*out_) << "              : RoadPosition: " << road_position << std::endl;
 }
 
-/////////////////////////////////////////////////
+/// Redirects `geo_position` to `lane_id`'s Lane::ToLanePosition().
 void RoadNetworkQuery::ToLanePosition(const maliput::api::LaneId& lane_id,
                                       const maliput::api::GeoPosition& geo_position) {
   const maliput::api::Lane* lane = rn_->road_geometry()->ById().GetLane(lane_id);
@@ -156,7 +156,7 @@ void RoadNetworkQuery::ToLanePosition(const maliput::api::LaneId& lane_id,
           << ", with distance: " << distance << std::endl;
 }
 
-/////////////////////////////////////////////////
+/// Redirects `geo_position` to RoadGeometry::ToRoadPosition().
 void RoadNetworkQuery::ToRoadPosition(const maliput::api::GeoPosition& geo_position) {
   double distance;
   maliput::api::GeoPosition nearest_pos;
@@ -168,29 +168,28 @@ void RoadNetworkQuery::ToRoadPosition(const maliput::api::GeoPosition& geo_posit
   (*out_) << "                RoadPosition: " << road_position << std::endl;
 }
 
-/////////////////////////////////////////////////
+/// Looks for all the maximum speed limits allowed at `lane_id`.
 void RoadNetworkQuery::GetMaxSpeedLimit(const maliput::api::LaneId& lane_id) {
   const maliput::api::rules::RoadRulebook::QueryResults query_result = FindRulesFor(lane_id);
 
   const int n_speed_limits = static_cast<int>(query_result.speed_limit.size());
   if (n_speed_limits > 0) {
-    double max_speed = query_result.speed_limit[0].max();
-    maliput::api::rules::SpeedLimitRule::Id max_speed_id = query_result.speed_limit[0].id();
-    for (int i = 1; i < n_speed_limits; i++) {
-      const double max_speed_cur = query_result.speed_limit[i].max();
+    double max_speed = query_result.speed_limit.begin()->second.max();
+    maliput::api::rules::SpeedLimitRule::Id max_speed_id = query_result.speed_limit.begin()->first;
+    for (auto const& speed_val : query_result.speed_limit) {
+      const double max_speed_cur = speed_val.second.max();
       if (max_speed_cur < max_speed) {
         max_speed = max_speed_cur;
-        max_speed_id = query_result.speed_limit[i].id();
+        max_speed_id = speed_val.first;
       }
     }
-
     (*out_) << "Speed limit (" << max_speed_id.string() << "): " << max_speed << " m/s" << std::endl;
   } else {
     (*out_) << "There is no speed limit found for this lane" << std::endl;
   }
 }
 
-/////////////////////////////////////////////////
+/// Looks for all the direction usages at `lane_id`.
 void RoadNetworkQuery::GetDirectionUsage(const maliput::api::LaneId& lane_id) {
   const maliput::api::rules::RoadRulebook::QueryResults query_result = FindRulesFor(lane_id);
 
@@ -199,7 +198,7 @@ void RoadNetworkQuery::GetDirectionUsage(const maliput::api::LaneId& lane_id) {
 
   if (n_rules > 0) {
     for (const auto& direction_rule : query_result.direction_usage) {
-      const auto& states = direction_rule.states();
+      const auto& states = direction_rule.second.states();
       for (const auto& state : states) {
         const int state_type = int(state.second.type());
         if (state_type < 0 || state_type >= int(direction_usage_names.size())) {
@@ -207,7 +206,7 @@ void RoadNetworkQuery::GetDirectionUsage(const maliput::api::LaneId& lane_id) {
           return;
         }
 
-        (*out_) << "              : Result: Rule (" << direction_rule.id().string()
+        (*out_) << "              : Result: Rule (" << direction_rule.second.id().string()
                 << "): " << direction_usage_names[state_type] << std::endl;
       }
     }
@@ -217,34 +216,35 @@ void RoadNetworkQuery::GetDirectionUsage(const maliput::api::LaneId& lane_id) {
   }
 }
 
-/////////////////////////////////////////////////
+/// Gets all right-of-way rules for the given `lane_s_range`.
 void RoadNetworkQuery::GetRightOfWay(const maliput::api::rules::LaneSRange& lane_s_range) {
   const maliput::api::rules::RoadRulebook::QueryResults results = rn_->rulebook()->FindRules({lane_s_range}, 0.);
   const maliput::api::rules::RuleStateProvider* rule_state_provider = rn_->rule_state_provider();
   (*out_) << "Right of way for " << lane_s_range << ":" << std::endl;
   for (const auto& rule : results.right_of_way) {
-    (*out_) << "    Rule(id: " << rule.id().string() << ", zone: " << rule.zone() << ", zone-type: '"
-            << rule.zone_type() << "'";
-    if (!rule.is_static()) {
+    (*out_) << "    Rule(id: " << rule.second.id().string() << ", zone: " << rule.second.zone() << ", zone-type: '"
+            << rule.second.zone_type() << "'";
+    if (!rule.second.is_static()) {
       (*out_) << ", states: [";
-      for (const auto& entry : rule.states()) {
+      for (const auto& entry : rule.second.states()) {
         (*out_) << entry.second << ", ";
       }
       (*out_) << "]";
-      auto rule_state_result = rule_state_provider->GetState(rule.id());
+      auto rule_state_result = rule_state_provider->GetState(rule.second.id());
       if (rule_state_result.has_value()) {
-        auto it = rule.states().find(rule_state_result->current_id);
-        DELPHYNE_DEMAND(it != rule.states().end());
+        auto it = rule.second.states().find(rule_state_result->current_id);
+        DELPHYNE_DEMAND(it != rule.second.states().end());
         (*out_) << ", current_state: " << it->second;
       }
     } else {
-      (*out_) << ", current_state: " << rule.static_state();
+      (*out_) << ", current_state: " << rule.second.static_state();
     }
-    (*out_) << ", static: " << (rule.is_static() ? "yes" : "no") << ")" << std::endl << std::endl;
+    (*out_) << ", static: " << (rule.second.is_static() ? "yes" : "no") << ")" << std::endl << std::endl;
   }
 }
 
-/////////////////////////////////////////////////
+/// Gets all right-of-way rules' states for a given phase in a given phase
+/// ring.
 void RoadNetworkQuery::GetPhaseRightOfWay(const maliput::api::rules::PhaseRing::Id& phase_ring_id,
                                           const maliput::api::rules::Phase::Id& phase_id) {
   const maliput::api::rules::PhaseRingBook* phase_ring_book = rn_->phase_ring_book();

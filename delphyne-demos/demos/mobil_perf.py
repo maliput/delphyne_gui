@@ -11,10 +11,14 @@ The performance benchmark demo.
 
 import math
 
+import delphyne.behaviours
 import delphyne.roads as delphyne_roads
 import delphyne.simulation as simulation
+import delphyne.trees
 import delphyne.utilities
 import delphyne_gui.utilities
+
+from delphyne_gui.utilities import launch_interactive_simulation
 
 from . import helpers
 
@@ -92,8 +96,8 @@ def straight_lanes(args):
     # Loads Multilane road.
     road = builder.set_road_geometry(
         delphyne_roads.create_multilane_from_file(
-            file_path=delphyne_gui.utilities.get_delphyne_resource(
-                '/roads/straight_lanes.yaml'
+            file_path=delphyne_gui.utilities.get_delphyne_gui_resource(
+                'roads/straight_lanes.yaml'
             )
         )
     )
@@ -190,6 +194,10 @@ def parse_arguments():
     return parser.parse_args()
 
 
+def create_mobil_perf_scenario_subtree():
+    return 0
+
+
 ##############################################################################
 # Main
 ##############################################################################
@@ -200,9 +208,13 @@ def main():
     args = parse_arguments()
 
     benchmark_simulation = benchmark.register[args.benchmark](args)
+    
+    # simulation_tree = delphyne.trees.BehaviourTree(
+    #     root=create_mobil_perf_scenario_subtree()
+    # )
 
     runner = simulation.SimulationRunner(
-        benchmark_simulation,
+        simulation=benchmark_simulation,
         time_step=0.01,  # (secs)
         realtime_rate=args.realtime_rate,
         paused=args.paused,
@@ -210,17 +222,18 @@ def main():
         logfile_name=args.logfile_name
     )
 
-    if args.duration < 0:
-        # run indefinitely
-        runner.start()
-    else:
-        # run for a finite amount of time
-        print("Running simulation for {0} seconds.".format(
-            args.duration))
-        runner.run_sync_for(args.duration)
-    # stop simulation if it's necessary
-    if runner.is_interactive_loop_running():
-        runner.stop()
-    # print simulation stats
-    print("Simulation ended. I'm happy, you should be too.")
-    delphyne.utilities.print_simulation_stats(runner)
+    with launch_interactive_simulation(runner, bare=args.bare) as launcher:
+        if args.duration < 0:
+            # run indefinitely
+            runner.start()
+        else:
+            # run for a finite amount of time
+            print("Running simulation for {0} seconds.".format(
+                args.duration))
+            runner.run_sync_for(args.duration)
+        # stop simulation if it's necessary
+        if runner.is_interactive_loop_running():
+            runner.stop()
+        # print simulation stats
+        print("Simulation ended. I'm happy, you should be too.")
+        delphyne_gui.utilities.print_simulation_stats(runner)

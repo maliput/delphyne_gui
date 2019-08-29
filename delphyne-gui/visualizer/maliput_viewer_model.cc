@@ -176,7 +176,7 @@ void RoadNetworkQuery::GetMaxSpeedLimit(const maliput::api::LaneId& lane_id) {
   if (n_speed_limits > 0) {
     double max_speed = query_result.speed_limit.begin()->second.max();
     maliput::api::rules::SpeedLimitRule::Id max_speed_id = query_result.speed_limit.begin()->first;
-    for (auto const& speed_val : query_result.speed_limit) {
+    for (const auto& speed_val : query_result.speed_limit) {
       const double max_speed_cur = speed_val.second.max();
       if (max_speed_cur < max_speed) {
         max_speed = max_speed_cur;
@@ -231,7 +231,7 @@ void RoadNetworkQuery::GetRightOfWay(const maliput::api::rules::LaneSRange& lane
         (*out_) << entry.second << ", ";
       }
       (*out_) << "]";
-      auto rule_state_result = rule_state_provider->GetState(rule.first);
+      const auto rule_state_result = rule_state_provider->GetState(rule.first);
       if (rule_state_result.has_value()) {
         auto it = rule.second.states().find(rule_state_result->current_id);
         DELPHYNE_DEMAND(it != rule.second.states().end());

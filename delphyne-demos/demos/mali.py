@@ -14,6 +14,7 @@ import os.path
 
 import delphyne.trees
 import delphyne.behaviours
+import delphyne.blackboard.providers
 import delphyne.roads as delphyne_roads
 import delphyne.utilities as utilities
 
@@ -121,19 +122,8 @@ def get_malidrive_resource(path):
     return ''
 
 
-class BasicLaneProvider():
-
-    def __init__(self, lane_id=None):
-        self.lane_id = lane_id
-
-    def get_lane(self, road_geometry):
-        if self.lane_id is None:
-            self.lane_id = road_geometry.junction(0).segment(0).lane(0)
-        return self.lane_id
-
-
 def create_mali_scenario_subtree(file_path, features,
-        lane_position, direction_of_travel, lane_provider):
+        lane_position, direction_of_travel, lane_id):
     scenario_subtree = delphyne.behaviours.roads.Malidrive(
             file_path=file_path,
             features=features,
@@ -141,7 +131,7 @@ def create_mali_scenario_subtree(file_path, features,
     scenario_subtree.add_child(
         delphyne.behaviours.agents.RailCar(
                 name='car',
-                lane_id=lane_provider.get_lane,
+                lane_id=lane_id,
                 longitudinal_position=lane_position,
                 lateral_offset=0.0,
                 speed=15.0,
@@ -179,9 +169,10 @@ def main():
         quit()
 
     if 'lane_id' in road:
-        lane_provider = BasicLaneProvider(road['lane_id'])
+        lane_id = road['lane_id']
     else:
-        lane_provider = BasicLaneProvider()
+        lane_provider = delphyne.blackboard.providers.LaneLocationProvider(distance_between_agents=1.0)
+        lane_id = lane_provider.random_lane
 
     features = delphyne_roads.ObjFeatures()
     features.draw_arrows = True
@@ -192,7 +183,7 @@ def main():
 
     simulation_tree = delphyne.trees.BehaviourTree(
         root=create_mali_scenario_subtree(road['file_path'], features,
-            road['lane_position'], road['moving_forward'], lane_provider))
+            road['lane_position'], road['moving_forward'], lane_id))
 
     simulation_tree.setup(
         realtime_rate=args.realtime_rate,

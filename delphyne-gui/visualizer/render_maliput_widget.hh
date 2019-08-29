@@ -240,7 +240,7 @@ class RenderMaliputWidget : public QWidget {
   /// \brief Tolerance used for the outliner.
   static constexpr double kOutlinerMinTolerance = 0.6;
   /// \brief Max amount of cubes used for the outliner.
-  static constexpr size_t kOutlinerPoolSize = 1500;
+  static constexpr int kOutlinerPoolSize = 1500;
 };
 
 }  // namespace gui

@@ -18,8 +18,8 @@
 namespace delphyne {
 namespace gui {
 
-Outliner::Outliner(ignition::rendering::ScenePtr& _scene, double _scaleX, double _scaleY, double _scaleZ,
-                   size_t _poolSize, double _minTolerance)
+Outliner::Outliner(ignition::rendering::ScenePtr& _scene, double _scaleX, double _scaleY, double _scaleZ, int _poolSize,
+                   double _minTolerance)
     : cubes(_poolSize),
       lastLaneOutlined(nullptr),
       lastCubesUsed(0),
@@ -63,24 +63,25 @@ void Outliner::OutlineLane(const maliput::api::Lane* _lane) {
   cubes[3]->SetWorldPosition(endRMaxGeoPos.x(), endRMaxGeoPos.y(), endRMaxGeoPos.z());
   cubes[3]->SetVisible(true);
 
-  size_t cubesUsed = 4;
-  size_t remainingCubes = cubes.size() - cubesUsed;
+  int cubesUsed = 4;
+  int remainingCubes = cubes.size() - cubesUsed;
 
   MoveCubeAtMidPointInR(initialRMinGeoPos, initialRMaxGeoPos, &cubesUsed, &remainingCubes);
 
   MoveCubeAtMidPointInR(endRMinGeoPos, endRMaxGeoPos, &cubesUsed, &remainingCubes);
 
-  size_t cubesLeftSide = std::ceil(remainingCubes / 2);
-  size_t cubesRightSide = remainingCubes - cubesLeftSide;
+  int cubesLeftSide = std::ceil(remainingCubes / 2);
+  int cubesRightSide = remainingCubes - cubesLeftSide;
   double oldTolerance = minTolerance;
 
   // If we have less cubes to cover the lane, increase the tolerance.
   minTolerance = GetNewToleranceToPopulateLane(max_s, cubesLeftSide);
-  cubesLeftSide = static_cast<size_t>(max_s / minTolerance);
+  cubesLeftSide = static_cast<int>(max_s / minTolerance);
   MoveCubeAtMidPointInS(_lane, 0., max_s, true, &cubesUsed, &cubesLeftSide);
 
+  minTolerance = oldTolerance;
   minTolerance = GetNewToleranceToPopulateLane(max_s, cubesRightSide);
-  cubesRightSide = static_cast<size_t>(max_s / minTolerance);
+  cubesRightSide = static_cast<int>(max_s / minTolerance);
   MoveCubeAtMidPointInS(_lane, 0., max_s, false, &cubesUsed, &cubesRightSide);
 
   SetVisibilityOfCubesStartingFromTo(cubesUsed, lastCubesUsed != 0 ? lastCubesUsed : cubes.size(), false);
@@ -96,7 +97,7 @@ void Outliner::SetVisibility(bool _visible) {
 
 void Outliner::CreateCubes(ignition::rendering::ScenePtr& _scene, double _scaleX, double _scaleY, double _scaleZ,
                            ignition::rendering::MaterialPtr& _material) {
-  for (size_t i = 0; i < cubes.size(); ++i) {
+  for (int i = 0; i < cubes.size(); ++i) {
     ignition::rendering::VisualPtr cube = _scene->CreateVisual();
     cube->AddGeometry(_scene->CreateBox());
     cube->SetMaterial(_material);
@@ -108,14 +109,14 @@ void Outliner::CreateCubes(ignition::rendering::ScenePtr& _scene, double _scaleX
   }
 }
 
-double Outliner::GetNewToleranceToPopulateLane(double _laneLength, size_t _cubesUsedForSide) {
+double Outliner::GetNewToleranceToPopulateLane(double _laneLength, int _cubesUsedForSide) {
   const double newToleranceForLaneSide = _laneLength / _cubesUsedForSide;
   return newToleranceForLaneSide < minTolerance ? minTolerance : newToleranceForLaneSide;
 }
 
 void Outliner::MoveCubeAtMidPointInR(const maliput::api::GeoPosition& _minRGeoPos,
-                                     const maliput::api::GeoPosition& _maxRGeoPos, size_t* _cubesUsed,
-                                     size_t* _maxAmountOfCubesToUse) {
+                                     const maliput::api::GeoPosition& _maxRGeoPos, int* _cubesUsed,
+                                     int* _maxAmountOfCubesToUse) {
   maliput::api::GeoPosition midPoint = maliput::api::GeoPosition::FromXyz((_maxRGeoPos.xyz() + _minRGeoPos.xyz()) / 2);
   if ((_maxRGeoPos - midPoint).length() > minTolerance && *_cubesUsed < cubes.size() && *_maxAmountOfCubesToUse != 0) {
     cubes[*_cubesUsed]->SetWorldPosition(midPoint.x(), midPoint.y(), midPoint.z());
@@ -128,13 +129,15 @@ void Outliner::MoveCubeAtMidPointInR(const maliput::api::GeoPosition& _minRGeoPo
 }
 
 void Outliner::MoveCubeAtMidPointInS(const maliput::api::Lane* _lane, double min_s, double max_s, bool _left_side,
-                                     size_t* _cubesUsed, size_t* _maxAmountOfCubesToUse) {
+                                     int* _cubesUsed, int* _maxAmountOfCubesToUse) {
   const double mid_s = (max_s + min_s) / 2.0;
   maliput::api::RBounds midRBounds = _lane->lane_bounds(mid_s);
-  const double r_bound = _left_side ? midRBounds.min() : midRBounds.max();
+  maliput::api::RBounds maxRBounds = _lane->lane_bounds(max_s);
+  const double r_mid_bound = _left_side ? midRBounds.min() : midRBounds.max();
+  const double r_extreme_bound = _left_side ? maxRBounds.min() : maxRBounds.max();
 
-  maliput::api::GeoPosition midPoint = _lane->ToGeoPosition(maliput::api::LanePosition(mid_s, r_bound, 0.));
-  maliput::api::GeoPosition extremePoint = _lane->ToGeoPosition(maliput::api::LanePosition(max_s, r_bound, 0.));
+  maliput::api::GeoPosition midPoint = _lane->ToGeoPosition(maliput::api::LanePosition(mid_s, r_mid_bound, 0.));
+  maliput::api::GeoPosition extremePoint = _lane->ToGeoPosition(maliput::api::LanePosition(max_s, r_extreme_bound, 0.));
 
   if ((midPoint - extremePoint).length() > minTolerance && *_cubesUsed < cubes.size() && *_maxAmountOfCubesToUse != 0) {
     ignition::math::Vector3d extremeMidPointMathVector(extremePoint.x(), extremePoint.y(), extremePoint.z());
@@ -149,8 +152,8 @@ void Outliner::MoveCubeAtMidPointInS(const maliput::api::Lane* _lane, double min
   }
 }
 
-void Outliner::SetVisibilityOfCubesStartingFromTo(size_t _startFrom, size_t _to, bool _visible) {
-  for (size_t i = _startFrom; i < _to; ++i) {
+void Outliner::SetVisibilityOfCubesStartingFromTo(int _startFrom, int _to, bool _visible) {
+  for (int i = _startFrom; i < _to; ++i) {
     cubes[i]->SetVisible(_visible);
   }
 }

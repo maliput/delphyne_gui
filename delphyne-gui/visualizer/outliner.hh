@@ -23,7 +23,7 @@ class Outliner {
   /// \param[in] _scaleZ Scale fator for the Z axis of each cube.
   /// \param[in] _poolSize Amount of cubes to be used for outlining.
   /// \param[in] _minTolerance Distance between cubes.
-  Outliner(ignition::rendering::ScenePtr& _scene, double _scaleX, double _scaleY, double _scaleZ, size_t _poolSize,
+  Outliner(ignition::rendering::ScenePtr& _scene, double _scaleX, double _scaleY, double _scaleZ, int _poolSize,
            double _minTolerance);
   /// \brief Destructor. Cube's destruction will be in charge of the scene's destructor.
   ~Outliner() = default;
@@ -50,7 +50,7 @@ class Outliner {
   /// side
   /// \param[in] _langeLength Length of the lane in s coordinate
   /// \param[in] _cubesUsedForSide Amount of cubes available to populate a side of the lane.
-  double GetNewToleranceToPopulateLane(double _laneLength, size_t _cubesUsedForSide);
+  double GetNewToleranceToPopulateLane(double _laneLength, int _cubesUsedForSide);
 
   /// \brief Sets cubes world position and rotation in the middle of two points considering only the r coordinate
   /// and assuming a straight line.
@@ -58,7 +58,7 @@ class Outliner {
   /// \param[in] _maxRGeoPos World position of the right extreme point.
   /// \param[in] _maxAmountOfCubesToUse Amount permitted of cubes to place in the lane.
   void MoveCubeAtMidPointInR(const maliput::api::GeoPosition& _minRGeoPos, const maliput::api::GeoPosition& _maxRGeoPos,
-                             size_t* _cubesUsed, size_t* _maxAmountOfCubesToUse);
+                             int* _cubesUsed, int* _maxAmountOfCubesToUse);
 
   /// \brief Sets cubes world position and rotation in the maximum given bound of a given lane for a given range in the
   /// s coordinate.
@@ -68,13 +68,13 @@ class Outliner {
   /// \param[in] _left_side which side of the lane should be populated.
   /// \param[in] _maxAmountOfCubesToUse Amount permitted of cubes to place in the lane.
   void MoveCubeAtMidPointInS(const maliput::api::Lane* _lane, double _min_s, double _max_s, bool _left_side,
-                             size_t* _cubesUsed, size_t* _maxAmountOfCubesToUse);
+                             int* _cubesUsed, int* _maxAmountOfCubesToUse);
 
   /// \brief Sets cubes visibility from and to a given point.
   /// \param[in] _startFrom From which cube should we start changing the visibility.
   /// \param[in] _to Until which cube should we change the visibility.
   /// \param[in] _visible Boolean that determines the visibility of the cubes.
-  void SetVisibilityOfCubesStartingFromTo(size_t _startFrom, size_t _to, bool _visible);
+  void SetVisibilityOfCubesStartingFromTo(int _startFrom, int _to, bool _visible);
 
   /// \brief Cubes used for rendering the outline in roads.
   std::vector<ignition::rendering::VisualPtr> cubes;
@@ -82,7 +82,7 @@ class Outliner {
   /// \brief Cache lane pointer to avoid setting the outline twice.
   const maliput::api::Lane* lastLaneOutlined;
   /// \brief Cache cubes used for the last lane so we hide the leftovers only.
-  size_t lastCubesUsed;
+  int lastCubesUsed;
 
   /// \brief Tolerance used for cubes positioning.
   double minTolerance;

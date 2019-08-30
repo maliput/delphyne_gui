@@ -12,8 +12,8 @@ The performance benchmark demo.
 import math
 
 import delphyne.behaviours
-import delphyne.trees
 import delphyne.blackboard
+import delphyne.trees
 import delphyne_gui.utilities
 
 from delphyne_gui.utilities import launch_interactive_simulation
@@ -62,16 +62,16 @@ def curved_lanes(args):
                 initial_pose=(
                     R * math.sin(theta),  # m
                     R0 - R * math.cos(theta),  # m
-                    0.0
+                    theta  # rads
                 ),
-                direction_of_travel=theta,  # rads
-                speed=1.0,  # m/s
+                direction_of_travel=0,
+                speed=1.,  # m/s
             )
         )
 
     # Adds the N*T rail cars to the multilane.
     num_traffic = int(args.traffic_density * args.num_cars)
-    lane_provider = delphyne.blackboard.providers.LaneLocationProvider(distance_between_agents=6.0)
+    lane_provider = delphyne.blackboard.providers.LaneLocationProvider(distance_between_agents=6.)
     for i in range(num_traffic):
         scenario_subtree.add_child(
             delphyne.behaviours.agents.RailCar(
@@ -79,7 +79,7 @@ def curved_lanes(args):
                 lane_id=lane_provider.random_lane,
                 longitudinal_position=12. * (i / 3) + 6.,  # m
                 lateral_offset=0.,  # m
-                speed=1.0  # m/s
+                speed=1.  # m/s
             )
         )
 
@@ -108,24 +108,24 @@ def straight_lanes(args):
                 initial_pose=(
                     12. * (i / 3),  # m
                     4. * (i % 3),  # m
-                    0.0
+                    0.  # rads
                 ),
-                direction_of_travel=0.0,  # rads
-                speed=1.0,  # m/s
+                direction_of_travel=0,
+                speed=1.,  # m/s
             )
         )
 
     # Adds the N*T rail cars to the multilane.
     num_traffic = int(args.traffic_density * args.num_cars)
-    lane_provider = delphyne.blackboard.providers.LaneLocationProvider(distance_between_agents=6.0)
+    lane_provider = delphyne.blackboard.providers.LaneLocationProvider(distance_between_agents=6.)
     for i in range(num_traffic):
         scenario_subtree.add_child(
             delphyne.behaviours.agents.RailCar(
                 name="rail " + str(i),
                 lane_id=lane_provider.random_lane,
-                longitudinal_position=12.0 * (i / 3) + 6.0,  # m
-                lateral_offset=0.0,  # m
-                speed=1.0   # m/s
+                longitudinal_position=12. * (i / 3) + 6.,  # m
+                lateral_offset=0.,  # m
+                speed=1.   # m/s
             )
         )
 
@@ -154,18 +154,18 @@ def dragway(args):
             delphyne.behaviours.agents.MobilCar(
                 name="mobil" + str(i),
                 initial_pose=(
-                     12.0 * (i / 4),  # m
+                     12. * (i / 4),  # m
                     -5.5 + 3.7 * (i % 4),  # m
-                     0.0
+                     0.  # rads
                 ),
-                direction_of_travel=0.0,  # rads
-                speed=1.0,  # m/s
+                direction_of_travel=0,
+                speed=1.,  # m/s
             )
         )
 
     # Adds the N*T rail cars to the multilane.
     num_traffic = int(args.traffic_density * args.num_cars)
-    lane_provider = delphyne.blackboard.providers.LaneLocationProvider(distance_between_agents=6.0)
+    lane_provider = delphyne.blackboard.providers.LaneLocationProvider(distance_between_agents=6.)
     for i in range(num_traffic):
         scenario_subtree.add_child(
             delphyne.behaviours.agents.RailCar(
@@ -173,7 +173,7 @@ def dragway(args):
                 lane_id=lane_provider.random_lane,
                 longitudinal_position=12. * (i / 4) + 6.,  # m
                 lateral_offset=0.,  # m
-                speed=1.0   # m/s
+                speed=1.   # m/s
             )
         )
 

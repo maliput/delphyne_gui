@@ -24,25 +24,6 @@ from . import helpers
 # Supporting Classes & Methods
 ##############################################################################
 
-def random_lane(road_geometry):
-    lane_provider = bb_helper.LaneAndLocationProvider(
-        distance_between_agents=6.0)
-    return lane_provider.random_lane(road_geometry)
-
-
-def random_position_for_mobil_car(road_geometry):
-    lane_provider = bb_helper.LaneAndLocationProvider(
-        distance_between_agents=6.0)
-    road_index = road_geometry.ById()
-    lane_id = random_lane(road_geometry)
-    lane_position = lane_provider.random_position(road_geometry, lane_id)
-    lane = road_index.GetLane(lane_id)
-    geo_position = lane.ToGeoPosition(lane_position)
-    geo_orientation = lane.GetOrientation(lane_position)
-    initial_x, initial_y, _ = geo_position.xyz()
-    initial_heading = geo_orientation.rpy().yaw_angle()
-    return (initial_x, initial_y, initial_heading)
-
 
 def benchmark(setup_fn):
     """
@@ -74,7 +55,7 @@ def curved_lanes(args):
     for i in range(args.num_cars):
         R = R0 - 4. * (i % 3)  # m
         # For a 6m distance between cars.
-        theta = (12./R0) * (i / 3)  # rads
+        theta = (12. / R0) * (i / 3)  # rads
         scenario_subtree.add_child(
             delphyne.behaviours.agents.MobilCar(
                 name="mobil" + str(i),
@@ -83,24 +64,25 @@ def curved_lanes(args):
                     R0 - R * math.cos(theta),  # m
                     0.0
                 ),
-                direction_of_travel=theta, # rads
+                direction_of_travel=theta,  # rads
                 speed=1.0,  # m/s
             )
         )
 
     # Adds the N*T rail cars to the multilane.
     num_traffic = int(args.traffic_density * args.num_cars)
+    lane_provider = delphyne.blackboard.providers.LaneLocationProvider(distance_between_agents=6.0)
     for i in range(num_traffic):
         scenario_subtree.add_child(
             delphyne.behaviours.agents.RailCar(
                 name="rail " + str(i),
-                lane_id=random_lane,
+                lane_id=lane_provider.random_lane,
                 longitudinal_position=12. * (i / 3) + 6.,  # m
                 lateral_offset=0.,  # m
                 speed=1.0  # m/s
             )
         )
-    
+
     return scenario_subtree
 
 
@@ -128,18 +110,19 @@ def straight_lanes(args):
                     4. * (i % 3),  # m
                     0.0
                 ),
-                direction_of_travel=0.0, # rads
+                direction_of_travel=0.0,  # rads
                 speed=1.0,  # m/s
             )
         )
 
     # Adds the N*T rail cars to the multilane.
     num_traffic = int(args.traffic_density * args.num_cars)
+    lane_provider = delphyne.blackboard.providers.LaneLocationProvider(distance_between_agents=6.0)
     for i in range(num_traffic):
         scenario_subtree.add_child(
             delphyne.behaviours.agents.RailCar(
                 name="rail " + str(i),
-                lane_id=random_lane,
+                lane_id=lane_provider.random_lane,
                 longitudinal_position=12.0 * (i / 3) + 6.0,  # m
                 lateral_offset=0.0,  # m
                 speed=1.0   # m/s
@@ -155,7 +138,7 @@ def dragway(args):
     Sets up a simulation with `args.num_cars` MOBIL cars on a dragway
     road with four (4) lanes.
     """
-    
+
     scenario_subtree = delphyne.behaviours.roads.Dragway(
         name="dragway",
         num_lanes=4,
@@ -175,24 +158,25 @@ def dragway(args):
                     -5.5 + 3.7 * (i % 4),  # m
                      0.0
                 ),
-                direction_of_travel=0.0, # rads
+                direction_of_travel=0.0,  # rads
                 speed=1.0,  # m/s
             )
         )
 
     # Adds the N*T rail cars to the multilane.
     num_traffic = int(args.traffic_density * args.num_cars)
+    lane_provider = delphyne.blackboard.providers.LaneLocationProvider(distance_between_agents=6.0)
     for i in range(num_traffic):
         scenario_subtree.add_child(
             delphyne.behaviours.agents.RailCar(
                 name="rail " + str(i),
-                lane_id=random_lane,
+                lane_id=lane_provider.random_lane,
                 longitudinal_position=12. * (i / 4) + 6.,  # m
                 lateral_offset=0.,  # m
                 speed=1.0   # m/s
             )
         )
-    
+
     return scenario_subtree
 
 
@@ -231,9 +215,7 @@ def create_mobil_perf_scenario_subtree():
 def main():
     """Keeping pylint entertained."""
     args = parse_arguments()
-    
-    scenario_subtree = benchmark.register[args.benchmark](args)
-    
+
     simulation_tree = delphyne.trees.BehaviourTree(
         root=benchmark.register[args.benchmark](args)
     )
@@ -244,7 +226,7 @@ def main():
         logfile_name=args.logfile_name
     )
 
-    time_step=0.01
+    time_step = 0.01
     with launch_interactive_simulation(
         simulation_tree.runner, bare=args.bare
     ) as launcher:
@@ -257,7 +239,7 @@ def main():
             print("Running simulation for {0} seconds.".format(
                 args.duration))
             simulation_tree.tick_tock(
-                period=time_step, number_of_iterations=args.duration/time_step
+                period=time_step, number_of_iterations=args.duration / time_step
             )
             launcher.terminate()
         # stop simulation if it's necessary

@@ -12,10 +12,8 @@ The performance benchmark demo.
 import math
 
 import delphyne.behaviours
-import delphyne.roads as delphyne_roads
-import delphyne.simulation as simulation
 import delphyne.trees
-import delphyne.utilities
+import delphyne.blackboard
 import delphyne_gui.utilities
 
 from delphyne_gui.utilities import launch_interactive_simulation
@@ -25,6 +23,25 @@ from . import helpers
 ##############################################################################
 # Supporting Classes & Methods
 ##############################################################################
+
+def random_lane(road_geometry):
+    lane_provider = bb_helper.LaneAndLocationProvider(
+        distance_between_agents=6.0)
+    return lane_provider.random_lane(road_geometry)
+
+
+def random_position_for_mobil_car(road_geometry):
+    lane_provider = bb_helper.LaneAndLocationProvider(
+        distance_between_agents=6.0)
+    road_index = road_geometry.ById()
+    lane_id = random_lane(road_geometry)
+    lane_position = lane_provider.random_position(road_geometry, lane_id)
+    lane = road_index.GetLane(lane_id)
+    geo_position = lane.ToGeoPosition(lane_position)
+    geo_orientation = lane.GetOrientation(lane_position)
+    initial_x, initial_y, _ = geo_position.xyz()
+    initial_heading = geo_orientation.rpy().yaw_angle()
+    return (initial_x, initial_y, initial_heading)
 
 
 def benchmark(setup_fn):
@@ -44,14 +61,11 @@ def curved_lanes(args):
     Sets up a simulation with `args.num_cars` MOBIL cars on a few
     lanes of a curved (arc) road.
     """
-    builder = simulation.AgentSimulationBuilder()
 
     # Loads Multilane road.
-    road = builder.set_road_geometry(
-        delphyne_roads.create_multilane_from_file(
-            file_path=delphyne_gui.utilities.get_delphyne_gui_resource(
-                'roads/curved_lanes.yaml'
-            )
+    scenario_subtree = delphyne.behaviours.roads.Multilane(
+        file_path=delphyne_gui.utilities.get_delphyne_gui_resource(
+            'roads/curved_lanes.yaml'
         )
     )
 
@@ -61,27 +75,33 @@ def curved_lanes(args):
         R = R0 - 4. * (i % 3)  # m
         # For a 6m distance between cars.
         theta = (12./R0) * (i / 3)  # rads
-        delphyne.utilities.add_mobil_car(
-            builder, name="mobil" + str(i),
-            scene_x=R * math.sin(theta),  # m
-            scene_y=R0 - R * math.cos(theta),  # m
-            heading=theta,  # rads
-            speed=1.0,  # m/s
+        scenario_subtree.add_child(
+            delphyne.behaviours.agents.MobilCar(
+                name="mobil" + str(i),
+                initial_pose=(
+                    R * math.sin(theta),  # m
+                    R0 - R * math.cos(theta),  # m
+                    0.0
+                ),
+                direction_of_travel=theta, # rads
+                speed=1.0,  # m/s
+            )
         )
 
     # Adds the N*T rail cars to the multilane.
-    road_segment = road.junction(0).segment(0)
     num_traffic = int(args.traffic_density * args.num_cars)
     for i in range(num_traffic):
-        delphyne.utilities.add_rail_car(
-            builder, name="rail " + str(i),
-            lane=road_segment.lane(i % 3),
-            position=12. * (i / 3) + 6.,  # m
-            offset=0.,  # m
-            speed=1.0  # m/s
+        scenario_subtree.add_child(
+            delphyne.behaviours.agents.RailCar(
+                name="rail " + str(i),
+                lane_id=random_lane,
+                longitudinal_position=12. * (i / 3) + 6.,  # m
+                lateral_offset=0.,  # m
+                speed=1.0  # m/s
+            )
         )
-
-    return builder.build()
+    
+    return scenario_subtree
 
 
 @benchmark
@@ -91,40 +111,42 @@ def straight_lanes(args):
     lanes of a straight road.
     """
 
-    builder = simulation.AgentSimulationBuilder()
-
     # Loads Multilane road.
-    road = builder.set_road_geometry(
-        delphyne_roads.create_multilane_from_file(
-            file_path=delphyne_gui.utilities.get_delphyne_gui_resource(
-                'roads/straight_lanes.yaml'
-            )
+    scenario_subtree = delphyne.behaviours.roads.Multilane(
+        file_path=delphyne_gui.utilities.get_delphyne_gui_resource(
+            'roads/straight_lanes.yaml'
         )
     )
 
     # Adds the N MOBIL cars to the multilane.
     for i in range(args.num_cars):
-        delphyne.utilities.add_mobil_car(
-            builder, name="mobil" + str(i),
-            scene_x=12. * (i / 3),  # m
-            scene_y=4. * (i % 3),  # m
-            heading=0.0,  # rads
-            speed=1.0,  # m/s
+        scenario_subtree.add_child(
+            delphyne.behaviours.agents.MobilCar(
+                name="mobil" + str(i),
+                initial_pose=(
+                    12. * (i / 3),  # m
+                    4. * (i % 3),  # m
+                    0.0
+                ),
+                direction_of_travel=0.0, # rads
+                speed=1.0,  # m/s
+            )
         )
 
     # Adds the N*T rail cars to the multilane.
-    road_segment = road.junction(0).segment(0)
     num_traffic = int(args.traffic_density * args.num_cars)
     for i in range(num_traffic):
-        delphyne.utilities.add_rail_car(
-            builder, name="rail " + str(i),
-            lane=road_segment.lane(i % 3),
-            position=12. * (i / 3) + 6.,  # m
-            offset=0.,  # m
-            speed=1.0   # m/s
+        scenario_subtree.add_child(
+            delphyne.behaviours.agents.RailCar(
+                name="rail " + str(i),
+                lane_id=random_lane,
+                longitudinal_position=12.0 * (i / 3) + 6.0,  # m
+                lateral_offset=0.0,  # m
+                speed=1.0   # m/s
+            )
         )
 
-    return builder.build()
+    return scenario_subtree
 
 
 @benchmark
@@ -133,42 +155,45 @@ def dragway(args):
     Sets up a simulation with `args.num_cars` MOBIL cars on a dragway
     road with four (4) lanes.
     """
-    builder = simulation.AgentSimulationBuilder()
-
-    road = builder.set_road_geometry(
-        delphyne_roads.create_dragway(
-            name="dragway",
-            num_lanes=4,
-            length=100.0,  # m
-            lane_width=3.7,  # m
-            shoulder_width=3.0,  # m
-            maximum_height=5.0  # m
-        )
+    
+    scenario_subtree = delphyne.behaviours.roads.Dragway(
+        name="dragway",
+        num_lanes=4,
+        length=100.0,  # m
+        lane_width=3.7,  # m
+        shoulder_width=3.0,  # m
+        maximum_height=5.0  # m
     )
 
     # Adds the N MOBIL cars to the dragway.
     for i in range(args.num_cars):
-        delphyne.utilities.add_mobil_car(
-            builder, name="mobil" + str(i),
-            scene_x=12.0 * (i / 4),  # m
-            scene_y=-5.5 + 3.7 * (i % 4),  # m
-            heading=0.0,  # rads
-            speed=1.0,  # m/s
+        scenario_subtree.add_child(
+            delphyne.behaviours.agents.MobilCar(
+                name="mobil" + str(i),
+                initial_pose=(
+                     12.0 * (i / 4),  # m
+                    -5.5 + 3.7 * (i % 4),  # m
+                     0.0
+                ),
+                direction_of_travel=0.0, # rads
+                speed=1.0,  # m/s
+            )
         )
 
     # Adds the N*T rail cars to the multilane.
-    road_segment = road.junction(0).segment(0)
     num_traffic = int(args.traffic_density * args.num_cars)
     for i in range(num_traffic):
-        delphyne.utilities.add_rail_car(
-            builder, name="rail " + str(i),
-            lane=road_segment.lane(i % 4),
-            position=12. * (i / 4) + 6.,  # m
-            offset=0.,  # m
-            speed=1.0   # m/s
+        scenario_subtree.add_child(
+            delphyne.behaviours.agents.RailCar(
+                name="rail " + str(i),
+                lane_id=random_lane,
+                longitudinal_position=12. * (i / 4) + 6.,  # m
+                lateral_offset=0.,  # m
+                speed=1.0   # m/s
+            )
         )
-
-    return builder.build()
+    
+    return scenario_subtree
 
 
 def parse_arguments():
@@ -206,34 +231,38 @@ def create_mobil_perf_scenario_subtree():
 def main():
     """Keeping pylint entertained."""
     args = parse_arguments()
-
-    benchmark_simulation = benchmark.register[args.benchmark](args)
     
-    # simulation_tree = delphyne.trees.BehaviourTree(
-    #     root=create_mobil_perf_scenario_subtree()
-    # )
+    scenario_subtree = benchmark.register[args.benchmark](args)
+    
+    simulation_tree = delphyne.trees.BehaviourTree(
+        root=benchmark.register[args.benchmark](args)
+    )
 
-    runner = simulation.SimulationRunner(
-        simulation=benchmark_simulation,
-        time_step=0.01,  # (secs)
+    simulation_tree.setup(
         realtime_rate=args.realtime_rate,
-        paused=args.paused,
-        log=args.log,
+        start_paused=args.paused,
         logfile_name=args.logfile_name
     )
 
-    with launch_interactive_simulation(runner, bare=args.bare) as launcher:
+    time_step=0.01
+    with launch_interactive_simulation(
+        simulation_tree.runner, bare=args.bare
+    ) as launcher:
         if args.duration < 0:
             # run indefinitely
-            runner.start()
+            print("Running simulation indefinitely.")
+            simulation_tree.tick_tock(period=time_step)
         else:
             # run for a finite amount of time
             print("Running simulation for {0} seconds.".format(
                 args.duration))
-            runner.run_sync_for(args.duration)
+            simulation_tree.tick_tock(
+                period=time_step, number_of_iterations=args.duration/time_step
+            )
+            launcher.terminate()
         # stop simulation if it's necessary
-        if runner.is_interactive_loop_running():
-            runner.stop()
+        if simulation_tree.runner.is_interactive_loop_running():
+            simulation_tree.runner.stop()
         # print simulation stats
         print("Simulation ended. I'm happy, you should be too.")
-        delphyne_gui.utilities.print_simulation_stats(runner)
+        delphyne_gui.utilities.print_simulation_stats(simulation_tree.runner)

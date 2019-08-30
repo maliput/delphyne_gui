@@ -203,10 +203,6 @@ def parse_arguments():
     return parser.parse_args()
 
 
-def create_mobil_perf_scenario_subtree():
-    return 0
-
-
 ##############################################################################
 # Main
 ##############################################################################
@@ -241,10 +237,10 @@ def main():
             simulation_tree.tick_tock(
                 period=time_step, number_of_iterations=args.duration / time_step
             )
-            launcher.terminate()
         # stop simulation if it's necessary
         if simulation_tree.runner.is_interactive_loop_running():
             simulation_tree.runner.stop()
         # print simulation stats
         print("Simulation ended. I'm happy, you should be too.")
         delphyne_gui.utilities.print_simulation_stats(simulation_tree.runner)
+        launcher.terminate()

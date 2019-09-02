@@ -114,10 +114,6 @@ class MaliputFileSelectionWidget : public QWidget {
   /// display the name of the loaded file.
   void Build();
 
-  /// \brief Get the file name for a given path.
-  /// \returns QString containing the file name or empty QString if file name couldn't be gathered from filePath
-  QString GetFileName(const QString& filePath);
-
   QPushButton* loadButton{nullptr};
   QLabel* fileNameLabel{nullptr};
   QPushButton* roadRulebookButton{nullptr};

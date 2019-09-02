@@ -76,9 +76,9 @@ void RulesVisualizerWidget::ConstructPhaseRingTree(
 }
 
 QString RulesVisualizerWidget::GetSelectedLaneId() const {
-  QListWidgetItem* currentItem = this->lanes_list->currentItem();
-  if (currentItem) {
-    return currentItem->text();
+  QListWidgetItem* selected_item = this->lanes_list->currentItem();
+  if (selected_item) {
+    return selected_item->text();
   }
   return QString();
 }

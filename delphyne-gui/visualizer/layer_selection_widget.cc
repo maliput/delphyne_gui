@@ -1,6 +1,7 @@
 // Copyright 2018 Toyota Research Institute
 
 #include "layer_selection_widget.hh"
+#include <ignition/common/Filesystem.hh>
 
 #include <QtCore/QDir>
 #include <QtWidgets/QFileDialog>
@@ -179,9 +180,15 @@ void MaliputFileSelectionWidget::SetFileNameLabel(const std::string& fileName) {
 
 void MaliputFileSelectionWidget::ClearLineEdits(bool keepOldTextsAsPlaceholders) {
   if (keepOldTextsAsPlaceholders) {
-    this->roadRulebookLineEdit->setPlaceholderText(GetFileName(this->roadRulebookLineEdit->text()));
-    this->trafficLightRulesLineEdit->setPlaceholderText(GetFileName(this->trafficLightRulesLineEdit->text()));
-    this->phaseRingLineEdit->setPlaceholderText(GetFileName(this->phaseRingLineEdit->text()));
+    std::string roadRulebookFileName = ignition::common::basename(this->roadRulebookLineEdit->text().toStdString());
+    this->roadRulebookLineEdit->setPlaceholderText(QString::fromStdString(roadRulebookFileName));
+
+    std::string trafficLightFileName =
+        ignition::common::basename(this->trafficLightRulesLineEdit->text().toStdString());
+    this->trafficLightRulesLineEdit->setPlaceholderText(QString::fromStdString(trafficLightFileName));
+
+    std::string phaseRingFileName = ignition::common::basename(this->phaseRingLineEdit->text().toStdString());
+    this->phaseRingLineEdit->setPlaceholderText(QString::fromStdString(phaseRingFileName));
   } else {
     this->roadRulebookLineEdit->setPlaceholderText(QString());
     this->trafficLightRulesLineEdit->setPlaceholderText(QString());
@@ -259,12 +266,4 @@ void MaliputFileSelectionWidget::Build() {
   layout->addWidget(phaseRingWidgetContainer);
 
   this->setLayout(layout);
-}
-
-QString MaliputFileSelectionWidget::GetFileName(const QString& filePath) {
-  int lastIndexOf = filePath.lastIndexOf("/");
-  if (lastIndexOf != -1) {
-    return filePath.mid(lastIndexOf + 1);
-  }
-  return QString();
 }

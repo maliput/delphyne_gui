@@ -118,7 +118,7 @@ void Outliner::MoveCubeAtMidPointInR(const maliput::api::GeoPosition& _minRGeoPo
                                      const maliput::api::GeoPosition& _maxRGeoPos, int* _cubesUsed,
                                      int* _maxAmountOfCubesToUse) {
   maliput::api::GeoPosition midPoint = maliput::api::GeoPosition::FromXyz((_maxRGeoPos.xyz() + _minRGeoPos.xyz()) / 2);
-  if ((_maxRGeoPos - midPoint).length() > minTolerance && *_cubesUsed < cubes.size() && *_maxAmountOfCubesToUse != 0) {
+  if ((_maxRGeoPos - midPoint).length() > minTolerance && *_maxAmountOfCubesToUse != 0) {
     cubes[*_cubesUsed]->SetWorldPosition(midPoint.x(), midPoint.y(), midPoint.z());
     cubes[*_cubesUsed]->SetVisible(true);
     ++(*_cubesUsed);
@@ -143,7 +143,7 @@ void Outliner::MoveCubeAtMidPointInS(const maliput::api::Lane* _lane, double min
   const maliput::api::GeoPosition maxPoint = _lane->ToGeoPosition(maliput::api::LanePosition(max_s, r_max_bound, 0.));
 
   if (!DoPointsViolateTolerance(midPoint, maxPoint) && !DoPointsViolateTolerance(midPoint, minPoint) &&
-      *_cubesUsed < cubes.size() && *_maxAmountOfCubesToUse != 0) {
+      *_maxAmountOfCubesToUse != 0) {
     ignition::math::Vector3d extremeMidPointMathVector(maxPoint.x(), maxPoint.y(), maxPoint.z());
     cubes[*_cubesUsed]->SetWorldPosition(midPoint.x(), midPoint.y(), midPoint.z());
     cubes[*_cubesUsed]->SetWorldRotation(

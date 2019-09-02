@@ -68,17 +68,17 @@ std::ostream& operator<<(std::ostream& out, const maliput::api::rules::RightOfWa
 }
 
 // Serializes `s_range` into `out`.
-std::ostream& operator<<(std::ostream& out, const maliput::api::rules::SRange& s_range) {
+std::ostream& operator<<(std::ostream& out, const maliput::api::SRange& s_range) {
   return out << "[" << s_range.s0() << ", " << s_range.s1() << "]";
 }
 
 // Serializes `lane_s_range` into `out`.
-std::ostream& operator<<(std::ostream& out, const maliput::api::rules::LaneSRange& lane_s_range) {
+std::ostream& operator<<(std::ostream& out, const maliput::api::LaneSRange& lane_s_range) {
   return out << "Range(lane_id: " << lane_s_range.lane_id().string() << ", s_range:" << lane_s_range.s_range() << ")";
 }
 
 // Serializes `lane_s_route` into `out`.
-std::ostream& operator<<(std::ostream& out, const maliput::api::rules::LaneSRoute& lane_s_route) {
+std::ostream& operator<<(std::ostream& out, const maliput::api::LaneSRoute& lane_s_route) {
   out << "Route(ranges: [";
   for (const auto& range : lane_s_route.ranges()) {
     out << range << ", ";
@@ -218,7 +218,7 @@ void RoadNetworkQuery::GetDirectionUsage(const maliput::api::LaneId& lane_id) {
 }
 
 /////////////////////////////////////////////////
-void RoadNetworkQuery::GetRightOfWay(const maliput::api::rules::LaneSRange& lane_s_range) {
+void RoadNetworkQuery::GetRightOfWay(const maliput::api::LaneSRange& lane_s_range) {
   const maliput::api::rules::RoadRulebook::QueryResults results = rn_->rulebook()->FindRules({lane_s_range}, 0.);
   const maliput::api::rules::RuleStateProvider* rule_state_provider = rn_->rule_state_provider();
   (*out_) << "Right of way for " << lane_s_range << ":" << std::endl;
@@ -293,9 +293,9 @@ maliput::api::rules::RoadRulebook::QueryResults RoadNetworkQuery::FindRulesFor(c
     return maliput::api::rules::RoadRulebook::QueryResults();
   }
 
-  const maliput::api::rules::SRange s_range(0., lane->length());
-  const maliput::api::rules::LaneSRange lane_s_range(lane->id(), s_range);
-  const std::vector<maliput::api::rules::LaneSRange> lane_s_ranges(1, lane_s_range);
+  const maliput::api::SRange s_range(0., lane->length());
+  const maliput::api::LaneSRange lane_s_range(lane->id(), s_range);
+  const std::vector<maliput::api::LaneSRange> lane_s_ranges(1, lane_s_range);
 
   return rn_->rulebook()->FindRules(lane_s_ranges, 0.);
 }

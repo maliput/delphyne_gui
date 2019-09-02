@@ -131,16 +131,20 @@ void Outliner::MoveCubeAtMidPointInR(const maliput::api::GeoPosition& _minRGeoPo
 void Outliner::MoveCubeAtMidPointInS(const maliput::api::Lane* _lane, double min_s, double max_s, bool _left_side,
                                      int* _cubesUsed, int* _maxAmountOfCubesToUse) {
   const double mid_s = (max_s + min_s) / 2.0;
-  maliput::api::RBounds midRBounds = _lane->lane_bounds(mid_s);
-  maliput::api::RBounds maxRBounds = _lane->lane_bounds(max_s);
+  const maliput::api::RBounds minRBounds = _lane->lane_bounds(min_s);
+  const maliput::api::RBounds midRBounds = _lane->lane_bounds(mid_s);
+  const maliput::api::RBounds maxRBounds = _lane->lane_bounds(max_s);
+  const double r_min_bound = _left_side ? minRBounds.min() : minRBounds.max();
   const double r_mid_bound = _left_side ? midRBounds.min() : midRBounds.max();
-  const double r_extreme_bound = _left_side ? maxRBounds.min() : maxRBounds.max();
+  const double r_max_bound = _left_side ? maxRBounds.min() : maxRBounds.max();
 
-  maliput::api::GeoPosition midPoint = _lane->ToGeoPosition(maliput::api::LanePosition(mid_s, r_mid_bound, 0.));
-  maliput::api::GeoPosition extremePoint = _lane->ToGeoPosition(maliput::api::LanePosition(max_s, r_extreme_bound, 0.));
+  const maliput::api::GeoPosition minPoint = _lane->ToGeoPosition(maliput::api::LanePosition(min_s, r_min_bound, 0.));
+  const maliput::api::GeoPosition midPoint = _lane->ToGeoPosition(maliput::api::LanePosition(mid_s, r_mid_bound, 0.));
+  const maliput::api::GeoPosition maxPoint = _lane->ToGeoPosition(maliput::api::LanePosition(max_s, r_max_bound, 0.));
 
-  if ((midPoint - extremePoint).length() > minTolerance && *_cubesUsed < cubes.size() && *_maxAmountOfCubesToUse != 0) {
-    ignition::math::Vector3d extremeMidPointMathVector(extremePoint.x(), extremePoint.y(), extremePoint.z());
+  if (!DoPointsViolateTolerance(midPoint, maxPoint) && !DoPointsViolateTolerance(midPoint, minPoint) &&
+      *_cubesUsed < cubes.size() && *_maxAmountOfCubesToUse != 0) {
+    ignition::math::Vector3d extremeMidPointMathVector(maxPoint.x(), maxPoint.y(), maxPoint.z());
     cubes[*_cubesUsed]->SetWorldPosition(midPoint.x(), midPoint.y(), midPoint.z());
     cubes[*_cubesUsed]->SetWorldRotation(
         ignition::math::Matrix4d::LookAt(cubes[*_cubesUsed]->WorldPosition(), extremeMidPointMathVector).Pose().Rot());
@@ -156,6 +160,11 @@ void Outliner::SetVisibilityOfCubesStartingFromTo(int _startFrom, int _to, bool 
   for (int i = _startFrom; i < _to; ++i) {
     cubes[i]->SetVisible(_visible);
   }
+}
+
+bool Outliner::DoPointsViolateTolerance(const maliput::api::GeoPosition& _first_point,
+                                        const maliput::api::GeoPosition& _second_point) {
+  return (_first_point - _second_point).length() < minTolerance;
 }
 
 }  // namespace gui

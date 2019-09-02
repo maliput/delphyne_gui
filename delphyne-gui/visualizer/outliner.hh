@@ -76,6 +76,13 @@ class Outliner {
   /// \param[in] _visible Boolean that determines the visibility of the cubes.
   void SetVisibilityOfCubesStartingFromTo(int _startFrom, int _to, bool _visible);
 
+  /// \brief Verifies if two points are so close that they violate the tolerance.
+  /// \param[in] _first_point First point to verify distance.
+  /// \param[in] _second_point Second point to verify distance.
+  /// \returns Boolean that determines if the two points are close to each other.
+  bool DoPointsViolateTolerance(const maliput::api::GeoPosition& _first_point,
+                                const maliput::api::GeoPosition& _second_point);
+
   /// \brief Cubes used for rendering the outline in roads.
   std::vector<ignition::rendering::VisualPtr> cubes;
 

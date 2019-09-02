@@ -3,8 +3,8 @@
 #include "layer_selection_widget.hh"
 #include <ignition/common/Filesystem.hh>
 
-#include <QtCore/QFileInfo>
 #include <QtCore/QDir>
+#include <QtCore/QFileInfo>
 #include <QtWidgets/QFileDialog>
 #include <QtWidgets/QGroupBox>
 #include <QtWidgets/QHBoxLayout>

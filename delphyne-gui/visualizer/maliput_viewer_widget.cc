@@ -170,13 +170,13 @@ void MaliputViewerWidget::paintEvent(QPaintEvent* _e) {
 }
 
 void MaliputViewerWidget::OnRulesForLaneRequested() {
-  this->renderWidget->Outline(this->model->GetLaneFromId(laneId.toStdString()));
+  const std::string lane_id = this->rulesVisualizerWidget->GetSelectedLaneId().toStdString();
+  this->renderWidget->Outline(this->model->GetLaneFromId(lane_id));
   PhaseRingPhaseIds phaseRingPhaseIds = this->rulesVisualizerWidget->GetSelectedPhaseRingAndPhaseId();
   emit this->rulesVisualizerWidget->ReceiveRules(
       this->rulesVisualizerWidget->GetSelectedLaneId(),
       this->model->GetRulesOfLane<QString>(phaseRingPhaseIds.phase_ring_id.toStdString(),
-                                           phaseRingPhaseIds.phase_id.toStdString(),
-                                           this->rulesVisualizerWidget->GetSelectedLaneId().toStdString()));
+                                           phaseRingPhaseIds.phase_id.toStdString(), lane_id));
 }
 
 /////////////////////////////////////////////////

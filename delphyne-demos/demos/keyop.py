@@ -88,7 +88,7 @@ def demo_callback(behaviour_tree, keyboard_handler, time_step_seconds):
                 behaviour_tree.runner.pause_simulation()
                 print("Simulation is now paused.")
         elif key == 'q':
-            behaviour_tree.interrupt_tick_tocking = True
+            behaviour_tree.interrupt()
             print("Quitting simulation.")
         elif key == 's':
             if behaviour_tree.runner.is_simulation_paused():

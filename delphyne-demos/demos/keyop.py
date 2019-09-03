@@ -19,8 +19,6 @@ import time
 
 import delphyne.trees
 import delphyne.behaviours
-import delphyne.simulation as simulation
-import delphyne.utilities as utilities
 
 from delphyne_gui.utilities import launch_interactive_simulation
 

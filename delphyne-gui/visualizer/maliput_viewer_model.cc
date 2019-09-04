@@ -222,7 +222,8 @@ void RoadNetworkQuery::GetDirectionUsage(const maliput::api::LaneId& lane_id) {
 /////////////////////////////////////////////////
 void RoadNetworkQuery::GetRightOfWay(const maliput::api::LaneSRange& lane_s_range) {
   const maliput::api::rules::RoadRulebook::QueryResults results = rn_->rulebook()->FindRules({lane_s_range}, 0.);
-  const maliput::api::rules::RuleStateProvider* rule_state_provider = rn_->rule_state_provider();
+  const maliput::api::rules::RightOfWayRuleStateProvider* right_of_way_rule_state_provider =
+      rn_->right_of_way_rule_state_provider();
   (*out_) << "Right of way for " << lane_s_range << ":" << std::endl;
   for (const auto& rule : results.right_of_way) {
     (*out_) << "    Rule(id: " << rule.first.string() << ", zone: " << rule.second.zone() << ", zone-type: '"
@@ -233,7 +234,7 @@ void RoadNetworkQuery::GetRightOfWay(const maliput::api::LaneSRange& lane_s_rang
         (*out_) << entry.second << ", ";
       }
       (*out_) << "]";
-      const auto rule_state_result = rule_state_provider->GetState(rule.first);
+      const auto rule_state_result = right_of_way_rule_state_provider->GetState(rule.first);
       if (rule_state_result.has_value()) {
         auto it = rule.second.states().find(rule_state_result->current_id);
         DELPHYNE_DEMAND(it != rule.second.states().end());

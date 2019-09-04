@@ -97,7 +97,7 @@ void Outliner::SetVisibility(bool _visible) {
 
 void Outliner::CreateCubes(ignition::rendering::ScenePtr& _scene, double _scaleX, double _scaleY, double _scaleZ,
                            ignition::rendering::MaterialPtr& _material) {
-  for (int i = 0; i < cubes.size(); ++i) {
+  for (size_t i = 0; i < cubes.size(); ++i) {
     ignition::rendering::VisualPtr cube = _scene->CreateVisual();
     cube->AddGeometry(_scene->CreateBox());
     cube->SetMaterial(_material);

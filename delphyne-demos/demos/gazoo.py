@@ -54,7 +54,6 @@ def create_gazoo_scenario_subtree(filename, mobil_cars_num):
     railcar_s = 0.0      # (m)
     robot_id = 1
     lane_1 = "l:s1_0"
-
     scenario_subtree.add_child(
         delphyne.behaviours.agents.RailCar(
             name=str(robot_id),
@@ -109,7 +108,6 @@ def create_gazoo_scenario_subtree(filename, mobil_cars_num):
                      0.0 + y_offset * (i % 3),
                      0.0
                 ),
-                direction_of_travel=0.0,
                 speed=velocity_base * i
             )
         )

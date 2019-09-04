@@ -132,7 +132,7 @@ def main():
             logfile_name=args.logfile_name
         )
     except RuntimeError as error:
-        print("There was an error trying to load the road network: {}".format(args.filename))
+        print("An error ocurred while trying to run the simulation with : {}".format(args.filename))
         print(str(error))
         print("Exiting the simulation")
         sys.exit()

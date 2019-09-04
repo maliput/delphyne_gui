@@ -17,8 +17,8 @@ import sys
 import termios
 import time
 
-import delphyne.simulation as simulation
-import delphyne.utilities as utilities
+import delphyne.trees
+import delphyne.behaviours
 
 from delphyne_gui.utilities import launch_interactive_simulation
 
@@ -74,29 +74,25 @@ class KeyboardHandler(object):
         return key_hit != []
 
 
-def demo_callback(runner, launcher, keyboard_handler, time_step_seconds):
+def demo_callback(behaviour_tree, keyboard_handler, time_step_seconds):
     """Callback function invoqued by the SimulationRunner
     at every time step.
     """
     if keyboard_handler.key_hit():
         key = keyboard_handler.get_character().lower()
         if key == 'p':
-            if runner.is_simulation_paused():
-                runner.unpause_simulation()
+            if behaviour_tree.runner.is_simulation_paused():
+                behaviour_tree.runner.unpause_simulation()
                 print("Simulation is now running.")
             else:
-                runner.pause_simulation()
+                behaviour_tree.runner.pause_simulation()
                 print("Simulation is now paused.")
         elif key == 'q':
-            runner.stop()
+            behaviour_tree.interrupt()
             print("Quitting simulation.")
-            # This is needed to avoid a possible deadlock.
-            # See SimulationRunner class description.
-            time.sleep(0.5)
-            launcher.terminate()
         elif key == 's':
-            if runner.is_simulation_paused():
-                runner.request_simulation_step_execution(1)
+            if behaviour_tree.runner.is_simulation_paused():
+                behaviour_tree.runner.request_simulation_step_execution(1)
                 print("Simulation step of {0}s executed.".
                       format(time_step_seconds))
             else:
@@ -117,6 +113,14 @@ keyboard on the GUI's teleop widget. In the console, we can toggle
         )
     return parser.parse_args()
 
+def create_scenario_subtree():
+    scenario_subtree = delphyne.behaviours.roads.Road()
+    scenario_subtree.add_child(
+        delphyne.behaviours.agents.SimpleCar(
+            name='0',
+            speed=0.0))
+    return scenario_subtree
+
 ##############################################################################
 # Main
 ##############################################################################
@@ -126,25 +130,23 @@ def main():
     """Keeping pylint entertained."""
     args = parse_arguments()
 
-    builder = simulation.AgentSimulationBuilder()
+    simulation_tree = delphyne.trees.BehaviourTree(
+        root=create_scenario_subtree())
 
-    utilities.add_simple_car(
-        builder,
-        name=str(0),
-        position_x=0.0,
-        position_y=0.0)
-
-    simulation_time_step_secs = 0.001
-    runner = simulation.SimulationRunner(
-        simulation=builder.build(),
-        time_step=simulation_time_step_secs
+    time_step = 0.01
+    simulation_tree.setup(
+        realtime_rate=args.realtime_rate,
+        start_paused=args.paused,
+        logfile_name=args.logfile_name
     )
 
     keyboard = KeyboardHandler()
 
-    runner.add_step_callback(
-        lambda: demo_callback(runner, launcher, keyboard,
-                              simulation_time_step_secs))
+    # We add it as a step callback because the runner gets stuck in a while loop until it's unpaused.
+    # See simulation_runner.cc line 185 at delphyne's repository.
+    simulation_tree.runner.add_step_callback(
+        lambda: demo_callback(simulation_tree, keyboard,
+                              time_step))
 
     print("\n"
           "************************************************************\n"
@@ -154,12 +156,16 @@ def main():
           "* <q> will stop the simulation and quit the demo.          *\n"
           "************************************************************\n")
 
-    with launch_interactive_simulation(runner, bare=args.bare) as launcher:
+    with launch_interactive_simulation(
+            simulation_tree.runner, bare=args.bare) as launcher:
         if args.duration < 0:
             # run indefinitely
-            runner.start()
+            print("Running simulation indefinitely.")
+            simulation_tree.tick_tock(period=time_step)
         else:
             # run for a finite time
             print("Running simulation for {0} seconds.".format(
                 args.duration))
-            runner.run_async_for(args.duration, launcher.terminate)
+            simulation_tree.tick_tock(period=time_step,
+                number_of_iterations=args.duration/time_step)
+        launcher.terminate()

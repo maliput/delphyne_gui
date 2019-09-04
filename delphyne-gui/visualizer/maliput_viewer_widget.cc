@@ -32,8 +32,10 @@ MaliputViewerWidget::MaliputViewerWidget(QWidget* parent) : Plugin() {
   QObject::connect(this->labelSelectionWidget, SIGNAL(valueChanged(const std::string&, bool)), this,
                    SLOT(OnTextLabelChanged(const std::string&, bool)));
 
-  QObject::connect(this->maliputFileSelectionWidget, SIGNAL(maliputFileChanged(const std::string&)), this,
-                   SLOT(OnNewMultilaneFile(const std::string&)));
+  QObject::connect(
+      this->maliputFileSelectionWidget,
+      SIGNAL(maliputFileChanged(const std::string&, const std::string&, const std::string&, const std::string&)), this,
+      SLOT(OnNewRoadNetwork(const std::string&, const std::string&, const std::string&, const std::string&)));
 }
 
 /////////////////////////////////////////////////
@@ -53,7 +55,9 @@ void MaliputViewerWidget::OnTextLabelChanged(const std::string& key, bool newVal
 }
 
 /////////////////////////////////////////////////
-void MaliputViewerWidget::OnNewMultilaneFile(const std::string& filePath) {
+void MaliputViewerWidget::OnNewRoadNetwork(const std::string& filePath, const std::string& roadRulebookFilePath,
+                                           const std::string& trafficLightRulesFilePath,
+                                           const std::string& phaseRingFilePath) {
   if (filePath.empty()) {
     return;
   }
@@ -63,12 +67,13 @@ void MaliputViewerWidget::OnNewMultilaneFile(const std::string& filePath) {
 
   // Loads the new file.
   this->model = std::make_unique<MaliputViewerModel>();
-  this->model->Load(filePath);
-  this->rulesVisualizerWiget->ClearText();
-  this->rulesVisualizerWiget->ClearLaneList();
+  this->model->Load(filePath, roadRulebookFilePath, trafficLightRulesFilePath, phaseRingFilePath);
+  this->rulesVisualizerWidget->ClearText();
+  this->rulesVisualizerWidget->ClearLaneList();
+  this->rulesVisualizerWidget->ConstructPhaseRingTree(this->model->GetPhaseRings<QString>());
   const auto lane_ids = this->model->GetAllLaneIds<std::vector<QString>>();
-  for (size_t i = 0; i < lane_ids.size(); ++i) {
-    this->rulesVisualizerWiget->AddLaneId(lane_ids[i]);
+  for (const QString& lane_id : lane_ids) {
+    this->rulesVisualizerWidget->AddLaneId(lane_id);
   }
 
   this->renderWidget->RenderArrow();
@@ -76,6 +81,7 @@ void MaliputViewerWidget::OnNewMultilaneFile(const std::string& filePath) {
   this->renderWidget->RenderLabels(this->model->Labels());
 
   this->VisualizeFileName(filePath);
+  this->maliputFileSelectionWidget->ClearLineEdits(true);
 }
 
 /////////////////////////////////////////////////
@@ -93,8 +99,12 @@ void MaliputViewerWidget::OnVisualClicked(ignition::rendering::RayQueryResult ra
     if (lane) {
       const std::string& lane_id = lane->id().string();
       ignmsg << "Clicked lane ID: " << lane_id << "\n";
-      OnRulesForLaneRequested(QString(lane_id.c_str()));
       this->renderWidget->Outline(lane);
+      PhaseRingPhaseIds phaseRingIdAndPhaseIdSelected = this->rulesVisualizerWidget->GetSelectedPhaseRingAndPhaseId();
+      emit this->rulesVisualizerWidget->ReceiveRules(
+          QString(lane_id.c_str()),
+          this->model->GetRulesOfLane<QString>(phaseRingIdAndPhaseIdSelected.phase_ring_id.toStdString(),
+                                               phaseRingIdAndPhaseIdSelected.phase_id.toStdString(), lane_id));
       this->renderWidget->PutArrowAt(rayResult.distance, rayResult.point);
       this->renderWidget->SetArrowVisibility(true);
     } else {
@@ -121,19 +131,18 @@ void MaliputViewerWidget::BuildGUI() {
   this->layerSelectionWidget = new LayerSelectionWidget(this);
   this->labelSelectionWidget = new LabelSelectionWidget(this);
   this->renderWidget = new RenderMaliputWidget(this);
-  this->rulesVisualizerWiget = new RulesVisualizerWidget(this);
+  this->rulesVisualizerWidget = new RulesVisualizerWidget(this);
 
   QObject::connect(this->renderWidget, SIGNAL(VisualClicked(ignition::rendering::RayQueryResult)), this,
                    SLOT(OnVisualClicked(ignition::rendering::RayQueryResult)));
 
-  QObject::connect(this->rulesVisualizerWiget, SIGNAL(RequestRulesForLaneId(QString)), this,
-                   SLOT(OnRulesForLaneRequested(QString)));
+  QObject::connect(this->rulesVisualizerWidget, SIGNAL(RequestRules()), this, SLOT(OnRulesForLaneRequested()));
 
   auto verticalLayout = new QVBoxLayout(this);
   verticalLayout->addWidget(this->maliputFileSelectionWidget);
   verticalLayout->addWidget(this->layerSelectionWidget);
   verticalLayout->addWidget(this->labelSelectionWidget);
-  verticalLayout->addWidget(this->rulesVisualizerWiget);
+  verticalLayout->addWidget(this->rulesVisualizerWidget);
   auto controlGroup = new QGroupBox("Control panel", this);
   controlGroup->setLayout(verticalLayout);
   controlGroup->setSizePolicy(QSizePolicy::Policy::Fixed, QSizePolicy::Policy::Fixed);
@@ -160,9 +169,14 @@ void MaliputViewerWidget::paintEvent(QPaintEvent* _e) {
   this->renderWidget->paintEvent(_e);
 }
 
-void MaliputViewerWidget::OnRulesForLaneRequested(QString laneId) {
-  this->renderWidget->Outline(this->model->GetLaneFromId(laneId.toStdString()));
-  emit this->rulesVisualizerWiget->ReceiveRules(laneId, this->model->GetRulesOfLane<QString>(laneId.toStdString()));
+void MaliputViewerWidget::OnRulesForLaneRequested() {
+  const std::string lane_id = this->rulesVisualizerWidget->GetSelectedLaneId().toStdString();
+  this->renderWidget->Outline(this->model->GetLaneFromId(lane_id));
+  PhaseRingPhaseIds phaseRingPhaseIds = this->rulesVisualizerWidget->GetSelectedPhaseRingAndPhaseId();
+  emit this->rulesVisualizerWidget->ReceiveRules(
+      this->rulesVisualizerWidget->GetSelectedLaneId(),
+      this->model->GetRulesOfLane<QString>(phaseRingPhaseIds.phase_ring_id.toStdString(),
+                                           phaseRingPhaseIds.phase_id.toStdString(), lane_id));
 }
 
 /////////////////////////////////////////////////

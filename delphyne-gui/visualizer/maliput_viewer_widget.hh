@@ -54,13 +54,16 @@ class MaliputViewerWidget : public ignition::gui::Plugin {
 
   /// \brief Clears the visualizer, loads the new set of meshes and text labels.
   /// \param filePath The path to the YAML file to load and visualize.
-  void OnNewMultilaneFile(const std::string& filePath);
+  void OnNewRoadNetwork(const std::string& filePath, const std::string& roadRulebookFilePath,
+                        const std::string& trafficLightRulesFilePath, const std::string& phaseRingFilePath);
 
   /// \brief Prints the ID of the lane if any was selected.
   /// \param[in] rayResult Ray that contains the point where the click hit.
   void OnVisualClicked(ignition::rendering::RayQueryResult rayResult);
 
-  void OnRulesForLaneRequested(QString laneId);
+  /// \brief Emits rulesVisualizerWidget's ReceiveRules signal with all the rules related
+  /// to the selected lane, phase ring and phase if any.
+  void OnRulesForLaneRequested();
 
  protected:
   /// \brief Overridden method to receive Qt paint event.
@@ -91,7 +94,7 @@ class MaliputViewerWidget : public ignition::gui::Plugin {
   RenderMaliputWidget* renderWidget{nullptr};
 
   /// \brief Rules visualizer widget.
-  RulesVisualizerWidget* rulesVisualizerWiget{nullptr};
+  RulesVisualizerWidget* rulesVisualizerWidget{nullptr};
 
   /// \brief Model that holds the meshes and the visualization status.
   std::unique_ptr<MaliputViewerModel> model{};

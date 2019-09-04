@@ -7,6 +7,7 @@
 
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QLabel>
+#include <QtWidgets/QLineEdit>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QWidget>
 
@@ -91,11 +92,22 @@ class MaliputFileSelectionWidget : public QWidget {
   /// Sets @p fileName into the label to display the loaded file.
   void SetFileNameLabel(const std::string& fileName);
 
+  /// \brief Clear rules line edits.
+  /// \param[in] keepOldTextsAsPlaceholders Use the last file opened as a placeholder to remember the user which file
+  /// he used.
+  void ClearLineEdits(bool keepOldTextsAsPlaceholders = true);
+
  public slots:
   void onLoadButtonPressed();
 
  signals:
-  void maliputFileChanged(const std::string& filePath);
+  void maliputFileChanged(const std::string& filePath, const std::string& roadRulebookFilePath,
+                          const std::string& trafficLightRulesFilePath, const std::string& phaseRingFilePath);
+
+ private slots:
+  void onRoadRulebookButtonPressed();
+  void onTrafficLightrulesButtonPressed();
+  void onPhaseRingButtonPressed();
 
  private:
   /// \brief Builds the GUI with a button to load a file dialog and a label to
@@ -104,6 +116,12 @@ class MaliputFileSelectionWidget : public QWidget {
 
   QPushButton* loadButton{nullptr};
   QLabel* fileNameLabel{nullptr};
+  QPushButton* roadRulebookButton{nullptr};
+  QPushButton* trafficLightRulesButton{nullptr};
+  QPushButton* phaseRingButton{nullptr};
+  QLineEdit* roadRulebookLineEdit{nullptr};
+  QLineEdit* trafficLightRulesLineEdit{nullptr};
+  QLineEdit* phaseRingLineEdit{nullptr};
   std::string fileDialogOpenPath{};
 };
 

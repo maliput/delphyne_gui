@@ -175,7 +175,9 @@ class MaliputViewerModel {
   /// Gets the file path from GlobalAttributes and loads the RoadGeometry into
   /// memory. Then, converts it into a map of meshes, loading each mesh material
   /// information. Meshes that are not available, are set to kDisabled.
-  bool Load(const std::string& _maliputFilePath);
+  bool Load(const std::string& _maliputFilePath, const std::string& _roadRulebookFilePath = std::string(),
+            const std::string& _trafficLightBook = std::string(),
+            const std::string& _phaseRingFilePath = std::string());
 
   /// \brief Getter of the map of meshes.
   /// \return The map of meshes.
@@ -230,7 +232,11 @@ class MaliputViewerModel {
   /// \return rules separated by brackets.
   /// Ex: [Right of way Rule]\n.
   template <typename StringType>
-  StringType GetRulesOfLane(const std::string& _laneId) const;
+  StringType GetRulesOfLane(const std::string& _phaseRingId, const std::string& _phaseId,
+                            const std::string& _laneId) const;
+
+  template <typename StringType>
+  std::unordered_map<std::string, std::vector<StringType>> GetPhaseRings() const;
 
  private:
   /// \brief Loads a maliput RoadGeometry of multilane from
@@ -240,7 +246,8 @@ class MaliputViewerModel {
   /// If the key doesn't exist in the file, it's not valid.
   /// Otherwise the correct loader will be called to parse the file.
   /// \param _maliputFilePath The YAML file path to parse.
-  void LoadRoadGeometry(const std::string& _maliputFilePath);
+  void LoadRoadGeometry(const std::string& _maliputFilePath, const std::string& _roadRulebookFilePath,
+                        const std::string& _trafficLightBookFilePath, const std::string& _phaseRingFilePath);
 
   /// \brief Converts @p _geoMeshes into a
   ///        std::map<std::string, std::unique_ptr<ignition::common::Mesh>>
@@ -280,6 +287,10 @@ class MaliputViewerModel {
   /// \return Direction usage rules as a StringType representation.
   template <typename StringType>
   StringType GetDirectionUsageRules(const maliput::api::LaneId& _laneId) const;
+
+  template <typename StringType>
+  StringType GetPhaseRightOfWayRules(const maliput::api::rules::PhaseRing::Id& _phaseRingId,
+                                     const maliput::api::rules::Phase::Id& _phaseId) const;
 
   // To support both malidrive and multilane files, we have both. roadNetwork
   // has a pointer to a RoadGeometry.
@@ -327,7 +338,31 @@ ContainerType MaliputViewerModel::GetAllLaneIds() const {
 }
 
 template <typename StringType>
-StringType MaliputViewerModel::GetRulesOfLane(const std::string& _laneId) const {
+std::unordered_map<std::string, std::vector<StringType>> MaliputViewerModel::GetPhaseRings() const {
+  if (this->roadNetwork == nullptr) {
+    return std::unordered_map<std::string, std::vector<StringType>>();
+  }
+  std::unordered_map<std::string, std::vector<StringType>> phase_rings;
+  const maliput::api::rules::PhaseRingBook* phase_ring_book = this->roadNetwork->phase_ring_book();
+  std::vector<maliput::api::rules::PhaseRing::Id> phase_ring_ids = phase_ring_book->GetPhaseRings();
+  phase_rings.reserve(phase_ring_ids.size());
+  for (const auto& phase_ring_id : phase_ring_ids) {
+    drake::optional<maliput::api::rules::PhaseRing> phase_ring = phase_ring_book->GetPhaseRing(phase_ring_id);
+    DELPHYNE_DEMAND(phase_ring.has_value());
+    const std::unordered_map<maliput::api::rules::Phase::Id, maliput::api::rules::Phase>& phases =
+        phase_ring.value().phases();
+    std::vector<StringType> phase_ids;
+    phase_ids.reserve(phases.size());
+    std::transform(phases.begin(), phases.end(), std::back_inserter(phase_ids),
+                   [](const auto& key_value) { return StringType(key_value.first.string().c_str()); });
+    phase_rings[phase_ring_id.string()] = std::move(phase_ids);
+  }
+  return phase_rings;
+}
+
+template <typename StringType>
+StringType MaliputViewerModel::GetRulesOfLane(const std::string& _phaseRingId, const std::string& _phaseId,
+                                              const std::string& _laneId) const {
   if (this->roadNetwork == nullptr) {
     return StringType("There are no rules for this road");
   }
@@ -337,6 +372,14 @@ StringType MaliputViewerModel::GetRulesOfLane(const std::string& _laneId) const 
   StringType rules = "[Right of way rules]\n" + GetRightOfWayRules<StringType>(laneSRange) + "\n" +
                      "[Max speed limit rules]\n" + GetMaxSpeedLimitRules<StringType>(id) + "\n" +
                      "[Direction usage rules]\n" + GetDirectionUsageRules<StringType>(id) + "\n";
+
+  if (!_phaseRingId.empty() && !_phaseId.empty()) {
+    rules += "[Right of way rules by phase ring id and phase id]\n" +
+             GetPhaseRightOfWayRules<StringType>(maliput::api::rules::PhaseRing::Id(_phaseRingId),
+                                                 maliput::api::rules::Phase::Id(_phaseId)) +
+             "\n";
+  }
+
   return rules;
 }
 
@@ -362,6 +405,15 @@ StringType MaliputViewerModel::GetDirectionUsageRules(const maliput::api::LaneId
   RoadNetworkQuery query(&directionUsageRules, roadNetwork.get());
   query.GetDirectionUsage(_laneId);
   return StringType(directionUsageRules.str().c_str());
+}
+
+template <typename StringType>
+StringType MaliputViewerModel::GetPhaseRightOfWayRules(const maliput::api::rules::PhaseRing::Id& _phaseRingId,
+                                                       const maliput::api::rules::Phase::Id& _phaseId) const {
+  std::ostringstream rightOfWayRulesPhaseRing;
+  RoadNetworkQuery query(&rightOfWayRulesPhaseRing, roadNetwork.get());
+  query.GetPhaseRightOfWay(_phaseRingId, _phaseId);
+  return StringType(rightOfWayRulesPhaseRing.str().c_str());
 }
 
 }  // namespace gui

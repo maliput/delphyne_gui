@@ -9,6 +9,8 @@
 #include <delphyne/roads/road_builder.h>
 #include <ignition/common/Console.hh>
 #include <ignition/rendering/RayQuery.hh>
+#include <malidrive/road_geometry_configuration.h>
+#include <malidrive/road_network_configuration.h>
 #include <maliput-utilities/generate_obj.h>
 #include <maliput-utilities/mesh.h>
 #include <maliput/api/lane_data.h>
@@ -301,11 +303,12 @@ maliput::api::rules::RoadRulebook::QueryResults RoadNetworkQuery::FindRulesFor(c
 }
 
 /////////////////////////////////////////////////
-bool MaliputViewerModel::Load(const std::string& _maliputFilePath) {
+bool MaliputViewerModel::Load(const std::string& _maliputFilePath, const std::string& _roadRulebookFilePath,
+                              const std::string& _trafficLightBookFilePath, const std::string& _phaseRingFilePath) {
   this->Clear();
 
   ignmsg << "About to load [" << _maliputFilePath << "] maliput file." << std::endl;
-  LoadRoadGeometry(_maliputFilePath);
+  LoadRoadGeometry(_maliputFilePath, _roadRulebookFilePath, _trafficLightBookFilePath, _phaseRingFilePath);
   const maliput::api::RoadGeometry* rg = roadGeometry == nullptr ? roadNetwork->road_geometry() : roadGeometry.get();
   ignmsg << "Loaded [" << _maliputFilePath << "] maliput file." << std::endl;
   ignmsg << "Loading RoadGeometry meshes of " << rg->id().string() << std::endl;
@@ -338,7 +341,9 @@ const std::map<std::string, std::unique_ptr<MaliputMesh>>& MaliputViewerModel::M
 const std::map<MaliputLabelType, std::vector<MaliputLabel>>& MaliputViewerModel::Labels() const { return this->labels; }
 
 /////////////////////////////////////////////////
-void MaliputViewerModel::LoadRoadGeometry(const std::string& _maliputFilePath) {
+void MaliputViewerModel::LoadRoadGeometry(const std::string& _maliputFilePath, const std::string& _roadRulebookFilePath,
+                                          const std::string& _trafficLightBookFilePath,
+                                          const std::string& _phaseRingFilePath) {
   std::ifstream fileStream(_maliputFilePath);
   if (!fileStream.is_open()) {
     throw std::runtime_error(_maliputFilePath + " doesn't exist or can't be opened.");
@@ -348,7 +353,8 @@ void MaliputViewerModel::LoadRoadGeometry(const std::string& _maliputFilePath) {
     std::getline(fileStream, line);
     if (line.find("<OpenDRIVE>") != std::string::npos) {
       this->roadNetwork = delphyne::roads::CreateMalidriveFromFile(
-          _maliputFilePath.substr(_maliputFilePath.find_last_of("/") + 1), _maliputFilePath);
+          _maliputFilePath.substr(_maliputFilePath.find_last_of("/") + 1), _maliputFilePath, _roadRulebookFilePath,
+          _trafficLightBookFilePath, _phaseRingFilePath);
       return;
     } else if (line.find("maliput_multilane_builder:") != std::string::npos) {
       this->roadGeometry = maliput::multilane::LoadFile(maliput::multilane::BuilderFactory(), _maliputFilePath);

@@ -64,7 +64,6 @@ def curved_lanes(args):
                     R0 - R * math.cos(theta),  # m
                     theta  # rads
                 ),
-                direction_of_travel=False,
                 speed=1.,  # m/s
             )
         )
@@ -110,7 +109,6 @@ def straight_lanes(args):
                     4. * (i % 3),  # m
                     0.  # rads
                 ),
-                direction_of_travel=False,
                 speed=1.,  # m/s
             )
         )
@@ -158,7 +156,6 @@ def dragway(args):
                     -5.5 + 3.7 * (i % 4),  # m
                      0.  # rads
                 ),
-                direction_of_travel=False,
                 speed=1.,  # m/s
             )
         )

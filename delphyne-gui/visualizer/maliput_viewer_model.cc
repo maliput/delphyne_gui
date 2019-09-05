@@ -14,6 +14,7 @@
 #include <maliput-utilities/generate_obj.h>
 #include <maliput-utilities/mesh.h>
 #include <maliput/api/lane_data.h>
+#include <maliput/api/rules/traffic_light_book.h>
 #include <multilane/loader.h>
 
 #include "maliput_mesh_converter.hh"
@@ -507,6 +508,16 @@ const maliput::api::Lane* MaliputViewerModel::GetLaneFromId(const std::string& _
       this->roadGeometry ? this->roadGeometry.get() : this->roadNetwork->road_geometry();
   DELPHYNE_DEMAND(rg != nullptr);
   return rg->ById().GetLane(maliput::api::LaneId(_id));
+}
+
+std::vector<maliput::api::rules::TrafficLight> MaliputViewerModel::GetTrafficLights() const {
+  if (this->roadNetwork) {
+    const maliput::api::rules::TrafficLightBook* traffic_light_book = this->roadNetwork->traffic_light_book();
+    if (traffic_light_book) {
+      return traffic_light_book->TrafficLights();
+    }
+  }
+  return std::vector<maliput::api::rules::TrafficLight>();
 }
 
 ///////////////////////////////////////////////////////

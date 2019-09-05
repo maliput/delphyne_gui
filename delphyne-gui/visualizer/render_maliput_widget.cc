@@ -51,7 +51,9 @@ RenderMaliputWidget::RenderMaliputWidget(QWidget* parent) : engine(nullptr) {
   // time at a fixed frequency.  Note that we do not start this timer until the
   // first time that showEvent() is called.
   this->updateTimer = new QTimer(this);
+  this->blinkTimer = new QTimer(this);
   QObject::connect(this->updateTimer, SIGNAL(timeout()), this, SLOT(update()));
+  QObject::connect(this->blinkTimer, SIGNAL(timeout()), this, SLOT(BlinkTrafficLights()));
 }
 
 /////////////////////////////////////////////////
@@ -433,6 +435,12 @@ void RenderMaliputWidget::RenderArrow() {
   }
 }
 
+void RenderMaliputWidget::RenderTrafficLights(const std::vector<maliput::api::rules::TrafficLight>& _traffic_lights) {
+  ignerr << "Amount of traffic lights " << _traffic_lights.size() << "\n";
+  this->traffic_light_manager->CreateTrafficLights(this->scene, _traffic_lights);
+  this->blinkTimer->start(this->kBlinkingTimer);
+}
+
 void RenderMaliputWidget::PutArrowAt(double _distance, const ignition::math::Vector3d& _worldPosition) {
   DELPHYNE_DEMAND(this->arrow != nullptr);
   this->arrow->SelectAt(_distance, _worldPosition);
@@ -466,6 +474,8 @@ void RenderMaliputWidget::Clear() {
   if (this->arrow) {
     SetArrowVisibility(false);
   }
+  this->blinkTimer->stop();
+  this->traffic_light_manager->Clear(this->scene);
   meshes.clear();
 }
 
@@ -478,6 +488,7 @@ void RenderMaliputWidget::showEvent(QShowEvent* _e) {
 
   if (!this->renderWindow) {
     this->CreateRenderWindow();
+    this->traffic_light_manager = std::make_unique<TrafficLightManager>(this->scene);
     this->updateTimer->start(this->kUpdateTimeFrequency);
   }
 
@@ -595,4 +606,10 @@ void RenderMaliputWidget::UpdateViewport() {
   if (this->renderWindow && this->camera) {
     this->camera->Update();
   }
+}
+
+void RenderMaliputWidget::BlinkTrafficLights() {
+  static bool blink = false;
+  this->traffic_light_manager->BlinkBulbs(blink);
+  blink = !blink;
 }

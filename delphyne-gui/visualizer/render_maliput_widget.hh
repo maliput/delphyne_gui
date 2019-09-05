@@ -13,6 +13,7 @@
 #include <ignition/rendering/RenderingIface.hh>
 #include <maliput-utilities/generate_obj.h>
 #include <maliput-utilities/mesh.h>
+#include <maliput/api/rules/traffic_lights.h>
 
 #include <QtWidgets/QWidget>
 
@@ -20,6 +21,7 @@
 #include "maliput_viewer_model.hh"
 #include "orbit_view_control.hh"
 #include "outliner.hh"
+#include "traffic_light_manager.hh"
 
 namespace delphyne {
 namespace gui {
@@ -75,6 +77,8 @@ class RenderMaliputWidget : public QWidget {
 
   /// \brief Create and render an arrow that will be positioned slightly above the selected road.
   void RenderArrow();
+
+  void RenderTrafficLights(const std::vector<maliput::api::rules::TrafficLight>& _traffic_lights);
 
   /// \brief Move the arrow based on the distance travelled by the camera's ray distance.
   /// \param[in] _distance Distance travelled from the camera's world position to the clicked object.
@@ -141,6 +145,8 @@ class RenderMaliputWidget : public QWidget {
  protected slots:
   void ShowContextMenu(const QPoint& _pos);
 
+  void BlinkTrafficLights();
+
  private:
   /// \brief Internal method to create the render window the first time
   /// RenderWidget::showEvent is called.
@@ -197,6 +203,7 @@ class RenderMaliputWidget : public QWidget {
 
   /// \brief Pointer to timer to call update on a periodic basis.
   QTimer* updateTimer = nullptr;
+  QTimer* blinkTimer = nullptr;
 
   /// \brief Pointer to the renderWindow created by this class.
   ignition::rendering::RenderWindowPtr renderWindow;
@@ -215,6 +222,8 @@ class RenderMaliputWidget : public QWidget {
 
   /// \brief Outliner used for outlining clicked lanes in the visualizer.
   std::unique_ptr<Outliner> outliner;
+
+  std::unique_ptr<TrafficLightManager> traffic_light_manager;
 
   /// \brief A pointer to the rendering engine
   ignition::rendering::RenderEngine* engine;
@@ -241,6 +250,8 @@ class RenderMaliputWidget : public QWidget {
   static constexpr double kOutlinerMinTolerance = 0.6;
   /// \brief Max amount of cubes used for the outliner.
   static constexpr int kOutlinerPoolSize = 1500;
+  /// \brief Every how much time should the lights blink in miliseconds.
+  static constexpr int kBlinkingTimer = 500;
 };
 
 }  // namespace gui

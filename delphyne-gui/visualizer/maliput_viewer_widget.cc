@@ -76,6 +76,7 @@ void MaliputViewerWidget::OnNewRoadNetwork(const std::string& filePath, const st
     this->rulesVisualizerWidget->AddLaneId(lane_id);
   }
 
+  this->renderWidget->RenderTrafficLights(this->model->GetTrafficLights());
   this->renderWidget->RenderArrow();
   this->renderWidget->RenderRoadMeshes(this->model->Meshes());
   this->renderWidget->RenderLabels(this->model->Labels());

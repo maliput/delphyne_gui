@@ -16,6 +16,7 @@
 #include <maliput/api/lane.h>
 #include <maliput/api/road_geometry.h>
 #include <maliput/api/road_network.h>
+#include <maliput/api/rules/traffic_lights.h>
 
 #include <maliput-utilities/generate_obj.h>
 #include <maliput-utilities/mesh.h>
@@ -206,6 +207,8 @@ class MaliputViewerModel {
   /// \param[in] _id Id of the lane.
   /// \return Lane associated with given id or nullptr if id is invalid.
   const maliput::api::Lane* GetLaneFromId(const std::string& _id);
+
+  std::vector<maliput::api::rules::TrafficLight> GetTrafficLights() const;
 
   /// \brief Get N lanes from the underlying road geometry.
   /// \param[in] _n Amount of lanes desired to get from the underlying

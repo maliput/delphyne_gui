@@ -12,8 +12,8 @@ Load a simulation with one of a few sample maliput road networks.
 import os
 import sys
 
-import delphyne.roads as delphyne_roads
-import delphyne.simulation as simulation
+import delphyne.trees
+import delphyne.behaviours
 
 from delphyne_gui.utilities import launch_interactive_simulation
 
@@ -93,7 +93,6 @@ $ {0} malidrive
 
     return parser.parse_args()
 
-
 ##############################################################################
 # Main
 ##############################################################################
@@ -102,64 +101,54 @@ def main():
     """Keeping pylint entertained."""
     args = parse_arguments()
 
-    builder = simulation.AgentSimulationBuilder()
-
     if args.road_type == "dragway":
-        builder.set_road_geometry(
-            delphyne_roads.create_dragway(
-                name="Demo Dragway",
-                num_lanes=args.lanes,
-                length=args.length,
-                lane_width=args.lane_width,
-                shoulder_width=args.shoulder_width,
-                maximum_height=args.max_height
-            )
-        )
+        scenario_subtree = delphyne.behaviours.roads.Dragway(
+            name="Demo Dragway",
+            num_lanes=args.lanes,
+            length=args.length,
+            lane_width=args.lane_width,
+            shoulder_width=args.shoulder_width,
+            maximum_height=args.max_height)
     elif args.road_type == "onramp":
-        builder.set_road_geometry(delphyne_roads.create_on_ramp())
+        scenario_subtree = delphyne.behaviours.roads.OnRamp()
     elif args.road_type == "multilane":
-        try:
-            builder.set_road_geometry(
-                delphyne_roads.create_multilane_from_file(
-                    file_path=args.filename
-                )
-            )
-        except RuntimeError as error:
-            print("There was an error trying to load the road network:")
-            print(str(error))
-            print("Exiting the simulation")
-            sys.exit()
+        scenario_subtree = delphyne.behaviours.roads.Multilane(
+            file_path=args.filename)
     elif args.road_type == "malidrive":
-        try:
-            builder.set_road_network(
-                delphyne_roads.create_malidrive_from_file(
-                    name=args.name,
-                    file_path=args.filename
-                )
-            )
-        except RuntimeError as error:
-            print("There was an error trying to load the road network:")
-            print(str(error))
-            print("Exiting the simulation")
-            sys.exit()
+        scenario_subtree = delphyne.behaviours.roads.Malidrive(
+            file_path=args.filename,
+            name=args.name)
     else:
-        raise RuntimeError("Option {} not recognized".format(args.road_type))
+        print("Option {} not recognized".format(args.road_type))
+        sys.exit()
 
-    runner = simulation.SimulationRunner(
-        simulation=builder.build(),
-        time_step=0.001,  # (secs)
-        realtime_rate=args.realtime_rate,
-        paused=args.paused,
-        log=args.log,
-        logfile_name=args.logfile_name
-    )
+    simulation_tree = delphyne.trees.BehaviourTree(
+        root=scenario_subtree)
 
-    with launch_interactive_simulation(runner, bare=args.bare) as launcher:
+    try:
+        simulation_tree.setup(
+            realtime_rate=args.realtime_rate,
+            start_paused=args.paused,
+            logfile_name=args.logfile_name
+        )
+    except RuntimeError as error:
+        print("An error ocurred while trying to run the simulation with : {}".format(args.filename))
+        print(str(error))
+        print("Exiting the simulation")
+        sys.exit()
+
+    time_step = 0.01
+
+    with launch_interactive_simulation(
+            simulation_tree.runner, bare=args.bare) as launcher:
         if args.duration < 0:
             # run indefinitely
-            runner.start()
+            print("Running simulation indefinitely.")
+            simulation_tree.tick_tock(period=time_step)
         else:
             # run for a finite time
             print("Running simulation for {0} seconds.".format(
                 args.duration))
-            runner.run_async_for(args.duration, launcher.terminate)
+            simulation_tree.tick_tock(period=time_step,
+                number_of_iterations=args.duration/time_step)
+        launcher.terminate()

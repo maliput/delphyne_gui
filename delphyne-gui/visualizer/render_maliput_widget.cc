@@ -439,8 +439,9 @@ void RenderMaliputWidget::PutArrowAt(double _distance, const ignition::math::Vec
 }
 
 void RenderMaliputWidget::SetArrowVisibility(bool _visible) {
-  DELPHYNE_DEMAND(arrow != nullptr);
-  arrow->SetVisibility(_visible);
+  if (this->arrow) {
+    this->arrow->SetVisibility(_visible);
+  }
 }
 
 /////////////////////////////////////////////////

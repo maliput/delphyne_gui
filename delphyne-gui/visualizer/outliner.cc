@@ -100,7 +100,7 @@ void Outliner::CreateCubes(ignition::rendering::ScenePtr& _scene, double _scaleX
   for (size_t i = 0; i < cubes.size(); ++i) {
     ignition::rendering::VisualPtr cube = _scene->CreateVisual();
     cube->AddGeometry(_scene->CreateBox());
-    cube->SetMaterial(_material);
+    cube->SetMaterial(_material, false);
     cube->SetVisible(false);
     cube->SetWorldScale(_scaleX, _scaleY, _scaleZ);
     cube->SetWorldPosition(0., 0., 0.);

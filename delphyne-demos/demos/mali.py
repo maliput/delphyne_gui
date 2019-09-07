@@ -185,22 +185,28 @@ def main():
         root=create_mali_scenario_subtree(road['file_path'], features,
             road['lane_position'], road['moving_forward'], lane_id))
 
+    sim_runner_time_step=0.015
     simulation_tree.setup(
         realtime_rate=args.realtime_rate,
         start_paused=args.paused,
-        logfile_name=args.logfile_name
+        logfile_name=args.logfile_name,
+        time_step=sim_runner_time_step
     )
-    time_step = 0.01
 
-    with launch_interactive_simulation(simulation_tree.runner, bare=args.bare) as launcher:
+    tree_time_step = 0.001
+    with launch_interactive_simulation(
+        simulation_tree.runner, bare=args.bare
+    ) as launcher:
         if args.duration < 0:
             # run indefinitely
             print("Running simulation indefinitely.")
-            simulation_tree.tick_tock(period=time_step)
+            simulation_tree.tick_tock(period=tree_time_step)
         else:
             # run for a finite time
-            print("Running simulation for {0} seconds.".format(
-                args.duration))
-            simulation_tree.tick_tock(period=time_step,
-                number_of_iterations=args.duration/time_step)
+            print("Running simulation for {0} seconds.".format(args.duration))i
+            tree_time_step = min(tree_time_step, args.duration)
+            time_step = max(tree_time_step, sim_runner_time_step)
+            simulation_tree.tick_tock(
+                period=tree_time_step, number_of_iterations=args.duration/time_step
+            )
         launcher.terminate()

@@ -205,7 +205,7 @@ def main():
             simulation_tree.tick_tock(period=tree_time_step)
         else:
             # run for a finite time
-            print("Running simulation for {0} seconds.".format(args.duration))i
+            print("Running simulation for {0} seconds.".format(args.duration))
             tree_time_step = min(tree_time_step, args.duration)
             time_step = max(tree_time_step, sim_runner_time_step)
             simulation_tree.tick_tock(

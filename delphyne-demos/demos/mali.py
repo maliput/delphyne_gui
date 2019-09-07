@@ -123,21 +123,23 @@ def get_malidrive_resource(path):
 
 
 def create_mali_scenario_subtree(file_path, features,
-        lane_position, direction_of_travel, lane_id):
+                                 lane_position, direction_of_travel,
+                                 lane_id):
     scenario_subtree = delphyne.behaviours.roads.Malidrive(
-            file_path=file_path,
-            features=features,
-            name=os.path.splitext(os.path.basename(file_path))[0])
+        file_path=file_path,
+        features=features,
+        name=os.path.splitext(os.path.basename(file_path))[0]
+    )
     scenario_subtree.add_child(
         delphyne.behaviours.agents.RailCar(
-                name='car',
-                lane_id=lane_id,
-                longitudinal_position=lane_position,
-                lateral_offset=0.0,
-                speed=15.0,
-                direction_of_travel=direction_of_travel
-            )
+            name='car',
+            lane_id=lane_id,
+            longitudinal_position=lane_position,
+            lateral_offset=0.0,
+            speed=15.0,
+            direction_of_travel=direction_of_travel
         )
+    )
     return scenario_subtree
 
 ##############################################################################
@@ -185,7 +187,7 @@ def main():
         root=create_mali_scenario_subtree(road['file_path'], features,
             road['lane_position'], road['moving_forward'], lane_id))
 
-    sim_runner_time_step=0.015
+    sim_runner_time_step = 0.015
     simulation_tree.setup(
         realtime_rate=args.realtime_rate,
         start_paused=args.paused,
@@ -207,6 +209,6 @@ def main():
             tree_time_step = min(tree_time_step, args.duration)
             time_step = max(tree_time_step, sim_runner_time_step)
             simulation_tree.tick_tock(
-                period=tree_time_step, number_of_iterations=args.duration/time_step
+                period=tree_time_step, number_of_iterations=args.duration / time_step
             )
         launcher.terminate()

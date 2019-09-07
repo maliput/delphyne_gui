@@ -195,7 +195,7 @@ def main():
         time_step=sim_runner_time_step
     )
 
-    tree_time_step = 0.001
+    tree_time_step = 0.03
     with launch_interactive_simulation(
         simulation_tree.runner, bare=args.bare
     ) as launcher:

@@ -436,7 +436,6 @@ void RenderMaliputWidget::RenderArrow() {
 }
 
 void RenderMaliputWidget::RenderTrafficLights(const std::vector<maliput::api::rules::TrafficLight>& _traffic_lights) {
-  ignerr << "Amount of traffic lights " << _traffic_lights.size() << "\n";
   this->traffic_light_manager->CreateTrafficLights(this->scene, _traffic_lights);
   this->blinkTimer->start(this->kBlinkingTimer);
 }

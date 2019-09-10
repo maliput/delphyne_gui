@@ -7,9 +7,11 @@
 #include <ignition/rendering/Scene.hh>
 #include <maliput/api/lane.h>
 #include <maliput/api/lane_data.h>
+#include <maliput/api/rules/phase.h>
 #include <maliput/api/rules/traffic_lights.h>
 
 #include <array>
+#include <mutex>
 #include <unordered_map>
 #include <vector>
 
@@ -30,8 +32,16 @@ class TrafficLightManager final {
 
   void BlinkBulbs(bool on);
 
+  void ChangeBulbState(const maliput::api::rules::BulbStates& bulb_states);
+
  private:
   static constexpr size_t kAmountOfColors = static_cast<size_t>(maliput::api::rules::BulbColor::kGreen) + 1;
+  static const std::string kGreenMaterialName;
+  static const std::string kGreenBrightMaterialName;
+  static const std::string kRedMaterialName;
+  static const std::string kRedBrightMaterialName;
+  static const std::string kYellowMaterialName;
+  static const std::string kYellowBrightMaterialName;
 
   struct BulbMeshes {
     ignition::rendering::VisualPtr visual;
@@ -57,7 +67,26 @@ class TrafficLightManager final {
     return bulb_materials[static_cast<size_t>(maliput::api::rules::BulbColor::kYellow)];
   }
 
+  inline ignition::rendering::MaterialPtr& GetBrightRedMaterial() {
+    return bright_bulb_materials[static_cast<size_t>(maliput::api::rules::BulbColor::kRed)];
+  }
+  inline ignition::rendering::MaterialPtr& GetBrightGreenMaterial() {
+    return bright_bulb_materials[static_cast<size_t>(maliput::api::rules::BulbColor::kGreen)];
+  }
+  inline ignition::rendering::MaterialPtr& GetBrightYellowMaterial() {
+    return bright_bulb_materials[static_cast<size_t>(maliput::api::rules::BulbColor::kYellow)];
+  }
+
+  ignition::rendering::VisualPtr GetBulbMesh(const maliput::api::rules::UniqueBulbId& bulb_id) const;
+
+  maliput::api::rules::BulbColor GetBulbColor(const ignition::rendering::VisualPtr& bulb) const;
+
   void SetBulbMaterialColors();
+
+  void SetBulbMaterial(const maliput::api::rules::Bulb::Id& id, ignition::rendering::VisualPtr& bulb,
+                       maliput::api::rules::BulbColor color, maliput::api::rules::BulbState new_bulb_state);
+
+  void RemoveBlinkingLight(const maliput::api::rules::Bulb::Id& id);
 
   void CreateSingleTrafficLight(ignition::rendering::ScenePtr& _scene,
                                 const maliput::api::rules::TrafficLight& _traffic_light);
@@ -73,13 +102,16 @@ class TrafficLightManager final {
                                                           const maliput::api::Rotation& bulb_group_world_rotation);
 
   std::array<ignition::rendering::MaterialPtr, kAmountOfColors> bulb_materials;
+  std::array<ignition::rendering::MaterialPtr, kAmountOfColors> bright_bulb_materials;
 
   std::unordered_map<maliput::api::rules::TrafficLight::Id, TrafficLightMesh> traffic_lights;
-  std::vector<ignition::rendering::VisualPtr> blinking_bulbs;
+  std::unordered_map<maliput::api::rules::Bulb::Id, ignition::rendering::VisualPtr> blinking_bulbs;
   ignition::math::Vector3d sphere_bulb_aabb_min;
   ignition::math::Vector3d sphere_bulb_aabb_max;
   ignition::math::Vector3d unit_box_aabb_min;
   ignition::math::Vector3d unit_box_aabb_max;
+
+  std::mutex mutex;
 };
 }  // namespace gui
 }  // namespace delphyne

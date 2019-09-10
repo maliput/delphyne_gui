@@ -8,15 +8,35 @@
 #include <ignition/math/Helpers.hh>
 #include <maliput/api/lane.h>
 #include <maliput/api/lane_data.h>
+#include <maliput/api/rules/phase.h>
 #include <maliput/api/rules/traffic_lights.h>
+
+#include <mutex>
 
 namespace delphyne {
 namespace gui {
 
+const std::string TrafficLightManager::kGreenMaterialName{"GreenBulb"};
+const std::string TrafficLightManager::kGreenBrightMaterialName{"GreenBulbBright"};
+const std::string TrafficLightManager::kRedMaterialName{"RedBulb"};
+const std::string TrafficLightManager::kRedBrightMaterialName{"RedBulbBright"};
+const std::string TrafficLightManager::kYellowMaterialName{"YellowBulb"};
+const std::string TrafficLightManager::kYellowBrightMaterialName{"YellowBulbBright"};
+
 TrafficLightManager::TrafficLightManager(ignition::rendering::ScenePtr& _scene) {
-  for (unsigned int bulb_index = 0; bulb_index < kAmountOfColors; ++bulb_index) {
-    bulb_materials[bulb_index] = _scene->CreateMaterial();
-  }
+  bulb_materials[static_cast<size_t>(maliput::api::rules::BulbColor::kRed)] = _scene->CreateMaterial(kRedMaterialName);
+  bulb_materials[static_cast<size_t>(maliput::api::rules::BulbColor::kYellow)] =
+      _scene->CreateMaterial(kYellowMaterialName);
+  bulb_materials[static_cast<size_t>(maliput::api::rules::BulbColor::kGreen)] =
+      _scene->CreateMaterial(kGreenMaterialName);
+
+  bright_bulb_materials[static_cast<size_t>(maliput::api::rules::BulbColor::kRed)] =
+      _scene->CreateMaterial(kRedBrightMaterialName);
+  bright_bulb_materials[static_cast<size_t>(maliput::api::rules::BulbColor::kYellow)] =
+      _scene->CreateMaterial(kYellowBrightMaterialName);
+  bright_bulb_materials[static_cast<size_t>(maliput::api::rules::BulbColor::kGreen)] =
+      _scene->CreateMaterial(kGreenBrightMaterialName);
+
   SetBulbMaterialColors();
   ignition::common::MeshManager* meshManager = ignition::common::MeshManager::Instance();
   DELPHYNE_DEMAND(meshManager);
@@ -52,18 +72,57 @@ void TrafficLightManager::Clear(ignition::rendering::ScenePtr& _scene) {
 }
 
 void TrafficLightManager::BlinkBulbs(bool on) {
-  static constexpr double kBlinkingAlpha = 0.5;
-  static constexpr double kOnAlpha = 1.0;
-  const double alpha = on ? kOnAlpha : kBlinkingAlpha;
-  for (ignition::rendering::VisualPtr& bulb : blinking_bulbs) {
-    ignition::rendering::MaterialPtr mat = bulb->Material();
-    ignition::math::Color ambient = mat->Ambient();
-    ambient.A() = alpha;
-    mat->SetAmbient(ambient);
-    // TODO: Figure out why we need to set (and clone) the same material again for ignition rendering to pick up
-    // new shader's attributes.
-    bulb->SetMaterial(mat);
+  if (!mutex.try_lock()) {
+    return;
   }
+  for (const auto& bulb : blinking_bulbs) {
+    const maliput::api::rules::BulbColor bulb_color = GetBulbColor(bulb.second);
+    const size_t color_index = static_cast<size_t>(bulb_color);
+    if (on) {
+      bulb.second->SetMaterial(bright_bulb_materials[color_index], false);
+    } else {
+      bulb.second->SetMaterial(bulb_materials[color_index], false);
+    }
+  }
+  mutex.unlock();
+}
+
+void TrafficLightManager::ChangeBulbState(const maliput::api::rules::BulbStates& bulb_states) {
+  std::lock_guard<std::mutex> lock(mutex);
+  for (const auto& state : bulb_states) {
+    ignition::rendering::VisualPtr bulb_mesh = GetBulbMesh(state.first);
+    if (bulb_mesh) {
+      SetBulbMaterial(state.first.bulb_id, bulb_mesh, GetBulbColor(bulb_mesh), state.second);
+    }
+  }
+}
+
+ignition::rendering::VisualPtr TrafficLightManager::GetBulbMesh(
+    const maliput::api::rules::UniqueBulbId& bulb_id) const {
+  auto traffic_light = traffic_lights.find(bulb_id.traffic_light_id);
+  if (traffic_light != traffic_lights.end()) {
+    auto bulb_group = traffic_light->second.bulb_groups.find(bulb_id.bulb_group_id);
+    if (bulb_group != traffic_light->second.bulb_groups.end()) {
+      auto bulb = bulb_group->second.bulbs.find(bulb_id.bulb_id);
+      if (bulb != bulb_group->second.bulbs.end()) {
+        return bulb->second;
+      }
+    }
+  }
+  return ignition::rendering::VisualPtr();
+}
+
+maliput::api::rules::BulbColor TrafficLightManager::GetBulbColor(const ignition::rendering::VisualPtr& bulb) const {
+  maliput::api::rules::BulbColor color;
+  const std::string& material_name = bulb->Material()->Name();
+  if (material_name.find(kGreenMaterialName) != std::string::npos) {
+    color = maliput::api::rules::BulbColor::kGreen;
+  } else if (material_name.find(kYellowMaterialName) != std::string::npos) {
+    color = maliput::api::rules::BulbColor::kYellow;
+  } else {
+    color = maliput::api::rules::BulbColor::kRed;
+  }
+  return color;
 }
 
 void TrafficLightManager::SetBulbMaterialColors() {
@@ -71,14 +130,51 @@ void TrafficLightManager::SetBulbMaterialColors() {
   ignition::rendering::MaterialPtr& green_material = GetGreenMaterial();
   ignition::rendering::MaterialPtr& yellow_material = GetYellowMaterial();
 
-  red_material->SetDiffuse(255.0, 0.0, 0.0, 1.0);
-  red_material->SetAmbient(255.0, 0.0, 0.0, 1.0);
+  ignition::rendering::MaterialPtr& red_bright_material = GetBrightRedMaterial();
+  ignition::rendering::MaterialPtr& green_bright_material = GetBrightGreenMaterial();
+  ignition::rendering::MaterialPtr& yellow_bright_material = GetBrightYellowMaterial();
 
-  green_material->SetDiffuse(0.0, 255.0, 0.0, 1.0);
-  green_material->SetAmbient(0.0, 255.0, 0.0, 1.0);
+  red_material->SetDiffuse(60.0, 0.0, 0.0, 1.0);
+  red_material->SetAmbient(60.0, 0.0, 0.0, 1.0);
+  red_bright_material->SetDiffuse(255.0, 0.0, 0.0, 1.0);
+  red_bright_material->SetAmbient(255.0, 0.0, 0.0, 1.0);
 
-  yellow_material->SetDiffuse(255.0, 255.0, 0.0, 1.0);
-  yellow_material->SetAmbient(255.0, 255.0, 0.0, 1.0);
+  green_material->SetDiffuse(0.0, 60.0, 0.0, 1.0);
+  green_material->SetAmbient(0.0, 60.0, 0.0, 1.0);
+  green_bright_material->SetDiffuse(0.0, 255.0, 0.0, 1.0);
+  green_bright_material->SetAmbient(0.0, 255.0, 0.0, 1.0);
+
+  yellow_material->SetDiffuse(60.0, 60.0, 0.0, 1.0);
+  yellow_material->SetAmbient(60.0, 60.0, 0.0, 1.0);
+  yellow_bright_material->SetDiffuse(255.0, 255.0, 0.0, 1.0);
+  yellow_bright_material->SetAmbient(255.0, 255.0, 0.0, 1.0);
+}
+
+void TrafficLightManager::SetBulbMaterial(const maliput::api::rules::Bulb::Id& id, ignition::rendering::VisualPtr& bulb,
+                                          maliput::api::rules::BulbColor color,
+                                          maliput::api::rules::BulbState new_bulb_state) {
+  const size_t color_index = static_cast<size_t>(color);
+  switch (new_bulb_state) {
+    case maliput::api::rules::BulbState::kOff:
+      bulb->SetMaterial(bulb_materials[color_index], false);
+      RemoveBlinkingLight(id);
+      break;
+    case maliput::api::rules::BulbState::kOn:
+      bulb->SetMaterial(bright_bulb_materials[color_index], false);
+      RemoveBlinkingLight(id);
+      break;
+    case maliput::api::rules::BulbState::kBlinking:
+      blinking_bulbs[id] = bulb;
+      break;
+    default:
+      break;
+  }
+}
+
+void TrafficLightManager::RemoveBlinkingLight(const maliput::api::rules::Bulb::Id& id) {
+  if (blinking_bulbs.find(id) != blinking_bulbs.end()) {
+    blinking_bulbs.erase(id);
+  }
 }
 
 void TrafficLightManager::CreateSingleTrafficLight(ignition::rendering::ScenePtr& _scene,
@@ -145,6 +241,7 @@ void TrafficLightManager::CreateBulbGroup(ignition::rendering::ScenePtr& _scene,
   bulb_meshes.visual->SetWorldRotation(bulb_group_world_rotation.roll(), bulb_group_world_rotation.pitch(),
                                        bulb_group_world_rotation.yaw());
   bulb_meshes.visual->SetWorldPosition(mid_point);
+  bulb_meshes.visual->SetVisible(false);
   traffic_light_mesh->bulb_groups[_bulb_group.id()] = std::move(bulb_meshes);
 }
 
@@ -180,12 +277,8 @@ maliput::api::rules::Bulb::BoundingBox TrafficLightManager::CreateSingleBulb(
       maliput::api::GeoPosition::FromXyz(bulb_group_world_position.xyz() + _single_bulb.position_bulb_group().xyz());
   visual->SetWorldRotation(bulb_rotation.roll(), bulb_rotation.pitch(), bulb_rotation.yaw());
   visual->SetWorldPosition(bulb_world_position.x(), bulb_world_position.y(), bulb_world_position.z());
-  const size_t bulb_color_index = static_cast<size_t>(_single_bulb.color());
-  visual->SetMaterial(bulb_materials[bulb_color_index]);
+  SetBulbMaterial(_single_bulb.id(), visual, _single_bulb.color(), _single_bulb.GetDefaultState());
   _scene->RootVisual()->AddChild(visual);
-  if (_single_bulb.GetDefaultState() == maliput::api::rules::BulbState::kBlinking) {
-    blinking_bulbs.push_back(visual);
-  }
   bulb_group->bulbs[_single_bulb.id()] = visual;
 
   bulb_world_bounding_box.p_BMax += bulb_world_position.xyz();

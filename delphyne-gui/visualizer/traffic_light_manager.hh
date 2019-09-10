@@ -33,7 +33,10 @@ class TrafficLightManager final {
  private:
   static constexpr size_t kAmountOfColors = static_cast<size_t>(maliput::api::rules::BulbColor::kGreen) + 1;
 
-  using BulbMeshes = std::unordered_map<maliput::api::rules::Bulb::Id, ignition::rendering::VisualPtr>;
+  struct BulbMeshes {
+    ignition::rendering::VisualPtr visual;
+    std::unordered_map<maliput::api::rules::Bulb::Id, ignition::rendering::VisualPtr> bulbs;
+  };
 
   // TODO: Instead of having ton of meshes doing a drawcall each one, we could try to merge every mesh onto one.
   // The problem is that we need to turn on the material of one particular bulb. We could have a RGB texture
@@ -48,10 +51,10 @@ class TrafficLightManager final {
     return bulb_materials[static_cast<size_t>(maliput::api::rules::BulbColor::kRed)];
   }
   inline ignition::rendering::MaterialPtr& GetGreenMaterial() {
-    return bulb_materials[static_cast<size_t>(maliput::api::rules::BulbColor::kYellow)];
+    return bulb_materials[static_cast<size_t>(maliput::api::rules::BulbColor::kGreen)];
   }
   inline ignition::rendering::MaterialPtr& GetYellowMaterial() {
-    return bulb_materials[static_cast<size_t>(maliput::api::rules::BulbColor::kGreen)];
+    return bulb_materials[static_cast<size_t>(maliput::api::rules::BulbColor::kYellow)];
   }
 
   void SetBulbMaterialColors();
@@ -64,15 +67,19 @@ class TrafficLightManager final {
                        const maliput::api::GeoPosition& traffic_light_world_position,
                        const maliput::api::Rotation& traffic_light_world_rotation);
 
-  void CreateSingleBulb(ignition::rendering::ScenePtr& _scene, BulbMeshes* bulb_group,
-                        const maliput::api::rules::Bulb& _single_bulb,
-                        const maliput::api::GeoPosition& bulb_group_world_position,
-                        const maliput::api::Rotation& bulb_group_world_rotation);
+  maliput::api::rules::Bulb::BoundingBox CreateSingleBulb(ignition::rendering::ScenePtr& _scene, BulbMeshes* bulb_group,
+                                                          const maliput::api::rules::Bulb& _single_bulb,
+                                                          const maliput::api::GeoPosition& bulb_group_world_position,
+                                                          const maliput::api::Rotation& bulb_group_world_rotation);
 
   std::array<ignition::rendering::MaterialPtr, kAmountOfColors> bulb_materials;
 
   std::unordered_map<maliput::api::rules::TrafficLight::Id, TrafficLightMesh> traffic_lights;
   std::vector<ignition::rendering::VisualPtr> blinking_bulbs;
+  ignition::math::Vector3d sphere_bulb_aabb_min;
+  ignition::math::Vector3d sphere_bulb_aabb_max;
+  ignition::math::Vector3d unit_box_aabb_min;
+  ignition::math::Vector3d unit_box_aabb_max;
 };
 }  // namespace gui
 }  // namespace delphyne

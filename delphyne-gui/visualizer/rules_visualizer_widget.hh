@@ -71,6 +71,8 @@ class RulesVisualizerWidget : public QWidget {
   /// and populates it with the rules for the requested lane id.
   void OnRulesReceived(QString lane_id, QString rules);
 
+  void OnPhaseTreeItemClicked(QTreeWidgetItem* tree_item, int column);
+
  private:
   QLabel* lanes_label{nullptr};
   QLabel* rules_label{nullptr};

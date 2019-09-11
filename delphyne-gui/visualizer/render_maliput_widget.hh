@@ -80,6 +80,8 @@ class RenderMaliputWidget : public QWidget {
 
   void RenderTrafficLights(const std::vector<maliput::api::rules::TrafficLight>& _traffic_lights);
 
+  void ChangeStateOfTrafficLights(const maliput::api::rules::BulbStates& _bulb_states);
+
   /// \brief Move the arrow based on the distance travelled by the camera's ray distance.
   /// \param[in] _distance Distance travelled from the camera's world position to the clicked object.
   /// \param[in] _worldPosition Position where the camera's ray hit.

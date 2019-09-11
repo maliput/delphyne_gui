@@ -171,13 +171,18 @@ void MaliputViewerWidget::paintEvent(QPaintEvent* _e) {
 }
 
 void MaliputViewerWidget::OnRulesForLaneRequested() {
-  const std::string lane_id = this->rulesVisualizerWidget->GetSelectedLaneId().toStdString();
-  this->renderWidget->Outline(this->model->GetLaneFromId(lane_id));
   PhaseRingPhaseIds phaseRingPhaseIds = this->rulesVisualizerWidget->GetSelectedPhaseRingAndPhaseId();
-  emit this->rulesVisualizerWidget->ReceiveRules(
-      this->rulesVisualizerWidget->GetSelectedLaneId(),
-      this->model->GetRulesOfLane<QString>(phaseRingPhaseIds.phase_ring_id.toStdString(),
-                                           phaseRingPhaseIds.phase_id.toStdString(), lane_id));
+  const std::string phase_ring_id = phaseRingPhaseIds.phase_ring_id.toStdString();
+  const std::string phase_id = phaseRingPhaseIds.phase_id.toStdString();
+  this->renderWidget->ChangeStateOfTrafficLights(this->model->GetBulbStates(phase_ring_id, phase_id));
+
+  const std::string lane_id = this->rulesVisualizerWidget->GetSelectedLaneId().toStdString();
+  if (!lane_id.empty()) {
+    this->renderWidget->Outline(this->model->GetLaneFromId(lane_id));
+    emit this->rulesVisualizerWidget->ReceiveRules(
+        this->rulesVisualizerWidget->GetSelectedLaneId(),
+        this->model->GetRulesOfLane<QString>(phase_ring_id, phase_id, lane_id));
+  }
 }
 
 /////////////////////////////////////////////////

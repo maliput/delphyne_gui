@@ -28,6 +28,7 @@
 
 #include <maliput-utilities/generate_obj.h>
 #include <maliput/api/lane.h>
+#include <maliput/api/rules/phase.h>
 
 #include <memory>
 
@@ -438,6 +439,10 @@ void RenderMaliputWidget::RenderArrow() {
 void RenderMaliputWidget::RenderTrafficLights(const std::vector<maliput::api::rules::TrafficLight>& _traffic_lights) {
   this->traffic_light_manager->CreateTrafficLights(this->scene, _traffic_lights);
   this->blinkTimer->start(this->kBlinkingTimer);
+}
+
+void RenderMaliputWidget::ChangeStateOfTrafficLights(const maliput::api::rules::BulbStates& _bulb_states) {
+  this->traffic_light_manager->ChangeBulbState(_bulb_states);
 }
 
 void RenderMaliputWidget::PutArrowAt(double _distance, const ignition::math::Vector3d& _worldPosition) {

@@ -16,6 +16,7 @@
 #include <maliput/api/lane.h>
 #include <maliput/api/road_geometry.h>
 #include <maliput/api/road_network.h>
+#include <maliput/api/rules/phase.h>
 #include <maliput/api/rules/traffic_lights.h>
 
 #include <maliput-utilities/generate_obj.h>
@@ -240,6 +241,8 @@ class MaliputViewerModel {
 
   template <typename StringType>
   std::unordered_map<std::string, std::vector<StringType>> GetPhaseRings() const;
+
+  maliput::api::rules::BulbStates GetBulbStates(const std::string& _phaseRingId, const std::string& _phaseId) const;
 
  private:
   /// \brief Loads a maliput RoadGeometry of multilane from

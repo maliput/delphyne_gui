@@ -11,7 +11,6 @@
 #include <maliput/api/rules/traffic_lights.h>
 
 #include <array>
-#include <mutex>
 #include <unordered_map>
 #include <vector>
 
@@ -83,20 +82,22 @@ class TrafficLightManager final {
 
   void SetBulbMaterialColors();
 
-  void SetBulbMaterial(const maliput::api::rules::Bulb::Id& id, ignition::rendering::VisualPtr& bulb,
+  void SetBulbMaterial(const maliput::api::rules::UniqueBulbId& unique_bulb_id, ignition::rendering::VisualPtr& bulb,
                        maliput::api::rules::BulbColor color, maliput::api::rules::BulbState new_bulb_state);
 
-  void RemoveBlinkingLight(const maliput::api::rules::Bulb::Id& id);
+  void RemoveBlinkingLight(const maliput::api::rules::UniqueBulbId& id);
 
   void CreateSingleTrafficLight(ignition::rendering::ScenePtr& _scene,
                                 const maliput::api::rules::TrafficLight& _traffic_light);
 
   void CreateBulbGroup(ignition::rendering::ScenePtr& _scene, TrafficLightMesh* traffic_light_mesh,
+                       const maliput::api::rules::TrafficLight::Id& traffic_light_id,
                        const maliput::api::rules::BulbGroup& _bulb_group,
                        const maliput::api::GeoPosition& traffic_light_world_position,
                        const maliput::api::Rotation& traffic_light_world_rotation);
 
   maliput::api::rules::Bulb::BoundingBox CreateSingleBulb(ignition::rendering::ScenePtr& _scene, BulbMeshes* bulb_group,
+                                                          const maliput::api::rules::UniqueBulbId& unique_bulb_id,
                                                           const maliput::api::rules::Bulb& _single_bulb,
                                                           const maliput::api::GeoPosition& bulb_group_world_position,
                                                           const maliput::api::Rotation& bulb_group_world_rotation);
@@ -105,13 +106,11 @@ class TrafficLightManager final {
   std::array<ignition::rendering::MaterialPtr, kAmountOfColors> bright_bulb_materials;
 
   std::unordered_map<maliput::api::rules::TrafficLight::Id, TrafficLightMesh> traffic_lights;
-  std::unordered_map<maliput::api::rules::Bulb::Id, ignition::rendering::VisualPtr> blinking_bulbs;
+  std::unordered_map<maliput::api::rules::UniqueBulbId, ignition::rendering::VisualPtr> blinking_bulbs;
   ignition::math::Vector3d sphere_bulb_aabb_min;
   ignition::math::Vector3d sphere_bulb_aabb_max;
   ignition::math::Vector3d unit_box_aabb_min;
   ignition::math::Vector3d unit_box_aabb_max;
-
-  std::mutex mutex;
 };
 }  // namespace gui
 }  // namespace delphyne

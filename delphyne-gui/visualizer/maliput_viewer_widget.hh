@@ -78,6 +78,7 @@ class MaliputViewerWidget : public ignition::gui::Plugin {
   /// \brief Builds the widgets of the GUI.
   void BuildGUI();
 
+  /// \brief Renders the arrow that will be spawned above a clicked lane.
   void RenderArrow();
 
   /// \brief Widget to hold and modify the visualization status of each layer.

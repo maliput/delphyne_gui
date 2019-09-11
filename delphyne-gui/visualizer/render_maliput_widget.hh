@@ -78,9 +78,13 @@ class RenderMaliputWidget : public QWidget {
   /// \brief Create and render an arrow that will be positioned slightly above the selected road.
   void RenderArrow();
 
+  /// \brief Render all traffic lights for a given vector of them.
+  /// \param[in] _traffic_lights Vector containing a set of traffic lights for the current road network.
   void RenderTrafficLights(const std::vector<maliput::api::rules::TrafficLight>& _traffic_lights);
 
-  void ChangeStateOfTrafficLights(const maliput::api::rules::BulbStates& _bulb_states);
+  /// \brief Set the state of all the bulbs by the traffic light manager.
+  /// \param[in] _bulb_states Unordered map containing the new state for each bulb in the road network.
+  void SetStateOfTrafficLights(const maliput::api::rules::BulbStates& _bulb_states);
 
   /// \brief Move the arrow based on the distance travelled by the camera's ray distance.
   /// \param[in] _distance Distance travelled from the camera's world position to the clicked object.

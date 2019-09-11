@@ -22,20 +22,7 @@ const std::string TrafficLightManager::kYellowMaterialName{"YellowBulb"};
 const std::string TrafficLightManager::kYellowBrightMaterialName{"YellowBulbBright"};
 
 TrafficLightManager::TrafficLightManager(ignition::rendering::ScenePtr& _scene) {
-  bulb_materials[static_cast<size_t>(maliput::api::rules::BulbColor::kRed)] = _scene->CreateMaterial(kRedMaterialName);
-  bulb_materials[static_cast<size_t>(maliput::api::rules::BulbColor::kYellow)] =
-      _scene->CreateMaterial(kYellowMaterialName);
-  bulb_materials[static_cast<size_t>(maliput::api::rules::BulbColor::kGreen)] =
-      _scene->CreateMaterial(kGreenMaterialName);
-
-  bright_bulb_materials[static_cast<size_t>(maliput::api::rules::BulbColor::kRed)] =
-      _scene->CreateMaterial(kRedBrightMaterialName);
-  bright_bulb_materials[static_cast<size_t>(maliput::api::rules::BulbColor::kYellow)] =
-      _scene->CreateMaterial(kYellowBrightMaterialName);
-  bright_bulb_materials[static_cast<size_t>(maliput::api::rules::BulbColor::kGreen)] =
-      _scene->CreateMaterial(kGreenBrightMaterialName);
-
-  SetBulbMaterialColors();
+  InitializeBulbMaterials(_scene);
   ignition::common::MeshManager* meshManager = ignition::common::MeshManager::Instance();
   DELPHYNE_DEMAND(meshManager);
   const ignition::common::Mesh* unit_sphere_mesh = meshManager->MeshByName("unit_sphere");
@@ -81,11 +68,13 @@ void TrafficLightManager::BlinkBulbs(bool on) {
   }
 }
 
-void TrafficLightManager::ChangeBulbState(const maliput::api::rules::BulbStates& bulb_states) {
+void TrafficLightManager::SetBulbsState(const maliput::api::rules::BulbStates& bulb_states) {
   for (const auto& state : bulb_states) {
-    ignition::rendering::VisualPtr bulb_mesh = GetBulbMesh(state.first);
+    const maliput::api::rules::UniqueBulbId& unique_bulb_id = state.first;
+    ignition::rendering::VisualPtr bulb_mesh = GetBulbMesh(unique_bulb_id);
     if (bulb_mesh) {
-      SetBulbMaterial(state.first, bulb_mesh, GetBulbColor(bulb_mesh), state.second);
+      const maliput::api::rules::BulbState& new_bulb_state = state.second;
+      SetBulbMaterial(state.first, bulb_mesh, GetBulbColor(bulb_mesh), new_bulb_state);
     }
   }
 }
@@ -118,7 +107,20 @@ maliput::api::rules::BulbColor TrafficLightManager::GetBulbColor(const ignition:
   return color;
 }
 
-void TrafficLightManager::SetBulbMaterialColors() {
+void TrafficLightManager::InitializeBulbMaterials(ignition::rendering::ScenePtr& _scene) {
+  bulb_materials[static_cast<size_t>(maliput::api::rules::BulbColor::kRed)] = _scene->CreateMaterial(kRedMaterialName);
+  bulb_materials[static_cast<size_t>(maliput::api::rules::BulbColor::kYellow)] =
+      _scene->CreateMaterial(kYellowMaterialName);
+  bulb_materials[static_cast<size_t>(maliput::api::rules::BulbColor::kGreen)] =
+      _scene->CreateMaterial(kGreenMaterialName);
+
+  bright_bulb_materials[static_cast<size_t>(maliput::api::rules::BulbColor::kRed)] =
+      _scene->CreateMaterial(kRedBrightMaterialName);
+  bright_bulb_materials[static_cast<size_t>(maliput::api::rules::BulbColor::kYellow)] =
+      _scene->CreateMaterial(kYellowBrightMaterialName);
+  bright_bulb_materials[static_cast<size_t>(maliput::api::rules::BulbColor::kGreen)] =
+      _scene->CreateMaterial(kGreenBrightMaterialName);
+
   ignition::rendering::MaterialPtr& red_material = GetRedMaterial();
   ignition::rendering::MaterialPtr& green_material = GetGreenMaterial();
   ignition::rendering::MaterialPtr& yellow_material = GetYellowMaterial();

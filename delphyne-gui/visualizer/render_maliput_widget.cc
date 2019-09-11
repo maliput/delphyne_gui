@@ -441,8 +441,8 @@ void RenderMaliputWidget::RenderTrafficLights(const std::vector<maliput::api::ru
   this->blinkTimer->start(this->kBlinkingTimer);
 }
 
-void RenderMaliputWidget::ChangeStateOfTrafficLights(const maliput::api::rules::BulbStates& _bulb_states) {
-  this->traffic_light_manager->ChangeBulbState(_bulb_states);
+void RenderMaliputWidget::SetStateOfTrafficLights(const maliput::api::rules::BulbStates& _bulb_states) {
+  this->traffic_light_manager->SetBulbsState(_bulb_states);
 }
 
 void RenderMaliputWidget::PutArrowAt(double _distance, const ignition::math::Vector3d& _worldPosition) {

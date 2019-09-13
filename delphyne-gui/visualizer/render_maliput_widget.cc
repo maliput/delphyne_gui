@@ -437,7 +437,7 @@ void RenderMaliputWidget::RenderArrow() {
 }
 
 void RenderMaliputWidget::RenderTrafficLights(const std::vector<maliput::api::rules::TrafficLight>& _traffic_lights) {
-  this->traffic_light_manager->CreateTrafficLights(this->scene, _traffic_lights);
+  this->traffic_light_manager->CreateTrafficLights(_traffic_lights);
   this->blinkTimer->start(this->kBlinkingTimer);
 }
 
@@ -479,7 +479,7 @@ void RenderMaliputWidget::Clear() {
     SetArrowVisibility(false);
   }
   this->blinkTimer->stop();
-  this->traffic_light_manager->Clear(this->scene);
+  this->traffic_light_manager->Clear();
   meshes.clear();
 }
 

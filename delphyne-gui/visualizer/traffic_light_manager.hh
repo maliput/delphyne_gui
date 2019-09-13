@@ -10,7 +10,6 @@
 #include <maliput/api/rules/phase.h>
 #include <maliput/api/rules/traffic_lights.h>
 
-#include <array>
 #include <unordered_map>
 #include <vector>
 
@@ -20,19 +19,18 @@ namespace gui {
 /// \brief Class that creates a representation for each traffic light and controls them.
 class TrafficLightManager final {
  public:
-  TrafficLightManager(ignition::rendering::ScenePtr& _scene);
+  TrafficLightManager(ignition::rendering::ScenePtr _scene);
   /// \brief Destructor. All mesh destruction will be in charge of the scene's destructor.
   ~TrafficLightManager() = default;
 
   /// \brief Renders all bulbs and box covering them passed by parameter with their corresponding colors
   /// \param[in] _scene Pointer containing the scene where all meshes will be rendered.
   /// \param[in] _traffic_lights Vector containing all the required traffic lights to render.
-  void CreateTrafficLights(ignition::rendering::ScenePtr& _scene,
-                           const std::vector<maliput::api::rules::TrafficLight>& _traffic_lights);
+  void CreateTrafficLights(const std::vector<maliput::api::rules::TrafficLight>& _traffic_lights);
 
   /// \brief Destroy all meshes created by the manager explictly.
   /// \param[in] _scene Pointer containing the scene where all meshes were rendered.
-  void Clear(ignition::rendering::ScenePtr& _scene);
+  void Clear();
 
   /// \brief Change the material of the bulbs when a blink ocurrs.
   /// \param[in] on If on, the bulb will turn on, otherwise it will be turned off.
@@ -43,7 +41,6 @@ class TrafficLightManager final {
   void SetBulbsState(const maliput::api::rules::BulbStates& bulb_states);
 
  private:
-  static constexpr size_t kAmountOfColors = static_cast<size_t>(maliput::api::rules::BulbColor::kGreen) + 1;
   /// \brief Name of the material used for the green bulb turned off.
   static const std::string kGreenMaterialName;
   /// \brief Name of the material used for the green bulb turned on.
@@ -71,23 +68,23 @@ class TrafficLightManager final {
   };
 
   inline ignition::rendering::MaterialPtr& GetRedMaterial() {
-    return bulb_materials[static_cast<size_t>(maliput::api::rules::BulbColor::kRed)];
+    return bulb_materials[maliput::api::rules::BulbColor::kRed];
   }
   inline ignition::rendering::MaterialPtr& GetGreenMaterial() {
-    return bulb_materials[static_cast<size_t>(maliput::api::rules::BulbColor::kGreen)];
+    return bulb_materials[maliput::api::rules::BulbColor::kGreen];
   }
   inline ignition::rendering::MaterialPtr& GetYellowMaterial() {
-    return bulb_materials[static_cast<size_t>(maliput::api::rules::BulbColor::kYellow)];
+    return bulb_materials[maliput::api::rules::BulbColor::kYellow];
   }
 
   inline ignition::rendering::MaterialPtr& GetBrightRedMaterial() {
-    return bright_bulb_materials[static_cast<size_t>(maliput::api::rules::BulbColor::kRed)];
+    return bright_bulb_materials[maliput::api::rules::BulbColor::kRed];
   }
   inline ignition::rendering::MaterialPtr& GetBrightGreenMaterial() {
-    return bright_bulb_materials[static_cast<size_t>(maliput::api::rules::BulbColor::kGreen)];
+    return bright_bulb_materials[maliput::api::rules::BulbColor::kGreen];
   }
   inline ignition::rendering::MaterialPtr& GetBrightYellowMaterial() {
-    return bright_bulb_materials[static_cast<size_t>(maliput::api::rules::BulbColor::kYellow)];
+    return bright_bulb_materials[maliput::api::rules::BulbColor::kYellow];
   }
 
   /// \brief Gets the bulb mesh related with a given id.
@@ -102,7 +99,7 @@ class TrafficLightManager final {
 
   /// \brief Initializes the bulb materials (red, yellow and green along with their brighter versions).
   /// \param[in] _scene Scene pointer where the traffic lights will be rendered.
-  void InitializeBulbMaterials(ignition::rendering::ScenePtr& _scene);
+  void InitializeBulbMaterials();
 
   /// \brief Sets the proper material for a bulb for a new state.
   /// \param[in] unique_bulb_id Unique id of a bulb.
@@ -119,8 +116,7 @@ class TrafficLightManager final {
   /// \brief Create the mesh for a given traffic light.
   /// \param[in] _scene Scene pointer where the traffic lights will be rendered.
   /// \param[in] _traffic_light Traffic light that will be rendered.
-  void CreateSingleTrafficLight(ignition::rendering::ScenePtr& _scene,
-                                const maliput::api::rules::TrafficLight& _traffic_light);
+  void CreateSingleTrafficLight(const maliput::api::rules::TrafficLight& _traffic_light);
 
   /// \brief Create the mesh for a given bulb group.
   /// \param[in] traffic_light_mesh Structure that holds the visual of the traffic light and the unordered map of bulb
@@ -128,7 +124,7 @@ class TrafficLightManager final {
   /// \param[in] _bulb_group Bulb group information to render the mesh.
   /// \param[in] traffic_light_world_position World position of the traffic light where this group lives in.
   /// \param[in] traffic_light_world_rotation World rotation of the traffic light where this group lives in.
-  void CreateBulbGroup(ignition::rendering::ScenePtr& _scene, TrafficLightMesh* traffic_light_mesh,
+  void CreateBulbGroup(TrafficLightMesh* traffic_light_mesh,
                        const maliput::api::rules::TrafficLight::Id& traffic_light_id,
                        const maliput::api::rules::BulbGroup& _bulb_group,
                        const maliput::api::GeoPosition& traffic_light_world_position,
@@ -139,19 +135,20 @@ class TrafficLightManager final {
   /// \param[in] _single_bulb Bulb information to render the mesh.
   /// \param[in] bulb_group_world_position World position of the bulb group where this bulb lives in.
   /// \param[in] bulb_group_world_rotation World rotation of the bulb group where this bulb lives in.
-  maliput::api::rules::Bulb::BoundingBox CreateSingleBulb(ignition::rendering::ScenePtr& _scene, BulbMeshes* bulb_group,
+  maliput::api::rules::Bulb::BoundingBox CreateSingleBulb(BulbMeshes* bulb_group,
                                                           const maliput::api::rules::UniqueBulbId& unique_bulb_id,
                                                           const maliput::api::rules::Bulb& _single_bulb,
                                                           const maliput::api::GeoPosition& bulb_group_world_position,
                                                           const maliput::api::Rotation& bulb_group_world_rotation);
 
-  std::array<ignition::rendering::MaterialPtr, kAmountOfColors> bulb_materials;
-  std::array<ignition::rendering::MaterialPtr, kAmountOfColors> bright_bulb_materials;
+  std::unordered_map<maliput::api::rules::BulbColor, ignition::rendering::MaterialPtr> bulb_materials;
+  std::unordered_map<maliput::api::rules::BulbColor, ignition::rendering::MaterialPtr> bright_bulb_materials;
 
   std::unordered_map<maliput::api::rules::TrafficLight::Id, TrafficLightMesh> traffic_lights;
   /// \brief Unordered map containing all the bulbs that are in the blinking state to facilitate the change
   /// of materials.
   std::unordered_map<maliput::api::rules::UniqueBulbId, ignition::rendering::VisualPtr> blinking_bulbs;
+  ignition::rendering::ScenePtr scene;
   ignition::math::Vector3d sphere_bulb_aabb_min;
   ignition::math::Vector3d sphere_bulb_aabb_max;
   ignition::math::Vector3d unit_box_aabb_min;

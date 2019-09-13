@@ -236,7 +236,7 @@ void RoadNetworkQuery::GetRightOfWay(const maliput::api::LaneSRange& lane_s_rang
       (*out_) << "]";
       const auto rule_state_result = right_of_way_rule_state_provider->GetState(rule.first);
       if (rule_state_result.has_value()) {
-        auto it = rule.second.states().find(rule_state_result->current_id);
+        auto it = rule.second.states().find(rule_state_result->state);
         DELPHYNE_DEMAND(it != rule.second.states().end());
         (*out_) << ", current_state: " << it->second;
       }

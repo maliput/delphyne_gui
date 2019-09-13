@@ -196,6 +196,14 @@ def main():
     )
 
     tree_time_step = 0.03
+    assert (args.duration > tree_time_step),                        \
+           "Duration ({}) must be greater than tree time step ({})" \
+           .format(args.duration, tree_time_step)
+
+    assert (sim_runner_time_step < tree_time_step),                          \
+           "Sim runner time step ({}) must be less than tree time step ({})" \
+           .format(sim_runner_time_step, tree_time_step)
+
     with launch_interactive_simulation(
         simulation_tree.runner, bare=args.bare
     ) as launcher:
@@ -206,9 +214,7 @@ def main():
         else:
             # run for a finite time
             print("Running simulation for {0} seconds.".format(args.duration))
-            tree_time_step = min(tree_time_step, args.duration)
-            time_step = max(tree_time_step, sim_runner_time_step)
             simulation_tree.tick_tock(
-                period=tree_time_step, number_of_iterations=args.duration / time_step
+                period=tree_time_step, number_of_iterations=args.duration / tree_time_step
             )
         launcher.terminate()

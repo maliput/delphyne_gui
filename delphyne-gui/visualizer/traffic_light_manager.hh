@@ -16,7 +16,7 @@
 namespace delphyne {
 namespace gui {
 
-/// \brief Class that creates a representation for each traffic light and controls them.
+/// \brief Class that creates a representation for traffic light and controls them.
 class TrafficLightManager final {
  public:
   TrafficLightManager(ignition::rendering::ScenePtr _scene);
@@ -34,7 +34,7 @@ class TrafficLightManager final {
 
   /// \brief Change the material of the bulbs when a blink ocurrs.
   /// \param[in] on If on, the bulb will turn on, otherwise it will be turned off.
-  void BlinkBulbs(bool on);
+  void Tick(bool on);
 
   /// \brief Set the state of all the bulbs.
   /// \param[in] bulb_states Unordered map containing the new state of each bulb.

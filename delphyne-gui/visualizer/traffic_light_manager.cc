@@ -56,7 +56,7 @@ void TrafficLightManager::Clear() {
   traffic_lights.clear();
 }
 
-void TrafficLightManager::BlinkBulbs(bool on) {
+void TrafficLightManager::Tick(bool on) {
   for (const auto& bulb : blinking_bulbs) {
     const maliput::api::rules::BulbColor bulb_color = GetBulbColor(bulb.second);
     if (on) {

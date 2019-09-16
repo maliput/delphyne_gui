@@ -238,6 +238,9 @@ maliput::api::rules::Bulb::BoundingBox TrafficLightManager::CreateSingleBulb(
     const maliput::api::rules::Bulb& _single_bulb, const maliput::api::GeoPosition& bulb_group_world_position,
     const maliput::api::Rotation& bulb_group_world_rotation) {
   const maliput::api::rules::Bulb::BoundingBox& bb = _single_bulb.bounding_box();
+  // Bulb's bounding box is in terms of 1 meter per unit coordinate. We consider that this bounding box is
+  // symmetric and will be used as a scale vector to set the proper size of the bulb in the visualizer.
+  DELPHYNE_DEMAND(bb.p_BMax == (-1.0 * bb.p_BMin));
 
   ignition::math::Vector3d world_bounding_box_max = sphere_bulb_aabb_max;
   ignition::math::Vector3d world_bounding_box_min = sphere_bulb_aabb_min;
@@ -260,7 +263,14 @@ maliput::api::rules::Bulb::BoundingBox TrafficLightManager::CreateSingleBulb(
     // TODO: Set the proper orientation for the "arrow" bulb.
     visual->AddGeometry(scene->CreateCone());
   }
-  visual->SetWorldScale(bb.p_BMax.x(), bb.p_BMax.y(), bb.p_BMax.z());
+  // The visual used has a bounding box size of 1x1x1 meter.
+  // Considering that the bulb's bounding box is symmetric and expressed in function of this size, it can be used
+  // for a scale operation.
+  const double& scale_x = bb.p_BMax.x();
+  const double& scale_y = bb.p_BMax.y();
+  const double& scale_z = bb.p_BMax.z();
+
+  visual->SetWorldScale(scale_x, scale_y, scale_z);
   const maliput::api::GeoPosition bulb_world_position =
       maliput::api::GeoPosition::FromXyz(bulb_group_world_position.xyz() + _single_bulb.position_bulb_group().xyz());
   visual->SetWorldRotation(bulb_rotation.roll(), bulb_rotation.pitch(), bulb_rotation.yaw());

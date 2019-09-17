@@ -196,14 +196,6 @@ def main():
     )
 
     tree_time_step = 0.03
-    assert (args.duration > tree_time_step),                        \
-           "Duration ({}) must be greater than tree time step ({})" \
-           .format(args.duration, tree_time_step)
-
-    assert (sim_runner_time_step < tree_time_step),                          \
-           "Sim runner time step ({}) must be less than tree time step ({})" \
-           .format(sim_runner_time_step, tree_time_step)
-
     with launch_interactive_simulation(
         simulation_tree.runner, bare=args.bare
     ) as launcher:

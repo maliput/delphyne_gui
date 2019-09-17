@@ -80,11 +80,11 @@ class RenderMaliputWidget : public QWidget {
 
   /// \brief Render all traffic lights for a given vector of them.
   /// \param[in] _traffic_lights Vector containing a set of traffic lights for the current road network.
-  void RenderTrafficLights(const std::vector<maliput::api::rules::TrafficLight>& _traffic_lights);
+  void RenderTrafficLights(const std::vector<maliput::api::rules::TrafficLight>& _trafficLights);
 
   /// \brief Set the state of all the bulbs by the traffic light manager.
   /// \param[in] _bulb_states Unordered map containing the new state for each bulb in the road network.
-  void SetStateOfTrafficLights(const maliput::api::rules::BulbStates& _bulb_states);
+  void SetStateOfTrafficLights(const maliput::api::rules::BulbStates& _bulbStates);
 
   /// \brief Move the arrow based on the distance travelled by the camera's ray distance.
   /// \param[in] _distance Distance travelled from the camera's world position to the clicked object.
@@ -229,7 +229,8 @@ class RenderMaliputWidget : public QWidget {
   /// \brief Outliner used for outlining clicked lanes in the visualizer.
   std::unique_ptr<Outliner> outliner;
 
-  std::unique_ptr<TrafficLightManager> traffic_light_manager;
+  /// \brief Manager of traffic lights visualization.
+  std::unique_ptr<TrafficLightManager> trafficLightManager;
 
   /// \brief A pointer to the rendering engine
   ignition::rendering::RenderEngine* engine;

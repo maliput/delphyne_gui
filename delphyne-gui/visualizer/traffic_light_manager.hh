@@ -24,19 +24,19 @@ class TrafficLightManager final {
   ~TrafficLightManager() = default;
 
   /// \brief Renders all bulbs and box covering them passed by parameter with their corresponding colors
-  /// \param[in] _traffic_lights Vector containing all the required traffic lights to render.
-  void CreateTrafficLights(const std::vector<maliput::api::rules::TrafficLight>& _traffic_lights);
+  /// \param[in] _trafficLights Vector containing all the required traffic lights to render.
+  void CreateTrafficLights(const std::vector<maliput::api::rules::TrafficLight>& _trafficLights);
 
   /// \brief Destroy all meshes created by the manager explictly.
   void Clear();
 
   /// \brief Change the material of the bulbs when a blink ocurrs.
-  /// \param[in] on If on, the bulb will turn on, otherwise it will be turned off.
-  void Tick(bool on);
+  /// \param[in] _on If on, the bulb will turn on, otherwise it will be turned off.
+  void Tick(bool _on);
 
   /// \brief Set the state of all the bulbs.
-  /// \param[in] bulb_states Unordered map containing the new state of each bulb.
-  void SetBulbStates(const maliput::api::rules::BulbStates& _bulb_states);
+  /// \param[in] _bulbStates Unordered map containing the new state of each bulb.
+  void SetBulbStates(const maliput::api::rules::BulbStates& _bulbStates);
 
  private:
   /// \brief Name of the material used for the green bulb turned off.
@@ -86,9 +86,9 @@ class TrafficLightManager final {
   }
 
   /// \brief Gets the bulb mesh related with a given id.
-  /// \param[in] bulb_id Unique id of a bulb.
+  /// \param[in] _uniqueBulbId Unique id of a bulb.
   /// \returns A pointer that contains the bulb's mesh or nullptr if not found.
-  ignition::rendering::VisualPtr GetBulbMesh(const maliput::api::rules::UniqueBulbId& _bulb_id) const;
+  ignition::rendering::VisualPtr GetBulbMesh(const maliput::api::rules::UniqueBulbId& _uniqueBulbId) const;
 
   /// \brief Gets the color of the bulb based on its material name.
   /// \param[in] bulb Pointer containing the bulb's mesh.
@@ -100,43 +100,44 @@ class TrafficLightManager final {
   void InitializeBulbMaterials();
 
   /// \brief Sets the proper material for a bulb for a new state.
-  /// \param[in] unique_bulb_id Unique id of a bulb.
-  /// \param[in] bulb Pointer containing the mesh of a given bulb.
-  /// \param[in] color Color used by the bulb.
-  /// \param[in] new_bulb_state The new state the bulb will be.
-  void SetBulbMaterial(const maliput::api::rules::UniqueBulbId& _unique_bulb_id, ignition::rendering::VisualPtr& _bulb,
-                       maliput::api::rules::BulbColor _color, maliput::api::rules::BulbState _new_bulb_state);
+  /// \param[in] _uniqueBulbId Unique id of a bulb.
+  /// \param[in] _bulb Pointer containing the mesh of a given bulb.
+  /// \param[in] _color Color used by the bulb.
+  /// \param[in] _newBulbState The new state the bulb will be.
+  void SetBulbMaterial(const maliput::api::rules::UniqueBulbId& _uniqueBulbId, ignition::rendering::VisualPtr& _bulb,
+                       maliput::api::rules::BulbColor _color, maliput::api::rules::BulbState _newBulbState);
 
   /// \brief Removes a given bulb from a list of blinking bulbs to not tick them anymore.
-  /// \param[in] _unique_bulb_id Bulb's unique id.
-  void RemoveBlinkingLight(const maliput::api::rules::UniqueBulbId& _unique_bulb_id);
+  /// \param[in] _uniqueBulbId Bulb's unique id.
+  void RemoveBlinkingLight(const maliput::api::rules::UniqueBulbId& _uniqueBulbId);
 
   /// \brief Create the mesh for a given traffic light.
-  /// \param[in] _traffic_light Traffic light that will be rendered.
-  void CreateSingleTrafficLight(const maliput::api::rules::TrafficLight& _traffic_light);
+  /// \param[in] _trafficLight Traffic light that will be rendered.
+  void CreateSingleTrafficLight(const maliput::api::rules::TrafficLight& _trafficLight);
 
   /// \brief Create the mesh for a given bulb group.
-  /// \param[in] _traffic_light_mesh Structure that holds the visual of the traffic light and the unordered map of bulb
+  /// \param[in] _trafficLightMesh Structure that holds the visual of the traffic light and the unordered map of bulb
   /// groups to be part of.
-  /// \param[in] _bulb_group Bulb group information to render the mesh.
-  /// \param[in] _traffic_light_world_position World position of the traffic light where this group lives in.
-  /// \param[in] _traffic_light_world_rotation World rotation of the traffic light where this group lives in.
-  void CreateBulbGroup(TrafficLightMesh* _traffic_light_mesh,
-                       const maliput::api::rules::TrafficLight::Id& _traffic_light_id,
-                       const maliput::api::rules::BulbGroup& _bulb_group,
-                       const maliput::api::GeoPosition& _traffic_light_world_position,
-                       const maliput::api::Rotation& _traffic_light_world_rotation);
+  /// \param[in] _trafficLightId Traffic light unique's id.
+  /// \param[in] _bulbGroup Bulb group information to render the mesh.
+  /// \param[in] _trafficLightWorldPosition World position of the traffic light where this group lives in.
+  /// \param[in] _trafficLightWorldRotation World rotation of the traffic light where this group lives in.
+  void CreateBulbGroup(TrafficLightMesh* _trafficLightMesh,
+                       const maliput::api::rules::TrafficLight::Id& _trafficLightId,
+                       const maliput::api::rules::BulbGroup& _bulbGroup,
+                       const maliput::api::GeoPosition& _trafficLightWorldPosition,
+                       const maliput::api::Rotation& _trafficLightWorldRotation);
 
   /// \brief Create the mesh for a given bulb that is within a bulb group.
-  /// \param[in] _unique_bulb_id Unique id that belongs to the bulb to be rendered.
-  /// \param[in] _single_bulb Bulb information to render the mesh.
-  /// \param[in] _bulb_group_world_position World position of the bulb group where this bulb lives in.
-  /// \param[in] _bulb_group_world_rotation World rotation of the bulb group where this bulb lives in.
-  maliput::api::rules::Bulb::BoundingBox CreateSingleBulb(BulbMeshes* _bulb_group,
-                                                          const maliput::api::rules::UniqueBulbId& _unique_bulb_id,
-                                                          const maliput::api::rules::Bulb& _single_bulb,
-                                                          const maliput::api::GeoPosition& _bulb_group_world_position,
-                                                          const maliput::api::Rotation& _bulb_group_world_rotation);
+  /// \param[in] _uniqueBulbId Unique id that belongs to the bulb to be rendered.
+  /// \param[in] _singleBulb Bulb information to render the mesh.
+  /// \param[in] _bulbGroupWorldPosition World position of the bulb group where this bulb lives in.
+  /// \param[in] _bulbGroupWorldRotation World rotation of the bulb group where this bulb lives in.
+  maliput::api::rules::Bulb::BoundingBox CreateSingleBulb(BulbMeshes* _bulbGroup,
+                                                          const maliput::api::rules::UniqueBulbId& _uniqueBulbId,
+                                                          const maliput::api::rules::Bulb& _singleBulb,
+                                                          const maliput::api::GeoPosition& _bulbGroupWorldPosition,
+                                                          const maliput::api::Rotation& _bulbGroupWorldRotation);
 
   /// \brief Unordered map containing the green, yellow and red material for the turned off bulb state.
   std::unordered_map<maliput::api::rules::BulbColor, ignition::rendering::MaterialPtr> bulbMaterials;

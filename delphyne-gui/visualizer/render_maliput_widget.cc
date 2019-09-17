@@ -437,15 +437,15 @@ void RenderMaliputWidget::RenderArrow() {
 }
 
 /////////////////////////////////////////////////
-void RenderMaliputWidget::RenderTrafficLights(const std::vector<maliput::api::rules::TrafficLight>& _traffic_lights) {
-  this->traffic_light_manager->CreateTrafficLights(_traffic_lights);
+void RenderMaliputWidget::RenderTrafficLights(const std::vector<maliput::api::rules::TrafficLight>& _trafficLights) {
+  this->trafficLightManager->CreateTrafficLights(_trafficLights);
   // TODO: Consider using maliput::api::rules::PhaseProvider::Result::Next::duration_until for the blinking duration.
   this->trafficLightsTickTimer->start(this->kBlinkingTimer);
 }
 
 /////////////////////////////////////////////////
-void RenderMaliputWidget::SetStateOfTrafficLights(const maliput::api::rules::BulbStates& _bulb_states) {
-  this->traffic_light_manager->SetBulbStates(_bulb_states);
+void RenderMaliputWidget::SetStateOfTrafficLights(const maliput::api::rules::BulbStates& _bulbStates) {
+  this->trafficLightManager->SetBulbStates(_bulbStates);
 }
 
 /////////////////////////////////////////////////
@@ -484,7 +484,7 @@ void RenderMaliputWidget::Clear() {
     SetArrowVisibility(false);
   }
   this->trafficLightsTickTimer->stop();
-  this->traffic_light_manager->Clear();
+  this->trafficLightManager->Clear();
   meshes.clear();
 }
 
@@ -497,7 +497,7 @@ void RenderMaliputWidget::showEvent(QShowEvent* _e) {
 
   if (!this->renderWindow) {
     this->CreateRenderWindow();
-    this->traffic_light_manager = std::make_unique<TrafficLightManager>(this->scene);
+    this->trafficLightManager = std::make_unique<TrafficLightManager>(this->scene);
     this->updateTimer->start(this->kUpdateTimeFrequency);
   }
 
@@ -620,6 +620,6 @@ void RenderMaliputWidget::UpdateViewport() {
 /////////////////////////////////////////////////
 void RenderMaliputWidget::TickTrafficLights() {
   static bool blinkTrafficLight = false;
-  this->traffic_light_manager->Tick(blinkTrafficLight);
+  this->trafficLightManager->Tick(blinkTrafficLight);
   blinkTrafficLight = !blinkTrafficLight;
 }

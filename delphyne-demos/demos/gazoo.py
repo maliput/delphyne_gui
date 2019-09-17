@@ -143,24 +143,26 @@ def main():
         root=create_gazoo_scenario_subtree(filename, mobil_cars_num)
     )
 
+    sim_runner_time_step=0.015
     simulation_tree.setup(
         realtime_rate=args.realtime_rate,
         start_paused=args.paused,
-        logfile_name=args.logfile_name
+        logfile_name=args.logfile_name,
+        time_step=sim_runner_time_step
     )
 
-    time_step = 0.01
+    tree_time_step = 0.03
     with launch_interactive_simulation(
         simulation_tree.runner, bare=args.bare
     ) as launcher:
         if args.duration < 0:
             # run indefinitely
             print("Running simulation indefinitely.")
-            simulation_tree.tick_tock(period=time_step)
+            simulation_tree.tick_tock(period=tree_time_step)
         else:
             # run for a finite time
             print("Running simulation for {0} seconds.".format(args.duration))
             simulation_tree.tick_tock(
-                period=time_step, number_of_iterations=args.duration/time_step
+                period=tree_time_step, number_of_iterations=args.duration / tree_time_step
             )
         launcher.terminate()

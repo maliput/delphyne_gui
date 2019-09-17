@@ -137,18 +137,18 @@ def main():
         print("Exiting the simulation")
         sys.exit()
 
-    time_step = 0.01
-
+    tree_time_step = 0.02
     with launch_interactive_simulation(
-            simulation_tree.runner, bare=args.bare) as launcher:
+        simulation_tree.runner, bare=args.bare
+    ) as launcher:
         if args.duration < 0:
             # run indefinitely
             print("Running simulation indefinitely.")
-            simulation_tree.tick_tock(period=time_step)
+            simulation_tree.tick_tock(period=tree_time_step)
         else:
             # run for a finite time
-            print("Running simulation for {0} seconds.".format(
-                args.duration))
-            simulation_tree.tick_tock(period=time_step,
-                number_of_iterations=args.duration/time_step)
+            print("Running simulation for {0} seconds.".format(args.duration))
+            simulation_tree.tick_tock(
+                period=tree_time_step, number_of_iterations=args.duration / tree_time_step
+            )
         launcher.terminate()

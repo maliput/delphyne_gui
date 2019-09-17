@@ -174,8 +174,8 @@ void TrafficLightManager::CreateSingleTrafficLight(const maliput::api::rules::Tr
   traffic_light_mesh.bulbGroups.reserve(_trafficLight.bulb_groups().size());
 
   for (const maliput::api::rules::BulbGroup& bulb_group : _trafficLight.bulb_groups()) {
-    CreateBulbGroup(_trafficLight.id(), bulb_group, traffic_light_world_position,
-                    traffic_light_world_rotation, &traffic_light_mesh);
+    CreateBulbGroup(_trafficLight.id(), bulb_group, traffic_light_world_position, traffic_light_world_rotation,
+                    &traffic_light_mesh);
   }
 
   trafficLights[_trafficLight.id()] = std::move(traffic_light_mesh);
@@ -235,9 +235,8 @@ void TrafficLightManager::CreateBulbGroup(const maliput::api::rules::TrafficLigh
 }
 
 maliput::api::rules::Bulb::BoundingBox TrafficLightManager::CreateSingleBulb(
-    const maliput::api::rules::UniqueBulbId& _uniqueBulbId,
-    const maliput::api::rules::Bulb& _single_bulb, const maliput::api::GeoPosition& _bulbGroupWorldPosition,
-    const maliput::api::Rotation& _bulbGroupWorldRotation,
+    const maliput::api::rules::UniqueBulbId& _uniqueBulbId, const maliput::api::rules::Bulb& _single_bulb,
+    const maliput::api::GeoPosition& _bulbGroupWorldPosition, const maliput::api::Rotation& _bulbGroupWorldRotation,
     BulbMeshes* _bulbGroup) {
   const maliput::api::rules::Bulb::BoundingBox& bb = _single_bulb.bounding_box();
   // Bulb's bounding box is in terms of 1 meter per unit coordinate. We consider that this bounding box is

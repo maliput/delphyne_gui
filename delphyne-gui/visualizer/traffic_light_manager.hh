@@ -120,8 +120,7 @@ class TrafficLightManager final {
   void CreateBulbGroup(const maliput::api::rules::TrafficLight::Id& _trafficLightId,
                        const maliput::api::rules::BulbGroup& _bulbGroup,
                        const maliput::api::GeoPosition& _trafficLightWorldPosition,
-                       const maliput::api::Rotation& _trafficLightWorldRotation,
-                       TrafficLightMesh* _trafficLightMesh);
+                       const maliput::api::Rotation& _trafficLightWorldRotation, TrafficLightMesh* _trafficLightMesh);
 
   /// \brief Create the mesh for a given bulb that is within a bulb group.
   /// \param[in] _uniqueBulbId Unique id that belongs to the bulb to be rendered.

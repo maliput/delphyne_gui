@@ -618,6 +618,4 @@ void RenderMaliputWidget::UpdateViewport() {
 }
 
 /////////////////////////////////////////////////
-void RenderMaliputWidget::TickTrafficLights() {
-  this->trafficLightManager->Tick();
-}
+void RenderMaliputWidget::TickTrafficLights() { this->trafficLightManager->Tick(); }

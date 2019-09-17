@@ -55,15 +55,16 @@ void TrafficLightManager::Clear() {
   trafficLights.clear();
 }
 
-void TrafficLightManager::Tick(bool _on) {
+void TrafficLightManager::Tick() {
   for (const auto& bulb : blinkingBulbs) {
     const maliput::api::rules::BulbColor bulb_color = GetBulbColor(bulb.second);
-    if (_on) {
+    if (blinkTrafficLight) {
       bulb.second->SetMaterial(brightBulbMaterials[bulb_color], false);
     } else {
       bulb.second->SetMaterial(bulbMaterials[bulb_color], false);
     }
   }
+  blinkTrafficLight = !blinkTrafficLight;
 }
 
 void TrafficLightManager::SetBulbStates(const maliput::api::rules::BulbStates& _bulbStates) {
@@ -173,18 +174,18 @@ void TrafficLightManager::CreateSingleTrafficLight(const maliput::api::rules::Tr
   traffic_light_mesh.bulbGroups.reserve(_trafficLight.bulb_groups().size());
 
   for (const maliput::api::rules::BulbGroup& bulb_group : _trafficLight.bulb_groups()) {
-    CreateBulbGroup(&traffic_light_mesh, _trafficLight.id(), bulb_group, traffic_light_world_position,
-                    traffic_light_world_rotation);
+    CreateBulbGroup(_trafficLight.id(), bulb_group, traffic_light_world_position,
+                    traffic_light_world_rotation, &traffic_light_mesh);
   }
 
   trafficLights[_trafficLight.id()] = std::move(traffic_light_mesh);
 }
 
-void TrafficLightManager::CreateBulbGroup(TrafficLightManager::TrafficLightMesh* _trafficLightMesh,
-                                          const maliput::api::rules::TrafficLight::Id& _trafficLightId,
+void TrafficLightManager::CreateBulbGroup(const maliput::api::rules::TrafficLight::Id& _trafficLightId,
                                           const maliput::api::rules::BulbGroup& _bulbGroup,
                                           const maliput::api::GeoPosition& _trafficLightWorldPosition,
-                                          const maliput::api::Rotation& _trafficLightWorldRotation) {
+                                          const maliput::api::Rotation& _trafficLightWorldRotation,
+                                          TrafficLightManager::TrafficLightMesh* _trafficLightMesh) {
   const maliput::api::GeoPosition bulb_group_world_position =
       maliput::api::GeoPosition::FromXyz(_trafficLightWorldPosition.xyz() + _bulbGroup.position_traffic_light().xyz());
   const maliput::api::Rotation bulb_group_world_rotation = maliput::api::Rotation::FromQuat(
@@ -212,7 +213,7 @@ void TrafficLightManager::CreateBulbGroup(TrafficLightManager::TrafficLightMesh*
   for (const maliput::api::rules::Bulb& bulb : _bulbGroup.bulbs()) {
     const maliput::api::rules::UniqueBulbId unique_bulb_id(_trafficLightId, _bulbGroup.id(), bulb.id());
     const maliput::api::rules::Bulb::BoundingBox bulb_bb_world_pos =
-        CreateSingleBulb(&bulb_meshes, unique_bulb_id, bulb, bulb_group_world_position, bulb_group_world_rotation);
+        CreateSingleBulb(unique_bulb_id, bulb, bulb_group_world_position, bulb_group_world_rotation, &bulb_meshes);
     bulb_group_aabb_max = ignition::math::Vector3d(std::max(bulb_group_aabb_max.X(), bulb_bb_world_pos.p_BMax.x()),
                                                    std::max(bulb_group_aabb_max.Y(), bulb_bb_world_pos.p_BMax.y()),
                                                    std::max(bulb_group_aabb_max.Z(), bulb_bb_world_pos.p_BMax.z()));
@@ -234,9 +235,10 @@ void TrafficLightManager::CreateBulbGroup(TrafficLightManager::TrafficLightMesh*
 }
 
 maliput::api::rules::Bulb::BoundingBox TrafficLightManager::CreateSingleBulb(
-    BulbMeshes* _bulbGroup, const maliput::api::rules::UniqueBulbId& _uniqueBulbId,
+    const maliput::api::rules::UniqueBulbId& _uniqueBulbId,
     const maliput::api::rules::Bulb& _single_bulb, const maliput::api::GeoPosition& _bulbGroupWorldPosition,
-    const maliput::api::Rotation& _bulbGroupWorldRotation) {
+    const maliput::api::Rotation& _bulbGroupWorldRotation,
+    BulbMeshes* _bulbGroup) {
   const maliput::api::rules::Bulb::BoundingBox& bb = _single_bulb.bounding_box();
   // Bulb's bounding box is in terms of 1 meter per unit coordinate. We consider that this bounding box is
   // symmetric and will be used as a scale vector to set the proper size of the bulb in the visualizer.

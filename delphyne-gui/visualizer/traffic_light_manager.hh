@@ -31,8 +31,7 @@ class TrafficLightManager final {
   void Clear();
 
   /// \brief Change the material of the bulbs when a blink ocurrs.
-  /// \param[in] _on If on, the bulb will turn on, otherwise it will be turned off.
-  void Tick(bool _on);
+  void Tick();
 
   /// \brief Set the state of all the bulbs.
   /// \param[in] _bulbStates Unordered map containing the new state of each bulb.
@@ -112,28 +111,29 @@ class TrafficLightManager final {
   void CreateSingleTrafficLight(const maliput::api::rules::TrafficLight& _trafficLight);
 
   /// \brief Create the mesh for a given bulb group.
-  /// \param[in] _trafficLightMesh Structure that holds the visual of the traffic light and the unordered map of bulb
-  /// groups to be part of.
   /// \param[in] _trafficLightId Traffic light unique's id.
   /// \param[in] _bulbGroup Bulb group information to render the mesh.
   /// \param[in] _trafficLightWorldPosition World position of the traffic light where this group lives in.
   /// \param[in] _trafficLightWorldRotation World rotation of the traffic light where this group lives in.
-  void CreateBulbGroup(TrafficLightMesh* _trafficLightMesh,
-                       const maliput::api::rules::TrafficLight::Id& _trafficLightId,
+  /// \param[out] _trafficLightMesh Structure that holds the visual of the traffic light and the unordered map of bulb
+  /// groups to be part of.
+  void CreateBulbGroup(const maliput::api::rules::TrafficLight::Id& _trafficLightId,
                        const maliput::api::rules::BulbGroup& _bulbGroup,
                        const maliput::api::GeoPosition& _trafficLightWorldPosition,
-                       const maliput::api::Rotation& _trafficLightWorldRotation);
+                       const maliput::api::Rotation& _trafficLightWorldRotation,
+                       TrafficLightMesh* _trafficLightMesh);
 
   /// \brief Create the mesh for a given bulb that is within a bulb group.
   /// \param[in] _uniqueBulbId Unique id that belongs to the bulb to be rendered.
   /// \param[in] _singleBulb Bulb information to render the mesh.
   /// \param[in] _bulbGroupWorldPosition World position of the bulb group where this bulb lives in.
   /// \param[in] _bulbGroupWorldRotation World rotation of the bulb group where this bulb lives in.
-  maliput::api::rules::Bulb::BoundingBox CreateSingleBulb(BulbMeshes* _bulbGroup,
-                                                          const maliput::api::rules::UniqueBulbId& _uniqueBulbId,
+  /// \param[out] _bulbGroup Group from where this bulb will live in.
+  maliput::api::rules::Bulb::BoundingBox CreateSingleBulb(const maliput::api::rules::UniqueBulbId& _uniqueBulbId,
                                                           const maliput::api::rules::Bulb& _singleBulb,
                                                           const maliput::api::GeoPosition& _bulbGroupWorldPosition,
-                                                          const maliput::api::Rotation& _bulbGroupWorldRotation);
+                                                          const maliput::api::Rotation& _bulbGroupWorldRotation,
+                                                          BulbMeshes* _bulbGroup);
 
   /// \brief Unordered map containing the green, yellow and red material for the turned off bulb state.
   std::unordered_map<maliput::api::rules::BulbColor, ignition::rendering::MaterialPtr> bulbMaterials;
@@ -154,6 +154,8 @@ class TrafficLightManager final {
   ignition::math::Vector3d unitBoxAABBMin;
   /// \brief Max point of the bulb group's bounding box.
   ignition::math::Vector3d unitBoxAABBMax;
+  /// \brief Used to change the blinking bulb's state.
+  bool blinkTrafficLight{false};
 };
 }  // namespace gui
 }  // namespace delphyne

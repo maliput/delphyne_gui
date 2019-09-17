@@ -247,9 +247,6 @@ class RenderMaliputWidget : public QWidget {
   /// \brief Map of text labels visual pointers.
   std::map<std::string, ignition::rendering::VisualPtr> textLabels;
 
-  /// \brief Used to change the blinking bulb's state.
-  bool blinkTrafficLight{false};
-
   /// \brief Scale in the X axis for the cubes used in the outliner.
   static constexpr double kOutlinerScaleX = 0.3;
   /// \brief Scale in the Y axis for the cubes used in the outliner.
@@ -261,7 +258,7 @@ class RenderMaliputWidget : public QWidget {
   /// \brief Max amount of cubes used for the outliner.
   static constexpr int kOutlinerPoolSize = 1500;
   /// \brief Every how much time should the lights blink in miliseconds.
-  static constexpr int kBlinkingTimer = 500;
+  static constexpr int kTrafficLightsTickPeriod = 500;
 };
 
 }  // namespace gui

@@ -154,6 +154,7 @@ void TrafficLightManager::SetBulbMaterial(const maliput::api::rules::UniqueBulbI
       blinkingBulbs[_uniqueBulbId] = _bulb;
       break;
     default:
+      DELPHYNE_VALIDATE(false, std::runtime_error, "Bulb state not supported");
       break;
   }
 }

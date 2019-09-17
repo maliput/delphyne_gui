@@ -619,7 +619,6 @@ void RenderMaliputWidget::UpdateViewport() {
 
 /////////////////////////////////////////////////
 void RenderMaliputWidget::TickTrafficLights() {
-  static bool blinkTrafficLight = false;
   this->trafficLightManager->Tick(blinkTrafficLight);
   blinkTrafficLight = !blinkTrafficLight;
 }

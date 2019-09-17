@@ -512,24 +512,19 @@ const maliput::api::Lane* MaliputViewerModel::GetLaneFromId(const std::string& _
 }
 
 std::vector<maliput::api::rules::TrafficLight> MaliputViewerModel::GetTrafficLights() const {
-  if (this->roadNetwork) {
-    const maliput::api::rules::TrafficLightBook* traffic_light_book = this->roadNetwork->traffic_light_book();
-    if (traffic_light_book) {
-      return traffic_light_book->TrafficLights();
-    }
-  }
-  return std::vector<maliput::api::rules::TrafficLight>();
+  return this->roadNetwork != nullptr ? this->roadNetwork->traffic_light_book()->TrafficLights() :
+    std::vector<maliput::api::rules::TrafficLight>();
 }
 
 maliput::api::rules::BulbStates MaliputViewerModel::GetBulbStates(const std::string& _phaseRingId,
                                                                   const std::string& _phaseId) const {
   if (this->roadNetwork && !_phaseRingId.empty() && !_phaseId.empty()) {
     const maliput::api::rules::PhaseRingBook* phase_ring_book = this->roadNetwork->phase_ring_book();
-    drake::optional<maliput::api::rules::PhaseRing> phase_ring =
+    const drake::optional<maliput::api::rules::PhaseRing> phase_ring =
         phase_ring_book->GetPhaseRing(maliput::api::rules::PhaseRing::Id(_phaseRingId));
     DELPHYNE_DEMAND(phase_ring.has_value());
     const std::unordered_map<maliput::api::rules::Phase::Id, maliput::api::rules::Phase>& phases = phase_ring->phases();
-    auto phase = phases.find(maliput::api::rules::Phase::Id(_phaseId));
+    const auto phase = phases.find(maliput::api::rules::Phase::Id(_phaseId));
     DELPHYNE_DEMAND(phase != phases.end());
     const drake::optional<maliput::api::rules::BulbStates>& bulb_states = phase->second.bulb_states();
     if (bulb_states.has_value()) {

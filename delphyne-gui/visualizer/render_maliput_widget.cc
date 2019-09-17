@@ -52,9 +52,9 @@ RenderMaliputWidget::RenderMaliputWidget(QWidget* parent) : engine(nullptr) {
   // time at a fixed frequency.  Note that we do not start this timer until the
   // first time that showEvent() is called.
   this->updateTimer = new QTimer(this);
-  this->blinkTimer = new QTimer(this);
+  this->trafficLightsTickTimer = new QTimer(this);
   QObject::connect(this->updateTimer, SIGNAL(timeout()), this, SLOT(update()));
-  QObject::connect(this->blinkTimer, SIGNAL(timeout()), this, SLOT(BlinkTrafficLights()));
+  QObject::connect(this->trafficLightsTickTimer, SIGNAL(timeout()), this, SLOT(TickTrafficLights()));
 }
 
 /////////////////////////////////////////////////
@@ -436,20 +436,25 @@ void RenderMaliputWidget::RenderArrow() {
   }
 }
 
+/////////////////////////////////////////////////
 void RenderMaliputWidget::RenderTrafficLights(const std::vector<maliput::api::rules::TrafficLight>& _traffic_lights) {
   this->traffic_light_manager->CreateTrafficLights(_traffic_lights);
-  this->blinkTimer->start(this->kBlinkingTimer);
+  // TODO: Consider using maliput::api::rules::PhaseProvider::Result::Next::duration_until for the blinking duration.
+  this->trafficLightsTickTimer->start(this->kBlinkingTimer);
 }
 
+/////////////////////////////////////////////////
 void RenderMaliputWidget::SetStateOfTrafficLights(const maliput::api::rules::BulbStates& _bulb_states) {
-  this->traffic_light_manager->SetBulbsState(_bulb_states);
+  this->traffic_light_manager->SetBulbStates(_bulb_states);
 }
 
+/////////////////////////////////////////////////
 void RenderMaliputWidget::PutArrowAt(double _distance, const ignition::math::Vector3d& _worldPosition) {
   DELPHYNE_DEMAND(this->arrow != nullptr);
   this->arrow->SelectAt(_distance, _worldPosition);
 }
 
+/////////////////////////////////////////////////
 void RenderMaliputWidget::SetArrowVisibility(bool _visible) {
   if (this->arrow) {
     this->arrow->SetVisibility(_visible);
@@ -478,7 +483,7 @@ void RenderMaliputWidget::Clear() {
   if (this->arrow) {
     SetArrowVisibility(false);
   }
-  this->blinkTimer->stop();
+  this->trafficLightsTickTimer->stop();
   this->traffic_light_manager->Clear();
   meshes.clear();
 }
@@ -612,8 +617,9 @@ void RenderMaliputWidget::UpdateViewport() {
   }
 }
 
-void RenderMaliputWidget::BlinkTrafficLights() {
-  static bool blink = false;
-  this->traffic_light_manager->Tick(blink);
-  blink = !blink;
+/////////////////////////////////////////////////
+void RenderMaliputWidget::TickTrafficLights() {
+  static bool blinkTrafficLight = false;
+  this->traffic_light_manager->Tick(blinkTrafficLight);
+  blinkTrafficLight = !blinkTrafficLight;
 }

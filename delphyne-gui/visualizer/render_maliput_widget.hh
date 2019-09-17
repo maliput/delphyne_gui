@@ -151,7 +151,7 @@ class RenderMaliputWidget : public QWidget {
  protected slots:
   void ShowContextMenu(const QPoint& _pos);
 
-  void BlinkTrafficLights();
+  void TickTrafficLights();
 
  private:
   /// \brief Internal method to create the render window the first time
@@ -209,7 +209,7 @@ class RenderMaliputWidget : public QWidget {
 
   /// \brief Pointer to timer to call update on a periodic basis.
   QTimer* updateTimer = nullptr;
-  QTimer* blinkTimer = nullptr;
+  QTimer* trafficLightsTickTimer = nullptr;
 
   /// \brief Pointer to the renderWindow created by this class.
   ignition::rendering::RenderWindowPtr renderWindow;

@@ -210,7 +210,7 @@ class MaliputViewerModel {
   const maliput::api::Lane* GetLaneFromId(const std::string& _id);
 
   /// \brief Get all the traffic lights from the underlying traffic light book that lives in the  road network if any.
-  /// \returns Vector containing all the traffic lights if any.
+  /// \returns Vector containing all the traffic lights that the underlying road network contains.
   std::vector<maliput::api::rules::TrafficLight> GetTrafficLights() const;
 
   /// \brief Get N lanes from the underlying road geometry.
@@ -247,7 +247,7 @@ class MaliputViewerModel {
   /// \brief Get the state of all the bulbs for a given phase ring id and phase id.
   /// \param[in] _phaseRingId Id of the desired phase ring to get the bulb states from.
   /// \param[in] _phaseId Id of the desired phase to get the bulb states from.
-  /// returns The state of all the bulbs in the underlying road network if any.
+  /// \returns The state of all the bulbs in the underlying road network.
   maliput::api::rules::BulbStates GetBulbStates(const std::string& _phaseRingId, const std::string& _phaseId) const;
 
  private:

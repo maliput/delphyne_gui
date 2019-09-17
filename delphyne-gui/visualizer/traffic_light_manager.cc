@@ -184,8 +184,8 @@ void TrafficLightManager::CreateBulbGroup(TrafficLightManager::TrafficLightMesh*
                                           const maliput::api::rules::BulbGroup& _bulbGroup,
                                           const maliput::api::GeoPosition& _trafficLightWorldPosition,
                                           const maliput::api::Rotation& _trafficLightWorldRotation) {
-  const maliput::api::GeoPosition bulb_group_world_position = maliput::api::GeoPosition::FromXyz(
-      _trafficLightWorldPosition.xyz() + _bulbGroup.position_traffic_light().xyz());
+  const maliput::api::GeoPosition bulb_group_world_position =
+      maliput::api::GeoPosition::FromXyz(_trafficLightWorldPosition.xyz() + _bulbGroup.position_traffic_light().xyz());
   const maliput::api::Rotation bulb_group_world_rotation = maliput::api::Rotation::FromQuat(
       _trafficLightWorldRotation.quat() * (_bulbGroup.orientation_traffic_light().quat()));
 
@@ -197,10 +197,10 @@ void TrafficLightManager::CreateBulbGroup(TrafficLightManager::TrafficLightMesh*
 
   ignition::math::Vector3d box_aabb_min =
       unitBoxAABBMin + ignition::math::Vector3d(bulb_group_world_position.x(), bulb_group_world_position.y(),
-                                                   bulb_group_world_position.z());
+                                                bulb_group_world_position.z());
   ignition::math::Vector3d box_aabb_max =
       unitBoxAABBMax + ignition::math::Vector3d(bulb_group_world_position.x(), bulb_group_world_position.y(),
-                                                   bulb_group_world_position.z());
+                                                bulb_group_world_position.z());
 
   ignition::math::Vector3d bulb_group_aabb_max(std::numeric_limits<double>::lowest(),
                                                std::numeric_limits<double>::lowest(),
@@ -259,8 +259,8 @@ maliput::api::rules::Bulb::BoundingBox TrafficLightManager::CreateSingleBulb(
       Eigen::Vector3d(world_bounding_box_max.X() * max_scale.x(), world_bounding_box_max.Y() * max_scale.y(),
                       world_bounding_box_max.Z() * max_scale.z());
 
-  const maliput::api::Rotation bulb_rotation = maliput::api::Rotation::FromQuat(
-      _bulbGroupWorldRotation.quat() * (_single_bulb.orientation_bulb_group().quat()));
+  const maliput::api::Rotation bulb_rotation =
+      maliput::api::Rotation::FromQuat(_bulbGroupWorldRotation.quat() * (_single_bulb.orientation_bulb_group().quat()));
   ignition::rendering::VisualPtr visual = scene->CreateVisual();
   if (_single_bulb.type() == maliput::api::rules::BulbType::kRound) {
     visual->AddGeometry(scene->CreateSphere());

@@ -65,12 +65,8 @@ class TrafficLightManager final {
     std::unordered_map<maliput::api::rules::BulbGroup::Id, BulbMeshes> bulbGroups;
   };
 
-  ignition::rendering::MaterialPtr& GetRedMaterial() {
-    return bulbMaterials[maliput::api::rules::BulbColor::kRed];
-  }
-  ignition::rendering::MaterialPtr& GetGreenMaterial() {
-    return bulbMaterials[maliput::api::rules::BulbColor::kGreen];
-  }
+  ignition::rendering::MaterialPtr& GetRedMaterial() { return bulbMaterials[maliput::api::rules::BulbColor::kRed]; }
+  ignition::rendering::MaterialPtr& GetGreenMaterial() { return bulbMaterials[maliput::api::rules::BulbColor::kGreen]; }
   ignition::rendering::MaterialPtr& GetYellowMaterial() {
     return bulbMaterials[maliput::api::rules::BulbColor::kYellow];
   }

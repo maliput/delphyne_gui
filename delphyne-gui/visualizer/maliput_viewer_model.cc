@@ -512,8 +512,8 @@ const maliput::api::Lane* MaliputViewerModel::GetLaneFromId(const std::string& _
 }
 
 std::vector<maliput::api::rules::TrafficLight> MaliputViewerModel::GetTrafficLights() const {
-  return this->roadNetwork != nullptr ? this->roadNetwork->traffic_light_book()->TrafficLights() :
-    std::vector<maliput::api::rules::TrafficLight>();
+  return this->roadNetwork != nullptr ? this->roadNetwork->traffic_light_book()->TrafficLights()
+                                      : std::vector<maliput::api::rules::TrafficLight>();
 }
 
 maliput::api::rules::BulbStates MaliputViewerModel::GetBulbStates(const std::string& _phaseRingId,

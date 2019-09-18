@@ -292,8 +292,9 @@ maliput::api::rules::Bulb::BoundingBox TrafficLightManager::CreateSingleBulb(
   } else {
     world_bounding_box_max = arrowBulbAABBMax;
     world_bounding_box_min = arrowBulbAABBMin;
-    bulb_rotation = maliput::api::Rotation::FromQuat(bulb_rotation.quat() *
-      maliput::api::Rotation::FromRpy({_single_bulb.arrow_orientation_rad().value(), 0.0, 0.0}).quat());
+    bulb_rotation = maliput::api::Rotation::FromQuat(
+        bulb_rotation.quat() *
+        maliput::api::Rotation::FromRpy({_single_bulb.arrow_orientation_rad().value(), 0.0, 0.0}).quat());
     visual->AddGeometry(scene->CreateMesh(arrowName));
   }
 

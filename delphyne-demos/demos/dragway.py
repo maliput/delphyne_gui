@@ -104,6 +104,6 @@ def main():
             # run for a finite time
             print("Running simulation for {0} seconds.".format(args.duration))
             simulation_tree.tick_tock(
-                period=tree_time_step, number_of_iterations=args.duration / tree_time_step
+                period=tree_time_step, number_of_iterations=int(args.duration / tree_time_step)
             )
         launcher.terminate()

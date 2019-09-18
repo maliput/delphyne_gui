@@ -4,6 +4,7 @@
 
 #include <ignition/common/Console.hh>
 #include <ignition/common/MeshManager.hh>
+#include <ignition/common/SystemPaths.hh>
 #include <ignition/math/Color.hh>
 #include <ignition/math/Helpers.hh>
 #include <maliput/api/lane.h>
@@ -20,19 +21,19 @@ const std::string TrafficLightManager::kRedMaterialName{"RedBulb"};
 const std::string TrafficLightManager::kRedBrightMaterialName{"RedBulbBright"};
 const std::string TrafficLightManager::kYellowMaterialName{"YellowBulb"};
 const std::string TrafficLightManager::kYellowBrightMaterialName{"YellowBulbBright"};
+const std::string TrafficLightManager::kBulbSphereName{"BulbSphere"};
+const std::string TrafficLightManager::kArrowBulbOBJFilePath{"resources/arrow_bulb.obj"};
 
 TrafficLightManager::TrafficLightManager(ignition::rendering::ScenePtr _scene) : scene(_scene) {
   InitializeBulbMaterials();
   ignition::common::MeshManager* meshManager = ignition::common::MeshManager::Instance();
   DELPHYNE_DEMAND(meshManager);
-  const ignition::common::Mesh* unit_sphere_mesh = meshManager->MeshByName("unit_sphere");
   const ignition::common::Mesh* unit_box_mesh = meshManager->MeshByName("unit_box");
-  DELPHYNE_DEMAND(unit_sphere_mesh);
   DELPHYNE_DEMAND(unit_box_mesh);
-  sphereBulbAABBMin = unit_sphere_mesh->Min();
-  sphereBulbAABBMax = unit_sphere_mesh->Max();
   unitBoxAABBMin = unit_box_mesh->Min();
   unitBoxAABBMax = unit_box_mesh->Max();
+  CreateRoundBulbMeshInManager();
+  CreateArrowBulbMeshInManager();
 }
 
 void TrafficLightManager::CreateTrafficLights(const std::vector<maliput::api::rules::TrafficLight>& _trafficLights) {
@@ -137,6 +138,35 @@ void TrafficLightManager::InitializeBulbMaterials() {
   yellowMaterial->SetAmbient(60.0, 60.0, 0.0, 1.0);
   yellowBrightMaterial->SetDiffuse(255.0, 255.0, 0.0, 1.0);
   yellowBrightMaterial->SetAmbient(255.0, 255.0, 0.0, 1.0);
+}
+
+void TrafficLightManager::CreateRoundBulbMeshInManager() {
+  ignition::common::MeshManager* meshManager = ignition::common::MeshManager::Instance();
+  DELPHYNE_DEMAND(meshManager);
+  meshManager->CreateSphere(kBulbSphereName, 1.0f, 32, 32);
+  const ignition::common::Mesh* bulb_sphere = meshManager->MeshByName(kBulbSphereName);
+  DELPHYNE_DEMAND(bulb_sphere);
+  sphereBulbAABBMax = bulb_sphere->Max();
+  sphereBulbAABBMin = bulb_sphere->Min();
+}
+
+void TrafficLightManager::CreateArrowBulbMeshInManager() {
+  const std::list<std::string> paths = ignition::common::SystemPaths::PathsFromEnv("DELPHYNE_GUI_RESOURCE_ROOT");
+  DELPHYNE_VALIDATE(!paths.empty(), std::runtime_error,
+                    "DELPHYNE_RESOURCE_ROOT environment "
+                    "variable is not set");
+  std::vector<std::string> resource_paths;
+  resource_paths.reserve(paths.size());
+  std::copy(paths.begin(), paths.end(), std::back_inserter(resource_paths));
+  arrowName = ignition::common::SystemPaths::LocateLocalFile(kArrowBulbOBJFilePath, resource_paths);
+  DELPHYNE_DEMAND(!arrowName.empty());
+
+  ignition::common::MeshManager* meshManager = ignition::common::MeshManager::Instance();
+  DELPHYNE_DEMAND(meshManager);
+  const ignition::common::Mesh* arrow = meshManager->Load(arrowName);
+  DELPHYNE_DEMAND(arrow);
+  arrowBulbAABBMax = arrow->Max();
+  arrowBulbAABBMin = arrow->Min();
 }
 
 void TrafficLightManager::SetBulbMaterial(const maliput::api::rules::UniqueBulbId& _uniqueBulbId,
@@ -249,8 +279,23 @@ maliput::api::rules::Bulb::BoundingBox TrafficLightManager::CreateSingleBulb(
   const Eigen::Vector3d& min_scale = bb.p_BMin;
   const Eigen::Vector3d& max_scale = bb.p_BMax;
 
-  ignition::math::Vector3d world_bounding_box_max = sphereBulbAABBMax;
-  ignition::math::Vector3d world_bounding_box_min = sphereBulbAABBMin;
+  ignition::math::Vector3d world_bounding_box_max;
+  ignition::math::Vector3d world_bounding_box_min;
+
+  maliput::api::Rotation bulb_rotation =
+      maliput::api::Rotation::FromQuat(_bulbGroupWorldRotation.quat() * (_single_bulb.orientation_bulb_group().quat()));
+  ignition::rendering::VisualPtr visual = scene->CreateVisual();
+  if (_single_bulb.type() == maliput::api::rules::BulbType::kRound) {
+    world_bounding_box_max = sphereBulbAABBMax;
+    world_bounding_box_min = sphereBulbAABBMin;
+    visual->AddGeometry(scene->CreateMesh(kBulbSphereName));
+  } else {
+    world_bounding_box_max = arrowBulbAABBMax;
+    world_bounding_box_min = arrowBulbAABBMin;
+    bulb_rotation = maliput::api::Rotation::FromQuat(bulb_rotation.quat() *
+      maliput::api::Rotation::FromRpy({_single_bulb.arrow_orientation_rad().value(), 0.0, 0.0}).quat());
+    visual->AddGeometry(scene->CreateMesh(arrowName));
+  }
 
   maliput::api::rules::Bulb::BoundingBox bulb_world_bounding_box;
 
@@ -260,16 +305,6 @@ maliput::api::rules::Bulb::BoundingBox TrafficLightManager::CreateSingleBulb(
   bulb_world_bounding_box.p_BMax =
       Eigen::Vector3d(world_bounding_box_max.X() * max_scale.x(), world_bounding_box_max.Y() * max_scale.y(),
                       world_bounding_box_max.Z() * max_scale.z());
-
-  const maliput::api::Rotation bulb_rotation =
-      maliput::api::Rotation::FromQuat(_bulbGroupWorldRotation.quat() * (_single_bulb.orientation_bulb_group().quat()));
-  ignition::rendering::VisualPtr visual = scene->CreateVisual();
-  if (_single_bulb.type() == maliput::api::rules::BulbType::kRound) {
-    visual->AddGeometry(scene->CreateSphere());
-  } else {
-    // TODO: Set the proper orientation for the "arrow" bulb.
-    visual->AddGeometry(scene->CreateCone());
-  }
 
   visual->SetWorldScale(max_scale.x(), max_scale.y(), max_scale.z());
   const maliput::api::GeoPosition bulb_world_position =

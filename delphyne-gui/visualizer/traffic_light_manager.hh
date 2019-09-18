@@ -50,6 +50,10 @@ class TrafficLightManager final {
   static const std::string kYellowMaterialName;
   /// \brief Name of the material used for the yellow bulb turned on.
   static const std::string kYellowBrightMaterialName;
+  /// \brief Relative path to the arrow obj file.
+  static const std::string kArrowBulbOBJFilePath;
+  /// \brief Name of the radius 1 sphere used for the round bulbs.
+  static const std::string kBulbSphereName;
 
   /// \brief Structure that contains the mesh related with the bulb group and connects it to a set of bulbs
   struct BulbMeshes {
@@ -93,6 +97,13 @@ class TrafficLightManager final {
   /// \brief Initializes the bulb materials (red, yellow and green along with their brighter versions). This is called
   /// just once per instance.
   void InitializeBulbMaterials();
+
+  /// \brief Creates a sphere of radius 1 in ignition common's mesh manager to use it as a bulb.
+  /// This is called just once.
+  void CreateRoundBulbMeshInManager();
+  /// \brief Loads the arrow obj living in resources directory within the current dir in ignition common's mesh manager.
+  /// This is called just once.
+  void CreateArrowBulbMeshInManager();
 
   /// \brief Sets the proper material for a bulb for a new state.
   /// \param[in] _uniqueBulbId Unique id of a bulb.
@@ -143,12 +154,18 @@ class TrafficLightManager final {
   /// \brief Unordered map containing all the bulbs that are in the blinking state to facilitate the change
   /// of materials.
   std::unordered_map<maliput::api::rules::UniqueBulbId, ignition::rendering::VisualPtr> blinkingBulbs;
+  /// \brief Full path of the arrow obj file so it can be used to create instances of it.
+  std::string arrowName;
   /// \brief Pointer to the scene where the traffic lights will be rendered.
   ignition::rendering::ScenePtr scene;
   /// \brief Min point of the sphere's bounding box used for the bulbs.
   ignition::math::Vector3d sphereBulbAABBMax;
   /// \brief Max point of the sphere's bounding box used for the bulbs.
   ignition::math::Vector3d sphereBulbAABBMin;
+  /// \brief Min point of the arrow's bounding box used for the bulbs.
+  ignition::math::Vector3d arrowBulbAABBMax;
+  /// \brief Max point of the arrow's bounding box used for the bulbs.
+  ignition::math::Vector3d arrowBulbAABBMin;
   /// \brief Min point of the bulb group's bounding box.
   ignition::math::Vector3d unitBoxAABBMin;
   /// \brief Max point of the bulb group's bounding box.

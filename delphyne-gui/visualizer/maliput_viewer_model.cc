@@ -14,6 +14,8 @@
 #include <maliput-utilities/generate_obj.h>
 #include <maliput-utilities/mesh.h>
 #include <maliput/api/lane_data.h>
+#include <maliput/api/rules/phase.h>
+#include <maliput/api/rules/traffic_light_book.h>
 #include <multilane/loader.h>
 
 #include "maliput_mesh_converter.hh"
@@ -507,6 +509,29 @@ const maliput::api::Lane* MaliputViewerModel::GetLaneFromId(const std::string& _
       this->roadGeometry ? this->roadGeometry.get() : this->roadNetwork->road_geometry();
   DELPHYNE_DEMAND(rg != nullptr);
   return rg->ById().GetLane(maliput::api::LaneId(_id));
+}
+
+std::vector<maliput::api::rules::TrafficLight> MaliputViewerModel::GetTrafficLights() const {
+  return this->roadNetwork != nullptr ? this->roadNetwork->traffic_light_book()->TrafficLights()
+                                      : std::vector<maliput::api::rules::TrafficLight>();
+}
+
+maliput::api::rules::BulbStates MaliputViewerModel::GetBulbStates(const std::string& _phaseRingId,
+                                                                  const std::string& _phaseId) const {
+  if (this->roadNetwork && !_phaseRingId.empty() && !_phaseId.empty()) {
+    const maliput::api::rules::PhaseRingBook* phase_ring_book = this->roadNetwork->phase_ring_book();
+    const drake::optional<maliput::api::rules::PhaseRing> phase_ring =
+        phase_ring_book->GetPhaseRing(maliput::api::rules::PhaseRing::Id(_phaseRingId));
+    DELPHYNE_DEMAND(phase_ring.has_value());
+    const std::unordered_map<maliput::api::rules::Phase::Id, maliput::api::rules::Phase>& phases = phase_ring->phases();
+    const auto phase = phases.find(maliput::api::rules::Phase::Id(_phaseId));
+    DELPHYNE_DEMAND(phase != phases.end());
+    const drake::optional<maliput::api::rules::BulbStates>& bulb_states = phase->second.bulb_states();
+    if (bulb_states.has_value()) {
+      return *bulb_states;
+    }
+  }
+  return maliput::api::rules::BulbStates();
 }
 
 ///////////////////////////////////////////////////////

@@ -28,6 +28,7 @@
 
 #include <maliput-utilities/generate_obj.h>
 #include <maliput/api/lane.h>
+#include <maliput/api/rules/phase.h>
 
 #include <memory>
 
@@ -51,7 +52,9 @@ RenderMaliputWidget::RenderMaliputWidget(QWidget* parent) : engine(nullptr) {
   // time at a fixed frequency.  Note that we do not start this timer until the
   // first time that showEvent() is called.
   this->updateTimer = new QTimer(this);
+  this->trafficLightsTickTimer = new QTimer(this);
   QObject::connect(this->updateTimer, SIGNAL(timeout()), this, SLOT(update()));
+  QObject::connect(this->trafficLightsTickTimer, SIGNAL(timeout()), this, SLOT(TickTrafficLights()));
 }
 
 /////////////////////////////////////////////////
@@ -433,11 +436,25 @@ void RenderMaliputWidget::RenderArrow() {
   }
 }
 
+/////////////////////////////////////////////////
+void RenderMaliputWidget::RenderTrafficLights(const std::vector<maliput::api::rules::TrafficLight>& _trafficLights) {
+  this->trafficLightManager->CreateTrafficLights(_trafficLights);
+  // TODO: Consider using maliput::api::rules::PhaseProvider::Result::Next::duration_until for the blinking duration.
+  this->trafficLightsTickTimer->start(this->kTrafficLightsTickPeriod);
+}
+
+/////////////////////////////////////////////////
+void RenderMaliputWidget::SetStateOfTrafficLights(const maliput::api::rules::BulbStates& _bulbStates) {
+  this->trafficLightManager->SetBulbStates(_bulbStates);
+}
+
+/////////////////////////////////////////////////
 void RenderMaliputWidget::PutArrowAt(double _distance, const ignition::math::Vector3d& _worldPosition) {
   DELPHYNE_DEMAND(this->arrow != nullptr);
   this->arrow->SelectAt(_distance, _worldPosition);
 }
 
+/////////////////////////////////////////////////
 void RenderMaliputWidget::SetArrowVisibility(bool _visible) {
   if (this->arrow) {
     this->arrow->SetVisibility(_visible);
@@ -466,6 +483,8 @@ void RenderMaliputWidget::Clear() {
   if (this->arrow) {
     SetArrowVisibility(false);
   }
+  this->trafficLightsTickTimer->stop();
+  this->trafficLightManager->Clear();
   meshes.clear();
 }
 
@@ -478,6 +497,7 @@ void RenderMaliputWidget::showEvent(QShowEvent* _e) {
 
   if (!this->renderWindow) {
     this->CreateRenderWindow();
+    this->trafficLightManager = std::make_unique<TrafficLightManager>(this->scene);
     this->updateTimer->start(this->kUpdateTimeFrequency);
   }
 
@@ -596,3 +616,6 @@ void RenderMaliputWidget::UpdateViewport() {
     this->camera->Update();
   }
 }
+
+/////////////////////////////////////////////////
+void RenderMaliputWidget::TickTrafficLights() { this->trafficLightManager->Tick(); }

@@ -49,6 +49,7 @@ add_library(${maliput_viewer_widget} SHARED
   render_maliput_widget.cc
   arrow_mesh.cc
   outliner.cc
+  traffic_light_manager.cc
   ${${maliput_viewer_widget}_MOC}
   ${LayerSelectionWidget_MOC}
   ${RenderMaliputWidget_MOC}

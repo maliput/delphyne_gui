@@ -16,6 +16,8 @@
 #include <maliput/api/lane.h>
 #include <maliput/api/road_geometry.h>
 #include <maliput/api/road_network.h>
+#include <maliput/api/rules/phase.h>
+#include <maliput/api/rules/traffic_lights.h>
 
 #include <maliput-utilities/generate_obj.h>
 #include <maliput-utilities/mesh.h>
@@ -207,6 +209,10 @@ class MaliputViewerModel {
   /// \return Lane associated with given id or nullptr if id is invalid.
   const maliput::api::Lane* GetLaneFromId(const std::string& _id);
 
+  /// \brief Get all the traffic lights from the underlying traffic light book that lives in the  road network if any.
+  /// \returns Vector containing all the traffic lights that the underlying road network contains.
+  std::vector<maliput::api::rules::TrafficLight> GetTrafficLights() const;
+
   /// \brief Get N lanes from the underlying road geometry.
   /// \param[in] _n Amount of lanes desired to get from the underlying
   /// road geometry.
@@ -237,6 +243,12 @@ class MaliputViewerModel {
 
   template <typename StringType>
   std::unordered_map<std::string, std::vector<StringType>> GetPhaseRings() const;
+
+  /// \brief Get the state of all the bulbs for a given phase ring id and phase id.
+  /// \param[in] _phaseRingId Id of the desired phase ring to get the bulb states from.
+  /// \param[in] _phaseId Id of the desired phase to get the bulb states from.
+  /// \returns The state of all the bulbs in the underlying road network.
+  maliput::api::rules::BulbStates GetBulbStates(const std::string& _phaseRingId, const std::string& _phaseId) const;
 
  private:
   /// \brief Loads a maliput RoadGeometry of multilane from

@@ -27,6 +27,8 @@ RulesVisualizerWidget::RulesVisualizerWidget(QWidget* parent) : QWidget(parent) 
                    SLOT(OnLaneItemClicked(QListWidgetItem*)));
 
   QObject::connect(this, SIGNAL(ReceiveRules(QString, QString)), this, SLOT(OnRulesReceived(QString, QString)));
+  QObject::connect(this->phase_tree, SIGNAL(itemClicked(QTreeWidgetItem*, int)), this,
+                   SLOT(OnPhaseTreeItemClicked(QTreeWidgetItem*, int)));
 
   layout->addWidget(this->phase_tree);
   layout->addWidget(this->lanes_label);
@@ -113,6 +115,8 @@ void RulesVisualizerWidget::OnRulesReceived(QString lane_id, QString rules) {
   cursor.setPosition(0);
   this->rules_log_text_browser->setTextCursor(cursor);
 }
+
+void RulesVisualizerWidget::OnPhaseTreeItemClicked(QTreeWidgetItem* tree_item, int column) { emit RequestRules(); }
 
 }  // namespace gui
 }  // namespace delphyne

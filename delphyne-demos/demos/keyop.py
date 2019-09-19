@@ -133,11 +133,12 @@ def main():
     simulation_tree = delphyne.trees.BehaviourTree(
         root=create_scenario_subtree())
 
-    time_step = 0.01
+    sim_runner_time_step = 0.01
     simulation_tree.setup(
         realtime_rate=args.realtime_rate,
         start_paused=args.paused,
-        logfile_name=args.logfile_name
+        logfile_name=args.logfile_name,
+        time_step=sim_runner_time_step
     )
 
     keyboard = KeyboardHandler()
@@ -146,7 +147,7 @@ def main():
     # See simulation_runner.cc line 185 at delphyne's repository.
     simulation_tree.runner.add_step_callback(
         lambda: demo_callback(simulation_tree, keyboard,
-                              time_step))
+                              sim_runner_time_step))
 
     print("\n"
           "************************************************************\n"
@@ -156,16 +157,18 @@ def main():
           "* <q> will stop the simulation and quit the demo.          *\n"
           "************************************************************\n")
 
+    tree_time_step = 0.02
     with launch_interactive_simulation(
-            simulation_tree.runner, bare=args.bare) as launcher:
+            simulation_tree.runner, bare=args.bare
+    ) as launcher:
         if args.duration < 0:
             # run indefinitely
             print("Running simulation indefinitely.")
-            simulation_tree.tick_tock(period=time_step)
+            simulation_tree.tick_tock(period=tree_time_step)
         else:
             # run for a finite time
-            print("Running simulation for {0} seconds.".format(
-                args.duration))
-            simulation_tree.tick_tock(period=time_step,
-                number_of_iterations=args.duration/time_step)
+            print("Running simulation for {0} seconds.".format(args.duration))
+            simulation_tree.tick_tock(
+                period=tree_time_step, number_of_iterations=int(args.duration / tree_time_step)
+            )
         launcher.terminate()

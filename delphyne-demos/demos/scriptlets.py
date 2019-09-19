@@ -181,23 +181,24 @@ def main():
         logfile_name=args.logfile_name
     )
 
-    time_step = 0.01
-
     stats = SimulationStats()
     simulation_tree.add_pre_tick_handler(random_print)
     simulation_tree.add_post_tick_handler(stats.pos_tick_handler)
+
+    tree_time_step = 0.02
     with delphyne_gui.utilities.launch_interactive_simulation(
-            simulation_tree.runner, bare=args.bare) as launcher:
+        simulation_tree.runner, bare=args.bare
+    ) as launcher:
         if args.duration < 0:
             # run indefinitely
             print("Running simulation indefinitely.")
             stats.start()
-            simulation_tree.tick_tock(period=time_step)
+            simulation_tree.tick_tock(period=tree_time_step)
         else:
             # run for a finite time
-            print("Running simulation for {0} seconds.".format(
-                args.duration))
+            print("Running simulation for {0} seconds.".format(args.duration))
             stats.start()
-            simulation_tree.tick_tock(period=time_step,
-                number_of_iterations=args.duration/time_step)
+            simulation_tree.tick_tock(
+                period=tree_time_step, number_of_iterations=int(args.duration / tree_time_step)
+            )
         launcher.terminate()

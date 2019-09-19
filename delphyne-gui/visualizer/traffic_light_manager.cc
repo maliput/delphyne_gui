@@ -144,10 +144,10 @@ void TrafficLightManager::CreateRoundBulbMeshInManager() {
   ignition::common::MeshManager* meshManager = ignition::common::MeshManager::Instance();
   DELPHYNE_DEMAND(meshManager);
   meshManager->CreateSphere(kBulbSphereName, 1.0f, 32, 32);
-  const ignition::common::Mesh* bulb_sphere = meshManager->MeshByName(kBulbSphereName);
-  DELPHYNE_DEMAND(bulb_sphere);
-  sphereBulbAABBMax = bulb_sphere->Max();
-  sphereBulbAABBMin = bulb_sphere->Min();
+  const ignition::common::Mesh* bulbSphere = meshManager->MeshByName(kBulbSphereName);
+  DELPHYNE_DEMAND(bulbSphere);
+  sphereBulbAABBMax = bulbSphere->Max();
+  sphereBulbAABBMin = bulbSphere->Min();
 }
 
 void TrafficLightManager::CreateArrowBulbMeshInManager() {
@@ -155,9 +155,7 @@ void TrafficLightManager::CreateArrowBulbMeshInManager() {
   DELPHYNE_VALIDATE(!paths.empty(), std::runtime_error,
                     "DELPHYNE_RESOURCE_ROOT environment "
                     "variable is not set");
-  std::vector<std::string> resource_paths;
-  resource_paths.reserve(paths.size());
-  std::copy(paths.begin(), paths.end(), std::back_inserter(resource_paths));
+  const std::vector<std::string> resource_paths(paths.begin(), paths.end());
   arrowName = ignition::common::SystemPaths::LocateLocalFile(kArrowBulbOBJFilePath, resource_paths);
   DELPHYNE_DEMAND(!arrowName.empty());
 
@@ -283,7 +281,7 @@ maliput::api::rules::Bulb::BoundingBox TrafficLightManager::CreateSingleBulb(
   ignition::math::Vector3d world_bounding_box_min;
 
   maliput::api::Rotation bulb_rotation =
-      maliput::api::Rotation::FromQuat(_bulbGroupWorldRotation.quat() * (_single_bulb.orientation_bulb_group().quat()));
+      maliput::api::Rotation::FromQuat(_bulbGroupWorldRotation.quat() * _single_bulb.orientation_bulb_group().quat());
   ignition::rendering::VisualPtr visual = scene->CreateVisual();
   if (_single_bulb.type() == maliput::api::rules::BulbType::kRound) {
     world_bounding_box_max = sphereBulbAABBMax;

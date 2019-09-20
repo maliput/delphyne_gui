@@ -187,6 +187,12 @@ install (FILES
   DESTINATION
   ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/delphyne/roads)
 
+install (FILES
+  resources/arrow_bulb.obj
+  resources/arrow_bulb.mtl
+  DESTINATION
+  ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/delphyne/resources)
+
 add_subdirectory(display_plugins)
 if(BUILD_TESTING)
   add_subdirectory(test)

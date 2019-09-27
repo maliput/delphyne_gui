@@ -132,14 +132,11 @@ void RoadNetworkQuery::ToGeoPosition(const maliput::api::LaneId& lane_id,
   (*out_) << "(" << lane_id.string() << ")->ToGeoPosition(lane_position: " << lane_position << ")" << std::endl;
   (*out_) << "              : Result: geo_position:" << geo_position << std::endl;
 
-  double distance = 0.0;
-  maliput::api::GeoPosition nearest_pos;
-  const maliput::api::RoadPosition road_position =
-      rn_->road_geometry()->ToRoadPosition(geo_position, nullptr, &nearest_pos, &distance);
+  const maliput::api::RoadPositionResult result = rn_->road_geometry()->ToRoadPosition(geo_position);
 
-  (*out_) << "              : Result round_trip geo_position" << nearest_pos << ", with distance: " << distance
-          << std::endl;
-  (*out_) << "              : RoadPosition: " << road_position << std::endl;
+  (*out_) << "              : Result round_trip geo_position" << result.nearest_position
+          << ", with distance: " << result.distance << std::endl;
+  (*out_) << "              : RoadPosition: " << result.road_position << std::endl;
 }
 
 /////////////////////////////////////////////////
@@ -162,14 +159,12 @@ void RoadNetworkQuery::ToLanePosition(const maliput::api::LaneId& lane_id,
 
 /////////////////////////////////////////////////
 void RoadNetworkQuery::ToRoadPosition(const maliput::api::GeoPosition& geo_position) {
-  double distance;
-  maliput::api::GeoPosition nearest_pos;
-  const maliput::api::RoadPosition road_position =
-      rn_->road_geometry()->ToRoadPosition(geo_position, nullptr, &nearest_pos, &distance);
+  const maliput::api::RoadPositionResult result = rn_->road_geometry()->ToRoadPosition(geo_position, drake::nullopt);
 
   (*out_) << "ToRoadPosition(geo_position: " << geo_position << ")" << std::endl;
-  (*out_) << "              : Result: nearest_pos:" << nearest_pos << " with distance: " << distance << std::endl;
-  (*out_) << "                RoadPosition: " << road_position << std::endl;
+  (*out_) << "              : Result: nearest_pos:" << result.nearest_position << " with distance: " << result.distance
+          << std::endl;
+  (*out_) << "                RoadPosition: " << result.road_position << std::endl;
 }
 
 /////////////////////////////////////////////////
@@ -501,7 +496,7 @@ const maliput::api::Lane* MaliputViewerModel::GetLaneFromWorldPosition(const ign
       this->roadGeometry ? this->roadGeometry.get() : this->roadNetwork->road_geometry();
   DELPHYNE_DEMAND(rg != nullptr);
   const maliput::api::GeoPosition geo_pos(_position.X(), _position.Y(), _position.Z());
-  return rg->ToRoadPosition(geo_pos, nullptr, nullptr, nullptr).lane;
+  return rg->ToRoadPosition(geo_pos).road_position.lane;
 }
 
 const maliput::api::Lane* MaliputViewerModel::GetLaneFromId(const std::string& _id) {

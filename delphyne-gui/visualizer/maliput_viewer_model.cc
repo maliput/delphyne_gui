@@ -148,13 +148,11 @@ void RoadNetworkQuery::ToLanePosition(const maliput::api::LaneId& lane_id,
     return;
   }
 
-  double distance{};
-  maliput::api::GeoPosition nearest_pos;
-  const maliput::api::LanePosition lane_position = lane->ToLanePosition(geo_position, &nearest_pos, &distance);
+  const maliput::api::LanePositionResult result = lane->ToLanePosition(geo_position);
 
   (*out_) << "(" << lane_id.string() << ")->ToLanePosition(geo_position: " << geo_position << ")" << std::endl;
-  (*out_) << "              : Result: lane_pos:" << lane_position << ", nearest_pos: " << nearest_pos
-          << ", with distance: " << distance << std::endl;
+  (*out_) << "              : Result: lane_pos:" << result.lane_position << ", nearest_pos: " << result.nearest_position
+          << ", with distance: " << result.distance << std::endl;
 }
 
 /////////////////////////////////////////////////

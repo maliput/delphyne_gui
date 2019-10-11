@@ -213,6 +213,10 @@ class MaliputViewerModel {
   /// \returns Vector containing all the traffic lights that the underlying road network contains.
   std::vector<const maliput::api::rules::TrafficLight*> GetTrafficLights() const;
 
+  /// \brief Toggles the current status of the lane marker's visibility and return the result
+  /// \param[in] _lane Lane to toggle
+  bool ToggleLaneMarkers(const maliput::api::Lane* _lane);
+
   /// \brief Get N lanes from the underlying road geometry.
   /// \param[in] _n Amount of lanes desired to get from the underlying
   /// road geometry.
@@ -268,6 +272,12 @@ class MaliputViewerModel {
   void ConvertMeshes(
       const std::map<std::string, std::pair<maliput::utility::mesh::GeoMesh, maliput::utility::Material>>& _geoMeshes);
 
+  /// \brief Converts @p _geoMeshes into a
+  ///        std::map<std::string, std::unique_ptr<ignition::common::Mesh>>
+  ///        filling the instance variable meshes.
+  /// \param[in] _geoMeshes A named collection of GeoMesh objects to convert.
+  void ConvertRoadGeometryMeshes(const maliput::utility::RoadGeometryMesh& _geoMeshes);
+
   /// \brief Populates this->labels map with this->roadGeometry lane and branch
   ///        point IDs.
   void GenerateLabels();
@@ -318,6 +328,9 @@ class MaliputViewerModel {
 
   /// \brief Map of labels.
   std::map<MaliputLabelType, std::vector<MaliputLabel>> labels;
+
+  /// \brief Map of the booleans for if the Markers for the lane are visualized
+  std::map<std::string, bool> laneMarkers;
 };
 
 template <typename ContainerType>

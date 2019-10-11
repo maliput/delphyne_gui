@@ -310,10 +310,12 @@ bool MaliputViewerModel::Load(const std::string& _maliputFilePath, const std::st
   ignmsg << "Loading RoadGeometry meshes of " << rg->id().string() << std::endl;
   maliput::utility::ObjFeatures features;
   features.off_grid_mesh_generation = true;
-  std::map<std::string, std::pair<maliput::utility::mesh::GeoMesh, maliput::utility::Material>> geoMeshes =
-      maliput::utility::BuildMeshes(rg, features);
+  // std::map<std::string, std::pair<maliput::utility::mesh::GeoMesh, maliput::utility::Material>> geoMeshes =
+  //    maliput::utility::BuildMeshes(rg, features);
+  maliput::utility::RoadGeometryMesh geoMeshes = BuildRoadGeometryMesh(rg, features);
   ignmsg << "Meshes loaded." << std::endl;
-  this->ConvertMeshes(geoMeshes);
+  this->ConvertRoadGeometryMeshes(geoMeshes);
+  // this->ConvertMeshes(geoMeshes);
   ignmsg << "Meshes converted to ignition type." << std::endl;
   this->GenerateLabels();
   ignmsg << "Labels generated." << std::endl;
@@ -326,6 +328,7 @@ void MaliputViewerModel::Clear() {
   this->roadNetwork.reset();
   this->labels.clear();
   this->maliputMeshes.clear();
+  this->laneMarkers.clear();
 }
 
 /////////////////////////////////////////////////
@@ -361,6 +364,21 @@ void MaliputViewerModel::LoadRoadGeometry(const std::string& _maliputFilePath, c
 }
 
 /////////////////////////////////////////////////
+bool MaliputViewerModel::ToggleLaneMarkers(const maliput::api::Lane* _lane) {
+  std::string lane_id = _lane->id().string();
+  std::map<std::string, bool>::iterator i = this->laneMarkers.find(lane_id);
+
+  if (i != this->laneMarkers.end()) {
+    i->second = !(i->second);
+    return i->second;
+  }
+
+  this->laneMarkers.insert({lane_id, true});
+
+  return true;
+}
+
+/////////////////////////////////////////////////
 void MaliputViewerModel::ConvertMeshes(
     const std::map<std::string, std::pair<maliput::utility::mesh::GeoMesh, maliput::utility::Material>>& _geoMeshes) {
   for (const auto& it : _geoMeshes) {
@@ -374,13 +392,31 @@ void MaliputViewerModel::ConvertMeshes(
     } else {
       ignmsg << "Enabling mesh [" << it.first << "].\n";
       maliputMesh->enabled = true;
-      maliputMesh->visible = true;
+      std::size_t found = it.first.find("asphalt");
+      if (found != std::string::npos) {
+        maliputMesh->visible = true;
+      } else {
+        maliputMesh->visible = false;
+      }
     }
     // Retrieves the material
     maliputMesh->material = std::make_unique<maliput::utility::Material>(it.second.second);
 
     this->maliputMeshes[it.first] = std::move(maliputMesh);
   }
+}
+
+void MaliputViewerModel::ConvertRoadGeometryMeshes(const maliput::utility::RoadGeometryMesh& _geoMeshes) {
+  ConvertMeshes(_geoMeshes.segment_asphalt_mesh);
+  ConvertMeshes(_geoMeshes.segment_grayed_asphalt_mesh);
+  ConvertMeshes(_geoMeshes.lane_asphalt_mesh);
+  ConvertMeshes(_geoMeshes.lane_lane_mesh);
+  ConvertMeshes(_geoMeshes.lane_marker_mesh);
+  ConvertMeshes(_geoMeshes.lane_grayed_asphalt_mesh);
+  ConvertMeshes(_geoMeshes.lane_grayed_lane_mesh);
+  ConvertMeshes(_geoMeshes.lane_grayed_marker_mesh);
+  ConvertMeshes(_geoMeshes.lane_hbounds_mesh);
+  ConvertMeshes(_geoMeshes.branch_point_mesh);
 }
 
 ///////////////////////////////////////////////////////

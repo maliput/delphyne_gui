@@ -99,7 +99,12 @@ void MaliputViewerWidget::OnVisualClicked(ignition::rendering::RayQueryResult ra
     const maliput::api::Lane* lane = this->model->GetLaneFromWorldPosition(rayResult.point);
     if (lane) {
       const std::string& lane_id = lane->id().string();
-      ignmsg << "Clicked lane ID: " << lane_id << "\n";
+      ignmsg << "Clicked lane ID: "
+             << "asphalt_" << lane_id << "\n";
+      bool visualized = this->model->ToggleLaneMarkers(lane);
+      OnLayerMeshChanged("lane_" + lane_id, visualized);
+      OnLayerMeshChanged("marker_" + lane_id, visualized);
+      OnLayerMeshChanged("hbounds_" + lane_id, visualized);
       this->renderWidget->Outline(lane);
       PhaseRingPhaseIds phaseRingIdAndPhaseIdSelected = this->rulesVisualizerWidget->GetSelectedPhaseRingAndPhaseId();
       emit this->rulesVisualizerWidget->ReceiveRules(

@@ -80,7 +80,7 @@ class RenderMaliputWidget : public QWidget {
 
   /// \brief Render all traffic lights for a given vector of them.
   /// \param[in] _traffic_lights Vector containing a set of traffic lights for the current road network.
-  void RenderTrafficLights(const std::vector<maliput::api::rules::TrafficLight>& _trafficLights);
+  void RenderTrafficLights(const std::vector<const maliput::api::rules::TrafficLight*>& _trafficLights);
 
   /// \brief Set the state of all the bulbs by the traffic light manager.
   /// \param[in] _bulb_states Unordered map containing the new state for each bulb in the road network.

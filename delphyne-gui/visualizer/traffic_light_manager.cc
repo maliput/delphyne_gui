@@ -36,9 +36,9 @@ TrafficLightManager::TrafficLightManager(ignition::rendering::ScenePtr _scene) :
   CreateArrowBulbMeshInManager();
 }
 
-void TrafficLightManager::CreateTrafficLights(const std::vector<maliput::api::rules::TrafficLight>& _trafficLights) {
+void TrafficLightManager::CreateTrafficLights(const std::vector<const maliput::api::rules::TrafficLight*>& _trafficLights) {
   trafficLights.reserve(_trafficLights.size());
-  for (const maliput::api::rules::TrafficLight& trafficLight : _trafficLights) {
+  for (const maliput::api::rules::TrafficLight* trafficLight : _trafficLights) {
     CreateSingleTrafficLight(trafficLight);
   }
 }
@@ -194,33 +194,33 @@ void TrafficLightManager::RemoveBlinkingLight(const maliput::api::rules::UniqueB
   }
 }
 
-void TrafficLightManager::CreateSingleTrafficLight(const maliput::api::rules::TrafficLight& _trafficLight) {
-  const maliput::api::GeoPosition& traffic_light_world_position = _trafficLight.position_road_network();
-  const maliput::api::Rotation& traffic_light_world_rotation = _trafficLight.orientation_road_network();
+void TrafficLightManager::CreateSingleTrafficLight(const maliput::api::rules::TrafficLight* _trafficLight) {
+  const maliput::api::GeoPosition& traffic_light_world_position = _trafficLight->position_road_network();
+  const maliput::api::Rotation& traffic_light_world_rotation = _trafficLight->orientation_road_network();
 
   TrafficLightManager::TrafficLightMesh traffic_light_mesh;
-  traffic_light_mesh.bulbGroups.reserve(_trafficLight.bulb_groups().size());
+  traffic_light_mesh.bulbGroups.reserve(_trafficLight->bulb_groups().size());
 
-  for (const maliput::api::rules::BulbGroup& bulb_group : _trafficLight.bulb_groups()) {
-    CreateBulbGroup(_trafficLight.id(), bulb_group, traffic_light_world_position, traffic_light_world_rotation,
+  for (const maliput::api::rules::BulbGroup* bulb_group : _trafficLight->bulb_groups()) {
+    CreateBulbGroup(_trafficLight->id(), bulb_group, traffic_light_world_position, traffic_light_world_rotation,
                     &traffic_light_mesh);
   }
 
-  trafficLights[_trafficLight.id()] = std::move(traffic_light_mesh);
+  trafficLights[_trafficLight->id()] = std::move(traffic_light_mesh);
 }
 
 void TrafficLightManager::CreateBulbGroup(const maliput::api::rules::TrafficLight::Id& _trafficLightId,
-                                          const maliput::api::rules::BulbGroup& _bulbGroup,
+                                          const maliput::api::rules::BulbGroup* _bulbGroup,
                                           const maliput::api::GeoPosition& _trafficLightWorldPosition,
                                           const maliput::api::Rotation& _trafficLightWorldRotation,
                                           TrafficLightManager::TrafficLightMesh* _trafficLightMesh) {
   const maliput::api::GeoPosition bulb_group_world_position =
-      maliput::api::GeoPosition::FromXyz(_trafficLightWorldPosition.xyz() + _bulbGroup.position_traffic_light().xyz());
+      maliput::api::GeoPosition::FromXyz(_trafficLightWorldPosition.xyz() + _bulbGroup->position_traffic_light().xyz());
   const maliput::api::Rotation bulb_group_world_rotation = maliput::api::Rotation::FromQuat(
-      _trafficLightWorldRotation.quat() * (_bulbGroup.orientation_traffic_light().quat()));
+      _trafficLightWorldRotation.quat() * (_bulbGroup->orientation_traffic_light().quat()));
 
   TrafficLightManager::BulbMeshes bulb_meshes;
-  bulb_meshes.bulbs.reserve(_bulbGroup.bulbs().size());
+  bulb_meshes.bulbs.reserve(_bulbGroup->bulbs().size());
   bulb_meshes.visual = scene->CreateVisual();
   bulb_meshes.visual->AddGeometry(scene->CreateBox());
   scene->RootVisual()->AddChild(bulb_meshes.visual);
@@ -238,8 +238,8 @@ void TrafficLightManager::CreateBulbGroup(const maliput::api::rules::TrafficLigh
   ignition::math::Vector3d bulb_group_aabb_min(std::numeric_limits<double>::max(), std::numeric_limits<double>::max(),
                                                std::numeric_limits<double>::max());
 
-  for (const maliput::api::rules::Bulb& bulb : _bulbGroup.bulbs()) {
-    const maliput::api::rules::UniqueBulbId unique_bulb_id(_trafficLightId, _bulbGroup.id(), bulb.id());
+  for (const maliput::api::rules::Bulb* bulb : _bulbGroup->bulbs()) {
+    const maliput::api::rules::UniqueBulbId unique_bulb_id = bulb->unique_id();
     const maliput::api::rules::Bulb::BoundingBox bulb_bb_world_pos =
         CreateSingleBulb(unique_bulb_id, bulb, bulb_group_world_position, bulb_group_world_rotation, &bulb_meshes);
     bulb_group_aabb_max = ignition::math::Vector3d(std::max(bulb_group_aabb_max.X(), bulb_bb_world_pos.p_BMax.x()),
@@ -259,14 +259,14 @@ void TrafficLightManager::CreateBulbGroup(const maliput::api::rules::TrafficLigh
                                        bulb_group_world_rotation.yaw());
   bulb_meshes.visual->SetWorldPosition(mid_point);
   bulb_meshes.visual->SetVisible(false);
-  _trafficLightMesh->bulbGroups[_bulbGroup.id()] = std::move(bulb_meshes);
+  _trafficLightMesh->bulbGroups[_bulbGroup->id()] = std::move(bulb_meshes);
 }
 
 maliput::api::rules::Bulb::BoundingBox TrafficLightManager::CreateSingleBulb(
-    const maliput::api::rules::UniqueBulbId& _uniqueBulbId, const maliput::api::rules::Bulb& _single_bulb,
+    const maliput::api::rules::UniqueBulbId& _uniqueBulbId, const maliput::api::rules::Bulb* _single_bulb,
     const maliput::api::GeoPosition& _bulbGroupWorldPosition, const maliput::api::Rotation& _bulbGroupWorldRotation,
     BulbMeshes* _bulbGroup) {
-  const maliput::api::rules::Bulb::BoundingBox& bb = _single_bulb.bounding_box();
+  const maliput::api::rules::Bulb::BoundingBox& bb = _single_bulb->bounding_box();
   // Bulb's bounding box is in terms of 1 meter per unit coordinate. We consider that this bounding box is
   // symmetric and will be used as a scale vector to set the proper size of the bulb in the visualizer.
   DELPHYNE_DEMAND(bb.p_BMax == (-1.0 * bb.p_BMin));
@@ -281,9 +281,9 @@ maliput::api::rules::Bulb::BoundingBox TrafficLightManager::CreateSingleBulb(
   ignition::math::Vector3d world_bounding_box_min;
 
   maliput::api::Rotation bulb_rotation =
-      maliput::api::Rotation::FromQuat(_bulbGroupWorldRotation.quat() * _single_bulb.orientation_bulb_group().quat());
+      maliput::api::Rotation::FromQuat(_bulbGroupWorldRotation.quat() * _single_bulb->orientation_bulb_group().quat());
   ignition::rendering::VisualPtr visual = scene->CreateVisual();
-  if (_single_bulb.type() == maliput::api::rules::BulbType::kRound) {
+  if (_single_bulb->type() == maliput::api::rules::BulbType::kRound) {
     world_bounding_box_max = sphereBulbAABBMax;
     world_bounding_box_min = sphereBulbAABBMin;
     visual->AddGeometry(scene->CreateMesh(kBulbSphereName));
@@ -292,7 +292,7 @@ maliput::api::rules::Bulb::BoundingBox TrafficLightManager::CreateSingleBulb(
     world_bounding_box_min = arrowBulbAABBMin;
     bulb_rotation = maliput::api::Rotation::FromQuat(
         bulb_rotation.quat() *
-        maliput::api::Rotation::FromRpy({_single_bulb.arrow_orientation_rad().value(), 0.0, 0.0}).quat());
+        maliput::api::Rotation::FromRpy({_single_bulb->arrow_orientation_rad().value(), 0.0, 0.0}).quat());
     visual->AddGeometry(scene->CreateMesh(arrowName));
   }
 
@@ -307,12 +307,12 @@ maliput::api::rules::Bulb::BoundingBox TrafficLightManager::CreateSingleBulb(
 
   visual->SetWorldScale(max_scale.x(), max_scale.y(), max_scale.z());
   const maliput::api::GeoPosition bulb_world_position =
-      maliput::api::GeoPosition::FromXyz(_bulbGroupWorldPosition.xyz() + _single_bulb.position_bulb_group().xyz());
+      maliput::api::GeoPosition::FromXyz(_bulbGroupWorldPosition.xyz() + _single_bulb->position_bulb_group().xyz());
   visual->SetWorldRotation(bulb_rotation.roll(), bulb_rotation.pitch(), bulb_rotation.yaw());
   visual->SetWorldPosition(bulb_world_position.x(), bulb_world_position.y(), bulb_world_position.z());
-  SetBulbMaterial(_uniqueBulbId, visual, _single_bulb.color(), _single_bulb.GetDefaultState());
+  SetBulbMaterial(_uniqueBulbId, visual, _single_bulb->color(), _single_bulb->GetDefaultState());
   scene->RootVisual()->AddChild(visual);
-  _bulbGroup->bulbs[_single_bulb.id()] = visual;
+  _bulbGroup->bulbs[_single_bulb->id()] = visual;
 
   bulb_world_bounding_box.p_BMax += bulb_world_position.xyz();
   bulb_world_bounding_box.p_BMin += bulb_world_position.xyz();

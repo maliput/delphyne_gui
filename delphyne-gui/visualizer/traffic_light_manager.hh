@@ -25,7 +25,7 @@ class TrafficLightManager final {
 
   /// \brief Renders all bulbs and box covering them passed by parameter with their corresponding colors
   /// \param[in] _trafficLights Vector containing all the required traffic lights to render.
-  void CreateTrafficLights(const std::vector<maliput::api::rules::TrafficLight>& _trafficLights);
+  void CreateTrafficLights(const std::vector<const maliput::api::rules::TrafficLight*>& _trafficLights);
 
   /// \brief Destroy all meshes created by the manager explictly.
   void Clear();
@@ -119,7 +119,7 @@ class TrafficLightManager final {
 
   /// \brief Create the mesh for a given traffic light.
   /// \param[in] _trafficLight Traffic light that will be rendered.
-  void CreateSingleTrafficLight(const maliput::api::rules::TrafficLight& _trafficLight);
+  void CreateSingleTrafficLight(const maliput::api::rules::TrafficLight* _trafficLight);
 
   /// \brief Create the mesh for a given bulb group.
   /// \param[in] _trafficLightId Traffic light unique's id.
@@ -129,7 +129,7 @@ class TrafficLightManager final {
   /// \param[out] _trafficLightMesh Structure that holds the visual of the traffic light and the unordered map of bulb
   /// groups to be part of.
   void CreateBulbGroup(const maliput::api::rules::TrafficLight::Id& _trafficLightId,
-                       const maliput::api::rules::BulbGroup& _bulbGroup,
+                       const maliput::api::rules::BulbGroup* _bulbGroup,
                        const maliput::api::GeoPosition& _trafficLightWorldPosition,
                        const maliput::api::Rotation& _trafficLightWorldRotation, TrafficLightMesh* _trafficLightMesh);
 
@@ -140,7 +140,7 @@ class TrafficLightManager final {
   /// \param[in] _bulbGroupWorldRotation World rotation of the bulb group where this bulb lives in.
   /// \param[out] _bulbGroup Group from where this bulb will live in.
   maliput::api::rules::Bulb::BoundingBox CreateSingleBulb(const maliput::api::rules::UniqueBulbId& _uniqueBulbId,
-                                                          const maliput::api::rules::Bulb& _singleBulb,
+                                                          const maliput::api::rules::Bulb* _singleBulb,
                                                           const maliput::api::GeoPosition& _bulbGroupWorldPosition,
                                                           const maliput::api::Rotation& _bulbGroupWorldRotation,
                                                           BulbMeshes* _bulbGroup);

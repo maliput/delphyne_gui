@@ -36,7 +36,8 @@ TrafficLightManager::TrafficLightManager(ignition::rendering::ScenePtr _scene) :
   CreateArrowBulbMeshInManager();
 }
 
-void TrafficLightManager::CreateTrafficLights(const std::vector<const maliput::api::rules::TrafficLight*>& _trafficLights) {
+void TrafficLightManager::CreateTrafficLights(
+    const std::vector<const maliput::api::rules::TrafficLight*>& _trafficLights) {
   trafficLights.reserve(_trafficLights.size());
   for (const maliput::api::rules::TrafficLight* trafficLight : _trafficLights) {
     CreateSingleTrafficLight(trafficLight);

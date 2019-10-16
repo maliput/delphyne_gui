@@ -437,7 +437,8 @@ void RenderMaliputWidget::RenderArrow() {
 }
 
 /////////////////////////////////////////////////
-void RenderMaliputWidget::RenderTrafficLights(const std::vector<const maliput::api::rules::TrafficLight*>& _trafficLights) {
+void RenderMaliputWidget::RenderTrafficLights(
+    const std::vector<const maliput::api::rules::TrafficLight*>& _trafficLights) {
   this->trafficLightManager->CreateTrafficLights(_trafficLights);
   // TODO: Consider using maliput::api::rules::PhaseProvider::Result::Next::duration_until for the blinking duration.
   this->trafficLightsTickTimer->start(this->kTrafficLightsTickPeriod);

@@ -211,7 +211,7 @@ class MaliputViewerModel {
 
   /// \brief Get all the traffic lights from the underlying traffic light book that lives in the  road network if any.
   /// \returns Vector containing all the traffic lights that the underlying road network contains.
-  std::vector<maliput::api::rules::TrafficLight> GetTrafficLights() const;
+  std::vector<const maliput::api::rules::TrafficLight*> GetTrafficLights() const;
 
   /// \brief Get N lanes from the underlying road geometry.
   /// \param[in] _n Amount of lanes desired to get from the underlying

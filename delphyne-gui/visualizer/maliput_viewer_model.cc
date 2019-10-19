@@ -310,12 +310,9 @@ bool MaliputViewerModel::Load(const std::string& _maliputFilePath, const std::st
   ignmsg << "Loading RoadGeometry meshes of " << rg->id().string() << std::endl;
   maliput::utility::ObjFeatures features;
   features.off_grid_mesh_generation = true;
-  // std::map<std::string, std::pair<maliput::utility::mesh::GeoMesh, maliput::utility::Material>> geoMeshes =
-  //    maliput::utility::BuildMeshes(rg, features);
   maliput::utility::RoadGeometryMesh geoMeshes = BuildRoadGeometryMesh(rg, features);
   ignmsg << "Meshes loaded." << std::endl;
   this->ConvertRoadGeometryMeshes(geoMeshes);
-  // this->ConvertMeshes(geoMeshes);
   ignmsg << "Meshes converted to ignition type." << std::endl;
   this->GenerateLabels();
   ignmsg << "Labels generated." << std::endl;
@@ -392,8 +389,9 @@ void MaliputViewerModel::ConvertMeshes(
     } else {
       ignmsg << "Enabling mesh [" << it.first << "].\n";
       maliputMesh->enabled = true;
-      std::size_t found = it.first.find("asphalt");
-      if (found != std::string::npos) {
+      std::size_t found_asphalt = it.first.find("asphalt");
+      std::size_t found_hbounds = it.first.find("h_bounds");
+      if (found_asphalt != std::string::npos || found_hbounds != std::string::npos) {
         maliputMesh->visible = true;
       } else {
         maliputMesh->visible = false;
@@ -407,15 +405,13 @@ void MaliputViewerModel::ConvertMeshes(
 }
 
 void MaliputViewerModel::ConvertRoadGeometryMeshes(const maliput::utility::RoadGeometryMesh& _geoMeshes) {
-  ConvertMeshes(_geoMeshes.segment_asphalt_mesh);
-  ConvertMeshes(_geoMeshes.segment_grayed_asphalt_mesh);
-  ConvertMeshes(_geoMeshes.lane_asphalt_mesh);
+  ConvertMeshes(_geoMeshes.asphalt_mesh);
+  ConvertMeshes(_geoMeshes.grayed_asphalt_mesh);
+  ConvertMeshes(_geoMeshes.hbounds_mesh);
   ConvertMeshes(_geoMeshes.lane_lane_mesh);
   ConvertMeshes(_geoMeshes.lane_marker_mesh);
-  ConvertMeshes(_geoMeshes.lane_grayed_asphalt_mesh);
   ConvertMeshes(_geoMeshes.lane_grayed_lane_mesh);
   ConvertMeshes(_geoMeshes.lane_grayed_marker_mesh);
-  ConvertMeshes(_geoMeshes.lane_hbounds_mesh);
   ConvertMeshes(_geoMeshes.branch_point_mesh);
 }
 

@@ -217,10 +217,6 @@ class MaliputViewerModel {
   /// \param[in] _lane Lane to toggle
   bool ToggleLaneMarkers(const maliput::api::Lane* _lane);
 
-  /// \brief Toggles the current status of the lane marker's visibility and return the result
-  /// \param[in] _lane Lane to toggle
-  bool ToggleLaneMarkers(const maliput::api::Lane* _lane);
-
   /// \brief Get N lanes from the underlying road geometry.
   /// \param[in] _n Amount of lanes desired to get from the underlying
   /// road geometry.

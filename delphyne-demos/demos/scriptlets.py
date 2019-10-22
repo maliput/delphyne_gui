@@ -64,13 +64,14 @@ class DelayedChangeSpeed(py_trees.behaviour.Behaviour):
     def initialise(self):
         self.status = py_trees.common.Status.RUNNING
 
+    def late_setup(self, simulation):
+        self.simulation = simulation
+        self.agent = simulation.get_agent_by_name(self.agent_name)
+
     def update(self):
-        simulation = delphyne.blackboard.state.get_simulation()
-        if simulation is not None and simulation.get_current_time() >= 10.0:
+        if self.simulation.get_current_time() >= 10.0:
             print("Speed up!")
-            delphyne.blackboard.state.set_attribute_for_agent(
-                self.agent_name, "speed", self.speed
-            )
+            self.agent.set_speed(self.speed)
             self.status = py_trees.common.Status.SUCCESS
         return self.status
 

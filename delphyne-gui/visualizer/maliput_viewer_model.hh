@@ -213,7 +213,8 @@ class MaliputViewerModel {
   /// \returns Vector containing all the traffic lights that the underlying road network contains.
   std::vector<const maliput::api::rules::TrafficLight*> GetTrafficLights() const;
 
-  /// \brief Toggles the current status of the lane marker's visibility and return the result
+  /// \brief Toggles the current status of the lane marker's visibility and returns the result, if @p _lane
+  /// was not previously clicked, it is registered with value true and true is returned
   /// \param[in] _lane Lane to toggle
   bool ToggleLaneMarkers(const maliput::api::Lane* _lane);
 

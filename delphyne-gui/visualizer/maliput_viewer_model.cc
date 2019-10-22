@@ -362,7 +362,9 @@ void MaliputViewerModel::LoadRoadGeometry(const std::string& _maliputFilePath, c
 
 /////////////////////////////////////////////////
 bool MaliputViewerModel::ToggleLaneMarkers(const maliput::api::Lane* _lane) {
-  std::string lane_id = _lane->id().string();
+  DELPHYNE_DEMAND(_lane != nullptr);
+
+  const std::string lane_id = _lane->id().string();
   std::map<std::string, bool>::iterator i = this->laneMarkers.find(lane_id);
 
   if (i != this->laneMarkers.end()) {
@@ -389,8 +391,8 @@ void MaliputViewerModel::ConvertMeshes(
     } else {
       ignmsg << "Enabling mesh [" << it.first << "].\n";
       maliputMesh->enabled = true;
-      std::size_t found_asphalt = it.first.find("asphalt");
-      std::size_t found_hbounds = it.first.find("h_bounds");
+      const std::size_t found_asphalt = it.first.find("asphalt");
+      const std::size_t found_hbounds = it.first.find("h_bounds");
       if (found_asphalt != std::string::npos || found_hbounds != std::string::npos) {
         maliputMesh->visible = true;
       } else {

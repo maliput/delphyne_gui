@@ -100,7 +100,7 @@ void MaliputViewerWidget::OnVisualClicked(ignition::rendering::RayQueryResult ra
     if (lane) {
       const std::string& lane_id = lane->id().string();
       ignmsg << "Clicked lane ID: " << lane_id << "\n";
-      bool visualized = this->model->ToggleLaneMarkers(lane);
+      const bool visualized = this->model->ToggleLaneMarkers(lane);
       OnLayerMeshChanged("lane_" + lane_id, visualized);
       OnLayerMeshChanged("marker_" + lane_id, visualized);
       OnLayerMeshChanged("hbounds_" + lane_id, visualized);

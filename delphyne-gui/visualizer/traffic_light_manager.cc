@@ -82,11 +82,11 @@ void TrafficLightManager::SetBulbStates(const maliput::api::rules::BulbStates& _
 
 ignition::rendering::VisualPtr TrafficLightManager::GetBulbMesh(
     const maliput::api::rules::UniqueBulbId& _uniqueBulbId) const {
-  auto trafficLight = trafficLights.find(_uniqueBulbId.traffic_light_id);
+  auto trafficLight = trafficLights.find(_uniqueBulbId.traffic_light_id());
   if (trafficLight != trafficLights.end()) {
-    auto bulbGroup = trafficLight->second.bulbGroups.find(_uniqueBulbId.bulb_group_id);
+    auto bulbGroup = trafficLight->second.bulbGroups.find(_uniqueBulbId.bulb_group_id());
     if (bulbGroup != trafficLight->second.bulbGroups.end()) {
-      auto bulb = bulbGroup->second.bulbs.find(_uniqueBulbId.bulb_id);
+      auto bulb = bulbGroup->second.bulbs.find(_uniqueBulbId.bulb_id());
       if (bulb != bulbGroup->second.bulbs.end()) {
         return bulb->second;
       }

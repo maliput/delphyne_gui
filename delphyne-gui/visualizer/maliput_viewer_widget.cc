@@ -103,7 +103,8 @@ void MaliputViewerWidget::OnVisualClicked(ignition::rendering::RayQueryResult ra
       const bool visualized = this->model->ToggleLaneMarkers(lane);
       OnLayerMeshChanged("lane_" + lane_id, visualized);
       OnLayerMeshChanged("marker_" + lane_id, visualized);
-      OnLayerMeshChanged("hbounds_" + lane_id, visualized);
+      // OnLayerMeshChanged("h_bounds", visualized);
+      // this->model->maliputMeshes["hbounds"] = visualized;
       this->renderWidget->Outline(lane);
       PhaseRingPhaseIds phaseRingIdAndPhaseIdSelected = this->rulesVisualizerWidget->GetSelectedPhaseRingAndPhaseId();
       emit this->rulesVisualizerWidget->ReceiveRules(

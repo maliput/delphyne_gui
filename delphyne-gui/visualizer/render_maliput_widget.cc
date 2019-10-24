@@ -278,15 +278,6 @@ bool RenderMaliputWidget::FillMaterial(const maliput::utility::Material* _malipu
 }
 
 /////////////////////////////////////////////////
-void RenderMaliputWidget::CreateTransparentMaterial(ignition::rendering::MaterialPtr& _material) const {
-  _material->SetDiffuse(0., 0., 0., 0.);
-  _material->SetAmbient(0., 0., 0., 0.);
-  _material->SetSpecular(0., 0., 0., 0.);
-  _material->SetShininess(0.);
-  _material->SetTransparency(1.);
-}
-
-/////////////////////////////////////////////////
 void RenderMaliputWidget::CreateLaneLabelMaterial(ignition::rendering::MaterialPtr& _material) const {
   _material->SetDiffuse(0.8, 0.8, 0.0);
   _material->SetAmbient(1.0, 1.0, 0.0);
@@ -307,12 +298,6 @@ void RenderMaliputWidget::CreateBranchPointLabelMaterial(ignition::rendering::Ma
 /////////////////////////////////////////////////
 void RenderMaliputWidget::RenderRoadMeshes(const std::map<std::string, std::unique_ptr<MaliputMesh>>& _maliputMeshes) {
   for (const auto& it : _maliputMeshes) {
-    // Creates a material for the visual.
-    ignition::rendering::MaterialPtr material = this->scene->CreateMaterial();
-    if (!material) {
-      ignerr << "Failed to create material.\n";
-      continue;
-    }
     /* TODO: Enable once ignition-rendering2 supports culling
     material->SetCulling(ignition::rendering::CullMode::CM_NONE);*/
 
@@ -321,16 +306,21 @@ void RenderMaliputWidget::RenderRoadMeshes(const std::map<std::string, std::uniq
     // If the mesh is disabled, there is no mesh for it so it must be set to
     // transparent.
     if (!it.second->enabled) {
-      // If the mesh already exits, a new transparent material is set.
+      // If the mesh already exists, set visibility to false
       if (meshExists != this->meshes.end()) {
-        this->CreateTransparentMaterial(material);
-        this->meshes[it.first]->SetMaterial(material);
+        this->meshes[it.first]->SetVisible(false);
       }
     } else {
       // If the mesh doesn't exist, it creates new one. Otherwise, just gathers
       // the pointer to set the correct material.
       ignition::rendering::VisualPtr visual;
       if (meshExists == this->meshes.end()) {
+        // Creates a material for the visual.
+        ignition::rendering::MaterialPtr material = this->scene->CreateMaterial();
+        if (!material) {
+          ignerr << "Failed to create material.\n";
+          continue;
+        }
         visual = this->scene->CreateVisual();
         if (!visual) {
           ignerr << "Failed to create visual.\n";
@@ -347,18 +337,18 @@ void RenderMaliputWidget::RenderRoadMeshes(const std::map<std::string, std::uniq
         visual->AddGeometry(meshGeom);
         // Adds the mesh to the parent root visual.
         this->rootVisual->AddChild(visual);
+
+        // Applies the correct material to the mesh.
+        if (!this->FillMaterial(it.second->material.get(), material)) {
+          ignerr << "Failed to fill " << it.first << " material information.\n";
+          continue;
+        }
+
+        visual->SetMaterial(material);
       } else {
         visual = this->meshes[it.first];
       }
-
-      // Applies the correct material to the mesh.
-      if (!it.second->visible) {
-        this->CreateTransparentMaterial(material);
-      } else if (!this->FillMaterial(it.second->material.get(), material)) {
-        ignerr << "Failed to fill " << it.first << " material information.\n";
-        continue;
-      }
-      visual->SetMaterial(material);
+      this->meshes[it.first]->SetVisible(it.second->visible);
     }
   }
 }
@@ -367,27 +357,26 @@ void RenderMaliputWidget::RenderRoadMeshes(const std::map<std::string, std::uniq
 void RenderMaliputWidget::RenderLabels(const std::map<MaliputLabelType, std::vector<MaliputLabel>>& _labels) {
   for (const auto& it : _labels) {
     for (const MaliputLabel& label : it.second) {
-      // Creates a material for the visual.
-      ignition::rendering::MaterialPtr material = this->scene->CreateMaterial();
-      if (!material) {
-        ignerr << "Failed to create material.\n";
-        continue;
-      }
       // Checks if the text labels to be rendered already exists or not.
       const auto labelExists = this->textLabels.find(label.text);
       // If the text label is disabled, there is no visual for it so it must be
       //  set to transparent.
       if (!label.enabled) {
-        // If the text label already exits, a new transparent material is set.
+        // If the text label already exists, set visibility to false
         if (labelExists != this->textLabels.end()) {
-          this->CreateTransparentMaterial(material);
-          this->textLabels[label.text]->SetMaterial(material);
+          this->textLabels[label.text]->SetVisible(false);
         }
       } else {
         // If the text label doesn't exist, it creates new one. Otherwise,
         // it just gathers the pointer to set the correct material.
         ignition::rendering::VisualPtr visual;
         if (labelExists == this->textLabels.end()) {
+          // Creates a material for the visual.
+          ignition::rendering::MaterialPtr material = this->scene->CreateMaterial();
+          if (!material) {
+            ignerr << "Failed to create material.\n";
+            continue;
+          }
           visual = this->scene->CreateVisual();
           if (!visual) {
             ignerr << "Failed to create visual.\n";
@@ -406,12 +395,7 @@ void RenderMaliputWidget::RenderLabels(const std::map<MaliputLabelType, std::vec
           visual->AddGeometry(textGeometry);
           // Adds the mesh to the parent root visual.
           this->rootVisual->AddChild(visual);
-        } else {
-          visual = this->textLabels[label.text];
-        }
-
-        // Assigns a material for the visual.
-        if (label.visible) {
+          // Assigns a material for the visual.
           if (it.first == MaliputLabelType::kLane) {
             CreateLaneLabelMaterial(material);
           } else if (it.first == MaliputLabelType::kBranchPoint) {
@@ -419,11 +403,12 @@ void RenderMaliputWidget::RenderLabels(const std::map<MaliputLabelType, std::vec
           } else {
             ignerr << "Unsupported label type for: " << label.text << std::endl;
           }
+          // Applies the correct material to the mesh.
+          visual->SetMaterial(material);
         } else {
-          CreateTransparentMaterial(material);
+          visual = this->textLabels[label.text];
         }
-        // Applies the correct material to the mesh.
-        visual->SetMaterial(material);
+        this->textLabels[label.text]->SetVisible(label.visible);
       }
     }
   }

@@ -361,6 +361,12 @@ void MaliputViewerModel::LoadRoadGeometry(const std::string& _maliputFilePath, c
 }
 
 /////////////////////////////////////////////////
+void MaliputViewerModel::SetLaneMarker(const std::string& _key, const bool _visible) {
+  this->laneMarkers.erase(_key);
+  this->laneMarkers.insert({_key, _visible});
+}
+
+/////////////////////////////////////////////////
 bool MaliputViewerModel::ToggleLaneMarkers(const maliput::api::Lane* _lane) {
   DELPHYNE_DEMAND(_lane != nullptr);
 
@@ -372,9 +378,9 @@ bool MaliputViewerModel::ToggleLaneMarkers(const maliput::api::Lane* _lane) {
     return i->second;
   }
 
-  this->laneMarkers.insert({lane_id, true});
+  this->laneMarkers.insert({lane_id, false});
 
-  return true;
+  return false;
 }
 
 /////////////////////////////////////////////////
@@ -391,13 +397,7 @@ void MaliputViewerModel::ConvertMeshes(
     } else {
       ignmsg << "Enabling mesh [" << it.first << "].\n";
       maliputMesh->enabled = true;
-      const std::size_t found_asphalt = it.first.find("asphalt");
-      const std::size_t found_hbounds = it.first.find("h_bounds");
-      if (found_asphalt != std::string::npos || found_hbounds != std::string::npos) {
-        maliputMesh->visible = true;
-      } else {
-        maliputMesh->visible = false;
-      }
+      maliputMesh->visible = true;
     }
     // Retrieves the material
     maliputMesh->material = std::make_unique<maliput::utility::Material>(it.second.second);
@@ -496,7 +496,7 @@ void MaliputViewerModel::GenerateLabels() {
 ///////////////////////////////////////////////////////
 void MaliputViewerModel::SetLayerState(const std::string& _key, bool _isVisible) {
   if (this->maliputMeshes.find(_key) == this->maliputMeshes.end()) {
-    igndbg << _key + " doest not exist in maliputMeshes." << std::endl;
+    igndbg << _key + " does not exist in maliputMeshes." << std::endl;
     return;
   }
   this->maliputMeshes[_key]->visible = _isVisible;

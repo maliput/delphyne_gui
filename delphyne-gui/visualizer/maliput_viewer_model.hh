@@ -218,6 +218,12 @@ class MaliputViewerModel {
   /// \param[in] _lane Lane to toggle
   bool ToggleLaneMarkers(const maliput::api::Lane* _lane);
 
+  /// \brief Sets a lane marker to @p _visible and creates an entry in the map if it doesn't
+  /// already exist
+  /// \param[in] _key The key to insert into the map
+  /// \param[in] _visible The boolean to set the value of the map
+  void SetLaneMarker(const std::string& _key, const bool _visible);
+
   /// \brief Get N lanes from the underlying road geometry.
   /// \param[in] _n Amount of lanes desired to get from the underlying
   /// road geometry.

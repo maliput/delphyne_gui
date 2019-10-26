@@ -79,11 +79,11 @@ void LayerSelectionWidget::onAsphaltValueChanged(int state) {
 }
 
 ///////////////////////////////////////////////////////
-void LayerSelectionWidget::onLaneValueChanged(int state) { emit valueChanged("lane", this->laneCheckBox->isChecked()); }
+void LayerSelectionWidget::onLaneValueChanged(int state) { emit valueChanged("lane_all", this->laneCheckBox->isChecked()); }
 
 ///////////////////////////////////////////////////////
 void LayerSelectionWidget::onMarkerValueChanged(int state) {
-  emit valueChanged("marker", this->markerCheckBox->isChecked());
+  emit valueChanged("marker_all", this->markerCheckBox->isChecked());
 }
 
 ///////////////////////////////////////////////////////
@@ -93,7 +93,7 @@ void LayerSelectionWidget::onHBoundsValueChanged(int state) {
 
 ///////////////////////////////////////////////////////
 void LayerSelectionWidget::onBranchPointValueChanged(int state) {
-  emit valueChanged("branch_point", this->branchPointCheckBox->isChecked());
+  emit valueChanged("branch_point_all", this->branchPointCheckBox->isChecked());
 }
 
 ///////////////////////////////////////////////////////
@@ -103,12 +103,12 @@ void LayerSelectionWidget::onGrayedAsphaltValueChanged(int state) {
 
 ///////////////////////////////////////////////////////
 void LayerSelectionWidget::onGrayedLaneValueChanged(int state) {
-  emit valueChanged("grayed_lane", this->grayedLaneCheckBox->isChecked());
+  emit valueChanged("grayed_lane_all", this->grayedLaneCheckBox->isChecked());
 }
 
 ///////////////////////////////////////////////////////
 void LayerSelectionWidget::onGrayedMarkerValueChanged(int state) {
-  emit valueChanged("grayed_marker", this->grayedMarkerCheckBox->isChecked());
+  emit valueChanged("grayed_marker_all", this->grayedMarkerCheckBox->isChecked());
 }
 
 ///////////////////////////////////////////////////////

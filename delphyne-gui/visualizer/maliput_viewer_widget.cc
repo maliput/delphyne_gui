@@ -40,8 +40,24 @@ MaliputViewerWidget::MaliputViewerWidget(QWidget* parent) : Plugin() {
 
 /////////////////////////////////////////////////
 void MaliputViewerWidget::OnLayerMeshChanged(const std::string& key, bool newValue) {
-  // Updates the model.
-  this->model->SetLayerState(key, newValue);
+  // If the keyword "all" is found, enable all of the parsed type
+  const std::size_t all_index = key.find("all");
+  if (all_index != std::string::npos) {
+    std::string keyword = key.substr(0, all_index);
+    for (auto const& it : this->model->Meshes()) {
+      if (it.first.find(keyword) != std::string::npos) {
+        // Updates the model.
+        const std::size_t firstNum = it.first.find_first_of("0123456789");
+        std::string lane_id = it.first.substr(firstNum, it.first.length() - firstNum + 1);
+        this->model->SetLayerState(it.first, newValue);
+        this->model->SetLaneMarker(lane_id, newValue);
+      }
+    }
+  } else {
+    // Updates the model.
+    this->model->SetLayerState(key, newValue);
+  }
+  
   // Replicates into the GUI.
   this->renderWidget->RenderRoadMeshes(this->model->Meshes());
 }
@@ -103,8 +119,6 @@ void MaliputViewerWidget::OnVisualClicked(ignition::rendering::RayQueryResult ra
       const bool visualized = this->model->ToggleLaneMarkers(lane);
       OnLayerMeshChanged("lane_" + lane_id, visualized);
       OnLayerMeshChanged("marker_" + lane_id, visualized);
-      // OnLayerMeshChanged("h_bounds", visualized);
-      // this->model->maliputMeshes["hbounds"] = visualized;
       this->renderWidget->Outline(lane);
       PhaseRingPhaseIds phaseRingIdAndPhaseIdSelected = this->rulesVisualizerWidget->GetSelectedPhaseRingAndPhaseId();
       emit this->rulesVisualizerWidget->ReceiveRules(

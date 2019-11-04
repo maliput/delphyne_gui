@@ -79,7 +79,9 @@ void LayerSelectionWidget::onAsphaltValueChanged(int state) {
 }
 
 ///////////////////////////////////////////////////////
-void LayerSelectionWidget::onLaneValueChanged(int state) { emit valueChanged("lane_all", this->laneCheckBox->isChecked()); }
+void LayerSelectionWidget::onLaneValueChanged(int state) {
+  emit valueChanged("lane_all", this->laneCheckBox->isChecked());
+}
 
 ///////////////////////////////////////////////////////
 void LayerSelectionWidget::onMarkerValueChanged(int state) {

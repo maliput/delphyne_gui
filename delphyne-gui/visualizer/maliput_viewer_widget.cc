@@ -57,7 +57,7 @@ void MaliputViewerWidget::OnLayerMeshChanged(const std::string& key, bool newVal
     // Updates the model.
     this->model->SetLayerState(key, newValue);
   }
-  
+
   // Replicates into the GUI.
   this->renderWidget->RenderRoadMeshes(this->model->Meshes());
 }

@@ -213,17 +213,6 @@ class MaliputViewerModel {
   /// \returns Vector containing all the traffic lights that the underlying road network contains.
   std::vector<const maliput::api::rules::TrafficLight*> GetTrafficLights() const;
 
-  /// \brief Toggles the current status of the lane marker's visibility and returns the result, if @p _lane
-  /// was not previously clicked, it is registered with value true and true is returned
-  /// \param[in] _lane Lane to toggle
-  bool ToggleLaneMarkers(const maliput::api::Lane* _lane);
-
-  /// \brief Sets a lane marker to @p _visible and creates an entry in the map if it doesn't
-  /// already exist
-  /// \param[in] _key The key to insert into the map
-  /// \param[in] _visible The boolean to set the value of the map
-  void SetLaneMarker(const std::string& _key, const bool _visible);
-
   /// \brief Get N lanes from the underlying road geometry.
   /// \param[in] _n Amount of lanes desired to get from the underlying
   /// road geometry.
@@ -335,9 +324,6 @@ class MaliputViewerModel {
 
   /// \brief Map of labels.
   std::map<MaliputLabelType, std::vector<MaliputLabel>> labels;
-
-  /// \brief Map of the booleans for if the Markers for the lane are visualized
-  std::map<std::string, bool> laneMarkers;
 };
 
 template <typename ContainerType>

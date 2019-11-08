@@ -25,6 +25,8 @@ MaliputViewerWidget::MaliputViewerWidget(QWidget* parent) : Plugin() {
     this->model->Load(GlobalAttributes::GetArgument("yaml_file"));
     this->VisualizeFileName(GlobalAttributes::GetArgument("yaml_file"));
   }
+  this->meshDefaults["marker"] = true;
+  this->meshDefaults["lane"] = true;
 
   QObject::connect(this->layerSelectionWidget, SIGNAL(valueChanged(const std::string&, bool)), this,
                    SLOT(OnLayerMeshChanged(const std::string&, bool)));
@@ -50,12 +52,25 @@ void MaliputViewerWidget::OnLayerMeshChanged(const std::string& key, bool newVal
         const std::size_t firstNum = it.first.find_first_of("0123456789");
         std::string lane_id = it.first.substr(firstNum, it.first.length() - firstNum + 1);
         this->model->SetLayerState(it.first, newValue);
-        this->model->SetLaneMarker(lane_id, newValue);
       }
+    }
+    // Store the value the mesh should return to if not selected
+    const std::size_t found_marker = key.find("marker");
+    const std::size_t found_lane = key.find("lane");
+    if (found_marker != std::string::npos) {
+      meshDefaults["marker"] = newValue;
+    } else if (found_lane != std::string::npos) {
+      meshDefaults["lane"] = newValue;
     }
   } else {
     // Updates the model.
     this->model->SetLayerState(key, newValue);
+
+    // If the asphalt is turned off, deselect all lanes
+    const std::size_t found_asphalt = key.find("asphalt");
+    if (found_asphalt != std::string::npos && !newValue) {
+      this->renderWidget->DeselectAllLanes();
+    }
   }
 
   // Replicates into the GUI.
@@ -116,10 +131,16 @@ void MaliputViewerWidget::OnVisualClicked(ignition::rendering::RayQueryResult ra
     if (lane) {
       const std::string& lane_id = lane->id().string();
       ignmsg << "Clicked lane ID: " << lane_id << "\n";
-      const bool visualized = this->model->ToggleLaneMarkers(lane);
-      OnLayerMeshChanged("lane_" + lane_id, visualized);
-      OnLayerMeshChanged("marker_" + lane_id, visualized);
-      this->renderWidget->Outline(lane);
+      this->renderWidget->SelectLane(lane);
+      const bool visualized = this->renderWidget->IsSelected(lane);
+      // Set the mesh back to the check box default if the lane is not selected
+      if (!visualized) {
+        OnLayerMeshChanged("lane_" + lane_id, meshDefaults["lane"]);
+        OnLayerMeshChanged("marker_" + lane_id, meshDefaults["marker"]);
+      } else {
+        OnLayerMeshChanged("lane_" + lane_id, visualized);
+        OnLayerMeshChanged("marker_" + lane_id, visualized);
+      }
       PhaseRingPhaseIds phaseRingIdAndPhaseIdSelected = this->rulesVisualizerWidget->GetSelectedPhaseRingAndPhaseId();
       emit this->rulesVisualizerWidget->ReceiveRules(
           QString(lane_id.c_str()),
@@ -129,7 +150,7 @@ void MaliputViewerWidget::OnVisualClicked(ignition::rendering::RayQueryResult ra
       this->renderWidget->SetArrowVisibility(true);
     } else {
       this->renderWidget->SetArrowVisibility(false);
-      this->renderWidget->HideOutline();
+      this->renderWidget->DeselectAllLanes();
     }
   }
 }
@@ -197,7 +218,7 @@ void MaliputViewerWidget::OnRulesForLaneRequested() {
 
   const std::string lane_id = this->rulesVisualizerWidget->GetSelectedLaneId().toStdString();
   if (!lane_id.empty()) {
-    this->renderWidget->Outline(this->model->GetLaneFromId(lane_id));
+    this->renderWidget->SelectLane(this->model->GetLaneFromId(lane_id));
     emit this->rulesVisualizerWidget->ReceiveRules(
         this->rulesVisualizerWidget->GetSelectedLaneId(),
         this->model->GetRulesOfLane<QString>(phase_ring_id, phase_id, lane_id));

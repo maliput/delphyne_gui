@@ -20,7 +20,7 @@
 #include "arrow_mesh.hh"
 #include "maliput_viewer_model.hh"
 #include "orbit_view_control.hh"
-#include "outliner.hh"
+#include "selecter.hh"
 #include "traffic_light_manager.hh"
 
 namespace delphyne {
@@ -81,15 +81,20 @@ class RenderMaliputWidget : public QWidget {
   /// \param[in] _visible Visibility of the arrow.
   void SetArrowVisibility(bool _visible);
 
-  /// \brief Hide the entire outline of a lane.
-  void HideOutline();
+  /// \brief Deselects all selected lanes.
+  void DeselectAllLanes();
 
   /// \brief Clears all the references to text labels, meshes and the scene.
   void Clear();
 
-  /// \brief Outlines a given lane.
-  /// \param[in] _lane Lane to outline.
-  void Outline(const maliput::api::Lane* _lane);
+  /// \brief Selects a lane if it is not selected and deselects a lane if it is selected.
+  /// \param[in] _lane Lane to select or deselect.
+  void SelectLane(const maliput::api::Lane* _lane);
+
+  /// \brief Finds if the passed in lane is currently selected or not.
+  /// \param[in] _lane Lane to be evaluated.
+  /// \returns Boolean that determines whether the lane is selected or not.
+  bool IsSelected(const maliput::api::Lane* _lane);
 
   /// \brief Overridden method to receive Qt paint event.
   /// \param[in] _e The event that happened.
@@ -208,8 +213,8 @@ class RenderMaliputWidget : public QWidget {
   /// \brief Arrow that points the location clicked in the visualizer.
   std::unique_ptr<ArrowMesh> arrow;
 
-  /// \brief Outliner used for outlining clicked lanes in the visualizer.
-  std::unique_ptr<Outliner> outliner;
+  /// \brief Selecter used for selecting clicked lanes in the visualizer.
+  std::unique_ptr<Selecter> selecter;
 
   /// \brief Manager of traffic lights visualization.
   std::unique_ptr<TrafficLightManager> trafficLightManager;
@@ -229,16 +234,18 @@ class RenderMaliputWidget : public QWidget {
   /// \brief Map of text labels visual pointers.
   std::map<std::string, ignition::rendering::VisualPtr> textLabels;
 
-  /// \brief Scale in the X axis for the cubes used in the outliner.
-  static constexpr double kOutlinerScaleX = 0.3;
-  /// \brief Scale in the Y axis for the cubes used in the outliner.
-  static constexpr double kOutlinerScaleY = 0.5;
-  /// \brief Scale in the Z axis for the cubes used in the outliner.
-  static constexpr double kOutlinerScaleZ = 0.1;
-  /// \brief Tolerance used for the outliner.
-  static constexpr double kOutlinerMinTolerance = 0.6;
-  /// \brief Max amount of cubes used for the outliner.
-  static constexpr int kOutlinerPoolSize = 1500;
+  /// \brief Scale in the X axis for the cubes used in the selecter.
+  static constexpr double kSelecterScaleX = 0.3;
+  /// \brief Scale in the Y axis for the cubes used in the selecter.
+  static constexpr double kSelecterScaleY = 0.5;
+  /// \brief Scale in the Z axis for the cubes used in the selecter.
+  static constexpr double kSelecterScaleZ = 0.1;
+  /// \brief Tolerance used for the selecter.
+  static constexpr double kSelecterMinTolerance = 0.6;
+  /// \brief Max amount of cubes used for the selecter.
+  static constexpr int kSelecterPoolSize = 50;
+  /// \brief Number of lanes to pre-initialize in selecter cubes vector.
+  static constexpr int kNumLanes = 15;
   /// \brief Every how much time should the lights blink in miliseconds.
   static constexpr int kTrafficLightsTickPeriod = 500;
 };

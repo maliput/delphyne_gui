@@ -239,8 +239,8 @@ void RenderMaliputWidget::CreateRenderWindow() {
 
   this->orbitViewControl.reset(new OrbitViewControl(this->camera));
 
-  this->outliner = std::make_unique<Outliner>(this->scene, kOutlinerScaleX, kOutlinerScaleY, kOutlinerScaleZ,
-                                              kOutlinerPoolSize, kOutlinerMinTolerance);
+  this->selecter = std::make_unique<Selecter>(this->scene, kSelecterScaleX, kSelecterScaleY, kSelecterScaleZ,
+                                              kSelecterPoolSize, kNumLanes, kSelecterMinTolerance);
 }
 
 /////////////////////////////////////////////////
@@ -448,10 +448,18 @@ void RenderMaliputWidget::SetArrowVisibility(bool _visible) {
 }
 
 /////////////////////////////////////////////////
-void RenderMaliputWidget::HideOutline() {
-  if (this->outliner) {
-    this->outliner->SetVisibility(false);
+void RenderMaliputWidget::DeselectAllLanes() {
+  if (this->selecter) {
+    this->selecter->DeselectAllLanes();
   }
+}
+
+/////////////////////////////////////////////////
+bool RenderMaliputWidget::IsSelected(const maliput::api::Lane* _lane) {
+  if (this->selecter) {
+    return this->selecter->IsSelected(_lane);
+  }
+  return false;
 }
 
 /////////////////////////////////////////////////
@@ -465,7 +473,7 @@ void RenderMaliputWidget::Clear() {
   for (auto it : meshes) {
     this->rootVisual->RemoveChild(it.second);
   }
-  HideOutline();
+  DeselectAllLanes();
   if (this->arrow) {
     SetArrowVisibility(false);
   }
@@ -475,7 +483,7 @@ void RenderMaliputWidget::Clear() {
 }
 
 /////////////////////////////////////////////////
-void RenderMaliputWidget::Outline(const maliput::api::Lane* _lane) { this->outliner->OutlineLane(_lane); }
+void RenderMaliputWidget::SelectLane(const maliput::api::Lane* _lane) { this->selecter->SelectLane(_lane); }
 
 /////////////////////////////////////////////////
 void RenderMaliputWidget::showEvent(QShowEvent* _e) {
@@ -552,7 +560,7 @@ void RenderMaliputWidget::mousePressEvent(QMouseEvent* _e) {
       emit VisualClicked(rayResult);
     } else {
       SetArrowVisibility(false);
-      HideOutline();
+      DeselectAllLanes();
     }
   }
   this->UpdateViewport();

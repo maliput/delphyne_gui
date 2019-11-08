@@ -325,7 +325,6 @@ void MaliputViewerModel::Clear() {
   this->roadNetwork.reset();
   this->labels.clear();
   this->maliputMeshes.clear();
-  this->laneMarkers.clear();
 }
 
 /////////////////////////////////////////////////
@@ -358,29 +357,6 @@ void MaliputViewerModel::LoadRoadGeometry(const std::string& _maliputFilePath, c
     }
   }
   throw std::runtime_error(_maliputFilePath + " doesn't have any of the multilane keys");
-}
-
-/////////////////////////////////////////////////
-void MaliputViewerModel::SetLaneMarker(const std::string& _key, const bool _visible) {
-  this->laneMarkers.erase(_key);
-  this->laneMarkers.insert({_key, _visible});
-}
-
-/////////////////////////////////////////////////
-bool MaliputViewerModel::ToggleLaneMarkers(const maliput::api::Lane* _lane) {
-  DELPHYNE_DEMAND(_lane != nullptr);
-
-  const std::string lane_id = _lane->id().string();
-  std::map<std::string, bool>::iterator i = this->laneMarkers.find(lane_id);
-
-  if (i != this->laneMarkers.end()) {
-    i->second = !(i->second);
-    return i->second;
-  }
-
-  this->laneMarkers.insert({lane_id, false});
-
-  return false;
 }
 
 /////////////////////////////////////////////////

@@ -448,8 +448,18 @@ void RenderMaliputWidget::SetArrowVisibility(bool _visible) {
 }
 
 /////////////////////////////////////////////////
+std::vector<std::string> RenderMaliputWidget::GetSelectedLanes() {
+  std::vector<std::string> selectedLanes;
+  if (this->selecter) {
+    selectedLanes = this->selecter->GetSelectedLanes();
+  }
+  return selectedLanes;
+}
+
+/////////////////////////////////////////////////
 void RenderMaliputWidget::DeselectAllLanes() {
   if (this->selecter) {
+    emit SetAllLanesToDefault();
     this->selecter->DeselectAllLanes();
   }
 }
@@ -473,6 +483,7 @@ void RenderMaliputWidget::Clear() {
   for (auto it : meshes) {
     this->rootVisual->RemoveChild(it.second);
   }
+  ignwarn << "Clearing\n";
   DeselectAllLanes();
   if (this->arrow) {
     SetArrowVisibility(false);
@@ -560,6 +571,7 @@ void RenderMaliputWidget::mousePressEvent(QMouseEvent* _e) {
       emit VisualClicked(rayResult);
     } else {
       SetArrowVisibility(false);
+      ignwarn << "Mouse event\n";
       DeselectAllLanes();
     }
   }

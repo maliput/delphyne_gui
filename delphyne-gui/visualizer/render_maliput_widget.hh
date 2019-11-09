@@ -84,6 +84,10 @@ class RenderMaliputWidget : public QWidget {
   /// \brief Deselects all selected lanes.
   void DeselectAllLanes();
 
+  /// \brief Gets the currently selected lanes.
+  /// \returns A vector of the lane_id's which are selected.
+  std::vector<std::string> GetSelectedLanes();
+
   /// \brief Clears all the references to text labels, meshes and the scene.
   void Clear();
 
@@ -100,9 +104,12 @@ class RenderMaliputWidget : public QWidget {
   /// \param[in] _e The event that happened.
   virtual void paintEvent(QPaintEvent* _e);
 
-  /// \brief Signal that gets fired when a click happens on a visual (mesh)
  signals:
+  /// \brief Signal that gets fired when a click happens on a visual (mesh)
   void VisualClicked(ignition::rendering::RayQueryResult rayResult);
+  
+  /// \brief Signal that gets fired upon a call to deselect all lanes
+  void SetAllLanesToDefault();
 
  protected:
   /// \brief Overridden method to receive Qt show event.

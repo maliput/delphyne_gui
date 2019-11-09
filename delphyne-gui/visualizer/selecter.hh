@@ -37,14 +37,18 @@ class Selecter {
   /// \param[in] _visible Boolean that determines the visibility of the outlining.
   void SetVisibility(bool _visible);
 
-  /// \brief Resets the population map
+  /// \brief Resets the population map.
   void ResetPopulationMap();
 
-  /// \brief Resets the selected lane group
+  /// \brief Resets the selected lane group.
   void ResetSelectedLanes();
 
-  /// \brief Deselects all lanes, resetting all corresponding attributes
+  /// \brief Deselects all lanes, resetting all corresponding attributes.
   void DeselectAllLanes();
+
+  /// \brief Gets the currently selected lanes.
+  /// \returns A vector of the lane_id's which are selected.
+  std::vector<std::string> GetSelectedLanes();
 
   /// \brief Finds if the passed in lane is currently selected or not.
   /// \param[in] _lane Lane to be evaluated.

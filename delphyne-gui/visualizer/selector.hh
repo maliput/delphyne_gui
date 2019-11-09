@@ -1,7 +1,7 @@
 // Copyright 2019 Toyota Research Institute
 
-#ifndef DELPHYNE_GUI_SELECTER_HH
-#define DELPHYNE_GUI_SELECTER_HH
+#ifndef DELPHYNE_GUI_SELECTOR_HH
+#define DELPHYNE_GUI_SELECTOR_HH
 
 #include <ignition/math/Vector3.hh>
 #include <ignition/rendering/Scene.hh>
@@ -13,7 +13,7 @@ namespace delphyne {
 namespace gui {
 
 /// \brief Selects lanes and outlines them with red cubes along the sides of the lane.
-class Selecter {
+class Selector {
  public:
   /// \brief Initializes the pool of red cubes to be used for selecting lanes.
   /// \param[in] _scene Pointer to the scene where cubes will live.
@@ -24,10 +24,10 @@ class Selecter {
   /// \param[in] _poolSize Amount of cubes to be used for outlining.
   /// \param[in] _numLanes The number of lanes to auto-initialize visuals for
   /// \param[in] _minTolerance Distance between cubes.
-  Selecter(ignition::rendering::ScenePtr& _scene, double _scaleX, double _scaleY, double _scaleZ, int _poolSize,
+  Selector(ignition::rendering::ScenePtr& _scene, double _scaleX, double _scaleY, double _scaleZ, int _poolSize,
            int _numLanes, double _minTolerance);
   /// \brief Destructor. Cube's destruction will be in charge of the scene's destructor.
-  ~Selecter() = default;
+  ~Selector() = default;
 
   /// \brief Selects a given lane if it is not selected and deselects a lane if it is
   /// \param[in] _lane Lane to be outlined.
@@ -146,4 +146,4 @@ class Selecter {
 }  // namespace gui
 }  // namespace delphyne
 
-#endif  // DELPHYNE_GUI_SELECTER_HH
+#endif  // DELPHYNE_GUI_SELECTOR_HH

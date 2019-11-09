@@ -20,7 +20,7 @@
 #include "arrow_mesh.hh"
 #include "maliput_viewer_model.hh"
 #include "orbit_view_control.hh"
-#include "selecter.hh"
+#include "selector.hh"
 #include "traffic_light_manager.hh"
 
 namespace delphyne {
@@ -220,8 +220,8 @@ class RenderMaliputWidget : public QWidget {
   /// \brief Arrow that points the location clicked in the visualizer.
   std::unique_ptr<ArrowMesh> arrow;
 
-  /// \brief Selecter used for selecting clicked lanes in the visualizer.
-  std::unique_ptr<Selecter> selecter;
+  /// \brief Selector used for selecting clicked lanes in the visualizer.
+  std::unique_ptr<Selector> selector;
 
   /// \brief Manager of traffic lights visualization.
   std::unique_ptr<TrafficLightManager> trafficLightManager;
@@ -241,17 +241,17 @@ class RenderMaliputWidget : public QWidget {
   /// \brief Map of text labels visual pointers.
   std::map<std::string, ignition::rendering::VisualPtr> textLabels;
 
-  /// \brief Scale in the X axis for the cubes used in the selecter.
-  static constexpr double kSelecterScaleX = 0.3;
-  /// \brief Scale in the Y axis for the cubes used in the selecter.
-  static constexpr double kSelecterScaleY = 0.5;
-  /// \brief Scale in the Z axis for the cubes used in the selecter.
-  static constexpr double kSelecterScaleZ = 0.1;
-  /// \brief Tolerance used for the selecter.
-  static constexpr double kSelecterMinTolerance = 0.6;
-  /// \brief Max amount of cubes used for the selecter.
-  static constexpr int kSelecterPoolSize = 50;
-  /// \brief Number of lanes to pre-initialize in selecter cubes vector.
+  /// \brief Scale in the X axis for the cubes used in the selector.
+  static constexpr double kSelectorScaleX = 0.3;
+  /// \brief Scale in the Y axis for the cubes used in the selector.
+  static constexpr double kSelectorScaleY = 0.5;
+  /// \brief Scale in the Z axis for the cubes used in the selector.
+  static constexpr double kSelectorScaleZ = 0.1;
+  /// \brief Tolerance used for the selector.
+  static constexpr double kSelectorMinTolerance = 0.6;
+  /// \brief Max amount of cubes used for the selector.
+  static constexpr int kSelectorPoolSize = 50;
+  /// \brief Number of lanes to pre-initialize in selector cubes vector.
   static constexpr int kNumLanes = 15;
   /// \brief Every how much time should the lights blink in miliseconds.
   static constexpr int kTrafficLightsTickPeriod = 500;

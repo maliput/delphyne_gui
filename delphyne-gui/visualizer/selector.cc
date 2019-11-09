@@ -1,6 +1,6 @@
 // Copyright 2019 Toyota Research Institute
 
-#include "selecter.hh"
+#include "selector.hh"
 
 #include <delphyne/macros.h>
 
@@ -18,7 +18,7 @@
 namespace delphyne {
 namespace gui {
 
-Selecter::Selecter(ignition::rendering::ScenePtr& _scene, double _scaleX, double _scaleY, double _scaleZ, int _poolSize,
+Selector::Selector(ignition::rendering::ScenePtr& _scene, double _scaleX, double _scaleY, double _scaleZ, int _poolSize,
                    int _numLanes, double _minTolerance)
     : scene(_scene),
       scaleX(_scaleX),
@@ -40,7 +40,7 @@ Selecter::Selecter(ignition::rendering::ScenePtr& _scene, double _scaleX, double
   this->CreateCubes(_scene, _scaleX, _scaleY, _scaleZ, cubeMaterial, _numLanes * _poolSize);
 }
 
-void Selecter::SelectLane(const maliput::api::Lane* _lane) {
+void Selector::SelectLane(const maliput::api::Lane* _lane) {
   std::string laneId = _lane->id().string();
 
   // Remove markers from previously selected lane
@@ -122,7 +122,7 @@ void Selecter::SelectLane(const maliput::api::Lane* _lane) {
   minTolerance = oldTolerance;
 }
 
-int Selecter::FindFirstEmpty() {
+int Selector::FindFirstEmpty() {
   for (size_t i = 0; i < populationMap.size(); ++i) {
     if (!populationMap[i]) {
       populationMap[i] = true;
@@ -132,18 +132,18 @@ int Selecter::FindFirstEmpty() {
   return -1;
 }
 
-void Selecter::SetVisibility(bool _visible) {
+void Selector::SetVisibility(bool _visible) {
   SetVisibilityOfCubesStartingFromTo(0, cubes.size(), _visible);
   lastCubesUsed = 0;
 }
 
-void Selecter::ResetPopulationMap() {
+void Selector::ResetPopulationMap() {
   for (size_t i = 0; i < populationMap.size(); ++i) {
     populationMap[i] = false;
   }
 }
 
-std::vector<std::string> Selecter::GetSelectedLanes() {
+std::vector<std::string> Selector::GetSelectedLanes() {
   std::vector<std::string> selectedLanes;
 
   for (const auto& i : lanesSelected) {
@@ -155,17 +155,17 @@ std::vector<std::string> Selecter::GetSelectedLanes() {
   return selectedLanes;
 }
 
-void Selecter::ResetSelectedLanes() { lanesSelected.clear(); }
+void Selector::ResetSelectedLanes() { lanesSelected.clear(); }
 
-void Selecter::DeselectAllLanes() {
+void Selector::DeselectAllLanes() {
   SetVisibility(false);
   ResetPopulationMap();
   ResetSelectedLanes();
 }
 
-bool Selecter::IsSelected(const maliput::api::Lane* _lane) { return lanesSelected[_lane->id().string()]; }
+bool Selector::IsSelected(const maliput::api::Lane* _lane) { return lanesSelected[_lane->id().string()]; }
 
-void Selecter::CreateCubes(ignition::rendering::ScenePtr& _scene, double _scaleX, double _scaleY, double _scaleZ,
+void Selector::CreateCubes(ignition::rendering::ScenePtr& _scene, double _scaleX, double _scaleY, double _scaleZ,
                            ignition::rendering::MaterialPtr& _material, unsigned int _numCubes) {
   for (size_t i = 0; i < _numCubes; ++i) {
     ignition::rendering::VisualPtr cube = _scene->CreateVisual();
@@ -179,12 +179,12 @@ void Selecter::CreateCubes(ignition::rendering::ScenePtr& _scene, double _scaleX
   }
 }
 
-double Selecter::GetNewToleranceToPopulateLane(double _laneLength, int _cubesUsedForSide) {
+double Selector::GetNewToleranceToPopulateLane(double _laneLength, int _cubesUsedForSide) {
   const double newToleranceForLaneSide = _laneLength / _cubesUsedForSide;
   return newToleranceForLaneSide < minTolerance ? minTolerance : newToleranceForLaneSide;
 }
 
-void Selecter::MoveCubeAtMidPointInR(const maliput::api::GeoPosition& _minRGeoPos,
+void Selector::MoveCubeAtMidPointInR(const maliput::api::GeoPosition& _minRGeoPos,
                                      const maliput::api::GeoPosition& _maxRGeoPos, int* _cubesUsed,
                                      int* _maxAmountOfCubesToUse) {
   maliput::api::GeoPosition midPoint = maliput::api::GeoPosition::FromXyz((_maxRGeoPos.xyz() + _minRGeoPos.xyz()) / 2);
@@ -198,7 +198,7 @@ void Selecter::MoveCubeAtMidPointInR(const maliput::api::GeoPosition& _minRGeoPo
   }
 }
 
-void Selecter::MoveCubeAtMidPointInS(const maliput::api::Lane* _lane, double min_s, double max_s, bool _left_side,
+void Selector::MoveCubeAtMidPointInS(const maliput::api::Lane* _lane, double min_s, double max_s, bool _left_side,
                                      int* _cubesUsed, int* _maxAmountOfCubesToUse) {
   const double mid_s = (max_s + min_s) / 2.0;
   const maliput::api::RBounds minRBounds = _lane->lane_bounds(min_s);
@@ -226,13 +226,13 @@ void Selecter::MoveCubeAtMidPointInS(const maliput::api::Lane* _lane, double min
   }
 }
 
-void Selecter::SetVisibilityOfCubesStartingFromTo(int _startFrom, int _to, bool _visible) {
+void Selector::SetVisibilityOfCubesStartingFromTo(int _startFrom, int _to, bool _visible) {
   for (int i = _startFrom; i < _to; ++i) {
     cubes[i]->SetVisible(_visible);
   }
 }
 
-bool Selecter::DoPointsViolateTolerance(const maliput::api::GeoPosition& _first_point,
+bool Selector::DoPointsViolateTolerance(const maliput::api::GeoPosition& _first_point,
                                         const maliput::api::GeoPosition& _second_point) {
   return (_first_point - _second_point).length() < minTolerance;
 }

@@ -239,8 +239,8 @@ void RenderMaliputWidget::CreateRenderWindow() {
 
   this->orbitViewControl.reset(new OrbitViewControl(this->camera));
 
-  this->selecter = std::make_unique<Selecter>(this->scene, kSelecterScaleX, kSelecterScaleY, kSelecterScaleZ,
-                                              kSelecterPoolSize, kNumLanes, kSelecterMinTolerance);
+  this->selector = std::make_unique<Selector>(this->scene, kSelectorScaleX, kSelectorScaleY, kSelectorScaleZ,
+                                              kSelectorPoolSize, kNumLanes, kSelectorMinTolerance);
 }
 
 /////////////////////////////////////////////////
@@ -449,24 +449,24 @@ void RenderMaliputWidget::SetArrowVisibility(bool _visible) {
 /////////////////////////////////////////////////
 std::vector<std::string> RenderMaliputWidget::GetSelectedLanes() {
   std::vector<std::string> selectedLanes;
-  if (this->selecter) {
-    selectedLanes = this->selecter->GetSelectedLanes();
+  if (this->selector) {
+    selectedLanes = this->selector->GetSelectedLanes();
   }
   return selectedLanes;
 }
 
 /////////////////////////////////////////////////
 void RenderMaliputWidget::DeselectAllLanes() {
-  if (this->selecter) {
+  if (this->selector) {
     emit SetAllLanesToDefault();
-    this->selecter->DeselectAllLanes();
+    this->selector->DeselectAllLanes();
   }
 }
 
 /////////////////////////////////////////////////
 bool RenderMaliputWidget::IsSelected(const maliput::api::Lane* _lane) {
-  if (this->selecter) {
-    return this->selecter->IsSelected(_lane);
+  if (this->selector) {
+    return this->selector->IsSelected(_lane);
   }
   return false;
 }
@@ -493,7 +493,7 @@ void RenderMaliputWidget::Clear() {
 }
 
 /////////////////////////////////////////////////
-void RenderMaliputWidget::SelectLane(const maliput::api::Lane* _lane) { this->selecter->SelectLane(_lane); }
+void RenderMaliputWidget::SelectLane(const maliput::api::Lane* _lane) { this->selector->SelectLane(_lane); }
 
 /////////////////////////////////////////////////
 void RenderMaliputWidget::showEvent(QShowEvent* _e) {

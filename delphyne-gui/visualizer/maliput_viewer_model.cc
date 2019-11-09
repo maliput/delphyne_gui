@@ -333,7 +333,7 @@ const std::map<std::string, std::unique_ptr<MaliputMesh>>& MaliputViewerModel::M
 }
 
 /////////////////////////////////////////////////
-const std::map<MaliputLabelType, std::vector<MaliputLabel>>& MaliputViewerModel::Labels() const { return this->labels; }
+const std::map<std::string, MaliputLabel>& MaliputViewerModel::Labels() const { return this->labels; }
 
 /////////////////////////////////////////////////
 void MaliputViewerModel::LoadRoadGeometry(const std::string& _maliputFilePath, const std::string& _roadRulebookFilePath,
@@ -422,6 +422,7 @@ ignition::math::Vector3d LaneEndWorldPosition(const maliput::api::LaneEnd& laneE
 MaliputLabel LabelFor(const maliput::api::BranchPoint& bp) {
   MaliputLabel label;
   label.text = bp.id().string();
+  label.labelType = MaliputLabelType::kBranchPoint;
   if (bp.GetASide() && bp.GetASide()->size() != 0) {
     label.position = LaneEndWorldPosition(bp.GetASide()->get(0));
   } else if (bp.GetBSide() && bp.GetBSide()->size() != 0) {
@@ -442,6 +443,7 @@ MaliputLabel LabelFor(const maliput::api::Lane& lane) {
   label.text = lane.id().string();
   const maliput::api::GeoPosition position = lane.ToGeoPosition({lane.length() / 2., 0., 0.});
   label.position.Set(position.x(), position.y(), position.z() + kLaneHeightOffset);
+  label.labelType = MaliputLabelType::kLane;
   return label;
 }
 }  // namespace
@@ -449,21 +451,19 @@ MaliputLabel LabelFor(const maliput::api::Lane& lane) {
 ///////////////////////////////////////////////////////
 void MaliputViewerModel::GenerateLabels() {
   // Traverses branch points to generate labels for them.
-  this->labels[MaliputLabelType::kBranchPoint] = std::vector<MaliputLabel>();
   const maliput::api::RoadGeometry* rg = roadGeometry == nullptr ? roadNetwork->road_geometry() : roadGeometry.get();
   for (int i = 0; i < rg->num_branch_points(); ++i) {
     const maliput::api::BranchPoint* bp = rg->branch_point(i);
-    this->labels[MaliputLabelType::kBranchPoint].push_back(LabelFor(*bp));
+    this->labels[bp->id().string()] = LabelFor(*bp);
   }
 
   // Traverses lanes to generate labels for them.
-  this->labels[MaliputLabelType::kLane] = std::vector<MaliputLabel>();
   for (int i = 0; i < rg->num_junctions(); ++i) {
     const maliput::api::Junction* junction = rg->junction(i);
     for (int j = 0; j < junction->num_segments(); ++j) {
       const maliput::api::Segment* segment = junction->segment(j);
       for (int k = 0; k < segment->num_lanes(); ++k) {
-        this->labels[MaliputLabelType::kLane].push_back(LabelFor(*segment->lane(k)));
+        this->labels[segment->lane(k)->id().string()] = LabelFor(*segment->lane(k));
       }
     }
   }
@@ -480,25 +480,23 @@ void MaliputViewerModel::SetLayerState(const std::string& _key, bool _isVisible)
 
 ///////////////////////////////////////////////////////
 void MaliputViewerModel::SetTextLabelState(MaliputLabelType _type, bool _isVisible) {
-  switch (_type) {
-    case MaliputLabelType::kLane: {
-      std::vector<MaliputLabel>& lane_labels = labels[MaliputLabelType::kLane];
-      for (MaliputLabel& label : lane_labels) {
-        label.visible = _isVisible;
-      }
-    } break;
-    case MaliputLabelType::kBranchPoint: {
-      std::vector<MaliputLabel>& branchpoint_labels = labels[MaliputLabelType::kBranchPoint];
-      for (MaliputLabel& label : branchpoint_labels) {
-        label.visible = _isVisible;
-      }
-    } break;
-    default:
-      throw std::runtime_error(std::string("_type is not a valid MaliputLabelType."));
-      break;
+  for (auto& i : this->labels) {
+    if (_type == i.second.labelType) {
+      i.second.visible = _isVisible;
+    }
   }
 }
 
+///////////////////////////////////////////////////////
+void MaliputViewerModel::SetTextLabelState(const std::string& _key, bool _isVisible) {
+  if (this->labels.find(_key) == this->labels.end()) {
+    igndbg << _key + " does not exist in labels." << std::endl;
+    return;
+  }
+  this->labels[_key].visible = _isVisible;
+}
+
+///////////////////////////////////////////////////////
 const maliput::api::Lane* MaliputViewerModel::GetLaneFromWorldPosition(const ignition::math::Vector3d& _position) {
   const maliput::api::RoadGeometry* rg =
       this->roadGeometry ? this->roadGeometry.get() : this->roadNetwork->road_geometry();
@@ -507,6 +505,7 @@ const maliput::api::Lane* MaliputViewerModel::GetLaneFromWorldPosition(const ign
   return rg->ToRoadPosition(geo_pos).road_position.lane;
 }
 
+///////////////////////////////////////////////////////
 const maliput::api::Lane* MaliputViewerModel::GetLaneFromId(const std::string& _id) {
   const maliput::api::RoadGeometry* rg =
       this->roadGeometry ? this->roadGeometry.get() : this->roadNetwork->road_geometry();
@@ -514,11 +513,13 @@ const maliput::api::Lane* MaliputViewerModel::GetLaneFromId(const std::string& _
   return rg->ById().GetLane(maliput::api::LaneId(_id));
 }
 
+///////////////////////////////////////////////////////
 std::vector<const maliput::api::rules::TrafficLight*> MaliputViewerModel::GetTrafficLights() const {
   return this->roadNetwork != nullptr ? this->roadNetwork->traffic_light_book()->TrafficLights()
                                       : std::vector<const maliput::api::rules::TrafficLight*>();
 }
 
+///////////////////////////////////////////////////////
 maliput::api::rules::BulbStates MaliputViewerModel::GetBulbStates(const std::string& _phaseRingId,
                                                                   const std::string& _phaseId) const {
   if (this->roadNetwork && !_phaseRingId.empty() && !_phaseId.empty()) {

@@ -145,8 +145,8 @@ void Selecter::ResetPopulationMap() {
 
 std::vector<std::string> Selecter::GetSelectedLanes() {
   std::vector<std::string> selectedLanes;
-  
-  for (const auto &i : lanesSelected) {
+
+  for (const auto& i : lanesSelected) {
     if (i.second) {
       selectedLanes.push_back(i.first);
     }

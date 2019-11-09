@@ -44,24 +44,24 @@ MaliputViewerWidget::MaliputViewerWidget(QWidget* parent) : Plugin() {
 }
 
 void MaliputViewerWidget::UpdateMeshDefaults(const std::string& key, bool newValue) {
-    // Store the value the mesh should return to if not selected
-    const std::size_t found_marker = key.find("marker");
-    const std::size_t found_lane = key.find("lane");
-    const std::size_t found_branchpoint = key.find("branch_point");
-    const std::size_t found_lane_text = key.find("lane_text");
-    const std::size_t found_branchpoint_text = key.find("branchpoint_text");
-    
-    if (found_marker != std::string::npos) {
-      meshDefaults["marker"] = newValue;
-    } else if (found_lane != std::string::npos) {
-      meshDefaults["lane"] = newValue;
-    } else if (found_branchpoint != std::string::npos) {
-      meshDefaults["branchpoint"] = newValue;
-    } else if (found_lane_text != std::string::npos) {
-      meshDefaults["lane_labels"] = newValue;
-    } else if (found_branchpoint_text != std::string::npos) {
-      meshDefaults["branchpoint_labels"] = newValue;
-    }
+  // Store the value the mesh should return to if not selected
+  const std::size_t found_marker = key.find("marker");
+  const std::size_t found_lane = key.find("lane");
+  const std::size_t found_branchpoint = key.find("branch_point");
+  const std::size_t found_lane_text = key.find("lane_text");
+  const std::size_t found_branchpoint_text = key.find("branchpoint_text");
+
+  if (found_marker != std::string::npos) {
+    meshDefaults["marker"] = newValue;
+  } else if (found_lane != std::string::npos) {
+    meshDefaults["lane"] = newValue;
+  } else if (found_branchpoint != std::string::npos) {
+    meshDefaults["branchpoint"] = newValue;
+  } else if (found_lane_text != std::string::npos) {
+    meshDefaults["lane_labels"] = newValue;
+  } else if (found_branchpoint_text != std::string::npos) {
+    meshDefaults["branchpoint_labels"] = newValue;
+  }
 }
 
 /////////////////////////////////////////////////
@@ -96,7 +96,12 @@ void MaliputViewerWidget::OnLayerMeshChanged(const std::string& key, bool newVal
 /////////////////////////////////////////////////
 void MaliputViewerWidget::OnTextLabelChanged(const std::string& key, bool newValue) {
   // Updates the model.
-  this->model->SetTextLabelState(FromString(key), newValue);
+  if (key == "lane_text_label" || key == "branchpoint_text_label") {
+    this->model->SetTextLabelState(FromString(key), newValue);
+  } else {
+    this->model->SetTextLabelState(key, newValue);
+  }
+
   // Replicates into the GUI.
   this->renderWidget->RenderLabels(this->model->Labels());
 }
@@ -143,10 +148,7 @@ void MaliputViewerWidget::VisualizeFileName(const std::string& filePath) {
 /////////////////////////////////////////////////
 void MaliputViewerWidget::OnSetAllLanesToDefault() {
   std::vector<std::string> selectedLanes = this->renderWidget->GetSelectedLanes();
-  for (const auto &i : selectedLanes) {
-    ignwarn << "found selected lane " << i << "\n";
-    ignwarn << "Setting lane mesh back to default " << meshDefaults["lane"] << "\n";
-    ignwarn << "Setting marker mesh back to default " << meshDefaults["marker"] << "\n";
+  for (const auto& i : selectedLanes) {
     OnLayerMeshChanged("lane_" + i, meshDefaults["lane"]);
     OnLayerMeshChanged("marker_" + i, meshDefaults["marker"]);
   }
@@ -156,7 +158,6 @@ void MaliputViewerWidget::OnSetAllLanesToDefault() {
 void MaliputViewerWidget::OnVisualClicked(ignition::rendering::RayQueryResult rayResult) {
   if (this->model) {
     const maliput::api::Lane* lane = this->model->GetLaneFromWorldPosition(rayResult.point);
-    ignwarn << "test\n";
     if (lane) {
       const std::string& lane_id = lane->id().string();
       ignmsg << "Clicked lane ID: " << lane_id << "\n";
@@ -178,12 +179,8 @@ void MaliputViewerWidget::OnVisualClicked(ignition::rendering::RayQueryResult ra
       this->renderWidget->PutArrowAt(rayResult.distance, rayResult.point);
       this->renderWidget->SetArrowVisibility(true);
     } else {
-      ignwarn << "Calling Selected Lanes \n";
       std::vector<std::string> selectedLanes = this->renderWidget->GetSelectedLanes();
-      for (const auto &i : selectedLanes) {
-        ignwarn << "found selected lane " << i << "\n";
-        ignwarn << "Setting lane mesh back to default " << meshDefaults["lane"] << "\n";
-        ignwarn << "Setting marker mesh back to default " << meshDefaults["marker"] << "\n";
+      for (const auto& i : selectedLanes) {
         OnLayerMeshChanged("lane_" + i, meshDefaults["lane"]);
         OnLayerMeshChanged("marker_" + i, meshDefaults["marker"]);
       }
@@ -214,9 +211,8 @@ void MaliputViewerWidget::BuildGUI() {
 
   QObject::connect(this->renderWidget, SIGNAL(VisualClicked(ignition::rendering::RayQueryResult)), this,
                    SLOT(OnVisualClicked(ignition::rendering::RayQueryResult)));
-  
-  QObject::connect(this->renderWidget, SIGNAL(SetAllLanesToDefault()), this,
-                   SLOT(OnSetAllLanesToDefault()));
+
+  QObject::connect(this->renderWidget, SIGNAL(SetAllLanesToDefault()), this, SLOT(OnSetAllLanesToDefault()));
 
   QObject::connect(this->rulesVisualizerWidget, SIGNAL(RequestRules()), this, SLOT(OnRulesForLaneRequested()));
 

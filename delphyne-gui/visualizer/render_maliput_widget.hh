@@ -59,7 +59,7 @@ class RenderMaliputWidget : public QWidget {
   /// both enabled and visibility flag is false. Otherwise, the text visual is
   /// created (if necessary) and its appropriate material is assigned.
   /// \param[in] _labels A map of labels to render.
-  void RenderLabels(const std::map<MaliputLabelType, std::vector<MaliputLabel>>& _labels);
+  void RenderLabels(const std::map<std::string, MaliputLabel>& _labels);
 
   /// \brief Create and render an arrow that will be positioned slightly above the selected road.
   void RenderArrow();
@@ -107,7 +107,7 @@ class RenderMaliputWidget : public QWidget {
  signals:
   /// \brief Signal that gets fired when a click happens on a visual (mesh)
   void VisualClicked(ignition::rendering::RayQueryResult rayResult);
-  
+
   /// \brief Signal that gets fired upon a call to deselect all lanes
   void SetAllLanesToDefault();
 

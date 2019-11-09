@@ -354,62 +354,61 @@ void RenderMaliputWidget::RenderRoadMeshes(const std::map<std::string, std::uniq
 }
 
 /////////////////////////////////////////////////
-void RenderMaliputWidget::RenderLabels(const std::map<MaliputLabelType, std::vector<MaliputLabel>>& _labels) {
+void RenderMaliputWidget::RenderLabels(const std::map<std::string, MaliputLabel>& _labels) {
   for (const auto& it : _labels) {
-    for (const MaliputLabel& label : it.second) {
-      // Checks if the text labels to be rendered already exists or not.
-      const auto labelExists = this->textLabels.find(label.text);
-      // If the text label is disabled, there is no visual for it so it must be
-      //  set to transparent.
-      if (!label.enabled) {
-        // If the text label already exists, set visibility to false
-        if (labelExists != this->textLabels.end()) {
-          this->textLabels[label.text]->SetVisible(false);
-        }
-      } else {
-        // If the text label doesn't exist, it creates new one. Otherwise,
-        // it just gathers the pointer to set the correct material.
-        ignition::rendering::VisualPtr visual;
-        if (labelExists == this->textLabels.end()) {
-          // Creates a material for the visual.
-          ignition::rendering::MaterialPtr material = this->scene->CreateMaterial();
-          if (!material) {
-            ignerr << "Failed to create material.\n";
-            continue;
-          }
-          visual = this->scene->CreateVisual();
-          if (!visual) {
-            ignerr << "Failed to create visual.\n";
-            continue;
-          }
-          // Adds the visual to the map for later reference.
-          this->textLabels[label.text] = visual;
-          visual->SetLocalPose(ignition::math::Pose3d(label.position, ignition::math::Quaterniond()));
-          // Creates the text geometry.
-          ignition::rendering::TextPtr textGeometry = this->scene->CreateText();
-          textGeometry->SetFontName("Liberation Sans");
-          textGeometry->SetTextString(label.text);
-          textGeometry->SetShowOnTop(true);
-          textGeometry->SetTextAlignment(ignition::rendering::TextHorizontalAlign::CENTER,
-                                         ignition::rendering::TextVerticalAlign::CENTER);
-          visual->AddGeometry(textGeometry);
-          // Adds the mesh to the parent root visual.
-          this->rootVisual->AddChild(visual);
-          // Assigns a material for the visual.
-          if (it.first == MaliputLabelType::kLane) {
-            CreateLaneLabelMaterial(material);
-          } else if (it.first == MaliputLabelType::kBranchPoint) {
-            CreateBranchPointLabelMaterial(material);
-          } else {
-            ignerr << "Unsupported label type for: " << label.text << std::endl;
-          }
-          // Applies the correct material to the mesh.
-          visual->SetMaterial(material);
-        } else {
-          visual = this->textLabels[label.text];
-        }
-        this->textLabels[label.text]->SetVisible(label.visible);
+    // Checks if the text labels to be rendered already exists or not.
+    const auto labelExists = this->textLabels.find(it.second.text);
+    // If the text label is disabled, there is no visual for it so it must be
+    //  set to transparent.
+    if (!it.second.enabled) {
+      // If the text label already exists, set visibility to false
+      if (labelExists != this->textLabels.end()) {
+        this->textLabels[it.second.text]->SetVisible(false);
       }
+    } else {
+      // If the text label doesn't exist, it creates new one. Otherwise,
+      // it just gathers the pointer to set the correct material.
+      ignition::rendering::VisualPtr visual;
+      if (labelExists == this->textLabels.end()) {
+        // Creates a material for the visual.
+        ignition::rendering::MaterialPtr material = this->scene->CreateMaterial();
+        if (!material) {
+          ignerr << "Failed to create material.\n";
+          continue;
+        }
+        visual = this->scene->CreateVisual();
+        if (!visual) {
+          ignerr << "Failed to create visual.\n";
+          continue;
+        }
+        // Adds the visual to the map for later reference.
+        this->textLabels[it.second.text] = visual;
+        visual->SetLocalPose(ignition::math::Pose3d(it.second.position, ignition::math::Quaterniond()));
+        // Creates the text geometry.
+        ignition::rendering::TextPtr textGeometry = this->scene->CreateText();
+        textGeometry->SetFontName("Liberation Sans");
+        textGeometry->SetTextString(it.second.text);
+        textGeometry->SetShowOnTop(true);
+        textGeometry->SetTextAlignment(ignition::rendering::TextHorizontalAlign::CENTER,
+                                       ignition::rendering::TextVerticalAlign::CENTER);
+        visual->AddGeometry(textGeometry);
+        // Adds the mesh to the parent root visual.
+        this->rootVisual->AddChild(visual);
+        // Assigns a material for the visual.
+        // TODO determine if it's branch or lane
+        if (it.second.labelType == MaliputLabelType::kLane) {
+          CreateLaneLabelMaterial(material);
+        } else if (it.second.labelType == MaliputLabelType::kBranchPoint) {
+          CreateBranchPointLabelMaterial(material);
+        } else {
+          ignerr << "Unsupported label type for: " << it.second.text << std::endl;
+        }
+        // Applies the correct material to the mesh.
+        visual->SetMaterial(material);
+      } else {
+        visual = this->textLabels[it.second.text];
+      }
+      this->textLabels[it.second.text]->SetVisible(it.second.visible);
     }
   }
 }

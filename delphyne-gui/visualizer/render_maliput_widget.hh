@@ -95,6 +95,11 @@ class RenderMaliputWidget : public QWidget {
   /// \param[in] _lane Lane to select or deselect.
   void SelectLane(const maliput::api::Lane* _lane);
 
+  /// \brief Finds if the passed in lane corresponding to the lane id is currently selected or not.
+  /// \param[in] _laneId Lane id of the lane to be evaluated.
+  /// \returns Boolean that determines whether the lane is selected or not.
+  bool IsSelected(const std::string& _laneId);
+
   /// \brief Finds if the passed in lane is currently selected or not.
   /// \param[in] _lane Lane to be evaluated.
   /// \returns Boolean that determines whether the lane is selected or not.

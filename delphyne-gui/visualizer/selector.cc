@@ -163,7 +163,9 @@ void Selector::DeselectAllLanes() {
   ResetSelectedLanes();
 }
 
-bool Selector::IsSelected(const maliput::api::Lane* _lane) { return lanesSelected[_lane->id().string()]; }
+bool Selector::IsSelected(const std::string& _laneId) { return lanesSelected[_laneId]; }
+
+bool Selector::IsSelected(const maliput::api::Lane* _lane) { return this->IsSelected(_lane->id().string()); }
 
 void Selector::CreateCubes(ignition::rendering::ScenePtr& _scene, double _scaleX, double _scaleY, double _scaleZ,
                            ignition::rendering::MaterialPtr& _material, unsigned int _numCubes) {

@@ -70,18 +70,20 @@ void MaliputViewerWidget::OnLayerMeshChanged(const std::string& key, bool newVal
   const std::size_t all_index = key.find("all");
   if (all_index != std::string::npos) {
     std::string keyword = key.substr(0, all_index);
+    UpdateMeshDefaults(key, newValue);
     for (auto const& it : this->model->Meshes()) {
       if (it.first.find(keyword) != std::string::npos) {
         // Updates the model.
         const std::size_t firstNum = it.first.find_first_of("0123456789");
         std::string lane_id = it.first.substr(firstNum, it.first.length() - firstNum + 1);
-        this->model->SetLayerState(it.first, newValue);
+        if (!this->renderWidget->IsSelected(lane_id)) {
+          this->model->SetLayerState(it.first, newValue);
+        }
       }
     }
   } else {
     // Updates the model.
     this->model->SetLayerState(key, newValue);
-    UpdateMeshDefaults(key, newValue);
     // If the asphalt is turned off, deselect all lanes
     const std::size_t found_asphalt = key.find("asphalt");
     if (found_asphalt != std::string::npos && !newValue) {
@@ -97,6 +99,7 @@ void MaliputViewerWidget::OnLayerMeshChanged(const std::string& key, bool newVal
 void MaliputViewerWidget::OnTextLabelChanged(const std::string& key, bool newValue) {
   // Updates the model.
   if (key == "lane_text_label" || key == "branchpoint_text_label") {
+    UpdateMeshDefaults(key, newValue);
     this->model->SetTextLabelState(FromString(key), newValue);
   } else {
     this->model->SetTextLabelState(key, newValue);
@@ -149,9 +152,17 @@ void MaliputViewerWidget::VisualizeFileName(const std::string& filePath) {
 void MaliputViewerWidget::OnSetAllLanesToDefault() {
   std::vector<std::string> selectedLanes = this->renderWidget->GetSelectedLanes();
   for (const auto& i : selectedLanes) {
-    OnLayerMeshChanged("lane_" + i, meshDefaults["lane"]);
-    OnLayerMeshChanged("marker_" + i, meshDefaults["marker"]);
+    this->model->SetLayerState("lane_" + i, meshDefaults["lane"]);
+    this->model->SetLayerState("marker_" + i, meshDefaults["marker"]);
+    // TODO set branchpoint, lane and branchpoint labels here
+    // this->model->SetLayerState("lane_" + i, meshDefaults["lane"]);
+    // this->model->SetLayerState("marker_" + i, meshDefaults["marker"]);
+    // this->meshDefaults["branchpoint"] = true;
+    // this->meshDefaults["branchpoint_labels"] = true;
+    // this->meshDefaults["lane_labels"] = true;
   }
+  // Replicates into the GUI.
+  this->renderWidget->RenderRoadMeshes(this->model->Meshes());
 }
 
 /////////////////////////////////////////////////

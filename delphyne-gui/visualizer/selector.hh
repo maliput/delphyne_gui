@@ -55,6 +55,11 @@ class Selector {
   /// \returns Boolean that determines whether the lane is selected or not.
   bool IsSelected(const maliput::api::Lane* _lane);
 
+  /// \brief Finds if lane corresponding to the lane id is currently selected or not.
+  /// \param[in] _laneId The lane id to be evaluated.
+  /// \returns Boolean that determines whether the lane is selected or not.
+  bool IsSelected(const std::string& _laneId);
+
  private:
   /// \brief Creates the pool of cubes.
   /// \param[in] _scene Pointer to the scene where cubes will live.

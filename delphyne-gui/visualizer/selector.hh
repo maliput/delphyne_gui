@@ -6,6 +6,7 @@
 #include <ignition/math/Vector3.hh>
 #include <ignition/rendering/Scene.hh>
 #include <maliput/api/lane.h>
+#include <maliput/api/road_geometry.h>
 
 #include <vector>
 
@@ -40,25 +41,32 @@ class Selector {
   /// \brief Resets the population map.
   void ResetPopulationMap();
 
+  /// \brief Resets the selected branchpoint group.
+  void ResetSelectedBranchPoints();
+
   /// \brief Resets the selected lane group.
   void ResetSelectedLanes();
 
-  /// \brief Deselects all lanes, resetting all corresponding attributes.
-  void DeselectAllLanes();
+  /// \brief Deselects everything, resetting all corresponding attributes.
+  void DeselectAll();
 
   /// \brief Gets the currently selected lanes.
   /// \returns A vector of the lane_id's which are selected.
   std::vector<std::string> GetSelectedLanes();
+  
+  /// \brief Gets the currently selected BranchPoints.
+  /// \returns A vector of the branch_point_id's which are selected.
+  std::vector<std::string> GetSelectedBranchPoints();
 
   /// \brief Finds if the passed in lane is currently selected or not.
   /// \param[in] _lane Lane to be evaluated.
   /// \returns Boolean that determines whether the lane is selected or not.
   bool IsSelected(const maliput::api::Lane* _lane);
 
-  /// \brief Finds if lane corresponding to the lane id is currently selected or not.
-  /// \param[in] _laneId The lane id to be evaluated.
-  /// \returns Boolean that determines whether the lane is selected or not.
-  bool IsSelected(const std::string& _laneId);
+  /// \brief Finds if mesh corresponding to the id is currently selected or not.
+  /// \param[in] _id The id to be evaluated.
+  /// \returns Boolean that determines whether the mesh is selected or not.
+  bool IsSelected(const std::string& _id);
 
  private:
   /// \brief Creates the pool of cubes.
@@ -122,6 +130,12 @@ class Selector {
 
   /// \brief A vector containing which segments of the cubes vector are currently in use.
   std::vector<bool> populationMap;
+  
+  /// \brief A map of all of the currently selected branch points.
+  /// The branch point id is the key and the amount of times it has been 
+  /// selected (to account for two lanes being able to select the same
+  /// branch point) is the value
+  std::map<std::string, int> branchPointsSelected;
 
   /// \brief A map of all of the currently selected lanes.
   /// The lane id is the key and the corresponding slot number of its visuals is the value

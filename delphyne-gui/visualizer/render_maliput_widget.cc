@@ -395,7 +395,6 @@ void RenderMaliputWidget::RenderLabels(const std::map<std::string, MaliputLabel>
         // Adds the mesh to the parent root visual.
         this->rootVisual->AddChild(visual);
         // Assigns a material for the visual.
-        // TODO determine if it's branch or lane
         if (it.second.labelType == MaliputLabelType::kLane) {
           CreateLaneLabelMaterial(material);
         } else if (it.second.labelType == MaliputLabelType::kBranchPoint) {
@@ -447,6 +446,15 @@ void RenderMaliputWidget::SetArrowVisibility(bool _visible) {
 }
 
 /////////////////////////////////////////////////
+std::vector<std::string> RenderMaliputWidget::GetSelectedBranchPoints() {
+  std::vector<std::string> selectedBranchPoints;
+  if (this->selector) {
+    selectedBranchPoints = this->selector->GetSelectedBranchPoints();
+  }
+  return selectedBranchPoints;
+}
+
+/////////////////////////////////////////////////
 std::vector<std::string> RenderMaliputWidget::GetSelectedLanes() {
   std::vector<std::string> selectedLanes;
   if (this->selector) {
@@ -456,10 +464,10 @@ std::vector<std::string> RenderMaliputWidget::GetSelectedLanes() {
 }
 
 /////////////////////////////////////////////////
-void RenderMaliputWidget::DeselectAllLanes() {
+void RenderMaliputWidget::DeselectAll() {
   if (this->selector) {
-    emit SetAllLanesToDefault();
-    this->selector->DeselectAllLanes();
+    emit SetAllToDefault();
+    this->selector->DeselectAll();
   }
 }
 
@@ -485,7 +493,7 @@ void RenderMaliputWidget::Clear() {
   for (auto it : meshes) {
     this->rootVisual->RemoveChild(it.second);
   }
-  DeselectAllLanes();
+  DeselectAll();
   if (this->arrow) {
     SetArrowVisibility(false);
   }
@@ -572,7 +580,7 @@ void RenderMaliputWidget::mousePressEvent(QMouseEvent* _e) {
       emit VisualClicked(rayResult);
     } else {
       SetArrowVisibility(false);
-      DeselectAllLanes();
+      DeselectAll();
     }
   }
   this->UpdateViewport();

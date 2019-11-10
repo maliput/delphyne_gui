@@ -61,8 +61,8 @@ class MaliputViewerWidget : public ignition::gui::Plugin {
   /// \param[in] rayResult Ray that contains the point where the click hit.
   void OnVisualClicked(ignition::rendering::RayQueryResult rayResult);
 
-  /// \brief Sets all lanes back to their default mesh value indicated by the GUI checkboxes
-  void OnSetAllLanesToDefault();
+  /// \brief Sets everything back to the default values indicated by the GUI checkboxes
+  void OnSetAllToDefault();
 
   /// \brief Emits rulesVisualizerWidget's ReceiveRules signal with all the rules related
   /// to the selected lane, phase ring and phase if any.

@@ -15,6 +15,7 @@
 #include <maliput/api/lane.h>
 #include <maliput/api/lane_data.h>
 
+
 namespace delphyne {
 namespace gui {
 
@@ -42,18 +43,25 @@ Selector::Selector(ignition::rendering::ScenePtr& _scene, double _scaleX, double
 
 void Selector::SelectLane(const maliput::api::Lane* _lane) {
   std::string laneId = _lane->id().string();
+  const std::string start_bp_id = _lane->GetBranchPoint(maliput::api::LaneEnd::kStart)->id().string();  
+  const std::string end_bp_id = _lane->GetBranchPoint(maliput::api::LaneEnd::kFinish)->id().string();
 
   // Remove markers from previously selected lane
   if (lanesSelected[laneId]) {
     int slot = lanesSelected[laneId] - 1;
     int laneIndex = slot * cubesPerLane;
-
+    branchPointsSelected[start_bp_id]--;
+    branchPointsSelected[end_bp_id]--;
     // Turn off visibility of a previously selected lane
     SetVisibilityOfCubesStartingFromTo(laneIndex, laneIndex + cubesPerLane, false);
     populationMap[slot] = false;
     lanesSelected[laneId] = 0;
     return;
   }
+  
+  // Increment value of branch point selection
+  branchPointsSelected[start_bp_id]++;
+  branchPointsSelected[end_bp_id]++;
 
   const double max_s = _lane->length();
 
@@ -143,6 +151,18 @@ void Selector::ResetPopulationMap() {
   }
 }
 
+std::vector<std::string> Selector::GetSelectedBranchPoints() {
+  std::vector<std::string> selectedBranchPoints;
+
+  for (const auto& i : branchPointsSelected) {
+    if (i.second) {
+      selectedBranchPoints.push_back(i.first);
+    }
+  }
+
+  return selectedBranchPoints;
+}
+
 std::vector<std::string> Selector::GetSelectedLanes() {
   std::vector<std::string> selectedLanes;
 
@@ -155,15 +175,20 @@ std::vector<std::string> Selector::GetSelectedLanes() {
   return selectedLanes;
 }
 
+void Selector::ResetSelectedBranchPoints() { branchPointsSelected.clear(); }
+
 void Selector::ResetSelectedLanes() { lanesSelected.clear(); }
 
-void Selector::DeselectAllLanes() {
+void Selector::DeselectAll() {
   SetVisibility(false);
   ResetPopulationMap();
   ResetSelectedLanes();
+  ResetSelectedBranchPoints();
 }
 
-bool Selector::IsSelected(const std::string& _laneId) { return lanesSelected[_laneId]; }
+bool Selector::IsSelected(const std::string& _id) {
+  return lanesSelected[_id] || branchPointsSelected[_id];
+}
 
 bool Selector::IsSelected(const maliput::api::Lane* _lane) { return this->IsSelected(_lane->id().string()); }
 

@@ -454,7 +454,7 @@ void MaliputViewerModel::GenerateLabels() {
   const maliput::api::RoadGeometry* rg = roadGeometry == nullptr ? roadNetwork->road_geometry() : roadGeometry.get();
   for (int i = 0; i < rg->num_branch_points(); ++i) {
     const maliput::api::BranchPoint* bp = rg->branch_point(i);
-    this->labels[bp->id().string()] = LabelFor(*bp);
+    this->labels["branch_point_" + bp->id().string()] = LabelFor(*bp);
   }
 
   // Traverses lanes to generate labels for them.
@@ -463,7 +463,7 @@ void MaliputViewerModel::GenerateLabels() {
     for (int j = 0; j < junction->num_segments(); ++j) {
       const maliput::api::Segment* segment = junction->segment(j);
       for (int k = 0; k < segment->num_lanes(); ++k) {
-        this->labels[segment->lane(k)->id().string()] = LabelFor(*segment->lane(k));
+        this->labels["lane_" + segment->lane(k)->id().string()] = LabelFor(*segment->lane(k));
       }
     }
   }

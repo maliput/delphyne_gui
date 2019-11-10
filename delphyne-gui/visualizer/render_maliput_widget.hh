@@ -81,12 +81,16 @@ class RenderMaliputWidget : public QWidget {
   /// \param[in] _visible Visibility of the arrow.
   void SetArrowVisibility(bool _visible);
 
-  /// \brief Deselects all selected lanes.
-  void DeselectAllLanes();
+  /// \brief Deselects the currently selected region.
+  void DeselectAll();
 
   /// \brief Gets the currently selected lanes.
   /// \returns A vector of the lane_id's which are selected.
   std::vector<std::string> GetSelectedLanes();
+  
+  /// \brief Gets the currently selected branch pointss.
+  /// \returns A vector of the branch_point_id's which are selected.
+  std::vector<std::string> GetSelectedBranchPoints();
 
   /// \brief Clears all the references to text labels, meshes and the scene.
   void Clear();
@@ -113,8 +117,8 @@ class RenderMaliputWidget : public QWidget {
   /// \brief Signal that gets fired when a click happens on a visual (mesh)
   void VisualClicked(ignition::rendering::RayQueryResult rayResult);
 
-  /// \brief Signal that gets fired upon a call to deselect all lanes
-  void SetAllLanesToDefault();
+  /// \brief Signal that gets fired upon a call to deselect everything
+  void SetAllToDefault();
 
  protected:
   /// \brief Overridden method to receive Qt show event.

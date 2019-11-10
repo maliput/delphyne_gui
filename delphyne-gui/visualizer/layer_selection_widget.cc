@@ -132,7 +132,7 @@ void LabelSelectionWidget::onLaneValueChanged(int state) {
 
 ///////////////////////////////////////////////////////
 void LabelSelectionWidget::onBranchPointValueChanged(int state) {
-  emit valueChanged("branchpoint_text_label", this->branchPointCheckBox->isChecked());
+  emit valueChanged("branch_point_text_label", this->branchPointCheckBox->isChecked());
 }
 
 ///////////////////////////////////////////////////////

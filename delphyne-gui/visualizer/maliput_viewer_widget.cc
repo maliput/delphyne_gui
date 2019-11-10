@@ -88,6 +88,7 @@ void MaliputViewerWidget::OnLayerMeshChanged(const std::string& key, bool newVal
     const std::size_t found_asphalt = key.find("asphalt");
     if (found_asphalt != std::string::npos && !newValue) {
       this->renderWidget->DeselectAll();
+      this->renderWidget->SetArrowVisibility(false);
     }
   }
 

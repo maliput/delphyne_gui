@@ -53,7 +53,7 @@ class Selector {
   /// \brief Gets the currently selected lanes.
   /// \returns A vector of the lane_id's which are selected.
   std::vector<std::string> GetSelectedLanes();
-  
+
   /// \brief Gets the currently selected BranchPoints.
   /// \returns A vector of the branch_point_id's which are selected.
   std::vector<std::string> GetSelectedBranchPoints();
@@ -130,9 +130,9 @@ class Selector {
 
   /// \brief A vector containing which segments of the cubes vector are currently in use.
   std::vector<bool> populationMap;
-  
+
   /// \brief A map of all of the currently selected branch points.
-  /// The branch point id is the key and the amount of times it has been 
+  /// The branch point id is the key and the amount of times it has been
   /// selected (to account for two lanes being able to select the same
   /// branch point) is the value
   std::map<std::string, int> branchPointsSelected;

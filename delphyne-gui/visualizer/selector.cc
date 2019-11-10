@@ -15,7 +15,6 @@
 #include <maliput/api/lane.h>
 #include <maliput/api/lane_data.h>
 
-
 namespace delphyne {
 namespace gui {
 
@@ -43,7 +42,7 @@ Selector::Selector(ignition::rendering::ScenePtr& _scene, double _scaleX, double
 
 void Selector::SelectLane(const maliput::api::Lane* _lane) {
   std::string laneId = _lane->id().string();
-  const std::string start_bp_id = _lane->GetBranchPoint(maliput::api::LaneEnd::kStart)->id().string();  
+  const std::string start_bp_id = _lane->GetBranchPoint(maliput::api::LaneEnd::kStart)->id().string();
   const std::string end_bp_id = _lane->GetBranchPoint(maliput::api::LaneEnd::kFinish)->id().string();
 
   // Remove markers from previously selected lane
@@ -58,7 +57,7 @@ void Selector::SelectLane(const maliput::api::Lane* _lane) {
     lanesSelected[laneId] = 0;
     return;
   }
-  
+
   // Increment value of branch point selection
   branchPointsSelected[start_bp_id]++;
   branchPointsSelected[end_bp_id]++;
@@ -186,9 +185,7 @@ void Selector::DeselectAll() {
   ResetSelectedBranchPoints();
 }
 
-bool Selector::IsSelected(const std::string& _id) {
-  return lanesSelected[_id] || branchPointsSelected[_id];
-}
+bool Selector::IsSelected(const std::string& _id) { return lanesSelected[_id] || branchPointsSelected[_id]; }
 
 bool Selector::IsSelected(const maliput::api::Lane* _lane) { return this->IsSelected(_lane->id().string()); }
 

@@ -206,7 +206,7 @@ void MaliputViewerWidget::OnVisualClicked(ignition::rendering::RayQueryResult ra
         OnLayerMeshChanged("branch_point_" + start_bp_id, isStartBPVisualized);
         OnTextLabelChanged("branch_point_" + start_bp_id, isStartBPVisualized);
       }
-      
+
       if (!isEndBPVisualized) {
         OnLayerMeshChanged("branch_point_" + end_bp_id, meshDefaults["branch_point"]);
         OnTextLabelChanged("branch_point_" + end_bp_id, meshDefaults["branch_point_labels"]);

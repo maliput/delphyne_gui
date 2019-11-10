@@ -87,7 +87,7 @@ class RenderMaliputWidget : public QWidget {
   /// \brief Gets the currently selected lanes.
   /// \returns A vector of the lane_id's which are selected.
   std::vector<std::string> GetSelectedLanes();
-  
+
   /// \brief Gets the currently selected branch pointss.
   /// \returns A vector of the branch_point_id's which are selected.
   std::vector<std::string> GetSelectedBranchPoints();

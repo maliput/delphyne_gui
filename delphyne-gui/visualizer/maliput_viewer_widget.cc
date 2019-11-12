@@ -25,11 +25,10 @@ MaliputViewerWidget::MaliputViewerWidget(QWidget* parent) : Plugin() {
     this->model->Load(GlobalAttributes::GetArgument("yaml_file"));
     this->VisualizeFileName(GlobalAttributes::GetArgument("yaml_file"));
   }
-  this->meshDefaults["marker"] = true;
-  this->meshDefaults["lane"] = true;
-  this->meshDefaults["branch_point"] = true;
-  this->meshDefaults["branch_point_labels"] = true;
-  this->meshDefaults["lane_labels"] = true;
+  
+  for (const std::string& key : {kMarker, kLane, kBranchPoint, kBranchPointLabels, kLaneLabels}) {
+    this->meshDefaults[key] = true;
+  }
 
   QObject::connect(this->layerSelectionWidget, SIGNAL(valueChanged(const std::string&, bool)), this,
                    SLOT(OnLayerMeshChanged(const std::string&, bool)));
@@ -52,15 +51,15 @@ void MaliputViewerWidget::UpdateMeshDefaults(const std::string& key, bool newVal
   const std::size_t found_branchpoint_text = key.find("branch_point_text");
 
   if (found_marker != std::string::npos) {
-    meshDefaults["marker"] = newValue;
+    this->meshDefaults[kMarker] = newValue;
   } else if (found_lane_text != std::string::npos) {
-    meshDefaults["lane_labels"] = newValue;
+    this->meshDefaults[kLaneLabels] = newValue;
   } else if (found_branchpoint_text != std::string::npos) {
-    meshDefaults["branch_point_labels"] = newValue;
+    this->meshDefaults[kBranchPointLabels] = newValue;
   } else if (found_lane != std::string::npos) {
-    meshDefaults["lane"] = newValue;
+    this->meshDefaults[kLane] = newValue;
   } else if (found_branchpoint != std::string::npos) {
-    meshDefaults["branch_point"] = newValue;
+    this->meshDefaults[kBranchPoint] = newValue;
   }
 }
 
@@ -70,7 +69,7 @@ void MaliputViewerWidget::OnLayerMeshChanged(const std::string& key, bool newVal
   const std::size_t all_index = key.find("all");
   if (all_index != std::string::npos) {
     std::string keyword = key.substr(0, all_index);
-    UpdateMeshDefaults(key, newValue);
+    this->UpdateMeshDefaults(key, newValue);
     for (auto const& it : this->model->Meshes()) {
       if (it.first.find(keyword) != std::string::npos) {
         // Updates the model.
@@ -102,7 +101,7 @@ void MaliputViewerWidget::OnTextLabelChanged(const std::string& key, bool newVal
   if (key == "lane_text_label" || key == "branch_point_text_label") {
     const int keyword_index = key.find("text");
     const std::string type = key.substr(0, keyword_index);
-    UpdateMeshDefaults(key, newValue);
+    this->UpdateMeshDefaults(key, newValue);
     for (auto const& it : this->model->Labels()) {
       if (it.first.find(type) != std::string::npos) {
         // Updates the model.
@@ -163,13 +162,13 @@ void MaliputViewerWidget::OnSetAllToDefault() {
   std::vector<std::string> selectedLanes = this->renderWidget->GetSelectedLanes();
   std::vector<std::string> selectedBranchPoints = this->renderWidget->GetSelectedBranchPoints();
   for (const auto& i : selectedLanes) {
-    this->model->SetLayerState("lane_" + i, meshDefaults["lane"]);
-    this->model->SetLayerState("marker_" + i, meshDefaults["marker"]);
-    this->model->SetTextLabelState("lane_" + i, meshDefaults["lane_labels"]);
+    this->model->SetLayerState("lane_" + i, meshDefaults[kLane]);
+    this->model->SetLayerState("marker_" + i, meshDefaults[kMarker]);
+    this->model->SetTextLabelState("lane_" + i, meshDefaults[kLaneLabels]);
   }
   for (const auto& i : selectedBranchPoints) {
-    this->model->SetLayerState("branch_point_" + i, meshDefaults["branch_point"]);
-    this->model->SetTextLabelState("branch_point_" + i, meshDefaults["branch_points_labels"]);
+    this->model->SetLayerState("branch_point_" + i, meshDefaults[kBranchPoint]);
+    this->model->SetTextLabelState("branch_point_" + i, meshDefaults[kBranchPointLabels]);
   }
   // Replicates into the GUI.
   this->renderWidget->RenderRoadMeshes(this->model->Meshes());
@@ -191,29 +190,29 @@ void MaliputViewerWidget::OnVisualClicked(ignition::rendering::RayQueryResult ra
       const bool isEndBPVisualized = this->renderWidget->IsSelected(end_bp_id);
       // Set the mesh back to the check box default if the lane is not selected
       if (!isLaneVisualized) {
-        OnLayerMeshChanged("lane_" + lane_id, meshDefaults["lane"]);
-        OnLayerMeshChanged("marker_" + lane_id, meshDefaults["marker"]);
-        OnTextLabelChanged("lane_" + lane_id, meshDefaults["lane_labels"]);
+        this->OnLayerMeshChanged("lane_" + lane_id, meshDefaults[kLane]);
+        this->OnLayerMeshChanged("marker_" + lane_id, meshDefaults[kMarker]);
+        this->OnTextLabelChanged("lane_" + lane_id, meshDefaults[kLaneLabels]);
       } else {
-        OnLayerMeshChanged("lane_" + lane_id, isLaneVisualized);
-        OnLayerMeshChanged("marker_" + lane_id, isLaneVisualized);
-        OnTextLabelChanged("lane_" + lane_id, isLaneVisualized);
+        this->OnLayerMeshChanged("lane_" + lane_id, isLaneVisualized);
+        this->OnLayerMeshChanged("marker_" + lane_id, isLaneVisualized);
+        this->OnTextLabelChanged("lane_" + lane_id, isLaneVisualized);
       }
 
       if (!isStartBPVisualized) {
-        OnLayerMeshChanged("branch_point_" + start_bp_id, meshDefaults["branch_point"]);
-        OnTextLabelChanged("branch_point_" + start_bp_id, meshDefaults["branch_point_labels"]);
+        this->OnLayerMeshChanged("branch_point_" + start_bp_id, meshDefaults[kBranchPoint]);
+        this->OnTextLabelChanged("branch_point_" + start_bp_id, meshDefaults[kBranchPointLabels]);
       } else {
-        OnLayerMeshChanged("branch_point_" + start_bp_id, isStartBPVisualized);
-        OnTextLabelChanged("branch_point_" + start_bp_id, isStartBPVisualized);
+        this->OnLayerMeshChanged("branch_point_" + start_bp_id, isStartBPVisualized);
+        this->OnTextLabelChanged("branch_point_" + start_bp_id, isStartBPVisualized);
       }
 
       if (!isEndBPVisualized) {
-        OnLayerMeshChanged("branch_point_" + end_bp_id, meshDefaults["branch_point"]);
-        OnTextLabelChanged("branch_point_" + end_bp_id, meshDefaults["branch_point_labels"]);
+        this->OnLayerMeshChanged("branch_point_" + end_bp_id, meshDefaults[kBranchPoint]);
+        this->OnTextLabelChanged("branch_point_" + end_bp_id, meshDefaults[kBranchPointLabels]);
       } else {
-        OnLayerMeshChanged("branch_point_" + end_bp_id, isEndBPVisualized);
-        OnTextLabelChanged("branch_point_" + end_bp_id, isEndBPVisualized);
+        this->OnLayerMeshChanged("branch_point_" + end_bp_id, isEndBPVisualized);
+        this->OnTextLabelChanged("branch_point_" + end_bp_id, isEndBPVisualized);
       }
 
       PhaseRingPhaseIds phaseRingIdAndPhaseIdSelected = this->rulesVisualizerWidget->GetSelectedPhaseRingAndPhaseId();
@@ -225,9 +224,15 @@ void MaliputViewerWidget::OnVisualClicked(ignition::rendering::RayQueryResult ra
       this->renderWidget->SetArrowVisibility(true);
     } else {
       std::vector<std::string> selectedLanes = this->renderWidget->GetSelectedLanes();
+      std::vector<std::string> selectedBranchPoints = this->renderWidget->GetSelectedBranchPoints();
       for (const auto& i : selectedLanes) {
-        OnLayerMeshChanged("lane_" + i, meshDefaults["lane"]);
-        OnLayerMeshChanged("marker_" + i, meshDefaults["marker"]);
+        this->OnLayerMeshChanged("lane_" + i, meshDefaults[kLane]);
+        this->OnLayerMeshChanged("marker_" + i, meshDefaults[kMarker]);
+        this->OnTextLabelChanged("lane_" + i, meshDefaults[kLaneLabels]);
+      }
+      for (const auto& i : selectedBranchPoints) {
+        this->OnLayerMeshChanged("branch_point_" + i, meshDefaults[kBranchPoint]);
+        this->OnTextLabelChanged("branch_point_" + i, meshDefaults[kBranchPointLabels]);
       }
       this->renderWidget->SetArrowVisibility(false);
       this->renderWidget->DeselectAll();

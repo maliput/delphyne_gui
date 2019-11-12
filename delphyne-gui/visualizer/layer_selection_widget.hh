@@ -50,6 +50,15 @@ class LayerSelectionWidget : public QWidget {
   QCheckBox* grayedAsphaltCheckBox{nullptr};
   QCheckBox* grayedLaneCheckBox{nullptr};
   QCheckBox* grayedMarkerCheckBox{nullptr};
+
+  const std::string kAsphalt{"asphalt"};
+  const std::string kLaneAll{"lane_all"};
+  const std::string kMarkerAll{"marker_all"};
+  const std::string kHBounds{"h_bounds"};
+  const std::string kBranchPointAll{"branch_point_all"};
+  const std::string kGrayedAsphalt{"grayed_asphalt"};
+  const std::string kGrayedLaneAll{"grayed_lane_all"};
+  const std::string kGrayedMarkerAll{"grayed_marker_all"};
 };
 
 /// \brief Widget with checkboxes to enable / disable label visualization.
@@ -76,6 +85,9 @@ class LabelSelectionWidget : public QWidget {
 
   QCheckBox* branchPointCheckBox{nullptr};
   QCheckBox* laneCheckBox{nullptr};
+  
+  const std::string kLaneTextLabel{"lane_text_label"};
+  const std::string kBranchPointTextLabel{"branch_point_text_label"};
 };
 
 /// \brief Controls the button and the file dialog to load a yaml file.

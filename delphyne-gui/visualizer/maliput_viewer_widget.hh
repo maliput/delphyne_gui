@@ -114,6 +114,21 @@ class MaliputViewerWidget : public ignition::gui::Plugin {
   /// \brief Flag used to record the first paint event and sync on the road
   /// meshes when required.
   bool first_run_{false};
+
+  ///brief Key for the marker mesh in the default map
+  const std::string kMarker{"marker"};
+
+  ///brief Key for the lane mesh in the default map
+  const std::string kLane{"lane"};
+
+  ///brief Key for the branch point mesh in the default map
+  const std::string kBranchPoint{"branch_point"};
+
+  ///brief Key for the branch point label mesh in the default map
+  const std::string kBranchPointLabels{"branch_point_labels"};
+
+  ///brief Key for the lane label mesh in the default map
+  const std::string kLaneLabels{"lane_labels"};
 };
 
 }  // namespace gui

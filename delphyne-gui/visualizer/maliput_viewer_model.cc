@@ -310,7 +310,7 @@ bool MaliputViewerModel::Load(const std::string& _maliputFilePath, const std::st
   ignmsg << "Loading RoadGeometry meshes of " << rg->id().string() << std::endl;
   maliput::utility::ObjFeatures features;
   features.off_grid_mesh_generation = true;
-  maliput::utility::RoadGeometryMesh geoMeshes = BuildRoadGeometryMesh(rg, features);
+  const maliput::utility::RoadGeometryMesh geoMeshes = BuildRoadGeometryMesh(rg, features);
   ignmsg << "Meshes loaded." << std::endl;
   this->ConvertRoadGeometryMeshes(geoMeshes);
   ignmsg << "Meshes converted to ignition type." << std::endl;

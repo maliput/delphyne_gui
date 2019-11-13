@@ -156,7 +156,7 @@ class Selector {
   std::map<std::string, int> lanesSelected;
 
   /// \brief The dimension scales of the world
-  std::vector<double> dimensionScale;
+  ignition::math::Vector3d dimensionScale;
 
   /// \brief The number of lanes to extend the cubes vector by when space is exhausted.
   const unsigned int numLanes;

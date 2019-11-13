@@ -447,14 +447,12 @@ void RenderMaliputWidget::SetArrowVisibility(bool _visible) {
 
 /////////////////////////////////////////////////
 std::vector<std::string> RenderMaliputWidget::GetSelectedBranchPoints() {
-  std::vector<std::string> emptyVector;
-  return this->selector ? this->selector->GetSelectedBranchPoints() : emptyVector;
+  return this->selector ? this->selector->GetSelectedBranchPoints() : std::vector<std::string>{};
 }
 
 /////////////////////////////////////////////////
 std::vector<std::string> RenderMaliputWidget::GetSelectedLanes() {
-  std::vector<std::string> emptyVector;
-  return this->selector ? this->selector->GetSelectedLanes() : emptyVector;
+  return this->selector ? this->selector->GetSelectedLanes() : std::vector<std::string>{};
 }
 
 /////////////////////////////////////////////////

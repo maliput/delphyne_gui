@@ -26,6 +26,10 @@ MaliputViewerWidget::MaliputViewerWidget(QWidget* parent) : Plugin() {
     this->VisualizeFileName(GlobalAttributes::GetArgument("yaml_file"));
   }
 
+  for (const std::string& key : {kLane, kMarker, kBranchPoint, kBranchPointLabels, kLaneLabels}) {
+    meshDefaults[key] = true;
+  }
+
   QObject::connect(this->layerSelectionWidget, SIGNAL(valueChanged(const std::string&, bool)), this,
                    SLOT(OnLayerMeshChanged(const std::string&, bool)));
 
@@ -41,15 +45,15 @@ MaliputViewerWidget::MaliputViewerWidget(QWidget* parent) : Plugin() {
 /////////////////////////////////////////////////
 void MaliputViewerWidget::UpdateMeshDefaults(const std::string& key, bool newValue) {
   // Store the value the mesh should return to if not selected
-  if (FoundKeyword(key, "marker")) {
+  if (FoundKeyword(key, kMarker)) {
     this->meshDefaults[kMarker] = newValue;
-  } else if (FoundKeyword(key, "lane_text")) {
+  } else if (FoundKeyword(key, kLaneTextLabel)) {
     this->meshDefaults[kLaneLabels] = newValue;
-  } else if (FoundKeyword(key, "branch_point_text")) {
+  } else if (FoundKeyword(key, kBranchPointTextLabel)) {
     this->meshDefaults[kBranchPointLabels] = newValue;
-  } else if (FoundKeyword(key, "lane")) {
+  } else if (FoundKeyword(key, kLane)) {
     this->meshDefaults[kLane] = newValue;
-  } else if (FoundKeyword(key, "branch_point")) {
+  } else if (FoundKeyword(key, kBranchPoint)) {
     this->meshDefaults[kBranchPoint] = newValue;
   }
 }
@@ -62,8 +66,7 @@ bool MaliputViewerWidget::FoundKeyword(const std::string& key, const std::string
 /////////////////////////////////////////////////
 std::string MaliputViewerWidget::GetID(const std::string& keyword) {
   const std::size_t firstNum = keyword.find_first_of("0123456789");
-  std::string id = keyword.substr(firstNum, keyword.length() - firstNum + 1);
-  return id;
+  return keyword.substr(firstNum, keyword.length() - firstNum + 1);
 }
 
 /////////////////////////////////////////////////
@@ -100,8 +103,8 @@ void MaliputViewerWidget::OnLayerMeshChanged(const std::string& key, bool newVal
 /////////////////////////////////////////////////
 void MaliputViewerWidget::OnTextLabelChanged(const std::string& key, bool newValue) {
   // Updates the model.
-  if (key == "lane_text_label" || key == "branch_point_text_label") {
-    const int keyword_index = key.find("text");
+  if (key == kLaneTextLabel || key == kBranchPointTextLabel) {
+    const int keyword_index = key.find(kText);
     const std::string keyword = key.substr(0, keyword_index);
     this->UpdateMeshDefaults(key, newValue);
     for (auto const& it : this->model->Labels()) {

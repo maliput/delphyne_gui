@@ -51,6 +51,13 @@ class LayerSelectionWidget : public QWidget {
   QCheckBox* grayedLaneCheckBox{nullptr};
   QCheckBox* grayedMarkerCheckBox{nullptr};
 
+  // TODO(anyone): The below string constants are used as keys for the mesh map
+  // that contains all of the meshes of the loaded road geometry.  These keys are
+  // currently in use in three separate files: `maliput_viewer_widget.cc`,
+  // `layer_selection_widget.cc`, and `generate_obj.cc` within maliput.  These keys
+  // should be consolidated into a singular location to prevent any accidental
+  // disruption of functionality going forward.
+
   const std::string kAsphalt{"asphalt"};
   const std::string kLaneAll{"lane_all"};
   const std::string kMarkerAll{"marker_all"};

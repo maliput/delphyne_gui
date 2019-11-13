@@ -27,13 +27,15 @@ Selector::Selector(ignition::rendering::ScenePtr& _scene, double _scaleX, double
   DELPHYNE_DEMAND(_poolSize > 3);
   DELPHYNE_DEMAND(_numLanes > 0);
   DELPHYNE_DEMAND(_scene != nullptr);
+  DELPHYNE_DEMAND(_minTolerance >= 0);
+  DELPHYNE_DEMAND(_scaleX > 0);
+  DELPHYNE_DEMAND(_scaleY > 0);
+  DELPHYNE_DEMAND(_scaleZ > 0);
   ignition::rendering::MaterialPtr material = _scene->CreateMaterial();
   material->SetDiffuse(255.0, 0.0, 0.0, 1.0);
   material->SetAmbient(255.0, 0.0, 0.0, 1.0);
   populationMap.resize(_numLanes);
-  dimensionScale.push_back(_scaleX);
-  dimensionScale.push_back(_scaleY);
-  dimensionScale.push_back(_scaleZ);
+  dimensionScale = ignition::math::Vector3d(_scaleX, _scaleY, _scaleZ);
   cubeMaterial = material;
 
   // Create and init space for _numLanes selected lanes, create more later if more lanes are selected
@@ -89,7 +91,7 @@ void Selector::SelectLane(const maliput::api::Lane* _lane) {
 
   // If all preinitialized markers are in use, create more
   if (slot == -1) {
-    this->CreateCubes(scene, dimensionScale[0], dimensionScale[1], dimensionScale[2], cubeMaterial,
+    this->CreateCubes(scene, dimensionScale.X(), dimensionScale.Y(), dimensionScale.Z(), cubeMaterial,
                       numLanes * cubesPerLane);
     for (size_t i = 0; i < numLanes; ++i) {
       populationMap.push_back(false);

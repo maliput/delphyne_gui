@@ -84,18 +84,18 @@ class RenderMaliputWidget : public QWidget {
   /// \brief Deselects the currently selected region.
   void DeselectAll();
 
-  /// \brief Gets the currently selected lanes.
+  /// \brief Gets the currently selected lanes as a string vector.
   /// \returns A vector of the lane_id's which are selected.
   std::vector<std::string> GetSelectedLanes();
 
-  /// \brief Gets the currently selected branch pointss.
+  /// \brief Gets the currently selected branch points as a string vector.
   /// \returns A vector of the branch_point_id's which are selected.
   std::vector<std::string> GetSelectedBranchPoints();
 
   /// \brief Clears all the references to text labels, meshes and the scene.
   void Clear();
 
-  /// \brief Selects a lane if it is not selected and deselects a lane if it is selected.
+  /// \brief Selects `_lane`'s mesh when it is not selected, or deselects it when it is selected.
   /// \param[in] _lane Lane to select or deselect.
   void SelectLane(const maliput::api::Lane* _lane);
 
@@ -117,8 +117,8 @@ class RenderMaliputWidget : public QWidget {
   /// \brief Signal that gets fired when a click happens on a visual (mesh)
   void VisualClicked(ignition::rendering::RayQueryResult rayResult);
 
-  /// \brief Signal that gets fired upon a call to deselect everything
-  void SetAllToDefault();
+  /// \brief Signal that gets fired upon a call to deselect all selected regions.
+  void SetAllSelectedRegionsToDefault();
 
  protected:
   /// \brief Overridden method to receive Qt show event.

@@ -85,7 +85,7 @@ class LabelSelectionWidget : public QWidget {
 
   QCheckBox* branchPointCheckBox{nullptr};
   QCheckBox* laneCheckBox{nullptr};
-  
+
   const std::string kLaneTextLabel{"lane_text_label"};
   const std::string kBranchPointTextLabel{"branch_point_text_label"};
 };

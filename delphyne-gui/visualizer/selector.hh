@@ -30,7 +30,7 @@ class Selector {
   /// \brief Destructor. Cube's destruction will be in charge of the scene's destructor.
   ~Selector() = default;
 
-  /// \brief Selects a given lane if it is not selected and deselects a lane if it is
+  /// \brief Selects `_lane`'s mesh when it is not selected, or deselects it when it is selected.
   /// \param[in] _lane Lane to be outlined.
   void SelectLane(const maliput::api::Lane* _lane);
 
@@ -38,23 +38,15 @@ class Selector {
   /// \param[in] _visible Boolean that determines the visibility of the outlining.
   void SetVisibility(bool _visible);
 
-  /// \brief Resets the population map.
-  void ResetPopulationMap();
-
-  /// \brief Resets the selected branchpoint group.
-  void ResetSelectedBranchPoints();
-
-  /// \brief Resets the selected lane group.
-  void ResetSelectedLanes();
-
-  /// \brief Deselects everything, resetting all corresponding attributes.
+  /// \brief Deselects all selected regions by calling `ResetPopulationMap()`,
+  /// `ClearSelectedBranchPoints()` and `ClearSelectedLanes()`
   void DeselectAll();
 
-  /// \brief Gets the currently selected lanes.
+  /// \brief Gets the currently selected lanes as a string vector.
   /// \returns A vector of the lane_id's which are selected.
   std::vector<std::string> GetSelectedLanes();
 
-  /// \brief Gets the currently selected BranchPoints.
+  /// \brief Gets the currently selected BranchPoints as a string vector.
   /// \returns A vector of the branch_point_id's which are selected.
   std::vector<std::string> GetSelectedBranchPoints();
 
@@ -115,9 +107,31 @@ class Selector {
   bool DoPointsViolateTolerance(const maliput::api::GeoPosition& _first_point,
                                 const maliput::api::GeoPosition& _second_point);
 
+  /// \brief Sets the complete segment population map to false, indicating no cube segments are currently in use
+  void ResetPopulationMap();
+
+  /// \brief Clears the currently selected branchpoint group.
+  void ClearSelectedBranchPoints();
+
+  /// \brief Clears the currently selected lane group.
+  void ClearSelectedLanes();
+
   /// \brief Finds the first empty segment of visuals in the cubes vector
   /// \returns The index of the segment, -1 if no segment is found
   int FindFirstEmpty();
+
+  /// \brief Calculates the lane index which the markers for the corresponding lanes
+  /// are located at.  This index is dependent upon the `cubesPerLane` variable.
+  /// \param[in] _slot The slot within the cubes vector that holds a lane's outline markers
+  int GetLaneIndex(int _slot);
+
+  /// \brief Gets the index that the pre-initialized cubes start at.  Adds 4 due to the 4 corners of the lanes
+  /// being populated beforehand
+  int GetCubeIndex(int _laneIndex);
+
+  /// \brief Gets the remaining number of cubes to populate for a lane.  Subtracts 4 as 4 cubes have already
+  /// been set before this call for the corners of the lane.
+  int GetRemainingCubes();
 
   /// \brief Cubes used for rendering the outline in roads.
   std::vector<ignition::rendering::VisualPtr> cubes;
@@ -141,23 +155,14 @@ class Selector {
   /// The lane id is the key and the corresponding slot number of its visuals is the value
   std::map<std::string, int> lanesSelected;
 
-  /// \brief X dimension scale of the world.
-  const double scaleX;
-
-  /// \brief Y dimension scale of the world.
-  const double scaleY;
-
-  /// \brief Z dimension scale of the world.
-  const double scaleZ;
+  /// \brief The dimension scales of the world
+  std::vector<double> dimensionScale;
 
   /// \brief The number of lanes to extend the cubes vector by when space is exhausted.
   const unsigned int numLanes;
 
   /// \brief The number of cubes that will be displayed per lane selected.
   const unsigned int cubesPerLane;
-
-  /// \brief Cache cubes used for the last lane so we hide the leftovers only.
-  int lastCubesUsed;
 
   /// \brief Tolerance used for cubes positioning.
   double minTolerance;

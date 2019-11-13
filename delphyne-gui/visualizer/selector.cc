@@ -21,34 +21,41 @@ namespace gui {
 Selector::Selector(ignition::rendering::ScenePtr& _scene, double _scaleX, double _scaleY, double _scaleZ, int _poolSize,
                    int _numLanes, double _minTolerance)
     : scene(_scene),
-      scaleX(_scaleX),
-      scaleY(_scaleY),
-      scaleZ(_scaleZ),
       numLanes(_numLanes),
       cubesPerLane(_poolSize),
-      lastCubesUsed(0),
       minTolerance(_minTolerance < _scaleX * 2.0 ? _scaleX : _minTolerance) {
   DELPHYNE_DEMAND(_poolSize > 3);
   DELPHYNE_DEMAND(_numLanes > 0);
+  DELPHYNE_DEMAND(_scene != nullptr);
   ignition::rendering::MaterialPtr material = _scene->CreateMaterial();
   material->SetDiffuse(255.0, 0.0, 0.0, 1.0);
   material->SetAmbient(255.0, 0.0, 0.0, 1.0);
   populationMap.resize(_numLanes);
+  dimensionScale.push_back(_scaleX);
+  dimensionScale.push_back(_scaleY);
+  dimensionScale.push_back(_scaleZ);
   cubeMaterial = material;
 
   // Create and init space for _numLanes selected lanes, create more later if more lanes are selected
   this->CreateCubes(_scene, _scaleX, _scaleY, _scaleZ, cubeMaterial, _numLanes * _poolSize);
 }
 
+int Selector::GetLaneIndex(int _slot) { return cubesPerLane * _slot; }
+
+int Selector::GetRemainingCubes() { return cubesPerLane - 4; }
+
+int Selector::GetCubeIndex(int _laneIndex) { return 4 + _laneIndex; }
+
 void Selector::SelectLane(const maliput::api::Lane* _lane) {
-  std::string laneId = _lane->id().string();
+  DELPHYNE_DEMAND(_lane != nullptr);
+  const std::string laneId = _lane->id().string();
   const std::string start_bp_id = _lane->GetBranchPoint(maliput::api::LaneEnd::kStart)->id().string();
   const std::string end_bp_id = _lane->GetBranchPoint(maliput::api::LaneEnd::kFinish)->id().string();
 
   // Remove markers from previously selected lane
   if (lanesSelected[laneId]) {
-    int slot = lanesSelected[laneId] - 1;
-    int laneIndex = slot * cubesPerLane;
+    const int slot = lanesSelected[laneId] - 1;
+    const int laneIndex = slot * cubesPerLane;
     branchPointsSelected[start_bp_id]--;
     branchPointsSelected[end_bp_id]--;
     // Turn off visibility of a previously selected lane
@@ -77,14 +84,13 @@ void Selector::SelectLane(const maliput::api::Lane* _lane) {
   const maliput::api::GeoPosition endRMaxGeoPos =
       _lane->ToGeoPosition(maliput::api::LanePosition(max_s, endRBounds.max(), 0.));
 
-  // Set cubes in the extremes of the lane.
-  std::vector<ignition::rendering::VisualPtr> laneCubes;
-
+  // Find first empty slot of unused markers
   int slot = FindFirstEmpty();
 
-  // Need more space in the cubes vector
+  // If all preinitialized markers are in use, create more
   if (slot == -1) {
-    this->CreateCubes(scene, scaleX, scaleY, scaleZ, cubeMaterial, numLanes * cubesPerLane);
+    this->CreateCubes(scene, dimensionScale[0], dimensionScale[1], dimensionScale[2], cubeMaterial,
+                      numLanes * cubesPerLane);
     for (size_t i = 0; i < numLanes; ++i) {
       populationMap.push_back(false);
     }
@@ -94,7 +100,7 @@ void Selector::SelectLane(const maliput::api::Lane* _lane) {
   // Add one for easy distinction between non-existing keys
   lanesSelected[laneId] = slot + 1;
 
-  const unsigned int laneIndex = cubesPerLane * slot;
+  const unsigned int laneIndex = GetLaneIndex(slot);
   cubes[laneIndex]->SetWorldPosition(initialRMinGeoPos.x(), initialRMinGeoPos.y(), initialRMinGeoPos.z());
   cubes[laneIndex]->SetVisible(true);
   cubes[laneIndex + 1]->SetWorldPosition(initialRMaxGeoPos.x(), initialRMaxGeoPos.y(), initialRMaxGeoPos.z());
@@ -105,8 +111,8 @@ void Selector::SelectLane(const maliput::api::Lane* _lane) {
   cubes[laneIndex + 3]->SetWorldPosition(endRMaxGeoPos.x(), endRMaxGeoPos.y(), endRMaxGeoPos.z());
   cubes[laneIndex + 3]->SetVisible(true);
 
-  int cubesUsed = 4 + laneIndex;
-  int remainingCubes = cubesPerLane - 4;
+  int cubesUsed = GetCubeIndex(laneIndex);
+  int remainingCubes = GetRemainingCubes();
   MoveCubeAtMidPointInR(initialRMinGeoPos, initialRMaxGeoPos, &cubesUsed, &remainingCubes);
 
   MoveCubeAtMidPointInR(endRMinGeoPos, endRMaxGeoPos, &cubesUsed, &remainingCubes);
@@ -124,8 +130,6 @@ void Selector::SelectLane(const maliput::api::Lane* _lane) {
   minTolerance = GetNewToleranceToPopulateLane(max_s, cubesRightSide);
   cubesRightSide = static_cast<int>(max_s / minTolerance);
   MoveCubeAtMidPointInS(_lane, 0., max_s, false, &cubesUsed, &cubesRightSide);
-  SetVisibilityOfCubesStartingFromTo(cubesUsed, lastCubesUsed != 0 ? lastCubesUsed : cubes.size(), false);
-  lastCubesUsed = cubesUsed;
   minTolerance = oldTolerance;
 }
 
@@ -139,10 +143,7 @@ int Selector::FindFirstEmpty() {
   return -1;
 }
 
-void Selector::SetVisibility(bool _visible) {
-  SetVisibilityOfCubesStartingFromTo(0, cubes.size(), _visible);
-  lastCubesUsed = 0;
-}
+void Selector::SetVisibility(bool _visible) { SetVisibilityOfCubesStartingFromTo(0, cubes.size(), _visible); }
 
 void Selector::ResetPopulationMap() {
   for (size_t i = 0; i < populationMap.size(); ++i) {
@@ -174,15 +175,15 @@ std::vector<std::string> Selector::GetSelectedLanes() {
   return selectedLanes;
 }
 
-void Selector::ResetSelectedBranchPoints() { branchPointsSelected.clear(); }
+void Selector::ClearSelectedBranchPoints() { branchPointsSelected.clear(); }
 
-void Selector::ResetSelectedLanes() { lanesSelected.clear(); }
+void Selector::ClearSelectedLanes() { lanesSelected.clear(); }
 
 void Selector::DeselectAll() {
   SetVisibility(false);
   ResetPopulationMap();
-  ResetSelectedLanes();
-  ResetSelectedBranchPoints();
+  ClearSelectedLanes();
+  ClearSelectedBranchPoints();
 }
 
 bool Selector::IsSelected(const std::string& _id) { return lanesSelected[_id] || branchPointsSelected[_id]; }

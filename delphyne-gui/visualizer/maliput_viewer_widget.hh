@@ -61,8 +61,9 @@ class MaliputViewerWidget : public ignition::gui::Plugin {
   /// \param[in] rayResult Ray that contains the point where the click hit.
   void OnVisualClicked(ignition::rendering::RayQueryResult rayResult);
 
-  /// \brief Sets everything back to the default values indicated by the GUI checkboxes
-  void OnSetAllToDefault();
+  /// \brief Sets all selected regions back to the default values indicated by the GUI checkboxes
+  /// and updates the visualizer
+  void OnSetAllSelectedRegionsToDefault();
 
   /// \brief Emits rulesVisualizerWidget's ReceiveRules signal with all the rules related
   /// to the selected lane, phase ring and phase if any.
@@ -88,6 +89,43 @@ class MaliputViewerWidget : public ignition::gui::Plugin {
   /// \param[in] key The key indicating which default to update.
   /// \param[in] newValue The new value to set the default value.
   void UpdateMeshDefaults(const std::string& key, bool newValue);
+
+  /// \brief Updates a lane so that if it is selected then all meshes are on, but if it is
+  /// not selected, all meshes are set to the default values.
+  /// \param[in] id The id of the lane.
+  void UpdateLane(const std::string& id);
+
+  /// \brief Updates a branch point so that if it is selected then all meshes are on, but if it is
+  /// not selected, all meshes are set to the default values.
+  /// \param[in] id The id of the branch point.
+  void UpdateBranchPoint(const std::string& id);
+
+  /// \brief Updates all of the selected regions to the default mesh values.
+  void UpdateSelectedWithDefault();
+
+  /// \brief Returns the corresponding map key for the marker. The string is
+  /// calculated as being `kMarker` + "_" + id.
+  /// \param[in] id The id of the marker.
+  std::string MarkerMeshMapKey(const std::string& id);
+
+  /// \brief Returns the corresponding map key for the branch point. The string is
+  /// calculated as being `kBranchPoint` + "_" + id.
+  /// \param[in] id The id of the branch point.
+  std::string BranchPointMeshMapKey(const std::string& id);
+
+  /// \brief Returns the corresponding map key for the lane. The string is
+  /// calculated as being `kLane` + "_" + id.
+  /// \param[in] id The id of the lane.
+  std::string LaneMeshMapKey(const std::string& id);
+
+  bool FoundKeyword(const std::string& key, const std::string& keyword);
+
+  /// \brief Obtains the id of a branchpoint or lane from the string used as it's
+  /// key value in the mesh map.
+  /// \param[in] key The key that the lane or branchpoint is associated with in the
+  /// mesh map.
+  /// \returns The lane or branchpoint id.
+  std::string GetID(const std::string& key);
 
   /// \brief Widget to hold and modify the visualization status of each layer.
   LayerSelectionWidget* layerSelectionWidget{nullptr};
@@ -115,19 +153,26 @@ class MaliputViewerWidget : public ignition::gui::Plugin {
   /// meshes when required.
   bool first_run_{false};
 
-  ///brief Key for the marker mesh in the default map
+  /// \brief Key used to detect an asphalt checkbox event.
+  const std::string kAsphalt{"asphalt"};
+
+  /// \brief Keyword used by the checkboxes to indicate the new default for all
+  /// of the provided mesh.
+  const std::string kAll{"all"};
+
+  /// \brief Key for the marker mesh in the default map.
   const std::string kMarker{"marker"};
 
-  ///brief Key for the lane mesh in the default map
+  /// \brief Key for the lane mesh in the default map.
   const std::string kLane{"lane"};
 
-  ///brief Key for the branch point mesh in the default map
+  /// \brief Key for the branch point mesh in the default map.
   const std::string kBranchPoint{"branch_point"};
 
-  ///brief Key for the branch point label mesh in the default map
+  /// \brief Key for the branch point label mesh in the default map.
   const std::string kBranchPointLabels{"branch_point_labels"};
 
-  ///brief Key for the lane label mesh in the default map
+  /// \brief Key for the lane label mesh in the default map.
   const std::string kLaneLabels{"lane_labels"};
 };
 

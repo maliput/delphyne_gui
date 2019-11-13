@@ -359,7 +359,7 @@ void RenderMaliputWidget::RenderLabels(const std::map<std::string, MaliputLabel>
     // Checks if the text labels to be rendered already exists or not.
     const auto labelExists = this->textLabels.find(it.second.text);
     // If the text label is disabled, there is no visual for it so it must be
-    //  set to transparent.
+    // set to a non-visible state
     if (!it.second.enabled) {
       // If the text label already exists, set visibility to false
       if (labelExists != this->textLabels.end()) {
@@ -447,36 +447,27 @@ void RenderMaliputWidget::SetArrowVisibility(bool _visible) {
 
 /////////////////////////////////////////////////
 std::vector<std::string> RenderMaliputWidget::GetSelectedBranchPoints() {
-  std::vector<std::string> selectedBranchPoints;
-  if (this->selector) {
-    selectedBranchPoints = this->selector->GetSelectedBranchPoints();
-  }
-  return selectedBranchPoints;
+  std::vector<std::string> emptyVector;
+  return this->selector ? this->selector->GetSelectedBranchPoints() : emptyVector;
 }
 
 /////////////////////////////////////////////////
 std::vector<std::string> RenderMaliputWidget::GetSelectedLanes() {
-  std::vector<std::string> selectedLanes;
-  if (this->selector) {
-    selectedLanes = this->selector->GetSelectedLanes();
-  }
-  return selectedLanes;
+  std::vector<std::string> emptyVector;
+  return this->selector ? this->selector->GetSelectedLanes() : emptyVector;
 }
 
 /////////////////////////////////////////////////
 void RenderMaliputWidget::DeselectAll() {
   if (this->selector) {
-    emit SetAllToDefault();
+    emit SetAllSelectedRegionsToDefault();
     this->selector->DeselectAll();
   }
 }
 
 /////////////////////////////////////////////////
 bool RenderMaliputWidget::IsSelected(const std::string& _laneId) {
-  if (this->selector) {
-    return this->selector->IsSelected(_laneId);
-  }
-  return false;
+  return this->selector ? this->selector->IsSelected(_laneId) : false;
 }
 
 /////////////////////////////////////////////////

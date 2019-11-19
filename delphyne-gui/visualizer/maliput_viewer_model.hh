@@ -114,6 +114,12 @@ class RoadNetworkQuery {
   const maliput::api::RoadNetwork* rn_{};
 };
 
+/// \brief Type of label based on road entities.
+enum class MaliputLabelType {
+  kLane,         ///< A lane label.
+  kBranchPoint,  ///< A branch point label.
+};
+
 /// \brief Holds the mesh, material and visualization status.
 class MaliputMesh {
  public:
@@ -144,12 +150,9 @@ class MaliputLabel {
 
   /// \brief Position of the label.
   ignition::math::Vector3d position{};
-};
 
-/// \brief Type of label based on road entities.
-enum class MaliputLabelType {
-  kLane,         ///< A lane label.
-  kBranchPoint,  ///< A branch point label.
+  /// \brief The type of label
+  MaliputLabelType labelType{};
 };
 
 /// \brief Converts @p _type into a MaliputLabelType.
@@ -187,7 +190,7 @@ class MaliputViewerModel {
 
   /// \brief Getter of the map of labels.
   /// \return The map of labels.
-  const std::map<MaliputLabelType, std::vector<MaliputLabel>>& Labels() const;
+  const std::map<std::string, MaliputLabel>& Labels() const;
 
   /// \brief Modifies the visualization state of @p key mesh.
   /// \param[in] _key The name of the mesh.
@@ -195,7 +198,12 @@ class MaliputViewerModel {
   void SetLayerState(const std::string& _key, bool _isVisible);
 
   /// \brief Modifies the visualization state of @p _type type text labels.
-  /// \param[in] _type Labels type.
+  /// \param[in] _key The id of the lane or branch point.
+  /// \param[in] _isVisible The new visualization status of the text label.
+  void SetTextLabelState(const std::string& _key, bool _isVisible);
+
+  /// \brief Modifies the visualization state of @p _type type text labels.
+  /// \param[in] _type The desired label type to target.
   /// \param[in] _isVisible The new visualization status of the text label.
   void SetTextLabelState(MaliputLabelType _type, bool _isVisible);
 
@@ -268,6 +276,12 @@ class MaliputViewerModel {
   void ConvertMeshes(
       const std::map<std::string, std::pair<maliput::utility::mesh::GeoMesh, maliput::utility::Material>>& _geoMeshes);
 
+  /// \brief Converts @p _geoMeshes into a
+  ///        std::map<std::string, std::unique_ptr<ignition::common::Mesh>>
+  ///        filling the instance variable meshes.
+  /// \param[in] _geoMeshes A named collection of GeoMesh objects to convert.
+  void ConvertRoadGeometryMeshes(const maliput::utility::RoadGeometryMesh& _geoMeshes);
+
   /// \brief Populates this->labels map with this->roadGeometry lane and branch
   ///        point IDs.
   void GenerateLabels();
@@ -317,7 +331,7 @@ class MaliputViewerModel {
   std::map<std::string, std::unique_ptr<MaliputMesh>> maliputMeshes;
 
   /// \brief Map of labels.
-  std::map<MaliputLabelType, std::vector<MaliputLabel>> labels;
+  std::map<std::string, MaliputLabel> labels;
 };
 
 template <typename ContainerType>

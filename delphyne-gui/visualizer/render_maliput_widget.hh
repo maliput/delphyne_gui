@@ -20,7 +20,7 @@
 #include "arrow_mesh.hh"
 #include "maliput_viewer_model.hh"
 #include "orbit_view_control.hh"
-#include "outliner.hh"
+#include "selector.hh"
 #include "traffic_light_manager.hh"
 
 namespace delphyne {
@@ -51,13 +51,6 @@ class RenderMaliputWidget : public QWidget {
   /// are both enabled and visibility flag is false. Otherwise, the mesh is
   /// created (if necessary) with its appropriate material.
   /// \param[in] _maliputMeshes A map of meshes to render.
-  // TODO(agalbachicar): In order to properly modify the visibility of the
-  // meshes, we should query visuals for their mesh rather than creating a new
-  // one each time. That API is available on this commit:
-  // https://bitbucket.org/ignitionrobotics/ign-rendering/commits/5accdc88afc557afc03c811d9e892ccb7f99951a
-  // ign-cmake dependency should be switched to 'Components' branch. So, once
-  // everything is stable on default or in a release branch, we should modify
-  // this method to properly set the transparency.
   void RenderRoadMeshes(const std::map<std::string, std::unique_ptr<MaliputMesh>>& _maliputMeshes);
 
   /// \brief Builds visuals for each label inside @p _labels that is enabled.
@@ -66,14 +59,7 @@ class RenderMaliputWidget : public QWidget {
   /// both enabled and visibility flag is false. Otherwise, the text visual is
   /// created (if necessary) and its appropriate material is assigned.
   /// \param[in] _labels A map of labels to render.
-  // TODO(agalbachicar): In order to properly modify the visibility of the
-  // meshes, we should query visuals for their mesh rather than creating a new
-  // one each time. That API is available on this commit:
-  // https://bitbucket.org/ignitionrobotics/ign-rendering/commits/5accdc88afc557afc03c811d9e892ccb7f99951a
-  // ign-cmake dependency should be switched to 'Components' branch. So, once
-  // everything is stable on default or in a release branch, we should modify
-  // this method to properly set the transparency.
-  void RenderLabels(const std::map<MaliputLabelType, std::vector<MaliputLabel>>& _labels);
+  void RenderLabels(const std::map<std::string, MaliputLabel>& _labels);
 
   /// \brief Create and render an arrow that will be positioned slightly above the selected road.
   void RenderArrow();
@@ -95,23 +81,44 @@ class RenderMaliputWidget : public QWidget {
   /// \param[in] _visible Visibility of the arrow.
   void SetArrowVisibility(bool _visible);
 
-  /// \brief Hide the entire outline of a lane.
-  void HideOutline();
+  /// \brief Deselects the currently selected region.
+  void DeselectAll();
+
+  /// \brief Gets the currently selected lanes as a string vector.
+  /// \returns A vector of the lane_id's which are selected.
+  std::vector<std::string> GetSelectedLanes();
+
+  /// \brief Gets the currently selected branch points as a string vector.
+  /// \returns A vector of the branch_point_id's which are selected.
+  std::vector<std::string> GetSelectedBranchPoints();
 
   /// \brief Clears all the references to text labels, meshes and the scene.
   void Clear();
 
-  /// \brief Outlines a given lane.
-  /// \param[in] _lane Lane to outline.
-  void Outline(const maliput::api::Lane* _lane);
+  /// \brief Selects `_lane`'s mesh when it is not selected, or deselects it when it is selected.
+  /// \param[in] _lane Lane to select or deselect.
+  void SelectLane(const maliput::api::Lane* _lane);
+
+  /// \brief Finds if the passed in lane corresponding to the lane id is currently selected or not.
+  /// \param[in] _laneId Lane id of the lane to be evaluated.
+  /// \returns Boolean that determines whether the lane is selected or not.
+  bool IsSelected(const std::string& _laneId);
+
+  /// \brief Finds if the passed in lane is currently selected or not.
+  /// \param[in] _lane Lane to be evaluated.
+  /// \returns Boolean that determines whether the lane is selected or not.
+  bool IsSelected(const maliput::api::Lane* _lane);
 
   /// \brief Overridden method to receive Qt paint event.
   /// \param[in] _e The event that happened.
   virtual void paintEvent(QPaintEvent* _e);
 
-  /// \brief Signal that gets fired when a click happens on a visual (mesh)
  signals:
+  /// \brief Signal that gets fired when a click happens on a visual (mesh)
   void VisualClicked(ignition::rendering::RayQueryResult rayResult);
+
+  /// \brief Signal that gets fired upon a call to deselect all selected regions.
+  void SetAllSelectedRegionsToDefault();
 
  protected:
   /// \brief Overridden method to receive Qt show event.
@@ -181,10 +188,6 @@ class RenderMaliputWidget : public QWidget {
   bool FillMaterial(const maliput::utility::Material* _maliputMaterial,
                     ignition::rendering::MaterialPtr& _ignitionMaterial) const;
 
-  /// \brief Fills a material to be transparent.
-  /// \param[in] _material Material to be transparent.
-  void CreateTransparentMaterial(ignition::rendering::MaterialPtr& _material) const;
-
   /// \brief Fills a material for a lane label.
   /// \param[in] _material Material to be filled.
   void CreateLaneLabelMaterial(ignition::rendering::MaterialPtr& _material) const;
@@ -226,8 +229,8 @@ class RenderMaliputWidget : public QWidget {
   /// \brief Arrow that points the location clicked in the visualizer.
   std::unique_ptr<ArrowMesh> arrow;
 
-  /// \brief Outliner used for outlining clicked lanes in the visualizer.
-  std::unique_ptr<Outliner> outliner;
+  /// \brief Selector used for selecting clicked lanes in the visualizer.
+  std::unique_ptr<Selector> selector;
 
   /// \brief Manager of traffic lights visualization.
   std::unique_ptr<TrafficLightManager> trafficLightManager;
@@ -247,16 +250,18 @@ class RenderMaliputWidget : public QWidget {
   /// \brief Map of text labels visual pointers.
   std::map<std::string, ignition::rendering::VisualPtr> textLabels;
 
-  /// \brief Scale in the X axis for the cubes used in the outliner.
-  static constexpr double kOutlinerScaleX = 0.3;
-  /// \brief Scale in the Y axis for the cubes used in the outliner.
-  static constexpr double kOutlinerScaleY = 0.5;
-  /// \brief Scale in the Z axis for the cubes used in the outliner.
-  static constexpr double kOutlinerScaleZ = 0.1;
-  /// \brief Tolerance used for the outliner.
-  static constexpr double kOutlinerMinTolerance = 0.6;
-  /// \brief Max amount of cubes used for the outliner.
-  static constexpr int kOutlinerPoolSize = 1500;
+  /// \brief Scale in the X axis for the cubes used in the selector.
+  static constexpr double kSelectorScaleX = 0.3;
+  /// \brief Scale in the Y axis for the cubes used in the selector.
+  static constexpr double kSelectorScaleY = 0.5;
+  /// \brief Scale in the Z axis for the cubes used in the selector.
+  static constexpr double kSelectorScaleZ = 0.1;
+  /// \brief Tolerance used for the selector.
+  static constexpr double kSelectorMinTolerance = 0.6;
+  /// \brief Max amount of cubes used for the selector.
+  static constexpr int kSelectorPoolSize = 50;
+  /// \brief Number of lanes to pre-initialize in selector cubes vector.
+  static constexpr int kNumLanes = 15;
   /// \brief Every how much time should the lights blink in miliseconds.
   static constexpr int kTrafficLightsTickPeriod = 500;
 };

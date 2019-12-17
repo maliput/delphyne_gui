@@ -165,10 +165,81 @@ void RoadNetworkQuery::ToRoadPosition(const maliput::api::GeoPosition& geo_posit
   (*out_) << "                RoadPosition: " << result.road_position << std::endl;
 }
 
+void RoadNetworkQuery::GetState(const maliput::api::rules::Rule::State& state) {
+  const int severity = state.severity;
+  const auto& related_rules = state.related_rules;
+
+  for (const auto& related_rule : related_rules) {
+    std::string rule_name = related_rule.first;
+    (*out_) << ", severity" << severity;
+    (*out_) << ", related rule name: " << rule_name;
+    (*out_) << ", ids [";
+    const auto& ids = related_rule.second;
+    for (const auto& id : ids) {
+      (*out_) << id.string() << ", ";
+    }
+    (*out_) << "]";
+  }
+
+  const auto& related_unique_ids = state.related_unique_ids;
+  for (const auto& related_unique_id : related_unique_ids) {
+    std::string related_unique_id_name = related_unique_id.first;
+    (*out_) << ", related unique id name: " << related_unique_id_name;
+    (*out_) << ", unique ids [";
+    const auto& unique_ids = related_unique_id.second;
+    for (const auto& unique_id : unique_ids) {
+      (*out_) << unique_id.string() << ", ";
+    }
+    (*out_) << "]";
+  }
+}
+
+/////////////////////////////////////////////////
+void RoadNetworkQuery::GetDiscreteValue(const maliput::api::LaneId& lane_id) {
+  const maliput::api::rules::RoadRulebook::QueryResults query_result = FindRulesFor(lane_id);
+  
+  const int n_rules = static_cast<int>(query_result.discrete_value_rules.size());
+  if (n_rules > 0) {
+    for (const auto& discrete_value_rule : query_result.discrete_value_rules) {
+      const auto& values = discrete_value_rule.second.values();
+      for (const auto& value : values) {
+        const std::string val = value.value;
+        (*out_) << "              : Result: Rule (id: " << discrete_value_rule.first.string();
+        (*out_) << ", value: " << val;
+        this->GetState(value);
+        (*out_) << ")" << std::endl;
+      }
+    }
+  } else {
+    (*out_) << "              : Result: There are no discrete value rules "
+            << "found for this lane" << std::endl;
+  }
+  (*out_) << std::endl;
+}
+
 /////////////////////////////////////////////////
 void RoadNetworkQuery::GetRangeValue(const maliput::api::LaneId& lane_id) {
   const maliput::api::rules::RoadRulebook::QueryResults query_result = FindRulesFor(lane_id);
-  (*out_) << "TEST" << std::endl;
+  
+  const int n_rules = static_cast<int>(query_result.range_value_rules.size());
+  if (n_rules > 0) {
+    for (const auto& range_value_rule : query_result.range_value_rules) {
+      const auto& ranges = range_value_rule.second.ranges();
+      for (const auto& range : ranges) {
+        const std::string description = range.description;
+        const double min = range.min;
+        const double max = range.max;
+        (*out_) << "              : Result: Rule (id: " << range_value_rule.first.string();
+        (*out_) << ", description: " << description << ", min: " << min << ", max: " << max;
+        this->GetState(range);
+        (*out_) << ")" << std::endl;
+      }
+    }
+  } else {
+    (*out_) << "              : Result: There are no discrete value rules "
+            << "found for this lane" << std::endl;
+  }
+  (*out_) << std::endl;
 }
 
 /////////////////////////////////////////////////
@@ -215,7 +286,7 @@ void RoadNetworkQuery::GetDirectionUsage(const maliput::api::LaneId& lane_id) {
       }
     }
   } else {
-    (*out_) << "              : Result: There is no direction usage rules "
+    (*out_) << "              : Result: There are no direction usage rules "
             << "found for this lane" << std::endl;
   }
 }

@@ -101,13 +101,13 @@ class RoadNetworkQuery {
   /// Gets all right-of-way rules for the given `lane_s_range`.
   void GetRightOfWay(const maliput::api::LaneSRange& lane_s_range);
 
-  /// Gets all right-of-way rules for the given `lane_s_range`.
+  /// Gets all the rule states for the given `State`.
   void GetState(const maliput::api::rules::Rule::State& state);
 
-  /// Gets all right-of-way rules for the given `lane_s_range`.
+  /// Gets all the range value rules for the given `lane_id`.
   void GetRangeValue(const maliput::api::LaneId& lane_id);
 
-  /// Gets all right-of-way rules for the given `lane_s_range`.
+  /// Gets all discrete value rules for the given `lane_id`.
   void GetDiscreteValue(const maliput::api::LaneId& lane_id);
 
   /// Gets all right-of-way rules' states for a given phase in a given phase
@@ -307,21 +307,19 @@ class MaliputViewerModel {
   template <typename StringType>
   StringType GetRightOfWayRules(const maliput::api::LaneSRange& _laneSRange) const;
 
-  /// \brief Get the right of way rules for a given LaneSRange.
-  /// \param[in] _laneSRange Object that contains a lane id and a range in the s
-  /// coordinate.
+  /// \brief Get the range value rules for a given lane id.
+  /// \param[in] _laneId Id of the lane to get the direction usage rules from.
   /// \tparam StringType A string class that must be constructible with a single const char* argument and
   /// must support concatenation via operator+.
-  /// \return Right of way rules as a StringType representation.
+  /// \return Range value rules as a StringType representation.
   template <typename StringType>
   StringType GetRangeValueRules(const maliput::api::LaneId& _laneId) const;
 
-  /// \brief Get the right of way rules for a given LaneSRange.
-  /// \param[in] _laneSRange Object that contains a lane id and a range in the s
-  /// coordinate.
+  /// \brief Get the discrete value rules for a given lane id.
+  /// \param[in] _laneId Id of the lane to get the direction usage rules from.
   /// \tparam StringType A string class that must be constructible with a single const char* argument and
   /// must support concatenation via operator+.
-  /// \return Right of way rules as a StringType representation.
+  /// \return Discrete value rules as a StringType representation.
   template <typename StringType>
   StringType GetDiscreteValueRules(const maliput::api::LaneId& _laneId) const;
 
@@ -425,8 +423,8 @@ StringType MaliputViewerModel::GetRulesOfLane(const std::string& _phaseRingId, c
   StringType rules = "[Right of way rules]\n" + GetRightOfWayRules<StringType>(laneSRange) + "\n" +
                      "[Max speed limit rules]\n" + GetMaxSpeedLimitRules<StringType>(id) + "\n" +
                      "[Direction usage rules]\n" + GetDirectionUsageRules<StringType>(id) + "\n" +
-                     "[Range Value rules]\n" + GetRangeValueRules<StringType>(id) + "\n" +
-                     "[Discrete Value rules]\n" + GetDiscreteValueRules<StringType>(id) + "\n";
+                     "[Range Value rules]\n" + GetRangeValueRules<StringType>(id) + "\n" + "[Discrete Value rules]\n" +
+                     GetDiscreteValueRules<StringType>(id) + "\n";
 
   if (!_phaseRingId.empty() && !_phaseId.empty()) {
     rules += "[Right of way rules by phase ring id and phase id]\n" +

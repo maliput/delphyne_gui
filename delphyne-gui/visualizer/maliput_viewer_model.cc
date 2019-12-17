@@ -166,6 +166,12 @@ void RoadNetworkQuery::ToRoadPosition(const maliput::api::GeoPosition& geo_posit
 }
 
 /////////////////////////////////////////////////
+void RoadNetworkQuery::GetRangeValue(const maliput::api::LaneId& lane_id) {
+  const maliput::api::rules::RoadRulebook::QueryResults query_result = FindRulesFor(lane_id);
+  (*out_) << "TEST" << std::endl;
+}
+
+/////////////////////////////////////////////////
 void RoadNetworkQuery::GetMaxSpeedLimit(const maliput::api::LaneId& lane_id) {
   const maliput::api::rules::RoadRulebook::QueryResults query_result = FindRulesFor(lane_id);
 

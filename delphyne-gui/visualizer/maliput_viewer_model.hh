@@ -101,6 +101,9 @@ class RoadNetworkQuery {
   /// Gets all right-of-way rules for the given `lane_s_range`.
   void GetRightOfWay(const maliput::api::LaneSRange& lane_s_range);
 
+  /// Gets all right-of-way rules for the given `lane_s_range`.
+  void GetRangeValue(const maliput::api::LaneId& lane_id);
+
   /// Gets all right-of-way rules' states for a given phase in a given phase
   /// ring.
   void GetPhaseRightOfWay(const maliput::api::rules::PhaseRing::Id& phase_ring_id,
@@ -298,6 +301,15 @@ class MaliputViewerModel {
   template <typename StringType>
   StringType GetRightOfWayRules(const maliput::api::LaneSRange& _laneSRange) const;
 
+  /// \brief Get the right of way rules for a given LaneSRange.
+  /// \param[in] _laneSRange Object that contains a lane id and a range in the s
+  /// coordinate.
+  /// \tparam StringType A string class that must be constructible with a single const char* argument and
+  /// must support concatenation via operator+.
+  /// \return Right of way rules as a StringType representation.
+  template <typename StringType>
+  StringType GetRangeValueRules(const maliput::api::LaneId& _laneId) const;
+
   /// \brief Get the max speed rules for a given lane id.
   /// \param[in] _laneId Id of the lane to get the max speed limit rules from.
   /// \tparam StringType A string class that must be constructible with a single const char* argument and
@@ -397,7 +409,8 @@ StringType MaliputViewerModel::GetRulesOfLane(const std::string& _phaseRingId, c
   maliput::api::LaneSRange laneSRange(id, maliput::api::SRange(0., roadIndex.GetLane(id)->length()));
   StringType rules = "[Right of way rules]\n" + GetRightOfWayRules<StringType>(laneSRange) + "\n" +
                      "[Max speed limit rules]\n" + GetMaxSpeedLimitRules<StringType>(id) + "\n" +
-                     "[Direction usage rules]\n" + GetDirectionUsageRules<StringType>(id) + "\n";
+                     "[Direction usage rules]\n" + GetDirectionUsageRules<StringType>(id) + "\n" +
+                     "[Range Value rules]\n" + GetRangeValueRules<StringType>(id) + "\n";
 
   if (!_phaseRingId.empty() && !_phaseId.empty()) {
     rules += "[Right of way rules by phase ring id and phase id]\n" +
@@ -407,6 +420,14 @@ StringType MaliputViewerModel::GetRulesOfLane(const std::string& _phaseRingId, c
   }
 
   return rules;
+}
+
+template <typename StringType>
+StringType MaliputViewerModel::GetRangeValueRules(const maliput::api::LaneId& _laneId) const {
+  std::ostringstream rangeValueRules;
+  RoadNetworkQuery query(&rangeValueRules, roadNetwork.get());
+  query.GetRangeValue(_laneId);
+  return StringType(rangeValueRules.str().c_str());
 }
 
 template <typename StringType>

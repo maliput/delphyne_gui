@@ -477,7 +477,6 @@ void RenderMaliputWidget::Clear() {
   for (auto it : textLabels) {
     this->rootVisual->RemoveChild(it.second);
   }
-  textLabels.clear();
   // Clears the meshes.
   for (auto it : meshes) {
     this->rootVisual->RemoveChild(it.second);
@@ -488,6 +487,7 @@ void RenderMaliputWidget::Clear() {
   }
   this->trafficLightsTickTimer->stop();
   this->trafficLightManager->Clear();
+  textLabels.clear();
   meshes.clear();
 }
 

@@ -398,7 +398,7 @@ std::unordered_map<std::string, std::vector<StringType>> MaliputViewerModel::Get
   std::vector<maliput::api::rules::PhaseRing::Id> phase_ring_ids = phase_ring_book->GetPhaseRings();
   phase_rings.reserve(phase_ring_ids.size());
   for (const auto& phase_ring_id : phase_ring_ids) {
-    drake::optional<maliput::api::rules::PhaseRing> phase_ring = phase_ring_book->GetPhaseRing(phase_ring_id);
+    std::optional<maliput::api::rules::PhaseRing> phase_ring = phase_ring_book->GetPhaseRing(phase_ring_id);
     DELPHYNE_DEMAND(phase_ring.has_value());
     const std::unordered_map<maliput::api::rules::Phase::Id, maliput::api::rules::Phase>& phases =
         phase_ring.value().phases();

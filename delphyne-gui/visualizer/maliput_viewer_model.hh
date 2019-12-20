@@ -101,7 +101,7 @@ class RoadNetworkQuery {
   /// Gets all right-of-way rules for the given `lane_s_range`.
   void GetRightOfWay(const maliput::api::LaneSRange& lane_s_range);
 
-  /// Gets all the rule states for the given `State`.
+  /// Gets all the rule states for the given `state`.
   void GetState(const maliput::api::rules::Rule::State& state);
 
   /// Gets all the range value rules for the given `lane_id`.

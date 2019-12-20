@@ -170,9 +170,9 @@ void RoadNetworkQuery::GetState(const maliput::api::rules::Rule::State& state) {
   const int severity = state.severity;
   const auto& related_rules = state.related_rules;
 
+  (*out_) << ", severity" << severity;
   for (const auto& related_rule : related_rules) {
     std::string rule_name = related_rule.first;
-    (*out_) << ", severity" << severity;
     (*out_) << ", related rule name: " << rule_name;
     (*out_) << ", ids [";
     const auto& ids = related_rule.second;

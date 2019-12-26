@@ -31,8 +31,6 @@ set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE_UPPERCASE}}")
 set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE_UPPERCASE}}")
 set (CMAKE_MODULE_LINKER_FLAGS "${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE_UPPERCASE}}")
 
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_${CMAKE_BUILD_TYPE_UPPERCASE}} -std=c++11")
-
 if (UNIX)
     set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS_${CMAKE_BUILD_TYPE_UPPERCASE}}")
     set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE_UPPERCASE}}")
@@ -40,12 +38,19 @@ if (UNIX)
     set (CMAKE_MODULE_LINKER_FLAGS "${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE_UPPERCASE}}")
 endif()
 
-# Compiler-specific C++11 activation.
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_${CMAKE_BUILD_TYPE_UPPERCASE}} -std=c++17")
+
+# C++ Version
+set (CMAKE_CXX_STANDARD 17)
+set (CMAKE_CXX_STANDARD_REQUIRED ON)
+set (CMAKE_CXX_EXTENSIONS OFF)
+
+# Compiler-specific C++17 activation.
 if ("${CMAKE_CXX_COMPILER_ID} " MATCHES "GNU ")
     execute_process(
         COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
-    if (NOT (GCC_VERSION VERSION_GREATER 4.7))
-        message(FATAL_ERROR "${PROJECT_NAME} requires g++ 4.8 or greater.")
+    if (NOT (GCC_VERSION VERSION_GREATER 6.9))
+        message(FATAL_ERROR "${PROJECT_NAME} requires g++ 7.0 or greater.")
     endif ()
 elseif ("${CMAKE_CXX_COMPILER_ID} " MATCHES "Clang ")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
@@ -54,5 +59,5 @@ elseif ("${CMAKE_CXX_COMPILER_ID} " STREQUAL "MSVC ")
         message(FATAL_ERROR "${PROJECT_NAME} requires VS 2013 os greater.")
     endif()
 else ()
-    message(FATAL_ERROR "Your C++ compiler does not support C++11.")
+    message(FATAL_ERROR "Your C++ compiler does not support C++17.")
 endif ()

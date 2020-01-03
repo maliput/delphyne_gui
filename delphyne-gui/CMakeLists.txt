@@ -113,6 +113,7 @@ include (${project_cmake_dir}/DissectVersion.cmake)
 message (STATUS "\n\n====== Finding 3rd Party Packages ======")
 include (${project_cmake_dir}/SearchForStuff.cmake)
 find_package(ament_cmake REQUIRED)
+find_package(ignition-math6 REQUIRED)
 message (STATUS "----------------------------------------\n")
 
 #####################################

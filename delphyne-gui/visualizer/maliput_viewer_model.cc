@@ -157,7 +157,7 @@ void RoadNetworkQuery::ToLanePosition(const maliput::api::LaneId& lane_id,
 
 /////////////////////////////////////////////////
 void RoadNetworkQuery::ToRoadPosition(const maliput::api::GeoPosition& geo_position) {
-  const maliput::api::RoadPositionResult result = rn_->road_geometry()->ToRoadPosition(geo_position, drake::nullopt);
+  const maliput::api::RoadPositionResult result = rn_->road_geometry()->ToRoadPosition(geo_position, std::nullopt);
 
   (*out_) << "ToRoadPosition(geo_position: " << geo_position << ")" << std::endl;
   (*out_) << "              : Result: nearest_pos:" << result.nearest_position << " with distance: " << result.distance
@@ -335,7 +335,7 @@ void RoadNetworkQuery::GetPhaseRightOfWay(const maliput::api::rules::PhaseRing::
     return;
   }
 
-  drake::optional<maliput::api::rules::PhaseRing> phase_ring = phase_ring_book->GetPhaseRing(phase_ring_id);
+  std::optional<maliput::api::rules::PhaseRing> phase_ring = phase_ring_book->GetPhaseRing(phase_ring_id);
   if (!phase_ring.has_value()) {
     (*out_) << "'" << phase_ring_id.string() << "' is not a known phase ring" << std::endl;
     return;
@@ -602,13 +602,13 @@ maliput::api::rules::BulbStates MaliputViewerModel::GetBulbStates(const std::str
                                                                   const std::string& _phaseId) const {
   if (this->roadNetwork && !_phaseRingId.empty() && !_phaseId.empty()) {
     const maliput::api::rules::PhaseRingBook* phase_ring_book = this->roadNetwork->phase_ring_book();
-    const drake::optional<maliput::api::rules::PhaseRing> phase_ring =
+    const std::optional<maliput::api::rules::PhaseRing> phase_ring =
         phase_ring_book->GetPhaseRing(maliput::api::rules::PhaseRing::Id(_phaseRingId));
     DELPHYNE_DEMAND(phase_ring.has_value());
     const std::unordered_map<maliput::api::rules::Phase::Id, maliput::api::rules::Phase>& phases = phase_ring->phases();
     const auto phase = phases.find(maliput::api::rules::Phase::Id(_phaseId));
     DELPHYNE_DEMAND(phase != phases.end());
-    const drake::optional<maliput::api::rules::BulbStates>& bulb_states = phase->second.bulb_states();
+    const std::optional<maliput::api::rules::BulbStates>& bulb_states = phase->second.bulb_states();
     if (bulb_states.has_value()) {
       return *bulb_states;
     }

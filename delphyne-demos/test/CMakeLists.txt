@@ -1,6 +1,4 @@
-# TODO(francocipollone): These tests are failing since Drake upgrade.
-# They were commented to allow other repositories to continue with their developments.
-# The error is originated in delphyne(PR delphyne#659).
+# TODO(delphyne-gui#266) Tests are disabled to unblock development in the entire workspace.
 #
 # add_test(
 #   NAME smoke_test_delphyne_mali

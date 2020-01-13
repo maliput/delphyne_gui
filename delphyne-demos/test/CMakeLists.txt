@@ -1,5 +1,5 @@
 # TODO(francocipollone): These tests are failing since Drake upgrade.
-# They were commented to allows other repositories to continue with their developments.
+# They were commented to allow other repositories to continue with their developments.
 # The error is originated in delphyne(PR delphyne#659).
 #
 # add_test(

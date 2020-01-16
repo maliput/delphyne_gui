@@ -135,6 +135,9 @@ add_library(${playback_widget} SHARED
   ${${playback_widget}_MOC}
   ${${playback_widget}_resources_RCC}
 )
+ament_target_dependencies(${playback_widget}
+  "maliput"
+)
 target_link_libraries(${playback_widget}
   ${IGNITION-COMMON_LIBRARIES}
   ${IGNITION-GUI_LIBRARIES}
@@ -144,6 +147,7 @@ target_link_libraries(${playback_widget}
   ${Qt5Widgets_LIBRARIES}
   delphyne::protobuf_messages
   delphyne::public_headers
+  maliput::common
 )
 
 install(TARGETS ${playback_widget} DESTINATION ${LIB_INSTALL_DIR} COMPONENT shlib)

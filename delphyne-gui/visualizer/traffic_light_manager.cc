@@ -216,7 +216,7 @@ void TrafficLightManager::CreateBulbGroup(const maliput::api::rules::TrafficLigh
                                           const maliput::api::Rotation& _trafficLightWorldRotation,
                                           TrafficLightManager::TrafficLightMesh* _trafficLightMesh) {
   const maliput::api::GeoPosition bulb_group_world_position =
-      maliput::api::GeoPosition::FromXyz(_trafficLightWorldPosition.xyz() + _bulbGroup->position_traffic_light().xyz());
+      _trafficLightWorldPosition + _bulbGroup->position_traffic_light();
   const maliput::api::Rotation bulb_group_world_rotation = maliput::api::Rotation::FromQuat(
       _trafficLightWorldRotation.quat() * (_bulbGroup->orientation_traffic_light().quat()));
 
@@ -307,8 +307,7 @@ maliput::api::rules::Bulb::BoundingBox TrafficLightManager::CreateSingleBulb(
                       world_bounding_box_max.Z() * max_scale.z());
 
   visual->SetWorldScale(max_scale.x(), max_scale.y(), max_scale.z());
-  const maliput::api::GeoPosition bulb_world_position =
-      maliput::api::GeoPosition::FromXyz(_bulbGroupWorldPosition.xyz() + _single_bulb->position_bulb_group().xyz());
+  const maliput::api::GeoPosition bulb_world_position = _bulbGroupWorldPosition + _single_bulb->position_bulb_group();
   visual->SetWorldRotation(bulb_rotation.roll(), bulb_rotation.pitch(), bulb_rotation.yaw());
   visual->SetWorldPosition(bulb_world_position.x(), bulb_world_position.y(), bulb_world_position.z());
   SetBulbMaterial(_uniqueBulbId, visual, _single_bulb->color(), _single_bulb->GetDefaultState());

@@ -275,8 +275,16 @@ maliput::api::rules::Bulb::BoundingBox TrafficLightManager::CreateSingleBulb(
   // The visual used has a bounding box size of 1x1x1 meter.
   // Considering that the bulb's bounding box is symmetric and expressed in function of this size, it can be used
   // for a scale operation.
-  const Eigen::Vector3d& min_scale = bb.p_BMin;
-  const Eigen::Vector3d& max_scale = bb.p_BMax;
+  const maliput::math::Vector3& min_scale{
+      bb.p_BMin.x(),
+      bb.p_BMin.y(),
+      bb.p_BMin.z(),
+  };
+  const maliput::math::Vector3& max_scale{
+      bb.p_BMax.x(),
+      bb.p_BMax.y(),
+      bb.p_BMax.z(),
+  };
 
   ignition::math::Vector3d world_bounding_box_max;
   ignition::math::Vector3d world_bounding_box_min;
@@ -298,13 +306,12 @@ maliput::api::rules::Bulb::BoundingBox TrafficLightManager::CreateSingleBulb(
   }
 
   maliput::api::rules::Bulb::BoundingBox bulb_world_bounding_box;
-
-  bulb_world_bounding_box.p_BMin = Eigen::Vector3d(world_bounding_box_min.X() * std::abs(min_scale.x()),
-                                                   world_bounding_box_min.Y() * std::abs(min_scale.y()),
-                                                   world_bounding_box_min.Z() * std::abs(min_scale.z()));
-  bulb_world_bounding_box.p_BMax =
-      Eigen::Vector3d(world_bounding_box_max.X() * max_scale.x(), world_bounding_box_max.Y() * max_scale.y(),
-                      world_bounding_box_max.Z() * max_scale.z());
+  bulb_world_bounding_box.p_BMin.x() = world_bounding_box_min.X() * std::abs(min_scale.x());
+  bulb_world_bounding_box.p_BMin.y() = world_bounding_box_min.Y() * std::abs(min_scale.y());
+  bulb_world_bounding_box.p_BMin.z() = world_bounding_box_min.Z() * std::abs(min_scale.z());
+  bulb_world_bounding_box.p_BMax.x() = world_bounding_box_max.X() * std::abs(max_scale.x());
+  bulb_world_bounding_box.p_BMax.y() = world_bounding_box_max.Y() * std::abs(max_scale.y());
+  bulb_world_bounding_box.p_BMax.z() = world_bounding_box_max.Z() * std::abs(max_scale.z());
 
   visual->SetWorldScale(max_scale.x(), max_scale.y(), max_scale.z());
   const maliput::api::GeoPosition bulb_world_position = _bulbGroupWorldPosition + _single_bulb->position_bulb_group();

@@ -6,6 +6,7 @@
 #include <map>
 #include <memory>
 #include <ostream>
+#include <sstream>
 #include <string>
 
 #include <delphyne/macros.h>

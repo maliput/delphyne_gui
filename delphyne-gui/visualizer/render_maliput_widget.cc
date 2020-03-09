@@ -26,9 +26,9 @@
 #include <ignition/rendering/Scene.hh>
 #include <ignition/rendering/Text.hh>
 
-#include <maliput-utilities/generate_obj.h>
 #include <maliput/api/lane.h>
 #include <maliput/api/rules/phase.h>
+#include <maliput/utilities/generate_obj.h>
 
 #include <memory>
 

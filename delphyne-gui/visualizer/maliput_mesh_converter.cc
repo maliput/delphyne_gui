@@ -16,13 +16,13 @@
 
 #include <delphyne/macros.h>
 
-#include <maliput-utilities/mesh.h>
 #include <maliput/api/branch_point.h>
 #include <maliput/api/junction.h>
 #include <maliput/api/lane.h>
 #include <maliput/api/lane_data.h>
 #include <maliput/api/road_geometry.h>
 #include <maliput/api/segment.h>
+#include <maliput/utilities/mesh.h>
 
 #include <ignition/common/SubMesh.hh>
 #include <ignition/math/Vector3.hh>

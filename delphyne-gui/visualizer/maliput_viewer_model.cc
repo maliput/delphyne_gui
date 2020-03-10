@@ -295,7 +295,7 @@ void RoadNetworkQuery::GetDirectionUsage(const maliput::api::LaneId& lane_id) {
 /////////////////////////////////////////////////
 void RoadNetworkQuery::GetRightOfWay(const maliput::api::LaneSRange& lane_s_range) {
   const maliput::api::rules::RoadRulebook::QueryResults results = rn_->rulebook()->FindRules({lane_s_range}, 0.);
-  const maliput::api::rules::RightOfWayRuleStateProvider* right_of_way_rule_state_provider =
+  maliput::api::rules::RightOfWayRuleStateProvider* right_of_way_rule_state_provider =
       rn_->right_of_way_rule_state_provider();
   (*out_) << "Right of way for " << lane_s_range << ":" << std::endl;
   for (const auto& rule : results.right_of_way) {

@@ -12,18 +12,15 @@
 #include <delphyne/macros.h>
 #include <ignition/math/Vector3.hh>
 
-#include <maliput-utilities/generate_obj.h>
-#include <maliput-utilities/mesh.h>
 #include <maliput/api/lane.h>
+#include <maliput/api/regions.h>
 #include <maliput/api/road_geometry.h>
 #include <maliput/api/road_network.h>
 #include <maliput/api/rules/phase.h>
-#include <maliput/api/rules/traffic_lights.h>
-
-#include <maliput-utilities/generate_obj.h>
-#include <maliput-utilities/mesh.h>
-#include <maliput/api/regions.h>
 #include <maliput/api/rules/right_of_way_rule.h>
+#include <maliput/api/rules/traffic_lights.h>
+#include <maliput/utilities/generate_obj.h>
+#include <maliput/utilities/mesh.h>
 
 #include <ignition/common/Mesh.hh>
 

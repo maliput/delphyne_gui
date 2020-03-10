@@ -11,11 +11,11 @@
 #include <ignition/rendering/RayQuery.hh>
 #include <malidrive/road_geometry_configuration.h>
 #include <malidrive/road_network_configuration.h>
-#include <maliput-utilities/generate_obj.h>
-#include <maliput-utilities/mesh.h>
 #include <maliput/api/lane_data.h>
 #include <maliput/api/rules/phase.h>
 #include <maliput/api/rules/traffic_light_book.h>
+#include <maliput/utilities/generate_obj.h>
+#include <maliput/utilities/mesh.h>
 #include <multilane/loader.h>
 
 #include "maliput_mesh_converter.hh"

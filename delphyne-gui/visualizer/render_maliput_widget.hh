@@ -11,9 +11,9 @@
 #include <ignition/rendering/RayQuery.hh>
 #include <ignition/rendering/RenderTypes.hh>
 #include <ignition/rendering/RenderingIface.hh>
-#include <maliput-utilities/generate_obj.h>
-#include <maliput-utilities/mesh.h>
 #include <maliput/api/rules/traffic_lights.h>
+#include <maliput/utilities/generate_obj.h>
+#include <maliput/utilities/mesh.h>
 
 #include <QtWidgets/QWidget>
 

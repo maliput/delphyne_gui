@@ -8,15 +8,14 @@ add_library(${maliput_mesh}
   maliput_mesh_converter.cc)
 
 ament_target_dependencies(${maliput_mesh}
-  "maliput"
-  "maliput-utilities")
+  "maliput")
 
 target_link_libraries(${maliput_mesh}
   ${drake_LIBRARIES}
   ${IGNITION-COMMON_LIBRARIES}
   delphyne::public_headers
   maliput::api
-  maliput-utilities::maliput-utilities)
+  maliput::utilities)
 
 install(TARGETS ${maliput_mesh} DESTINATION
   ${LIB_INSTALL_DIR} COMPONENT shlib)
@@ -58,8 +57,7 @@ add_library(${maliput_viewer_widget} SHARED
 
 ament_target_dependencies(${maliput_viewer_widget}
   "maliput"
-  "multilane"
-  "maliput-utilities")
+  "multilane")
 
 target_link_libraries(${maliput_viewer_widget}
   ${drake_LIBRARIES}
@@ -74,7 +72,7 @@ target_link_libraries(${maliput_viewer_widget}
   delphyne::roads_utilities
   maliput::api
   multilane::multilane
-  maliput-utilities::maliput-utilities
+  maliput::utilities
   )
 
 install(TARGETS ${maliput_viewer_widget} DESTINATION

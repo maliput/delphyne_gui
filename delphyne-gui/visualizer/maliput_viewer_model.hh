@@ -76,7 +76,7 @@ class RoadNetworkQuery {
   ///            It must not be nullptr.
   /// @param rn A pointer to a RoadNetwork. It must not be nullptr.
   /// @throws std::runtime_error When `out` or `rn` are nullptr.
-  RoadNetworkQuery(std::ostream* out, const maliput::api::RoadNetwork* rn) : out_(out), rn_(rn) {
+  RoadNetworkQuery(std::ostream* out, maliput::api::RoadNetwork* rn) : out_(out), rn_(rn) {
     DELPHYNE_DEMAND(out_ != nullptr);
     DELPHYNE_DEMAND(rn_ != nullptr);
   }
@@ -121,7 +121,7 @@ class RoadNetworkQuery {
   maliput::api::rules::RoadRulebook::QueryResults FindRulesFor(const maliput::api::LaneId& lane_id);
 
   std::ostream* out_{};
-  const maliput::api::RoadNetwork* rn_{};
+  maliput::api::RoadNetwork* rn_{};
 };
 
 /// \brief Type of label based on road entities.
@@ -351,7 +351,7 @@ class MaliputViewerModel {
   std::unique_ptr<const maliput::api::RoadGeometry> roadGeometry;
 
   /// \brief Maliput RoadNetwork pointer.
-  std::unique_ptr<const maliput::api::RoadNetwork> roadNetwork;
+  std::unique_ptr<maliput::api::RoadNetwork> roadNetwork;
 
   /// \brief Map of meshes to hold all the ignition meshes.
   std::map<std::string, std::unique_ptr<MaliputMesh>> maliputMeshes;

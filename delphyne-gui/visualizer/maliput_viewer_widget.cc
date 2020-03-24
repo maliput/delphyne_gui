@@ -13,7 +13,7 @@ using namespace delphyne;
 using namespace gui;
 
 /////////////////////////////////////////////////
-MaliputViewerWidget::MaliputViewerWidget(QWidget* parent) : Plugin() {
+MaliputViewerWidget::MaliputViewerWidget(QWidget*) : Plugin() {
   // Loads the GUI.
   this->BuildGUI();
   // Loads the maliput file path if any and parses it.

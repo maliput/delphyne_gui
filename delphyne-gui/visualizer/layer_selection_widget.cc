@@ -74,42 +74,40 @@ void LayerSelectionWidget::Build() {
 }
 
 ///////////////////////////////////////////////////////
-void LayerSelectionWidget::onAsphaltValueChanged(int state) {
+void LayerSelectionWidget::onAsphaltValueChanged(int) {
   emit valueChanged(kAsphalt, this->asphaltCheckBox->isChecked());
 }
 
 ///////////////////////////////////////////////////////
-void LayerSelectionWidget::onLaneValueChanged(int state) {
-  emit valueChanged(kLaneAll, this->laneCheckBox->isChecked());
-}
+void LayerSelectionWidget::onLaneValueChanged(int) { emit valueChanged(kLaneAll, this->laneCheckBox->isChecked()); }
 
 ///////////////////////////////////////////////////////
-void LayerSelectionWidget::onMarkerValueChanged(int state) {
+void LayerSelectionWidget::onMarkerValueChanged(int) {
   emit valueChanged(kMarkerAll, this->markerCheckBox->isChecked());
 }
 
 ///////////////////////////////////////////////////////
-void LayerSelectionWidget::onHBoundsValueChanged(int state) {
+void LayerSelectionWidget::onHBoundsValueChanged(int) {
   emit valueChanged(kHBounds, this->hboundCheckBox->isChecked());
 }
 
 ///////////////////////////////////////////////////////
-void LayerSelectionWidget::onBranchPointValueChanged(int state) {
+void LayerSelectionWidget::onBranchPointValueChanged(int) {
   emit valueChanged(kBranchPointAll, this->branchPointCheckBox->isChecked());
 }
 
 ///////////////////////////////////////////////////////
-void LayerSelectionWidget::onGrayedAsphaltValueChanged(int state) {
+void LayerSelectionWidget::onGrayedAsphaltValueChanged(int) {
   emit valueChanged(kGrayedAsphalt, this->grayedAsphaltCheckBox->isChecked());
 }
 
 ///////////////////////////////////////////////////////
-void LayerSelectionWidget::onGrayedLaneValueChanged(int state) {
+void LayerSelectionWidget::onGrayedLaneValueChanged(int) {
   emit valueChanged(kGrayedLaneAll, this->grayedLaneCheckBox->isChecked());
 }
 
 ///////////////////////////////////////////////////////
-void LayerSelectionWidget::onGrayedMarkerValueChanged(int state) {
+void LayerSelectionWidget::onGrayedMarkerValueChanged(int) {
   emit valueChanged(kGrayedMarkerAll, this->grayedMarkerCheckBox->isChecked());
 }
 
@@ -126,12 +124,12 @@ LabelSelectionWidget::LabelSelectionWidget(QWidget* parent) : QWidget(parent) {
 LabelSelectionWidget::~LabelSelectionWidget() {}
 
 ///////////////////////////////////////////////////////
-void LabelSelectionWidget::onLaneValueChanged(int state) {
+void LabelSelectionWidget::onLaneValueChanged(int) {
   emit valueChanged(kLaneTextLabel, this->laneCheckBox->isChecked());
 }
 
 ///////////////////////////////////////////////////////
-void LabelSelectionWidget::onBranchPointValueChanged(int state) {
+void LabelSelectionWidget::onBranchPointValueChanged(int) {
   emit valueChanged(kBranchPointTextLabel, this->branchPointCheckBox->isChecked());
 }
 

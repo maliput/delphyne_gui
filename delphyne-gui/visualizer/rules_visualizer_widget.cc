@@ -102,7 +102,7 @@ PhaseRingPhaseIds RulesVisualizerWidget::GetSelectedPhaseRingAndPhaseId() const 
   return phase_ring_phase_ids;
 }
 
-void RulesVisualizerWidget::OnLaneItemClicked(QListWidgetItem* item) { emit RequestRules(); }
+void RulesVisualizerWidget::OnLaneItemClicked(QListWidgetItem*) { emit RequestRules(); }
 
 void RulesVisualizerWidget::OnRulesReceived(QString lane_id, QString rules) {
   QList<QListWidgetItem*> items = this->lanes_list->findItems(lane_id, Qt::MatchExactly);
@@ -116,7 +116,7 @@ void RulesVisualizerWidget::OnRulesReceived(QString lane_id, QString rules) {
   this->rules_log_text_browser->setTextCursor(cursor);
 }
 
-void RulesVisualizerWidget::OnPhaseTreeItemClicked(QTreeWidgetItem* tree_item, int column) { emit RequestRules(); }
+void RulesVisualizerWidget::OnPhaseTreeItemClicked(QTreeWidgetItem*, int) { emit RequestRules(); }
 
 }  // namespace gui
 }  // namespace delphyne

@@ -40,13 +40,13 @@ void ChronoToDuration(const std::chrono::nanoseconds& src, ignition::msgs::Durat
 }  // namespace
 
 /////////////////////////////////////////////////
-PlaybackWidget::PlaybackWidget(QWidget* parent) : Plugin() { qRegisterMetaType<ignition::msgs::PlaybackStatus>(); }
+PlaybackWidget::PlaybackWidget(QWidget*) : Plugin() { qRegisterMetaType<ignition::msgs::PlaybackStatus>(); }
 
 /////////////////////////////////////////////////
 PlaybackWidget::~PlaybackWidget() {}
 
 /////////////////////////////////////////////////
-void PlaybackWidget::LoadConfig(const tinyxml2::XMLElement* _pluginElem) {
+void PlaybackWidget::LoadConfig(const tinyxml2::XMLElement*) {
   this->title = "PlaybackWidget";
   this->setEnabled(false);
 
@@ -154,7 +154,7 @@ void PlaybackWidget::OnTimelineMove(int slider_location) {
 void PlaybackWidget::OnTimelineRelease() { timeline_interaction_ = false; }
 
 /////////////////////////////////////////////////
-void PlaybackWidget::timerEvent(QTimerEvent* event) {
+void PlaybackWidget::timerEvent(QTimerEvent*) {
   const std::chrono::nanoseconds current_time = std::chrono::steady_clock::now().time_since_epoch();
   // Disables the entire widget if playback status updates have stopped coming.
   this->setEnabled(current_time - last_update_time_ < kStatusUpdateMaxDelay);

@@ -17,7 +17,7 @@ using namespace gui;
 Q_DECLARE_METATYPE(ignition::msgs::Boolean)
 
 /////////////////////////////////////////////////
-TeleopWidget::TeleopWidget(QWidget* parent)
+TeleopWidget::TeleopWidget(QWidget*)
     : Plugin(), currentThrottle(0.0), currentBrake(0.0), currentSteeringAngle(0.0), driving(false) {
   qRegisterMetaType<ignition::msgs::Boolean>();
 
@@ -87,7 +87,7 @@ void TeleopWidget::StartDriving() {
 TeleopWidget::~TeleopWidget() {}
 
 /////////////////////////////////////////////////
-void TeleopWidget::mousePressEvent(QMouseEvent* _event) { setFocus(); }
+void TeleopWidget::mousePressEvent(QMouseEvent*) { setFocus(); }
 
 /////////////////////////////////////////////////
 static void sec_and_nsec_now(int64_t& sec, int32_t& nsec) {

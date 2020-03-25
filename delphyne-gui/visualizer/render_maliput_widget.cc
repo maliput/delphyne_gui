@@ -38,7 +38,7 @@ using namespace delphyne;
 using namespace gui;
 
 /////////////////////////////////////////////////
-RenderMaliputWidget::RenderMaliputWidget(QWidget* parent) : engine(nullptr) {
+RenderMaliputWidget::RenderMaliputWidget(QWidget*) : engine(nullptr) {
   this->setAttribute(Qt::WA_OpaquePaintEvent, true);
   this->setAttribute(Qt::WA_PaintOnScreen, true);
   this->setAttribute(Qt::WA_NoSystemBackground, true);
@@ -517,7 +517,7 @@ QPaintEngine* RenderMaliputWidget::paintEngine() const { return nullptr; }
 // Replace inherited implementation with a do-nothing one, so that the
 // context menu doesn't appear and we get back the zoom in/out using the
 // right mouse button.
-void RenderMaliputWidget::ShowContextMenu(const QPoint& _pos) {}
+void RenderMaliputWidget::ShowContextMenu(const QPoint&) {}
 
 /////////////////////////////////////////////////
 void RenderMaliputWidget::paintEvent(QPaintEvent* _e) {

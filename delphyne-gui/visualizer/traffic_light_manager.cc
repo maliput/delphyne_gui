@@ -203,15 +203,13 @@ void TrafficLightManager::CreateSingleTrafficLight(const maliput::api::rules::Tr
   traffic_light_mesh.bulbGroups.reserve(_trafficLight->bulb_groups().size());
 
   for (const maliput::api::rules::BulbGroup* bulb_group : _trafficLight->bulb_groups()) {
-    CreateBulbGroup(_trafficLight->id(), bulb_group, traffic_light_world_position, traffic_light_world_rotation,
-                    &traffic_light_mesh);
+    CreateBulbGroup(bulb_group, traffic_light_world_position, traffic_light_world_rotation, &traffic_light_mesh);
   }
 
   trafficLights[_trafficLight->id()] = std::move(traffic_light_mesh);
 }
 
-void TrafficLightManager::CreateBulbGroup(const maliput::api::rules::TrafficLight::Id& _trafficLightId,
-                                          const maliput::api::rules::BulbGroup* _bulbGroup,
+void TrafficLightManager::CreateBulbGroup(const maliput::api::rules::BulbGroup* _bulbGroup,
                                           const maliput::api::GeoPosition& _trafficLightWorldPosition,
                                           const maliput::api::Rotation& _trafficLightWorldRotation,
                                           TrafficLightManager::TrafficLightMesh* _trafficLightMesh) {

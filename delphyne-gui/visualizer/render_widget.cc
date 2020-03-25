@@ -86,7 +86,7 @@ static void setPoseFromMessage(const ignition::msgs::Link& _link, ignition::rend
 }
 
 /////////////////////////////////////////////////
-RenderWidget::RenderWidget(QWidget* parent) : Plugin(), initializedScene(false), engine(nullptr) {
+RenderWidget::RenderWidget(QWidget*) : Plugin(), initializedScene(false), engine(nullptr) {
   qRegisterMetaType<ignition::msgs::Scene>();
   qRegisterMetaType<ignition::msgs::Model_V>();
 
@@ -681,7 +681,7 @@ QPaintEngine* RenderWidget::paintEngine() const { return nullptr; }
 // Replace inherited implementation with a do-nothing one, so that the
 // context menu doesn't appear and we get back the zoom in/out using the
 // right mouse button.
-void RenderWidget::ShowContextMenu(const QPoint& _pos) {}
+void RenderWidget::ShowContextMenu(const QPoint&) {}
 
 /////////////////////////////////////////////////
 void RenderWidget::paintEvent(QPaintEvent* _e) {

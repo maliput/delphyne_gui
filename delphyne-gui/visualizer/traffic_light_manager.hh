@@ -122,14 +122,12 @@ class TrafficLightManager final {
   void CreateSingleTrafficLight(const maliput::api::rules::TrafficLight* _trafficLight);
 
   /// \brief Create the mesh for a given bulb group.
-  /// \param[in] _trafficLightId Traffic light unique's id.
   /// \param[in] _bulbGroup Bulb group information to render the mesh.
   /// \param[in] _trafficLightWorldPosition World position of the traffic light where this group lives in.
   /// \param[in] _trafficLightWorldRotation World rotation of the traffic light where this group lives in.
   /// \param[out] _trafficLightMesh Structure that holds the visual of the traffic light and the unordered map of bulb
   /// groups to be part of.
-  void CreateBulbGroup(const maliput::api::rules::TrafficLight::Id& _trafficLightId,
-                       const maliput::api::rules::BulbGroup* _bulbGroup,
+  void CreateBulbGroup(const maliput::api::rules::BulbGroup* _bulbGroup,
                        const maliput::api::GeoPosition& _trafficLightWorldPosition,
                        const maliput::api::Rotation& _trafficLightWorldRotation, TrafficLightMesh* _trafficLightMesh);
 

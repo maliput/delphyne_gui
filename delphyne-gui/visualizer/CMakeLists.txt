@@ -57,7 +57,7 @@ add_library(${maliput_viewer_widget} SHARED
 
 ament_target_dependencies(${maliput_viewer_widget}
   "maliput"
-  "multilane")
+  "maliput_multilane")
 
 target_link_libraries(${maliput_viewer_widget}
   ${drake_LIBRARIES}
@@ -71,7 +71,7 @@ target_link_libraries(${maliput_viewer_widget}
   ${Qt5Widgets_LIBRARIES}
   delphyne::roads_utilities
   maliput::api
-  multilane::multilane
+  maliput_multilane::maliput_multilane
   maliput::utilities
   )
 

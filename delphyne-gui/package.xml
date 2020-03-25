@@ -22,7 +22,7 @@
   <build_depend>ignition-gui0</build_depend>
   <build_depend>delphyne</build_depend>
   <depend>maliput</depend>
-  <depend>multilane</depend>
+  <depend>maliput_multilane</depend>
 
   <build_export_depend>ignition-common3</build_export_depend>
   <build_export_depend>ignition-msgs2</build_export_depend>

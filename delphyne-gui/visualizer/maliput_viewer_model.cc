@@ -16,7 +16,7 @@
 #include <maliput/api/rules/traffic_light_book.h>
 #include <maliput/utilities/generate_obj.h>
 #include <maliput/utilities/mesh.h>
-#include <multilane/loader.h>
+#include <maliput_multilane/loader.h>
 
 #include "maliput_mesh_converter.hh"
 

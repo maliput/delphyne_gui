@@ -42,7 +42,7 @@ class PlaybackWidget : public ignition::gui::Plugin {
 
   /// @brief Overridden method to load user configuration.
   /// @param[in] _pluginElem The data containing the configuration.
-  virtual void LoadConfig(const tinyxml2::XMLElement* _pluginElem);
+  virtual void LoadConfig(const tinyxml2::XMLElement* _pluginElem) override;
 
  public slots:
   /// Updates widget using the given playback @p status message.

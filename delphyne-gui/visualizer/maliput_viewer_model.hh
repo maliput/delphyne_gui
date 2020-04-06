@@ -403,7 +403,9 @@ std::unordered_map<std::string, std::vector<StringType>> MaliputViewerModel::Get
     std::vector<StringType> phase_ids;
     phase_ids.reserve(phases.size());
     std::transform(phases.begin(), phases.end(), std::back_inserter(phase_ids),
-                   [](const auto& key_value) { return StringType(key_value.first.string().c_str()); });
+                   [](const std::pair<maliput::api::rules::Phase::Id, maliput::api::rules::Phase>& key_value) {
+                     return StringType(key_value.first.string().c_str());
+                   });
     phase_rings[phase_ring_id.string()] = std::move(phase_ids);
   }
   return phase_rings;

@@ -16,7 +16,7 @@ namespace delphyne {
 namespace gui {
 namespace display_plugins {
 
-class AgentInfoText;
+struct AgentInfoText;
 class AgentInfoDisplayPrivate;
 
 /// \brief Display the origin on an Ignition Rendering scene.

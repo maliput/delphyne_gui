@@ -163,6 +163,9 @@ if(NOT DEFINED USE_UPSTREAM_CFLAGS OR USE_UPSTREAM_CFLAGS)
   include(${project_cmake_dir}/DefaultCFlags.cmake)
 endif()
 
+# Check whether sanitizers should be enabled or not.
+include(${project_cmake_dir}/SanitizersConfig.cmake)
+
 # Check if warning options are avaliable for the compiler and return WARNING_CXX_FLAGS variable
 list(APPEND WARN_LEVEL -Waddress -Warray-bounds -Wcomment -Wformat -Wnonnull)
 list(APPEND WARN_LEVEL -Wparentheses -Wreorder -Wreturn-type)

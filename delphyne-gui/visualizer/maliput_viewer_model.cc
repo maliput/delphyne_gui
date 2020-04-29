@@ -9,8 +9,6 @@
 #include <delphyne/roads/road_builder.h>
 #include <ignition/common/Console.hh>
 #include <ignition/rendering/RayQuery.hh>
-#include <malidrive/road_geometry_configuration.h>
-#include <malidrive/road_network_configuration.h>
 #include <maliput/api/lane_data.h>
 #include <maliput/api/rules/phase.h>
 #include <maliput/api/rules/traffic_light_book.h>

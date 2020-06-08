@@ -34,6 +34,14 @@ KNOWN_ROADS = {
         'lane_position': 0.,
         'moving_forward': True,
     },
+    'ArcSingleLane': {
+        'description': ('Single arc lane of 100m length '
+                        'and 40m of radius'),
+        'file_path': 'odr/ArcLane.xodr',
+        'lane_id': '1_0_1',
+        'lane_position': 0.,
+        'moving_forward': True,
+    },
 }
 
 

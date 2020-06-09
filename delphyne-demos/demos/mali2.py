@@ -62,7 +62,7 @@ found in the current working directory.
 """.format(', '.join(KNOWN_ROADS))
 
     parser.add_argument(
-        '-n', '--road-name', default='LineSingleLane', help=argument_help
+        '-n', '--road-name', default='ArcSingleLane', help=argument_help
     )
     return parser.parse_args()
 

@@ -34,6 +34,14 @@ KNOWN_ROADS = {
         'lane_position': 0.,
         'moving_forward': True,
     },
+    'ArcSingleLane': {
+        'description': ('Single arc lane of 100m length '
+                        'and 40m of radius'),
+        'file_path': 'odr/ArcLane.xodr',
+        'lane_id': '1_0_1',
+        'lane_position': 0.,
+        'moving_forward': True,
+    },
 }
 
 
@@ -54,7 +62,7 @@ found in the current working directory.
 """.format(', '.join(KNOWN_ROADS))
 
     parser.add_argument(
-        '-n', '--road-name', default='LineSingleLane', help=argument_help
+        '-n', '--road-name', default='ArcSingleLane', help=argument_help
     )
     return parser.parse_args()
 

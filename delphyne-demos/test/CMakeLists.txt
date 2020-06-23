@@ -6,8 +6,16 @@ if (NOT ${SANITIZERS})
     COMMAND ${PROJECT_SOURCE_DIR}/examples/delphyne-mali -b -d 2
   )
   add_test(
-    NAME smoke_test_delphyne_mali2
-    COMMAND ${PROJECT_SOURCE_DIR}/examples/delphyne-mali2 -b -d 2
+    NAME smoke_test_delphyne_mali2_line_single_lane
+    COMMAND ${PROJECT_SOURCE_DIR}/examples/delphyne-mali2 -n LineSingleLane -b -d 2
+  )
+  add_test(
+    NAME smoke_test_delphyne_mali2_arc_single_lane
+    COMMAND ${PROJECT_SOURCE_DIR}/examples/delphyne-mali2 -n ArcSingleLane -b -d 2
+  )
+  add_test(
+    NAME smoke_test_delphyne_mali2_s_shape_road
+    COMMAND ${PROJECT_SOURCE_DIR}/examples/delphyne-mali2 -n SShapeRoad -b -d 2
   )
   add_test(
     NAME smoke_test_delphyne_gazoo

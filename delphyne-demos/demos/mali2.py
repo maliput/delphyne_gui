@@ -49,6 +49,13 @@ KNOWN_ROADS = {
         'lane_position': 0.,
         'moving_forward': True,
     },
+    'LShapeRoad': {
+        'description': ('Single lane describing a L shape road.'),
+        'file_path': 'odr/LShapeRoad.xodr',
+        'lane_id': '1_0_1',
+        'lane_position': 0.,
+        'moving_forward': True,
+    },
 }
 
 

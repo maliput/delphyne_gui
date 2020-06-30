@@ -56,6 +56,13 @@ KNOWN_ROADS = {
         'lane_position': 0.,
         'moving_forward': True,
     },
+    'LShapeRoadVariableLanes': {
+        'description': ('Variable number of lanes describing a L shape road.'),
+        'file_path': 'odr/LShapeRoadVariableLanes.xodr',
+        'lane_id': '1_0_1',
+        'lane_position': 0.,
+        'moving_forward': True,
+    },
 }
 
 

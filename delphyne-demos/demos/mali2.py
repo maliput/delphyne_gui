@@ -63,6 +63,18 @@ KNOWN_ROADS = {
         'lane_position': 0.,
         'moving_forward': True,
     },
+    'TShapeRoad': {
+        'description': 'T intersection road with double hand roads',
+        'lane_id': '2_0_1',
+        'lane_position': 0.,
+        'moving_forward': True,
+    },
+    'FlatTown01': {
+        'description': 'Town with multiples flat Roads and one lane section per road.',
+        'lane_id': '25_0_-1',
+        'lane_position': 0.,
+        'moving_forward': True,
+    },
 }
 
 

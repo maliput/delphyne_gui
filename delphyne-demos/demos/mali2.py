@@ -69,6 +69,13 @@ KNOWN_ROADS = {
         'lane_position': 0.,
         'moving_forward': True,
     },
+    'LineMultipleSections': {
+        'description': ('A single flat road with multiple LaneSections.'),
+        'file_path': 'odr/LineMultipleSections.xodr',
+        'lane_id': '1_0_-1',
+        'lane_position': 0.,
+        'moving_forward': True,
+    },
 }
 
 

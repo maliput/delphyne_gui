@@ -76,6 +76,12 @@ KNOWN_ROADS = {
         'lane_position': 0.,
         'moving_forward': True,
     },
+    'FlatTown01': {
+        'description': 'Flat grid city',
+        'lane_id': '25_0_-1',
+        'lane_position': 0.,
+        'moving_forward': True,
+    },
 }
 
 

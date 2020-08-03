@@ -82,6 +82,13 @@ KNOWN_ROADS = {
         'lane_position': 0.,
         'moving_forward': True,
     },
+    'ParkingGarageRamp': {
+        'description': ('A pitched road curve describing a parking garage ramp.'),
+        'file_path': 'odr/ParkingGarageRamp.xodr',
+        'lane_id': '1_0_-1',
+        'lane_position': 0.,
+        'moving_forward': True,
+    },
 }
 
 

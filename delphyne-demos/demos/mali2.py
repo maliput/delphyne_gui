@@ -89,6 +89,12 @@ KNOWN_ROADS = {
         'lane_position': 0.,
         'moving_forward': True,
     },
+    'SShapeSuperelevatedRoad': {
+        'description': 'Multiple lanes describing a S shape road with superelevation',
+        'lane_id': '1_0_-1',
+        'lane_position': 0.,
+        'moving_forward': True,
+    },
 }
 
 

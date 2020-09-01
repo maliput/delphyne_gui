@@ -42,8 +42,16 @@ if (NOT ${SANITIZERS})
     COMMAND ${PROJECT_SOURCE_DIR}/examples/delphyne-mali2 -n ParkingGarageRamp -b -d 2
   )
   add_test(
-    NAME smoke_test_delphyne_mali2_parking_garage_ramp
+    NAME smoke_test_delphyne_mali2_s_shape_superelevated_road
     COMMAND ${PROJECT_SOURCE_DIR}/examples/delphyne-mali2 -n SShapeSuperelevatedRoad -b -d 2
+  )
+  add_test(
+    NAME smoke_test_delphyne_mali2_r_r_long_road
+    COMMAND ${PROJECT_SOURCE_DIR}/examples/delphyne-mali2 -n RRLongRoad -b -d 2
+  )
+  add_test(
+    NAME smoke_test_delphyne_mali2_highway
+    COMMAND ${PROJECT_SOURCE_DIR}/examples/delphyne-mali2 -n Highway -b -d 2
   )
   add_test(
     NAME smoke_test_delphyne_gazoo

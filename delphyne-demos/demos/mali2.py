@@ -95,6 +95,19 @@ KNOWN_ROADS = {
         'lane_position': 0.,
         'moving_forward': True,
     },
+    'RRLongRoad': {
+        'description': 'Long road with turning lanes',
+        'file_path': 'odr/RRLongROad.xodr',
+        'lane_id': '3_0_-1',
+        'lane_position': 16.,
+        'moving_forward': False,
+    },
+    'Highway': {
+        'description': 'Highway',
+        'lane_id': '9_0_1',
+        'lane_position': 0.,
+        'moving_forward': True,
+    },
 }
 
 

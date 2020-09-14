@@ -54,6 +54,10 @@ if (NOT ${SANITIZERS})
     COMMAND ${PROJECT_SOURCE_DIR}/examples/delphyne-mali2 -n Highway -b -d 2
   )
   add_test(
+    NAME smoke_test_delphyne_mali2_variable_width
+    COMMAND ${PROJECT_SOURCE_DIR}/examples/delphyne-mali2 -n LineVariableWidth -b -d 2
+  )
+  add_test(
     NAME smoke_test_delphyne_gazoo
     COMMAND ${PROJECT_SOURCE_DIR}/examples/delphyne-gazoo -b -d 2
   )

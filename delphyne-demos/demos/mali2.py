@@ -108,6 +108,12 @@ KNOWN_ROADS = {
         'lane_position': 0.,
         'moving_forward': True,
     },
+    'LineVariableWidth': {
+        'description': 'Straight Road with variable width',
+        'lane_id': '1_0_2',
+        'lane_position': 0.,
+        'moving_forward': True,
+    },
 }
 
 

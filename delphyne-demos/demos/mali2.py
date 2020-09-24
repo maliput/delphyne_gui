@@ -114,6 +114,12 @@ KNOWN_ROADS = {
         'lane_position': 0.,
         'moving_forward': True,
     },
+    'Town01': {
+        'description': 'Grid city',
+        'lane_id': '25_0_-1',
+        'lane_position': 0.,
+        'moving_forward': True,
+    },
 }
 
 

@@ -70,8 +70,16 @@ if (NOT ${SANITIZERS})
     COMMAND ${PROJECT_SOURCE_DIR}/examples/delphyne-mali2 -n Town02 -b -d 2
   )
   add_test(
+    NAME smoke_test_delphyne_mali2_town_04
+    COMMAND ${PROJECT_SOURCE_DIR}/examples/delphyne-mali2 -n Town04 -b -d 2
+  )
+  add_test(
     NAME smoke_test_delphyne_mali2_town_05
     COMMAND ${PROJECT_SOURCE_DIR}/examples/delphyne-mali2 -n Town05 -b -d 2
+  )
+  add_test(
+    NAME smoke_test_delphyne_mali2_town_06
+    COMMAND ${PROJECT_SOURCE_DIR}/examples/delphyne-mali2 -n Town06 -b -d 2
   )
   add_test(
     NAME smoke_test_delphyne_gazoo

@@ -33,6 +33,7 @@ KNOWN_ROADS = {
         'lane_id': '1_0_-1',
         'lane_position': 0.,
         'moving_forward': True,
+        'linear_tolerance': 1e-3,
     },
     'ArcSingleLane': {
         'description': ('Single arc lane of 100m length '
@@ -41,6 +42,7 @@ KNOWN_ROADS = {
         'lane_id': '1_0_-1',
         'lane_position': 0.,
         'moving_forward': True,
+        'linear_tolerance': 1e-3,
     },
     'SShapeRoad': {
         'description': ('Single lane describing a S shape road.'),
@@ -48,6 +50,7 @@ KNOWN_ROADS = {
         'lane_id': '1_0_-1',
         'lane_position': 0.,
         'moving_forward': True,
+        'linear_tolerance': 1e-3,
     },
     'LShapeRoad': {
         'description': ('Single lane describing a L shape road.'),
@@ -55,6 +58,7 @@ KNOWN_ROADS = {
         'lane_id': '1_0_1',
         'lane_position': 0.,
         'moving_forward': True,
+        'linear_tolerance': 1e-3,
     },
     'LShapeRoadVariableLanes': {
         'description': ('Variable number of lanes describing a L shape road.'),
@@ -62,12 +66,14 @@ KNOWN_ROADS = {
         'lane_id': '1_0_1',
         'lane_position': 0.,
         'moving_forward': True,
+        'linear_tolerance': 1e-3,
     },
     'TShapeRoad': {
         'description': 'T intersection road with double hand roads',
         'lane_id': '2_0_1',
         'lane_position': 0.,
         'moving_forward': True,
+        'linear_tolerance': 1e-3,
     },
     'LineMultipleSections': {
         'description': ('A single flat road with multiple LaneSections.'),
@@ -75,12 +81,14 @@ KNOWN_ROADS = {
         'lane_id': '1_0_-1',
         'lane_position': 0.,
         'moving_forward': True,
+        'linear_tolerance': 1e-3,
     },
     'FlatTown01': {
         'description': 'Flat grid city',
         'lane_id': '25_0_-1',
         'lane_position': 0.,
         'moving_forward': True,
+        'linear_tolerance': 1e-3,
     },
     'ParkingGarageRamp': {
         'description': ('A pitched road curve describing a parking garage ramp.'),
@@ -88,12 +96,14 @@ KNOWN_ROADS = {
         'lane_id': '1_0_-1',
         'lane_position': 0.,
         'moving_forward': True,
+        'linear_tolerance': 1e-3,
     },
     'SShapeSuperelevatedRoad': {
         'description': 'Multiple lanes describing a S shape road with superelevation',
         'lane_id': '1_0_-1',
         'lane_position': 0.,
         'moving_forward': True,
+        'linear_tolerance': 1e-3,
     },
     'RRLongRoad': {
         'description': 'Long road with turning lanes',
@@ -101,24 +111,35 @@ KNOWN_ROADS = {
         'lane_id': '3_0_-1',
         'lane_position': 16.,
         'moving_forward': False,
+        'linear_tolerance': 1e-3,
     },
     'Highway': {
         'description': 'Highway',
         'lane_id': '9_0_1',
         'lane_position': 0.,
         'moving_forward': True,
+        'linear_tolerance': 1e-3,
     },
     'LineVariableWidth': {
         'description': 'Straight Road with variable width',
         'lane_id': '1_0_2',
         'lane_position': 0.,
         'moving_forward': True,
+        'linear_tolerance': 1e-3,
     },
     'Town01': {
         'description': 'Grid city',
         'lane_id': '25_0_-1',
         'lane_position': 0.,
         'moving_forward': True,
+        'linear_tolerance': 1e-3,
+    },
+    'Town05': {
+        'description': 'Grid city',
+        'lane_id': '3_0_2',
+        'lane_position': 0.,
+        'moving_forward': True,
+        'linear_tolerance': 5e-2,
     },
 }
 
@@ -157,11 +178,14 @@ def get_malidrive_resource(path):
 
 def create_mali_scenario_subtree(file_path, features,
                                  lane_position, direction_of_travel,
-                                 lane_id):
+                                 lane_id, linear_tolerance,
+                                 angular_tolerance=1e-3):
     scenario_subtree = delphyne.behaviours.roads.Malidrive2(
         file_path=file_path,
         features=features,
-        name=os.path.splitext(os.path.basename(file_path))[0]
+        name=os.path.splitext(os.path.basename(file_path))[0],
+        linear_tolerance=linear_tolerance,
+        angular_tolerance=angular_tolerance
     )
     scenario_subtree.add_child(
         delphyne.behaviours.agents.RailCar(
@@ -218,7 +242,7 @@ def main():
 
     simulation_tree = delphyne.trees.BehaviourTree(
         root=create_mali_scenario_subtree(road['file_path'], features,
-            road['lane_position'], road['moving_forward'], lane_id))
+            road['lane_position'], road['moving_forward'], lane_id, road['linear_tolerance']))
 
     sim_runner_time_step = 0.015
     simulation_tree.setup(

@@ -127,12 +127,26 @@ KNOWN_ROADS = {
         'moving_forward': True,
         'linear_tolerance': 1e-3,
     },
+    'Figure8': {
+        'description': '8-shaped road ',
+        'lane_id': '1_0_1',
+        'lane_position': 0.,
+        'moving_forward': True,
+        'linear_tolerance': 5e-2,
+    },
     'Town01': {
         'description': 'Grid city',
         'lane_id': '25_0_-1',
         'lane_position': 0.,
         'moving_forward': True,
-        'linear_tolerance': 1e-3,
+        'linear_tolerance': 5e-2,
+    },
+    'Town02': {
+        'description': 'Grid city',
+        'lane_id': '1_0_1',
+        'lane_position': 0.,
+        'moving_forward': True,
+        'linear_tolerance': 5e-2,
     },
     'Town05': {
         'description': 'Grid city',

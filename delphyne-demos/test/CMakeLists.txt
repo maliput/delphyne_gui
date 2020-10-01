@@ -58,8 +58,20 @@ if (NOT ${SANITIZERS})
     COMMAND ${PROJECT_SOURCE_DIR}/examples/delphyne-mali2 -n LineVariableWidth -b -d 2
   )
   add_test(
+    NAME smoke_test_delphyne_mali2_figure_8
+    COMMAND ${PROJECT_SOURCE_DIR}/examples/delphyne-mali2 -n Figure8 -b -d 2
+  )
+  add_test(
     NAME smoke_test_delphyne_mali2_town_01
     COMMAND ${PROJECT_SOURCE_DIR}/examples/delphyne-mali2 -n Town01 -b -d 2
+  )
+  add_test(
+    NAME smoke_test_delphyne_mali2_town_02
+    COMMAND ${PROJECT_SOURCE_DIR}/examples/delphyne-mali2 -n Town02 -b -d 2
+  )
+  add_test(
+    NAME smoke_test_delphyne_mali2_town_05
+    COMMAND ${PROJECT_SOURCE_DIR}/examples/delphyne-mali2 -n Town05 -b -d 2
   )
   add_test(
     NAME smoke_test_delphyne_gazoo

@@ -110,8 +110,8 @@ KNOWN_ROADS = {
         'file_path': 'odr/RRLongRoad.xodr',
         'lane_id': '0_0_-4',
         'lane_position': 0.,
-        'moving_forward': False,
-        'linear_tolerance': 1e-3,
+        'moving_forward': True,
+        'linear_tolerance': 5e-2,
     },
     'Highway': {
         'description': 'Highway',
@@ -134,6 +134,13 @@ KNOWN_ROADS = {
         'moving_forward': True,
         'linear_tolerance': 1e-3,
     },
+    'RRFigure8': {
+        'description': '8-shaped road ',
+        'lane_id': '1_0_1',
+        'lane_position': 0.,
+        'moving_forward': True,
+        'linear_tolerance': 5e-2,
+    },
     'Town01': {
         'description': 'Grid city',
         'lane_id': '25_0_-1',
@@ -144,6 +151,13 @@ KNOWN_ROADS = {
     'Town02': {
         'description': 'Grid city',
         'lane_id': '1_0_1',
+        'lane_position': 0.,
+        'moving_forward': True,
+        'linear_tolerance': 5e-2,
+    },
+    'Town03': {
+        'description': 'Grid city',
+        'lane_id': '352_1_-1',
         'lane_position': 0.,
         'moving_forward': True,
         'linear_tolerance': 5e-2,
@@ -165,6 +179,13 @@ KNOWN_ROADS = {
     'Town06': {
         'description': 'Grid city',
         'lane_id': '75_0_3',
+        'lane_position': 0.,
+        'moving_forward': True,
+        'linear_tolerance': 5e-2,
+    },
+    'Town07': {
+        'description': 'Grid city',
+        'lane_id': '438_1_1',
         'lane_position': 0.,
         'moving_forward': True,
         'linear_tolerance': 5e-2,

@@ -46,6 +46,10 @@ if (NOT ${SANITIZERS})
     COMMAND delphyne-mali2 -n SShapeSuperelevatedRoad -b -d 2
   )
   add_test(
+    NAME smoke_test_delphyne_mali2_r_r_long_road
+    COMMAND delphyne-mali2 -n RRLongRoad -b -d 2
+  )
+  add_test(
     NAME smoke_test_delphyne_mali2_highway
     COMMAND delphyne-mali2 -n Highway -b -d 2
   )
@@ -58,12 +62,20 @@ if (NOT ${SANITIZERS})
     COMMAND delphyne-mali2 -n Figure8 -b -d 2
   )
   add_test(
+    NAME smoke_test_delphyne_mali2_r_r_figure_8
+    COMMAND delphyne-mali2 -n RRFigure8 -b -d 2
+  )
+  add_test(
     NAME smoke_test_delphyne_mali2_town_01
     COMMAND delphyne-mali2 -n Town01 -b -d 2
   )
   add_test(
     NAME smoke_test_delphyne_mali2_town_02
     COMMAND delphyne-mali2 -n Town02 -b -d 2
+  )
+  add_test(
+    NAME smoke_test_delphyne_mali2_town_03
+    COMMAND delphyne-mali2 -n Town03 -b -d 2
   )
   add_test(
     NAME smoke_test_delphyne_mali2_town_04
@@ -76,6 +88,10 @@ if (NOT ${SANITIZERS})
   add_test(
     NAME smoke_test_delphyne_mali2_town_06
     COMMAND delphyne-mali2 -n Town06 -b -d 2
+  )
+  add_test(
+    NAME smoke_test_delphyne_mali2_town_07
+    COMMAND delphyne-mali2 -n Town07 -b -d 2
   )
   add_test(
     NAME smoke_test_delphyne_gazoo

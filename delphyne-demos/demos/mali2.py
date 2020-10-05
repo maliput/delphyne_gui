@@ -125,14 +125,14 @@ KNOWN_ROADS = {
         'lane_id': '1_0_2',
         'lane_position': 0.,
         'moving_forward': True,
-        'linear_tolerance': 1e-3,
+        'linear_tolerance': 5e-2,
     },
     'Figure8': {
         'description': '8-shaped road ',
         'lane_id': '1_0_1',
         'lane_position': 0.,
         'moving_forward': True,
-        'linear_tolerance': 5e-2,
+        'linear_tolerance': 1e-3,
     },
     'Town01': {
         'description': 'Grid city',

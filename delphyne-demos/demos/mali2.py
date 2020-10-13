@@ -190,6 +190,13 @@ KNOWN_ROADS = {
         'moving_forward': True,
         'linear_tolerance': 5e-2,
     },
+    'LineVariableOffset': {
+        'description': 'Straight Road with varying offset',
+        'lane_id': '1_0_2',
+        'lane_position': 0.,
+        'moving_forward': True,
+        'linear_tolerance': 5e-2,
+    },
 }
 
 

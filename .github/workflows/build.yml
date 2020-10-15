@@ -4,6 +4,7 @@ on: [push, pull_request]
 
 env:
   PACKAGE_NAME: delphyne-gui
+  EXTRA_PACKAGE_NAME: delphyne-demos
   ROS_DISTRO: dashing
   ROS_WS: maliput_ws
 
@@ -91,7 +92,7 @@ jobs:
       working-directory: ${{ env.ROS_WS }}
       run: |
         . /opt/ros/${ROS_DISTRO}/setup.bash;
-        colcon build --packages-up-to ${PACKAGE_NAME} \
+        colcon build --packages-up-to ${EXTRA_PACKAGE_NAME} \
           --event-handlers=console_direct+ \
           --cmake-args -DBUILD_TESTING=OFF
     - name: colcon build tests
@@ -108,4 +109,19 @@ jobs:
       run: |
         . /opt/ros/${ROS_DISTRO}/setup.bash;
         colcon test --packages-select ${PACKAGE_NAME} --event-handlers=console_direct+;
+        colcon test-result --verbose;
+    - name: colcon build tests for extra package
+      shell: bash
+      working-directory: ${{ env.ROS_WS }}
+      run: |
+        . /opt/ros/${ROS_DISTRO}/setup.bash;
+        colcon build --packages-select ${EXTRA_PACKAGE_NAME} \
+          --event-handlers=console_direct+ \
+          --cmake-args -DBUILD_TESTING=ON;
+    - name: colcon test for extra package
+      shell: bash
+      working-directory: ${{ env.ROS_WS }}
+      run: |
+        . /opt/ros/${ROS_DISTRO}/setup.bash;
+        colcon test --packages-select ${EXTRA_PACKAGE_NAME} --event-handlers=console_direct+;
         colcon test-result --verbose;

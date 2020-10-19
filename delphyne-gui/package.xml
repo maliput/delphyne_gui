@@ -1,11 +1,11 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format2.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
-<package format="2">
+<package format="3">
   <name>delphyne-gui</name>
-  <version>0.1.0</version>
+  <version>1.0.0</version>
   <description>Delphyne GUI</description>
   <maintainer email="daniel.stonier@tri.global">Daniel Stonier</maintainer>
-  <license>TODO</license>
+  <license file="../LICENSE">BSD 3-Clause</license>
 
   <!-- Packages not present in rosdep DB -->
   <build_depend>libqt5multimedia5</build_depend>

@@ -375,6 +375,16 @@ maliput::api::rules::RoadRulebook::QueryResults RoadNetworkQuery::FindRulesFor(c
 }
 
 /////////////////////////////////////////////////
+void MaliputViewerModel::SetOpenDriveBackend(const std::string& _malidriveBackend) {
+  if (_malidriveBackend != "opendrive_sdk" && _malidriveBackend != "malidrive2") {
+    std::cerr << " Unknown OpenDRIVE backend: <" << _malidriveBackend << ">. Using <opendrive_sdk> by default." << std::endl;
+    malidriveBackend = "opendrive_sdk";
+  } else {
+    malidriveBackend = _malidriveBackend;
+  }
+}
+
+/////////////////////////////////////////////////
 bool MaliputViewerModel::Load(const std::string& _maliputFilePath, const std::string& _roadRulebookFilePath,
                               const std::string& _trafficLightBookFilePath, const std::string& _phaseRingFilePath) {
   this->Clear();
@@ -423,9 +433,15 @@ void MaliputViewerModel::LoadRoadGeometry(const std::string& _maliputFilePath, c
   while (!fileStream.eof()) {
     std::getline(fileStream, line);
     if (line.find("<OpenDRIVE>") != std::string::npos) {
-      this->roadNetwork = delphyne::roads::CreateMalidriveFromFile(
-          _maliputFilePath.substr(_maliputFilePath.find_last_of("/") + 1), _maliputFilePath, _roadRulebookFilePath,
-          _trafficLightBookFilePath, _phaseRingFilePath);
+      if (malidriveBackend == "opendrive_sdk") {
+        this->roadNetwork = delphyne::roads::CreateMalidriveFromFile(
+            _maliputFilePath.substr(_maliputFilePath.find_last_of("/") + 1), _maliputFilePath, _roadRulebookFilePath,
+            _trafficLightBookFilePath, _phaseRingFilePath);
+      } else {
+        this->roadNetwork = delphyne::roads::CreateMalidriveRoadNetworkFromXodr(
+            _maliputFilePath.substr(_maliputFilePath.find_last_of("/") + 1), _maliputFilePath, _roadRulebookFilePath,
+            _trafficLightBookFilePath, _phaseRingFilePath);
+      }
       return;
     } else if (line.find("maliput_multilane_builder:") != std::string::npos) {
       this->roadGeometry = maliput::multilane::LoadFile(maliput::multilane::BuilderFactory(), _maliputFilePath);

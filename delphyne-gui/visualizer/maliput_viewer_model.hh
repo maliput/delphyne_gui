@@ -182,6 +182,11 @@ class MaliputViewerModel {
   /// \brief Destructor.
   ~MaliputViewerModel() = default;
 
+  /// \brief Sets an OpenDRIVE backend to be loaded via Load().
+  ///
+  /// \param[in] malidrive_backend It could be <opendrive_sdk> or <malidrive2>
+  void SetOpenDriveBackend(const std::string& _malidriveBackend);
+
   /// \brief Loads the meshes from a yaml file.
   ///
   /// Gets the file path from GlobalAttributes and loads the RoadGeometry into
@@ -355,6 +360,9 @@ class MaliputViewerModel {
 
   /// \brief Map of labels.
   std::map<std::string, MaliputLabel> labels;
+
+  /// \brief Backend choice to load malidrive maps.
+  std::string malidriveBackend{"opendrive_sdk"};
 };
 
 template <typename ContainerType>

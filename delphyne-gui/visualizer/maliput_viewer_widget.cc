@@ -19,6 +19,9 @@ MaliputViewerWidget::MaliputViewerWidget(QWidget*) : Plugin() {
   // Loads the maliput file path if any and parses it.
   this->model = std::make_unique<MaliputViewerModel>();
   if (GlobalAttributes::HasArgument("xodr_file")) {
+    if (GlobalAttributes::HasArgument("malidrive_backend")) {
+      this->model->SetOpenDriveBackend(GlobalAttributes::GetArgument("malidrive_backend"));
+    }
     this->model->Load(GlobalAttributes::GetArgument("xodr_file"));
     this->VisualizeFileName(GlobalAttributes::GetArgument("xodr_file"));
   } else if (GlobalAttributes::HasArgument("yaml_file")) {

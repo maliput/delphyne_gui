@@ -33,7 +33,7 @@ def parse_arguments():
 def create_dragway_scenario_subtree():
     scenario_subtree = delphyne.behaviours.roads.Dragway(
         name="dragway",
-        num_lanes=4,
+        num_lanes=5,
         length=100.0,
         lane_width=3.7,
         shoulder_width=3.0,
@@ -67,6 +67,10 @@ def create_dragway_scenario_subtree():
                 [60.0,  -5.55, 0.0],  # pylint: disable=C0326
                 [100.0, -5.55, 0.0]
             ]
+        ),
+        delphyne.behaviours.agents.UnicycleCar(
+            name='unicycle-car',
+            initial_pose=(0.0, 3.0 * 3.7, 0.)
         )
     ])
 

@@ -5,7 +5,7 @@ on: [push, pull_request]
 env:
   PACKAGE_NAME: delphyne-gui
   EXTRA_PACKAGE_NAME: delphyne-demos
-  ROS_DISTRO: dashing
+  ROS_DISTRO: eloquent
   ROS_WS: maliput_ws
 
 jobs:

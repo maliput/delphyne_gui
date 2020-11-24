@@ -212,7 +212,7 @@ An example of a railcar running in an OpenDrive based maliput road.
     argument_help = """\
 The OpenDRIVE road description to drive on. Either a path
 to an .xodr file or one of the following well known roads: {}.
-All relative paths are resolved against MALIPUT_MALIDRIVE_RESOURCE_ROOT if not
+All relative paths are resolved against MALIDRIVE_RESOURCE_ROOT if not
 found in the current working directory.
 """.format(', '.join(KNOWN_ROADS))
 
@@ -224,7 +224,7 @@ found in the current working directory.
 
 def get_malidrive_resource(path):
     """Resolve the path against malidrive resources root location."""
-    root = utilities.get_from_env_or_fail('MALIPUT_MALIDRIVE_RESOURCE_ROOT')
+    root = utilities.get_from_env_or_fail('MALIDRIVE_RESOURCE_ROOT')
     for root in root.split(':'):
         resolved_path = os.path.join(root, 'resources', path)
         if os.path.exists(resolved_path):

@@ -108,7 +108,6 @@ endmacro()
 # This should be migrated to more fine control solution based on set_property APPEND
 # directories. It's present on cmake 2.8.8 while precise version is 2.8.7
 link_directories(${PROJECT_BINARY_DIR}/test)
-include_directories("${PROJECT_SOURCE_DIR}/test/gtest/include")
 
 #################################################
 # Enable tests compilation by default

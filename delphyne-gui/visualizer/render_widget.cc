@@ -263,23 +263,17 @@ bool RenderWidget::CreateVisual(const ignition::msgs::Visual& _vis, ignition::re
     const auto& material = _vis.material();
     if (material.has_diffuse()) {
       const auto& diffuse = material.diffuse();
-      if (diffuse.has_r() && diffuse.has_g() && diffuse.has_b()) {
-        _material->SetDiffuse(diffuse.r(), diffuse.g(), diffuse.b());
-      }
+      _material->SetDiffuse(diffuse.r(), diffuse.g(), diffuse.b());
+
       const auto& ambient = material.ambient();
-      if (ambient.has_r() && ambient.has_g() && ambient.has_b()) {
-        _material->SetAmbient(ambient.r(), ambient.g(), ambient.b());
-      }
+      _material->SetAmbient(ambient.r(), ambient.g(), ambient.b());
+
       const auto& specular = material.specular();
-      if (specular.has_r() && specular.has_g() && specular.has_b()) {
-        _material->SetSpecular(specular.r(), specular.g(), specular.b());
-      }
+      _material->SetSpecular(specular.r(), specular.g(), specular.b());
     }
   }
 
-  if (_vis.has_transparency()) {
-    _material->SetTransparency(_vis.transparency());
-  }
+  _material->SetTransparency(_vis.transparency());
 
   _material->SetShininess(50);
   _material->SetReflectivity(0);
@@ -321,11 +315,9 @@ ignition::rendering::VisualPtr RenderWidget::RenderSphere(const ignition::msgs::
                                                           ignition::rendering::MaterialPtr& _material) {
   ignition::math::Vector3d scale = ignition::math::Vector3d::One;
   auto geomSphere = _vis.geometry().sphere();
-  if (geomSphere.has_radius()) {
-    scale.X() *= geomSphere.radius();
-    scale.Y() *= geomSphere.radius();
-    scale.Z() *= geomSphere.radius();
-  }
+  scale.X() *= geomSphere.radius();
+  scale.Y() *= geomSphere.radius();
+  scale.Z() *= geomSphere.radius();
 
   _visual->AddGeometry(this->scene->CreateSphere());
   this->Render(_vis, scale, _material, _visual);
@@ -338,13 +330,9 @@ ignition::rendering::VisualPtr RenderWidget::RenderCylinder(const ignition::msgs
                                                             ignition::rendering::MaterialPtr& _material) {
   ignition::math::Vector3d scale = ignition::math::Vector3d::One;
   auto geomCylinder = _vis.geometry().cylinder();
-  if (geomCylinder.has_radius()) {
-    scale.X() *= 2 * geomCylinder.radius();
-    scale.Y() *= 2 * geomCylinder.radius();
-  }
-  if (geomCylinder.has_length()) {
-    scale.Z() = geomCylinder.length();
-  }
+  scale.X() *= 2 * geomCylinder.radius();
+  scale.Y() *= 2 * geomCylinder.radius();
+  scale.Z() = geomCylinder.length();
 
   _visual->AddGeometry(this->scene->CreateCylinder());
   this->Render(_vis, scale, _material, _visual);
@@ -362,7 +350,7 @@ ignition::rendering::VisualPtr RenderWidget::RenderMesh(const ignition::msgs::Vi
     ignerr << "Unable to find mesh in message" << std::endl;
   }
 
-  if (!_vis.geometry().mesh().has_filename()) {
+  if (_vis.geometry().mesh().filename().empty()) {
     ignerr << "Unable to find filename in message" << std::endl;
   }
 
@@ -466,17 +454,11 @@ ignition::rendering::VisualPtr RenderWidget::CreateLinkRootVisual(ignition::msgs
 
 /////////////////////////////////////////////////
 void RenderWidget::LoadModel(const ignition::msgs::Model& _msg) {
-  // Sanity check: It's required to have a model Id.
-  if (!_msg.has_id()) {
-    ignerr << "Skipping model without id" << std::endl;
-    return;
-  }
-
   for (int i = 0; i < _msg.link_size(); ++i) {
     auto link = _msg.link(i);
 
     // Sanity check: Verify that the link contains the required name.
-    if (!link.has_name()) {
+    if (link.name().empty()) {
       ignerr << "No name on link, skipping" << std::endl;
       continue;
     }
@@ -547,17 +529,11 @@ void RenderWidget::UpdateScene(const ignition::msgs::Model_V& _msg) {
   for (int j = 0; j < _msg.models_size(); ++j) {
     auto model = _msg.models(j);
 
-    // Sanity check: It's required to have a model Id.
-    if (!model.has_id()) {
-      ignerr << "Skipping model without id" << std::endl;
-      continue;
-    }
-
     for (int i = 0; i < model.link_size(); ++i) {
       auto link = model.link(i);
 
       // Sanity check: It's required to have a link name.
-      if (!link.has_name()) {
+      if (link.name().empty()) {
         ignerr << "Skipping link without name" << std::endl;
         continue;
       }

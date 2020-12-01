@@ -26,8 +26,7 @@ namespace gui {
 namespace {
 
 std::chrono::nanoseconds TimeToChrono(const ignition::msgs::Time& src) {
-  return (std::chrono::seconds(src.has_sec() ? src.sec() : 0) +
-          std::chrono::nanoseconds(src.has_nsec() ? src.nsec() : 0));
+  return (std::chrono::seconds(src.sec()) + std::chrono::nanoseconds(src.nsec()));
 }
 
 void ChronoToDuration(const std::chrono::nanoseconds& src, ignition::msgs::Duration* dst) {

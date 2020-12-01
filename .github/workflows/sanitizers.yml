@@ -111,7 +111,7 @@ jobs:
       run: ${GITHUB_WORKSPACE}/dsim-repos-index/tools/prereqs-install -t ignition .
     - name: clang 8 install
       shell: bash
-      run: ${{ env.ROS_WS }}/src/${REPOSITORY_NAME}/.github/clang_suite_installation.sh
+      run: ${{ env.ROS_WS }}/src/${PACKAGE_NAME}/.github/clang_suite_installation.sh
     # clone public dependencies
     - name: vcs import
       shell: bash

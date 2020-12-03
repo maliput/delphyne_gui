@@ -146,22 +146,9 @@ endif()
 
 #####################################
 # Handle CFlags
-unset (CMAKE_C_FLAGS_ALL CACHE)
 unset (CMAKE_CXX_FLAGS CACHE)
 
-# USE_HOST_CFLAGS (default TRUE)
-# Will check building host machine for proper cflags
-if(NOT DEFINED USE_HOST_CFLAGS OR USE_HOST_CFLAGS)
-  message(STATUS "Enable host CFlags")
-  include (${project_cmake_dir}/HostCFlags.cmake)
-endif()
-
-# USE_UPSTREAM_CFLAGS (default TRUE)
-# Will use predefined delphyne developers cflags
-if(NOT DEFINED USE_UPSTREAM_CFLAGS OR USE_UPSTREAM_CFLAGS)
-  message(STATUS "Enable upstream CFlags")
-  include(${project_cmake_dir}/DefaultCFlags.cmake)
-endif()
+include(${project_cmake_dir}/DefaultCFlags.cmake)
 
 # Check whether sanitizers should be enabled or not.
 include(${project_cmake_dir}/SanitizersConfig.cmake)

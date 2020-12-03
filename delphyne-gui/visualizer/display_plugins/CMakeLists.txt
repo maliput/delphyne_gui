@@ -12,10 +12,10 @@ add_library(${origin_display} SHARED
   ${${origin_display}_MOC}
 )
 target_link_libraries(${origin_display}
-  ${IGNITION-COMMON_LIBRARIES}
-  ${IGNITION-GUI_LIBRARIES}
-  ${IGNITION-MSGS_LIBRARIES}
-  ${IGNITION-TRANSPORT_LIBRARIES}
+  ignition-common3::ignition-common3
+  ignition-gui0::ignition-gui0
+  ignition-msgs2::ignition-msgs2
+  ignition-transport5::ignition-transport5
   ${Qt5Core_LIBRARIES}
   ${Qt5Widgets_LIBRARIES}
   delphyne::protobuf_messages
@@ -31,10 +31,10 @@ add_library(${agent_info_display} SHARED
   ${${agent_info_display}_MOC}
 )
 target_link_libraries(${agent_info_display}
-  ${IGNITION-COMMON_LIBRARIES}
-  ${IGNITION-GUI_LIBRARIES}
-  ${IGNITION-MSGS_LIBRARIES}
-  ${IGNITION-TRANSPORT_LIBRARIES}
+  ignition-common3::ignition-common3
+  ignition-gui0::ignition-gui0
+  ignition-msgs2::ignition-msgs2
+  ignition-transport5::ignition-transport5
   ${Qt5Core_LIBRARIES}
   ${Qt5Widgets_LIBRARIES}
   delphyne::protobuf_messages

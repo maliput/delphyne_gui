@@ -27,8 +27,7 @@ if prereqs.tag_applies "ignition|all"; then
                 libignition-tools-dev \
                 libignition-cmake2-dev \
                 libignition-cmake1-dev \
-                libignition-rendering2-dev \
-                libignition-gui0-dev
+                libignition-rendering2-dev
 fi
 
 prereqs.done

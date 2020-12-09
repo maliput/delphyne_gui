@@ -21,8 +21,6 @@ if (NOT ignition-common3_FOUND)
   BUILD_ERROR ("Missing: Ignition common0 library (libignition-common3-dev).")
 else()
   message(STATUS "Looking for ignition-common3-config.cmake - found")
-  include_directories(${IGNITION-COMMON_INCLUDE_DIRS})
-  link_directories(${IGNITION-COMMON_LIBRARY_DIRS})
 endif()
 
 ########################################
@@ -33,8 +31,6 @@ if (NOT ignition-math6_FOUND)
   BUILD_ERROR ("Missing: Ignition math4 library (libignition-math6-dev).")
 else()
   message(STATUS "Looking for ignition-math6-config.cmake - found")
-  include_directories(${IGNITION-MATH_INCLUDE_DIRS})
-  link_directories(${IGNITION-MATH_LIBRARY_DIRS})
 endif()
 
 ########################################
@@ -45,8 +41,6 @@ if (NOT ignition-msgs2_FOUND)
   BUILD_ERROR ("Missing: Ignition msgs2 library (libignition-msgs2-dev).")
 else()
   message(STATUS "Looking for ignition-msgs2-config.cmake - found")
-  include_directories(${IGNITION-MSGS_INCLUDE_DIRS})
-  link_directories(${IGNITION-MSGS_LIBRARY_DIRS})
 endif()
 
 ########################################
@@ -57,8 +51,6 @@ if (NOT ignition-gui0_FOUND)
   BUILD_ERROR ("Missing: Ignition gui0 library (libignition-gui0-dev).")
 else()
   message(STATUS "Looking for ignition-gui0-config.cmake - found")
-  include_directories(${IGNITION-GUI_INCLUDE_DIRS})
-  link_directories(${IGNITION-GUI_LIBRARY_DIRS})
 endif()
 
 ########################################
@@ -69,9 +61,6 @@ if (NOT ignition-rendering2_FOUND)
   BUILD_ERROR ("Missing: Ignition rendering2 library (libignition-rendering2-dev).")
 else()
   message(STATUS "Looking for ignition-rendering2-config.cmake - found")
-  include_directories(${IGNITION-RENDERING_INCLUDE_DIRS})
-  MESSAGE(STATUS "rendering include: ${IGNITION-RENDERING_INCLUDE_DIRS}")
-  link_directories(${IGNITION-RENDERING_LIBRARY_DIRS})
 endif()
 
 ########################################
@@ -82,8 +71,6 @@ if (NOT ignition-transport5_FOUND)
   BUILD_ERROR ("Missing: Ignition transport5 library (libignition-transport5-dev).")
 else()
   message(STATUS "Looking for ignition-transport5-config.cmake - found")
-  include_directories(${IGNITION-TRANSPORT_INCLUDE_DIRS})
-  link_directories(${IGNITION-TRANSPORT_LIBRARY_DIRS})
 endif()
 
 ########################################

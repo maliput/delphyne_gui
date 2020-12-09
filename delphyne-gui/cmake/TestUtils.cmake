@@ -16,7 +16,7 @@ macro (delphyne_build_tests)
     # Kind of an ugly catch-all bucket
     target_link_libraries(
       ${BINARY_NAME}
-        ${IGNITION-COMMON_LIBRARIES}
+        ignition-common3::ignition-common3
         ${global_attributes}
         pthread
     )

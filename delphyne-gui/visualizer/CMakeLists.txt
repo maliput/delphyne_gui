@@ -12,7 +12,7 @@ ament_target_dependencies(${maliput_mesh}
 
 target_link_libraries(${maliput_mesh}
   ${drake_LIBRARIES}
-  ${IGNITION-COMMON_LIBRARIES}
+  ignition-common3::ignition-common3
   delphyne::public_headers
   maliput::api
   maliput::utilities)
@@ -26,7 +26,7 @@ add_library(${global_attributes}
   global_attributes.cc
 )
 target_link_libraries(${global_attributes}
-  ${IGNITION-COMMON_LIBRARIES}
+  ignition-common3::ignition-common3
 )
 
 install(TARGETS ${global_attributes} DESTINATION
@@ -62,10 +62,10 @@ ament_target_dependencies(${maliput_viewer_widget}
 target_link_libraries(${maliput_viewer_widget}
   ${drake_LIBRARIES}
   ${global_attributes}
-  ${IGNITION-COMMON_LIBRARIES}
-  ${IGNITION-GUI_LIBRARIES}
-  ${IGNITION-MSGS_LIBRARIES}
-  ${IGNITION-RENDERING_LIBRARIES}
+  ignition-common3::ignition-common3
+  ignition-gui0::ignition-gui0
+  ignition-msgs2::ignition-msgs2
+  ignition-rendering2::ignition-rendering2
   ${maliput_mesh}
   ${Qt5Core_LIBRARIES}
   ${Qt5Widgets_LIBRARIES}
@@ -87,11 +87,11 @@ add_library(${render_widget} SHARED
   ${${render_widget}_MOC}
 )
 target_link_libraries(${render_widget}
-  ${IGNITION-COMMON_LIBRARIES}
-  ${IGNITION-GUI_LIBRARIES}
-  ${IGNITION-MSGS_LIBRARIES}
-  ${IGNITION-RENDERING_LIBRARIES}
-  ${IGNITION-TRANSPORT_LIBRARIES}
+  ignition-common3::ignition-common3
+  ignition-gui0::ignition-gui0
+  ignition-msgs2::ignition-msgs2
+  ignition-rendering2::ignition-rendering2
+  ignition-transport5::ignition-transport5
   ${Qt5Core_LIBRARIES}
   ${Qt5Widgets_LIBRARIES}
   delphyne::protobuf_messages
@@ -107,10 +107,10 @@ add_library(${teleop_widget} SHARED
   ${${teleop_widget}_MOC}
 )
 target_link_libraries(${teleop_widget}
-  ${IGNITION-COMMON_LIBRARIES}
-  ${IGNITION-GUI_LIBRARIES}
-  ${IGNITION-MSGS_LIBRARIES}
-  ${IGNITION-TRANSPORT_LIBRARIES}
+  ignition-common3::ignition-common3
+  ignition-gui0::ignition-gui0
+  ignition-msgs2::ignition-msgs2
+  ignition-transport5::ignition-transport5
   ${Qt5Core_LIBRARIES}
   ${Qt5Widgets_LIBRARIES}
   delphyne::protobuf_messages
@@ -134,10 +134,10 @@ add_library(${playback_widget} SHARED
   ${${playback_widget}_resources_RCC}
 )
 target_link_libraries(${playback_widget}
-  ${IGNITION-COMMON_LIBRARIES}
-  ${IGNITION-GUI_LIBRARIES}
-  ${IGNITION-MSGS_LIBRARIES}
-  ${IGNITION-TRANSPORT_LIBRARIES}
+  ignition-common3::ignition-common3
+  ignition-gui0::ignition-gui0
+  ignition-msgs2::ignition-msgs2
+  ignition-transport5::ignition-transport5
   ${Qt5Core_LIBRARIES}
   ${Qt5Widgets_LIBRARIES}
   delphyne::protobuf_messages
@@ -158,8 +158,8 @@ add_executable(visualizer
 )
 
 target_link_libraries(visualizer
-  ${IGNITION-COMMON_LIBRARIES}
-  ${IGNITION-GUI_LIBRARIES}
+  ignition-common3::ignition-common3
+  ignition-gui0::ignition-gui0
   ${Qt5Core_LIBRARIES}
   ${Qt5Widgets_LIBRARIES}
   ${global_attributes}

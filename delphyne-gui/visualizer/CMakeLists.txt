@@ -2,43 +2,64 @@ include (${project_cmake_dir}/Utils.cmake)
 
 # ----------------------------------------
 # MaliputMesh library.
-set(maliput_mesh MaliputMesh)
+add_library(maliput_mesh
+  maliput_mesh_converter.cc
+)
+add_library(delphyne_gui::maliput_mesh ALIAS maliput_mesh)
+set_target_properties(maliput_mesh
+  PROPERTIES
+    OUTPUT_NAME delphyne_gui_maliput_mesh
+)
 
-add_library(${maliput_mesh}
-  maliput_mesh_converter.cc)
+ament_target_dependencies(maliput_mesh
+  "maliput"
+)
 
-ament_target_dependencies(${maliput_mesh}
-  "maliput")
-
-target_link_libraries(${maliput_mesh}
+target_link_libraries(maliput_mesh
   ${drake_LIBRARIES}
   ignition-common3::ignition-common3
   delphyne::public_headers
   maliput::api
-  maliput::utilities)
+  maliput::utilities
+)
 
-install(TARGETS ${maliput_mesh} DESTINATION
-  ${LIB_INSTALL_DIR} COMPONENT shlib)
+install(
+  TARGETS maliput_mesh
+  EXPORT ${PROJECT_NAME}-targets
+  RUNTIME DESTINATION bin
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib
+)
 
 # GlobalAttributes library.
-set(global_attributes GlobalAttributes)
-add_library(${global_attributes}
+add_library(global_attributes
   global_attributes.cc
 )
-target_link_libraries(${global_attributes}
+add_library(delphyne_gui::global_attributes ALIAS global_attributes)
+set_target_properties(global_attributes
+  PROPERTIES
+    OUTPUT_NAME delphyne_gui_global_attributes
+)
+
+target_link_libraries(global_attributes
   ignition-common3::ignition-common3
 )
 
-install(TARGETS ${global_attributes} DESTINATION
-  ${LIB_INSTALL_DIR} COMPONENT shlib)
+install(
+  TARGETS global_attributes
+  EXPORT ${PROJECT_NAME}-targets
+  RUNTIME DESTINATION bin
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib
+)
 
 # MaliputViewerWidget GUI plugin.
-set(maliput_viewer_widget MaliputViewerWidget)
-QT5_WRAP_CPP(${maliput_viewer_widget}_MOC maliput_viewer_widget.hh)
+QT5_WRAP_CPP(MaliputViewerWidget_MOC maliput_viewer_widget.hh)
 QT5_WRAP_CPP(LayerSelectionWidget_MOC layer_selection_widget.hh)
 QT5_WRAP_CPP(RenderMaliputWidget_MOC render_maliput_widget.hh)
 QT5_WRAP_CPP(RulesVisualizerWidget_MOC rules_visualizer_widget.hh)
-add_library(${maliput_viewer_widget} SHARED
+
+add_library(maliput_viewer_widget
   ${CMAKE_CURRENT_SOURCE_DIR}/layer_selection_widget.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/maliput_viewer_widget.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/render_maliput_widget.cc
@@ -49,44 +70,63 @@ add_library(${maliput_viewer_widget} SHARED
   arrow_mesh.cc
   selector.cc
   traffic_light_manager.cc
-  ${${maliput_viewer_widget}_MOC}
+  ${MaliputViewerWidget_MOC}
   ${LayerSelectionWidget_MOC}
   ${RenderMaliputWidget_MOC}
   ${RulesVisualizerWidget_MOC}
 )
+add_library(delphyne_gui::maliput_viewer_widget ALIAS maliput_viewer_widget)
+set_target_properties(maliput_viewer_widget
+  PROPERTIES
+    OUTPUT_NAME delphyne_gui_maliput_viewer_widget
+)
 
-ament_target_dependencies(${maliput_viewer_widget}
+ament_target_dependencies(maliput_viewer_widget
   "maliput"
-  "maliput_multilane")
+  "maliput_multilane"
+)
 
-target_link_libraries(${maliput_viewer_widget}
+target_link_libraries(maliput_viewer_widget
   ${drake_LIBRARIES}
-  ${global_attributes}
+  global_attributes
   ignition-common3::ignition-common3
   ignition-gui0::ignition-gui0
   ignition-msgs2::ignition-msgs2
   ignition-rendering2::ignition-rendering2
-  ${maliput_mesh}
+  maliput_mesh
   ${Qt5Core_LIBRARIES}
   ${Qt5Widgets_LIBRARIES}
   delphyne::roads_utilities
   maliput::api
   maliput_multilane::maliput_multilane
   maliput::utilities
-  )
+)
 
-install(TARGETS ${maliput_viewer_widget} DESTINATION
-  ${LIB_INSTALL_DIR} COMPONENT shlib)
+install(
+  TARGETS maliput_viewer_widget
+  EXPORT ${PROJECT_NAME}-targets
+  RUNTIME DESTINATION bin
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib
+)
 
 # RenderWidget GUI plugin.
 set(render_widget RenderWidget)
-QT5_WRAP_CPP(${render_widget}_MOC render_widget.hh)
-add_library(${render_widget} SHARED
+
+QT5_WRAP_CPP(RenderWidget_MOC render_widget.hh)
+
+add_library(render_widget
   ${CMAKE_CURRENT_SOURCE_DIR}/render_widget.cc
   orbit_view_control.cc
-  ${${render_widget}_MOC}
+  ${RenderWidget_MOC}
 )
-target_link_libraries(${render_widget}
+add_library(delphyne_gui::render_widget ALIAS render_widget)
+set_target_properties(render_widget
+  PROPERTIES
+    OUTPUT_NAME delphyne_gui_render_widget
+)
+
+target_link_libraries(render_widget
   ignition-common3::ignition-common3
   ignition-gui0::ignition-gui0
   ignition-msgs2::ignition-msgs2
@@ -95,18 +135,31 @@ target_link_libraries(${render_widget}
   ${Qt5Core_LIBRARIES}
   ${Qt5Widgets_LIBRARIES}
   delphyne::protobuf_messages
-  delphyne::utility)
+  delphyne::utility
+)
 
-install(TARGETS ${render_widget} DESTINATION ${LIB_INSTALL_DIR} COMPONENT shlib)
+install(
+  TARGETS render_widget
+  EXPORT ${PROJECT_NAME}-targets
+  RUNTIME DESTINATION bin
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib
+)
 
 # TeleopWidget GUI plugin.
-set(teleop_widget TeleopWidget)
-QT5_WRAP_CPP(${teleop_widget}_MOC teleop_widget.hh)
-add_library(${teleop_widget} SHARED
+QT5_WRAP_CPP(TeleopWidget_MOC teleop_widget.hh)
+
+add_library(teleop_widget
   ${CMAKE_CURRENT_SOURCE_DIR}/teleop_widget.cc
-  ${${teleop_widget}_MOC}
+  ${TeleopWidget_MOC}
 )
-target_link_libraries(${teleop_widget}
+add_library(delphyne_gui::teleop_widget ALIAS teleop_widget)
+set_target_properties(teleop_widget
+  PROPERTIES
+    OUTPUT_NAME delphyne_gui_teleop_widget
+)
+
+target_link_libraries(teleop_widget
   ignition-common3::ignition-common3
   ignition-gui0::ignition-gui0
   ignition-msgs2::ignition-msgs2
@@ -116,7 +169,13 @@ target_link_libraries(${teleop_widget}
   delphyne::protobuf_messages
 )
 
-install(TARGETS ${teleop_widget} DESTINATION ${LIB_INSTALL_DIR} COMPONENT shlib)
+install(
+  TARGETS teleop_widget
+  EXPORT ${PROJECT_NAME}-targets
+  RUNTIME DESTINATION bin
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib
+)
 
 include_directories(
   ${Qt5Core_INCLUDE_DIRS}
@@ -125,15 +184,21 @@ include_directories(
 )
 
 # PlaybackWidget GUI plugin.
-set(playback_widget PlaybackWidget)
-QT5_WRAP_CPP(${playback_widget}_MOC playback_widget.hh)
-QT5_ADD_RESOURCES(${playback_widget}_resources_RCC playback.qrc)
-add_library(${playback_widget} SHARED
+QT5_WRAP_CPP(PlaybackWidget_MOC playback_widget.hh)
+QT5_ADD_RESOURCES(PlaybackWidget_resources_RCC playback.qrc)
+
+add_library(playback_widget
   ${CMAKE_CURRENT_SOURCE_DIR}/playback_widget.cc
-  ${${playback_widget}_MOC}
-  ${${playback_widget}_resources_RCC}
+  ${PlaybackWidget_MOC}
+  ${PlaybackWidget_resources_RCC}
 )
-target_link_libraries(${playback_widget}
+add_library(delphyne_gui::playback_widget ALIAS playback_widget)
+set_target_properties(playback_widget
+  PROPERTIES
+    OUTPUT_NAME delphyne_gui_playback_widget
+)
+
+target_link_libraries(playback_widget
   ignition-common3::ignition-common3
   ignition-gui0::ignition-gui0
   ignition-msgs2::ignition-msgs2
@@ -144,7 +209,13 @@ target_link_libraries(${playback_widget}
   delphyne::public_headers
 )
 
-install(TARGETS ${playback_widget} DESTINATION ${LIB_INSTALL_DIR} COMPONENT shlib)
+install(
+  TARGETS playback_widget
+  EXPORT ${PROJECT_NAME}-targets
+  RUNTIME DESTINATION bin
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib
+)
 
 include_directories(
   ${Qt5Core_INCLUDE_DIRS}
@@ -162,36 +233,49 @@ target_link_libraries(visualizer
   ignition-gui0::ignition-gui0
   ${Qt5Core_LIBRARIES}
   ${Qt5Widgets_LIBRARIES}
-  ${global_attributes}
   delphyne::utility
+  global_attributes
 )
 
-install (TARGETS visualizer DESTINATION ${BIN_INSTALL_DIR})
+install(
+  TARGETS visualizer
+  EXPORT ${PROJECT_NAME}-targets
+  DESTINATION ${BIN_INSTALL_DIR}/${PROJECT_NAME}
+)
 
 # Install .config files.
-install (FILES
-  layout_with_render_only.config layout_with_teleop.config
-  layout_maliput_viewer.config layout_for_playback.config
+install(
+  FILES
+    layout_with_render_only.config
+    layout_with_teleop.config
+    layout_maliput_viewer.config
+    layout_for_playback.config
   DESTINATION
-  ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/delphyne/layouts)
+    ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/delphyne/layouts
+)
 
 # Install .yaml files.
-install (FILES
-  roads/double_ring.yaml
-  roads/circuit.yaml
-  roads/curved_lanes.yaml
-  roads/straight_lanes.yaml
-  roads/little_city.yaml
+install(
+  FILES
+    roads/double_ring.yaml
+    roads/circuit.yaml
+    roads/curved_lanes.yaml
+    roads/straight_lanes.yaml
+    roads/little_city.yaml
   DESTINATION
-  ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/delphyne/roads)
+    ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/delphyne/roads
+)
 
-install (FILES
-  resources/arrow_bulb.obj
-  resources/arrow_bulb.mtl
+install(
+  FILES
+    resources/arrow_bulb.obj
+    resources/arrow_bulb.mtl
   DESTINATION
-  ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/delphyne/resources)
+    ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/delphyne/resources
+)
 
 add_subdirectory(display_plugins)
+
 if(BUILD_TESTING)
   add_subdirectory(test)
 endif()

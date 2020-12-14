@@ -19,6 +19,8 @@ set (project_cmake_dir ${PROJECT_SOURCE_DIR}/cmake
 
 include (${project_cmake_dir}/Utils.cmake)
 
+set(BUILD_SHARED_LIBS true)
+
 ##########
 # Package Creation:
 

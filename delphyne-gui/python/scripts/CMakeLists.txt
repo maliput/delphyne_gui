@@ -4,7 +4,7 @@
 
 install(
   PROGRAMS
-    delphyne-replay
+    delphyne_replay
   DESTINATION
     bin
 )

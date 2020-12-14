@@ -3,7 +3,7 @@
 ##############################################################################
 
 cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
-project(delphyne-demos)
+project(delphyne_demos)
 
 include(${PROJECT_SOURCE_DIR}/cmake/SanitizersConfig.cmake)
 

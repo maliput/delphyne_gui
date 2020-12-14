@@ -17,7 +17,7 @@
 #include <ignition/gui/qt.h>
 #endif
 
-#include "delphyne-gui/config.hh"
+#include "delphyne_gui/config.hh"
 
 #include "global_attributes.hh"
 

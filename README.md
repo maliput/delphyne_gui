@@ -1,6 +1,6 @@
-# Delphyne-gui
+# delphyne_gui
 
-This is the repository for Delphyne GUI, a front-end visualizer for Delphyne. 
+This is the repository for Delphyne GUI, a front-end visualizer for `delphyne`.
 
 ## Build
 
@@ -18,13 +18,13 @@ source ./bringup
   - If not building drake from source:
 
    ```sh
-   colcon build --packages-up-to delphyne-gui
+   colcon build --packages-up-to delphyne_gui
    ```
 
   - If building drake from source:
 
    ```sh
-   colcon build --cmake-args -DWITH_PYTHON_VERSION=3 --packages-up-to delphyne-gui
+   colcon build --cmake-args -DWITH_PYTHON_VERSION=3 --packages-up-to delphyne_gui
    ```
 
 ## Tools

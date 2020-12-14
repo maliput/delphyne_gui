@@ -1,6 +1,6 @@
 # Changelog
 
-## delphyne-gui
+## delphyne_gui
 
 ### 1.X.X YYYY-MM-DD
 
@@ -20,7 +20,7 @@
 
 - ...
 
-## delphyne-demos
+## delphyne_demos
 
 ### 1.X.X YYYY-MM-DD
 

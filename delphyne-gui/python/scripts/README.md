@@ -15,13 +15,13 @@ logging-related flags to enable and route these recordings to specific
 locations within your local filesystem.
 
 Then, logs have to be reproduced in a way that's transparent for the
-visualization frontend. And that's what the `delphyne-replay` script is
+visualization frontend. And that's what the `delphyne_replay` script is
 for.
 
 As an example, first run a demo with logging enabled as follows:
 
 ```sh
-delphyne-gazoo -d 30 -l -f /tmp/test.log
+delphyne_gazoo -d 30 -l -f /tmp/test.log
 ```
 
 After simulation ends, logs will have been written to `/tmp/test.log`.
@@ -29,7 +29,7 @@ After simulation ends, logs will have been written to `/tmp/test.log`.
 Then, replay them using:
 
 ```sh
-delphyne-replay /tmp/test.log
+delphyne_replay /tmp/test.log
 ```
 
 You should be able to see the same simulation being reproduced.

@@ -17,7 +17,7 @@ macro (delphyne_build_tests)
     target_link_libraries(
       ${BINARY_NAME}
         ignition-common3::ignition-common3
-        ${global_attributes}
+        delphyne_gui::global_attributes
         pthread
     )
 

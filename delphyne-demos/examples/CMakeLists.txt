@@ -3,21 +3,21 @@
 ##############################################################################
 
 # TODO(daniel.stonier) if we ever have other executables that are not demos
-# consider renaming these to delphyne-demo-<name>
+# consider renaming these to delphyne_demo_<name>
 
 install(
   PROGRAMS
-    delphyne-city
-    delphyne-crash
-    delphyne-dragway
-    delphyne-gazoo
-    delphyne-keyop
-    delphyne-mali
-    delphyne-mali2
-    delphyne-mobil-perf
-    delphyne-realtime
-    delphyne-roads
-    delphyne-scriptlets
+    delphyne_city
+    delphyne_crash
+    delphyne_dragway
+    delphyne_gazoo
+    delphyne_keyop
+    delphyne_mali
+    delphyne_mali2
+    delphyne_mobil_perf
+    delphyne_realtime
+    delphyne_roads
+    delphyne_scriptlets
   DESTINATION
     bin
 )

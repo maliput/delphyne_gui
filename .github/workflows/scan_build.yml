@@ -7,8 +7,8 @@ on:
   pull_request:
 
 env:
-  PACKAGE_NAME: delphyne-gui
-  EXTRA_PACKAGE_NAME: delphyne-demos
+  PACKAGE_NAME: delphyne_gui
+  EXTRA_PACKAGE_NAME: delphyne_demos
   ROS_DISTRO: dashing
   ROS_WS: maliput_ws
 
@@ -96,10 +96,10 @@ jobs:
       shell: bash
       working-directory: ${{ env.ROS_WS }}/src/delphyne
       run: ${GITHUB_WORKSPACE}/dsim-repos-index/tools/prereqs-install -t ignition .
-    # install delphyne-gui prereqs using dsim-repos-index/tools/prereqs.lib
-    - name: install delphyne-gui prereqs
+    # install delphyne_gui prereqs using dsim-repos-index/tools/prereqs.lib
+    - name: install delphyne_gui prereqs
       shell: bash
-      working-directory: ${{ env.ROS_WS }}/src/delphyne-gui
+      working-directory: ${{ env.ROS_WS }}/src/${{ env.PACKAGE_NAME }}
       run: ${GITHUB_WORKSPACE}/dsim-repos-index/tools/prereqs-install -t ignition .
     - name: clang 8 install
       shell: bash

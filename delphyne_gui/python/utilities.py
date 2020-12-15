@@ -77,7 +77,7 @@ def launch_visualizer(launcher_manager, layout_filename=None,
 
 
 def get_delphyne_gui_resource_root():
-    """Return the root path where delphyne-gui resources live"""
+    """Return the root path where delphyne_gui resources live"""
     return delphyne.utilities.get_from_env_or_fail('DELPHYNE_GUI_RESOURCE_ROOT')
 
 

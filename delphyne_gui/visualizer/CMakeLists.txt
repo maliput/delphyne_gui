@@ -91,7 +91,7 @@ target_link_libraries(maliput_viewer_widget
   global_attributes
   ignition-common3::ignition-common3
   ignition-gui0::ignition-gui0
-  ignition-msgs2::ignition-msgs2
+  ignition-msgs4::ignition-msgs4
   ignition-rendering2::ignition-rendering2
   maliput_mesh
   ${Qt5Core_LIBRARIES}
@@ -129,9 +129,9 @@ set_target_properties(render_widget
 target_link_libraries(render_widget
   ignition-common3::ignition-common3
   ignition-gui0::ignition-gui0
-  ignition-msgs2::ignition-msgs2
+  ignition-msgs4::ignition-msgs4
   ignition-rendering2::ignition-rendering2
-  ignition-transport5::ignition-transport5
+  ignition-transport7::ignition-transport7
   ${Qt5Core_LIBRARIES}
   ${Qt5Widgets_LIBRARIES}
   delphyne::protobuf_messages
@@ -162,8 +162,8 @@ set_target_properties(teleop_widget
 target_link_libraries(teleop_widget
   ignition-common3::ignition-common3
   ignition-gui0::ignition-gui0
-  ignition-msgs2::ignition-msgs2
-  ignition-transport5::ignition-transport5
+  ignition-msgs4::ignition-msgs4
+  ignition-transport7::ignition-transport7
   ${Qt5Core_LIBRARIES}
   ${Qt5Widgets_LIBRARIES}
   delphyne::protobuf_messages
@@ -201,8 +201,8 @@ set_target_properties(playback_widget
 target_link_libraries(playback_widget
   ignition-common3::ignition-common3
   ignition-gui0::ignition-gui0
-  ignition-msgs2::ignition-msgs2
-  ignition-transport5::ignition-transport5
+  ignition-msgs4::ignition-msgs4
+  ignition-transport7::ignition-transport7
   ${Qt5Core_LIBRARIES}
   ${Qt5Widgets_LIBRARIES}
   delphyne::protobuf_messages

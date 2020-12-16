@@ -35,12 +35,12 @@ endif()
 
 ########################################
 # Find ignition msgs
-find_package(ignition-msgs2 QUIET)
-if (NOT ignition-msgs2_FOUND)
-  message(STATUS "Looking for ignition-msgs2-config.cmake - not found")
-  BUILD_ERROR ("Missing: Ignition msgs2 library (libignition-msgs2-dev).")
+find_package(ignition-msgs4 QUIET)
+if (NOT ignition-msgs4_FOUND)
+  message(STATUS "Looking for ignition-msgs4-config.cmake - not found")
+  BUILD_ERROR ("Missing: Ignition msgs4 library (libignition-msgs4-dev).")
 else()
-  message(STATUS "Looking for ignition-msgs2-config.cmake - found")
+  message(STATUS "Looking for ignition-msgs4-config.cmake - found")
 endif()
 
 ########################################
@@ -65,12 +65,12 @@ endif()
 
 ########################################
 # Find ignition transport
-find_package(ignition-transport5 REQUIRED)
-if (NOT ignition-transport5_FOUND)
-  message(STATUS "Looking for ignition-transport5-config.cmake - not found")
-  BUILD_ERROR ("Missing: Ignition transport5 library (libignition-transport5-dev).")
+find_package(ignition-transport7 REQUIRED)
+if (NOT ignition-transport7_FOUND)
+  message(STATUS "Looking for ignition-transport7-config.cmake - not found")
+  BUILD_ERROR ("Missing: Ignition transport7 library (libignition-transport7-dev).")
 else()
-  message(STATUS "Looking for ignition-transport5-config.cmake - found")
+  message(STATUS "Looking for ignition-transport7-config.cmake - found")
 endif()
 
 ########################################

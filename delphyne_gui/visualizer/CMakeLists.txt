@@ -243,6 +243,26 @@ install(
   DESTINATION ${BIN_INSTALL_DIR}
 )
 
+# Visualizer with ign-gui2
+add_executable(visualizer
+  visualizer2.cc
+)
+
+target_link_libraries(visualizer
+  ignition-common3::ignition-common3
+  ignition-gui2::ignition-gui2
+  ${Qt5Core_LIBRARIES}
+  ${Qt5Widgets_LIBRARIES}
+  delphyne::utility
+  global_attributes
+)
+
+install(
+  TARGETS visualizer
+  EXPORT ${PROJECT_NAME}-targets
+  DESTINATION ${BIN_INSTALL_DIR}
+)
+
 # Install .config files.
 install(
   FILES

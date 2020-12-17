@@ -24,7 +24,7 @@ from contextlib import contextmanager
 @contextmanager
 def launch_interactive_simulation(simulation_runner,
                                   layout="layout_with_teleop.config",
-                                  bare=False):
+                                  bare=False, ign_visualizer=None):
     """Defines a context manager function used to hande the execution of an
     interactive simulation. An interactive simulation launches the delphyne
     visualizer in a separate process and ends the simulation when the
@@ -33,7 +33,8 @@ def launch_interactive_simulation(simulation_runner,
     launch_manager = launcher.Launcher()
     try:
         if not bare:
-            launch_visualizer(launch_manager, layout)
+            launch_visualizer(launch_manager, layout,
+                              ign_visualizer=ign_visualizer)
         yield launch_manager
         launch_manager.wait(float("Inf"))
     except RuntimeError as error_msg:
@@ -54,12 +55,14 @@ def launch_interactive_simulation(simulation_runner,
 
 
 def launch_visualizer(launcher_manager, layout_filename=None,
-                      plugin_injection=None, bundle_path=None):
+                      plugin_injection=None, bundle_path=None,
+                      ign_visualizer=None):
     """
     Launches the project's visualizer with a given layout and using the
     given bundled package, if any.
     """
-    ign_visualizer = "visualizer0"
+    if ign_visualizer is None:
+        ign_visualizer = "visualizer"
     ign_visualizer_args = []
     if layout_filename:
         layout_key = "--layout="

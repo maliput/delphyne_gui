@@ -240,7 +240,7 @@ target_link_libraries(visualizer
 install(
   TARGETS visualizer
   EXPORT ${PROJECT_NAME}-targets
-  DESTINATION ${BIN_INSTALL_DIR}/${PROJECT_NAME}
+  DESTINATION ${BIN_INSTALL_DIR}
 )
 
 # Install .config files.

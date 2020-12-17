@@ -223,12 +223,12 @@ include_directories(
   ${CMAKE_SOURCE_DIR}
 )
 
-# Visualizer
-add_executable(visualizer
-  visualizer.cc
+# Visualizer with ign-gui0
+add_executable(visualizer0
+  visualizer0.cc
 )
 
-target_link_libraries(visualizer
+target_link_libraries(visualizer0
   ignition-common3::ignition-common3
   ignition-gui0::ignition-gui0
   ${Qt5Core_LIBRARIES}
@@ -238,7 +238,7 @@ target_link_libraries(visualizer
 )
 
 install(
-  TARGETS visualizer
+  TARGETS visualizer0
   EXPORT ${PROJECT_NAME}-targets
   DESTINATION ${BIN_INSTALL_DIR}
 )

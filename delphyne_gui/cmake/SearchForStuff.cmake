@@ -44,7 +44,7 @@ else()
 endif()
 
 ########################################
-# Find ignition gui
+# Find ignition gui0
 find_package(ignition-gui0 0.1 QUIET)
 if (NOT ignition-gui0_FOUND)
   message(STATUS "Looking for ignition-gui0-config.cmake - not found")

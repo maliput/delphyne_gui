@@ -59,7 +59,7 @@ def launch_visualizer(launcher_manager, layout_filename=None,
     Launches the project's visualizer with a given layout and using the
     given bundled package, if any.
     """
-    ign_visualizer = "visualizer"
+    ign_visualizer = "visualizer0"
     ign_visualizer_args = []
     if layout_filename:
         layout_key = "--layout="

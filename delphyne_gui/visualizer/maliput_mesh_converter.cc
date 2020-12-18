@@ -106,7 +106,7 @@ std::unique_ptr<ignition::common::Mesh> Convert(const std::string& name, const G
   auto sub_mesh = std::make_unique<ignition::common::SubMesh>();
   sub_mesh->SetPrimitiveType(ignition::common::SubMesh::TRIANGLES);
 
-  auto geo_position_to_ign_vector = [](const maliput::api::GeoPosition& v) {
+  auto geo_position_to_ign_vector = [](const maliput::api::InertialPosition& v) {
     return ignition::math::Vector3d(v.x(), v.y(), v.z());
   };
 
@@ -134,7 +134,7 @@ std::unique_ptr<ignition::common::Mesh> Convert(const std::string& name, const G
     std::vector<std::tuple<ignition::math::Vector3d, int>> ordered_vertices_indices;
     for (const IndexFace::Vertex& ifv : index_face.vertices()) {
       // Sets the correct normal.
-      const maliput::api::GeoPosition normal = geo_mesh.get_normal(ifv.normal_index).n();
+      const maliput::api::InertialPosition normal = geo_mesh.get_normal(ifv.normal_index).n();
       sub_mesh->SetNormal(ifv.vertex_index, geo_position_to_ign_vector(normal));
       // Adds the vertices to the vector so we can later order them.
       ordered_vertices_indices.push_back(

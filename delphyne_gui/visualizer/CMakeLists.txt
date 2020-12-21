@@ -1,14 +1,14 @@
 include (${project_cmake_dir}/Utils.cmake)
 
 # ----------------------------------------
-# MaliputMesh library.
+# maliput_mesh library.
 add_library(maliput_mesh
   maliput_mesh_converter.cc
 )
 add_library(delphyne_gui::maliput_mesh ALIAS maliput_mesh)
 set_target_properties(maliput_mesh
   PROPERTIES
-    OUTPUT_NAME MaliputMesh
+    OUTPUT_NAME delphyne_gui_maliput_mesh
 )
 
 ament_target_dependencies(maliput_mesh
@@ -31,14 +31,14 @@ install(
   ARCHIVE DESTINATION lib
 )
 
-# GlobalAttributes library.
+# global_attributes library.
 add_library(global_attributes
   global_attributes.cc
 )
 add_library(delphyne_gui::global_attributes ALIAS global_attributes)
 set_target_properties(global_attributes
   PROPERTIES
-    OUTPUT_NAME GlobalAttributes
+    OUTPUT_NAME delphyne_gui_global_attributes
 )
 
 target_link_libraries(global_attributes

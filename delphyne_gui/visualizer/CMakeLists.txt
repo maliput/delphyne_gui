@@ -8,7 +8,7 @@ add_library(maliput_mesh
 add_library(delphyne_gui::maliput_mesh ALIAS maliput_mesh)
 set_target_properties(maliput_mesh
   PROPERTIES
-    OUTPUT_NAME delphyne_gui_maliput_mesh
+    OUTPUT_NAME MaliputMesh
 )
 
 ament_target_dependencies(maliput_mesh
@@ -38,7 +38,7 @@ add_library(global_attributes
 add_library(delphyne_gui::global_attributes ALIAS global_attributes)
 set_target_properties(global_attributes
   PROPERTIES
-    OUTPUT_NAME delphyne_gui_global_attributes
+    OUTPUT_NAME GlobalAttributes
 )
 
 target_link_libraries(global_attributes
@@ -78,7 +78,7 @@ add_library(maliput_viewer_widget
 add_library(delphyne_gui::maliput_viewer_widget ALIAS maliput_viewer_widget)
 set_target_properties(maliput_viewer_widget
   PROPERTIES
-    OUTPUT_NAME delphyne_gui_maliput_viewer_widget
+    OUTPUT_NAME MaliputViewerWidget
 )
 
 ament_target_dependencies(maliput_viewer_widget
@@ -123,7 +123,7 @@ add_library(render_widget
 add_library(delphyne_gui::render_widget ALIAS render_widget)
 set_target_properties(render_widget
   PROPERTIES
-    OUTPUT_NAME delphyne_gui_render_widget
+    OUTPUT_NAME RenderWidget
 )
 
 target_link_libraries(render_widget
@@ -156,7 +156,7 @@ add_library(teleop_widget
 add_library(delphyne_gui::teleop_widget ALIAS teleop_widget)
 set_target_properties(teleop_widget
   PROPERTIES
-    OUTPUT_NAME delphyne_gui_teleop_widget
+    OUTPUT_NAME TeleopWidget
 )
 
 target_link_libraries(teleop_widget
@@ -195,7 +195,7 @@ add_library(playback_widget
 add_library(delphyne_gui::playback_widget ALIAS playback_widget)
 set_target_properties(playback_widget
   PROPERTIES
-    OUTPUT_NAME delphyne_gui_playback_widget
+    OUTPUT_NAME PlaybackWidget
 )
 
 target_link_libraries(playback_widget

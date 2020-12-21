@@ -14,7 +14,7 @@ add_library(origin_display
 add_library(delphyne_gui::origin_display ALIAS origin_display)
 set_target_properties(origin_display
   PROPERTIES
-    OUTPUT_NAME delphyne_gui_origin_display
+    OUTPUT_NAME OriginDisplay
 )
 
 target_link_libraries(origin_display
@@ -45,7 +45,7 @@ add_library(agent_info_display
 add_library(delphyne_gui::agent_info_display ALIAS agent_info_display)
 set_target_properties(agent_info_display
   PROPERTIES
-    OUTPUT_NAME delphyne_gui_agent_info_display
+    OUTPUT_NAME AgentInfoDisplay
 )
 
 target_link_libraries(agent_info_display

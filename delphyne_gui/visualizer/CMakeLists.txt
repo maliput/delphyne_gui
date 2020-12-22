@@ -78,7 +78,7 @@ add_library(maliput_viewer_widget
 add_library(delphyne_gui::maliput_viewer_widget ALIAS maliput_viewer_widget)
 set_target_properties(maliput_viewer_widget
   PROPERTIES
-    OUTPUT_NAME MaliputViewerWidget
+    OUTPUT_NAME delphyne_gui_maliput_viewer_widget
 )
 
 ament_target_dependencies(maliput_viewer_widget
@@ -111,8 +111,6 @@ install(
 )
 
 # RenderWidget GUI plugin.
-set(render_widget RenderWidget)
-
 QT5_WRAP_CPP(RenderWidget_MOC render_widget.hh)
 
 add_library(render_widget
@@ -123,7 +121,7 @@ add_library(render_widget
 add_library(delphyne_gui::render_widget ALIAS render_widget)
 set_target_properties(render_widget
   PROPERTIES
-    OUTPUT_NAME RenderWidget
+    OUTPUT_NAME delphyne_gui_render_widget
 )
 
 target_link_libraries(render_widget
@@ -156,7 +154,7 @@ add_library(teleop_widget
 add_library(delphyne_gui::teleop_widget ALIAS teleop_widget)
 set_target_properties(teleop_widget
   PROPERTIES
-    OUTPUT_NAME TeleopWidget
+    OUTPUT_NAME delphyne_gui_teleop_widget
 )
 
 target_link_libraries(teleop_widget
@@ -195,7 +193,7 @@ add_library(playback_widget
 add_library(delphyne_gui::playback_widget ALIAS playback_widget)
 set_target_properties(playback_widget
   PROPERTIES
-    OUTPUT_NAME PlaybackWidget
+    OUTPUT_NAME delphyne_gui_playback_widget
 )
 
 target_link_libraries(playback_widget

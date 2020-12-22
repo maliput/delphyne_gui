@@ -14,7 +14,7 @@ add_library(origin_display
 add_library(delphyne_gui::origin_display ALIAS origin_display)
 set_target_properties(origin_display
   PROPERTIES
-    OUTPUT_NAME OriginDisplay
+    OUTPUT_NAME delphyne_gui_origin_display
 )
 
 target_link_libraries(origin_display
@@ -35,7 +35,7 @@ install(
   ARCHIVE DESTINATION lib
 )
 
-# Origin display plugin.
+# Agent Info display plugin.
 QT5_WRAP_CPP(AgentInfoDisplay_MOC agent_info_display.hh)
 
 add_library(agent_info_display
@@ -45,7 +45,7 @@ add_library(agent_info_display
 add_library(delphyne_gui::agent_info_display ALIAS agent_info_display)
 set_target_properties(agent_info_display
   PROPERTIES
-    OUTPUT_NAME AgentInfoDisplay
+    OUTPUT_NAME delphyne_gui_agent_info_display
 )
 
 target_link_libraries(agent_info_display

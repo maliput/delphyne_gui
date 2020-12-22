@@ -1,0 +1,9 @@
+#!/usr/bin/env python3
+#
+# Copyright 2020 Toyota Research Institute
+#
+
+import delphyne_demos.demos.trip_integration
+
+if __name__ == "__main__":
+    delphyne_demos.demos.trip_integration.main()

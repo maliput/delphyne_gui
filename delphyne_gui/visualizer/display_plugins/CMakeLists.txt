@@ -35,7 +35,7 @@ install(
   ARCHIVE DESTINATION lib
 )
 
-# Origin display plugin.
+# Agent Info display plugin.
 QT5_WRAP_CPP(AgentInfoDisplay_MOC agent_info_display.hh)
 
 add_library(agent_info_display

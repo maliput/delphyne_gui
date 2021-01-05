@@ -17,6 +17,7 @@ install(
     realtime.py
     roads.py
     scriptlets.py
+    trip_integration.py
   DESTINATION
     ${PYTHON_INSTALL_DIR}/delphyne_demos/demos
 )

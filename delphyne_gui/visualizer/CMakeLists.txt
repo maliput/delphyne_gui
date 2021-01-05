@@ -1,7 +1,7 @@
 include (${project_cmake_dir}/Utils.cmake)
 
 # ----------------------------------------
-# MaliputMesh library.
+# maliput_mesh library.
 add_library(maliput_mesh
   maliput_mesh_converter.cc
 )
@@ -31,7 +31,7 @@ install(
   ARCHIVE DESTINATION lib
 )
 
-# GlobalAttributes library.
+# global_attributes library.
 add_library(global_attributes
   global_attributes.cc
 )
@@ -111,8 +111,6 @@ install(
 )
 
 # RenderWidget GUI plugin.
-set(render_widget RenderWidget)
-
 QT5_WRAP_CPP(RenderWidget_MOC render_widget.hh)
 
 add_library(render_widget
@@ -240,7 +238,7 @@ target_link_libraries(visualizer
 install(
   TARGETS visualizer
   EXPORT ${PROJECT_NAME}-targets
-  DESTINATION ${BIN_INSTALL_DIR}/${PROJECT_NAME}
+  DESTINATION ${BIN_INSTALL_DIR}
 )
 
 # Install .config files.

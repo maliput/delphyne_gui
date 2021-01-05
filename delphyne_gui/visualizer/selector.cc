@@ -76,15 +76,15 @@ void Selector::SelectLane(const maliput::api::Lane* _lane) {
   const maliput::api::RBounds initialRBounds = _lane->lane_bounds(0.);
   const maliput::api::RBounds endRBounds = _lane->lane_bounds(max_s);
 
-  const maliput::api::GeoPosition initialRMinGeoPos =
-      _lane->ToGeoPosition(maliput::api::LanePosition(0., initialRBounds.min(), 0.));
-  const maliput::api::GeoPosition initialRMaxGeoPos =
-      _lane->ToGeoPosition(maliput::api::LanePosition(0., initialRBounds.max(), 0.));
+  const maliput::api::InertialPosition initialRMinInertialPos =
+      _lane->ToInertialPosition(maliput::api::LanePosition(0., initialRBounds.min(), 0.));
+  const maliput::api::InertialPosition initialRMaxInertialPos =
+      _lane->ToInertialPosition(maliput::api::LanePosition(0., initialRBounds.max(), 0.));
 
-  const maliput::api::GeoPosition endRMinGeoPos =
-      _lane->ToGeoPosition(maliput::api::LanePosition(max_s, endRBounds.min(), 0.));
-  const maliput::api::GeoPosition endRMaxGeoPos =
-      _lane->ToGeoPosition(maliput::api::LanePosition(max_s, endRBounds.max(), 0.));
+  const maliput::api::InertialPosition endRMinInertialPos =
+      _lane->ToInertialPosition(maliput::api::LanePosition(max_s, endRBounds.min(), 0.));
+  const maliput::api::InertialPosition endRMaxInertialPos =
+      _lane->ToInertialPosition(maliput::api::LanePosition(max_s, endRBounds.max(), 0.));
 
   // Find first empty slot of unused markers
   int slot = FindFirstEmpty();
@@ -103,21 +103,23 @@ void Selector::SelectLane(const maliput::api::Lane* _lane) {
   lanesSelected[laneId] = slot + 1;
 
   const unsigned int laneIndex = GetLaneIndex(slot);
-  cubes[laneIndex]->SetWorldPosition(initialRMinGeoPos.x(), initialRMinGeoPos.y(), initialRMinGeoPos.z());
+  cubes[laneIndex]->SetWorldPosition(initialRMinInertialPos.x(), initialRMinInertialPos.y(),
+                                     initialRMinInertialPos.z());
   cubes[laneIndex]->SetVisible(true);
-  cubes[laneIndex + 1]->SetWorldPosition(initialRMaxGeoPos.x(), initialRMaxGeoPos.y(), initialRMaxGeoPos.z());
+  cubes[laneIndex + 1]->SetWorldPosition(initialRMaxInertialPos.x(), initialRMaxInertialPos.y(),
+                                         initialRMaxInertialPos.z());
   cubes[laneIndex + 1]->SetVisible(true);
 
-  cubes[laneIndex + 2]->SetWorldPosition(endRMinGeoPos.x(), endRMinGeoPos.y(), endRMinGeoPos.z());
+  cubes[laneIndex + 2]->SetWorldPosition(endRMinInertialPos.x(), endRMinInertialPos.y(), endRMinInertialPos.z());
   cubes[laneIndex + 2]->SetVisible(true);
-  cubes[laneIndex + 3]->SetWorldPosition(endRMaxGeoPos.x(), endRMaxGeoPos.y(), endRMaxGeoPos.z());
+  cubes[laneIndex + 3]->SetWorldPosition(endRMaxInertialPos.x(), endRMaxInertialPos.y(), endRMaxInertialPos.z());
   cubes[laneIndex + 3]->SetVisible(true);
 
   int cubesUsed = GetCubeIndex(laneIndex);
   int remainingCubes = GetRemainingCubes();
-  MoveCubeAtMidPointInR(initialRMinGeoPos, initialRMaxGeoPos, &cubesUsed, &remainingCubes);
+  MoveCubeAtMidPointInR(initialRMinInertialPos, initialRMaxInertialPos, &cubesUsed, &remainingCubes);
 
-  MoveCubeAtMidPointInR(endRMinGeoPos, endRMaxGeoPos, &cubesUsed, &remainingCubes);
+  MoveCubeAtMidPointInR(endRMinInertialPos, endRMaxInertialPos, &cubesUsed, &remainingCubes);
 
   int cubesLeftSide = std::ceil(remainingCubes / 2);
   int cubesRightSide = remainingCubes - cubesLeftSide;
@@ -211,17 +213,18 @@ double Selector::GetNewToleranceToPopulateLane(double _laneLength, int _cubesUse
   return newToleranceForLaneSide < minTolerance ? minTolerance : newToleranceForLaneSide;
 }
 
-void Selector::MoveCubeAtMidPointInR(const maliput::api::GeoPosition& _minRGeoPos,
-                                     const maliput::api::GeoPosition& _maxRGeoPos, int* _cubesUsed,
+void Selector::MoveCubeAtMidPointInR(const maliput::api::InertialPosition& _minRInertialPos,
+                                     const maliput::api::InertialPosition& _maxRInertialPos, int* _cubesUsed,
                                      int* _maxAmountOfCubesToUse) {
-  maliput::api::GeoPosition midPoint = maliput::api::GeoPosition::FromXyz((_maxRGeoPos.xyz() + _minRGeoPos.xyz()) / 2);
-  if ((_maxRGeoPos - midPoint).length() > minTolerance && *_maxAmountOfCubesToUse != 0) {
+  maliput::api::InertialPosition midPoint =
+      maliput::api::InertialPosition::FromXyz((_maxRInertialPos.xyz() + _minRInertialPos.xyz()) / 2);
+  if ((_maxRInertialPos - midPoint).length() > minTolerance && *_maxAmountOfCubesToUse != 0) {
     cubes[*_cubesUsed]->SetWorldPosition(midPoint.x(), midPoint.y(), midPoint.z());
     cubes[*_cubesUsed]->SetVisible(true);
     ++(*_cubesUsed);
     --(*_maxAmountOfCubesToUse);
-    MoveCubeAtMidPointInR(_minRGeoPos, midPoint, _cubesUsed, _maxAmountOfCubesToUse);
-    MoveCubeAtMidPointInR(midPoint, _maxRGeoPos, _cubesUsed, _maxAmountOfCubesToUse);
+    MoveCubeAtMidPointInR(_minRInertialPos, midPoint, _cubesUsed, _maxAmountOfCubesToUse);
+    MoveCubeAtMidPointInR(midPoint, _maxRInertialPos, _cubesUsed, _maxAmountOfCubesToUse);
   }
 }
 
@@ -235,9 +238,12 @@ void Selector::MoveCubeAtMidPointInS(const maliput::api::Lane* _lane, double min
   const double r_mid_bound = _left_side ? midRBounds.min() : midRBounds.max();
   const double r_max_bound = _left_side ? maxRBounds.min() : maxRBounds.max();
 
-  const maliput::api::GeoPosition minPoint = _lane->ToGeoPosition(maliput::api::LanePosition(min_s, r_min_bound, 0.));
-  const maliput::api::GeoPosition midPoint = _lane->ToGeoPosition(maliput::api::LanePosition(mid_s, r_mid_bound, 0.));
-  const maliput::api::GeoPosition maxPoint = _lane->ToGeoPosition(maliput::api::LanePosition(max_s, r_max_bound, 0.));
+  const maliput::api::InertialPosition minPoint =
+      _lane->ToInertialPosition(maliput::api::LanePosition(min_s, r_min_bound, 0.));
+  const maliput::api::InertialPosition midPoint =
+      _lane->ToInertialPosition(maliput::api::LanePosition(mid_s, r_mid_bound, 0.));
+  const maliput::api::InertialPosition maxPoint =
+      _lane->ToInertialPosition(maliput::api::LanePosition(max_s, r_max_bound, 0.));
 
   if (!DoPointsViolateTolerance(midPoint, maxPoint) && !DoPointsViolateTolerance(midPoint, minPoint) &&
       *_maxAmountOfCubesToUse != 0) {
@@ -259,8 +265,8 @@ void Selector::SetVisibilityOfCubesStartingFromTo(int _startFrom, int _to, bool 
   }
 }
 
-bool Selector::DoPointsViolateTolerance(const maliput::api::GeoPosition& _first_point,
-                                        const maliput::api::GeoPosition& _second_point) {
+bool Selector::DoPointsViolateTolerance(const maliput::api::InertialPosition& _first_point,
+                                        const maliput::api::InertialPosition& _second_point) {
   return (_first_point - _second_point).length() < minTolerance;
 }
 

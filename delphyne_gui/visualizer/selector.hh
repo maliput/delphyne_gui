@@ -78,11 +78,12 @@ class Selector {
 
   /// \brief Sets cubes world position and rotation in the middle of two points considering only the r coordinate
   /// and assuming a straight line.
-  /// \param[in] _minRGeoPos World position of the left extreme point.
-  /// \param[in] _maxRGeoPos World position of the right extreme point.
+  /// \param[in] _minRInertialPos World position of the left extreme point.
+  /// \param[in] _maxRInertialPos World position of the right extreme point.
   /// \param[in] _maxAmountOfCubesToUse Amount permitted of cubes to place in the lane.
-  void MoveCubeAtMidPointInR(const maliput::api::GeoPosition& _minRGeoPos, const maliput::api::GeoPosition& _maxRGeoPos,
-                             int* _cubesUsed, int* _maxAmountOfCubesToUse);
+  void MoveCubeAtMidPointInR(const maliput::api::InertialPosition& _minRInertialPos,
+                             const maliput::api::InertialPosition& _maxRInertialPos, int* _cubesUsed,
+                             int* _maxAmountOfCubesToUse);
 
   /// \brief Sets cubes world position and rotation in the maximum given bound of a given lane for a given range in the
   /// s coordinate.
@@ -104,8 +105,8 @@ class Selector {
   /// \param[in] _first_point First point to verify distance.
   /// \param[in] _second_point Second point to verify distance.
   /// \returns Boolean that determines if the two points are close to each other.
-  bool DoPointsViolateTolerance(const maliput::api::GeoPosition& _first_point,
-                                const maliput::api::GeoPosition& _second_point);
+  bool DoPointsViolateTolerance(const maliput::api::InertialPosition& _first_point,
+                                const maliput::api::InertialPosition& _second_point);
 
   /// \brief Sets the complete segment population map to false, indicating no cube segments are currently in use
   void ResetPopulationMap();

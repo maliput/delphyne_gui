@@ -78,17 +78,17 @@ class RoadNetworkQuery {
     DELPHYNE_DEMAND(rn_ != nullptr);
   }
 
-  /// Redirects `geo_position` and `radius` to RoadGeometry::FindRoadPosition().
-  void FindRoadPositions(const maliput::api::GeoPosition& geo_position, double radius);
+  /// Redirects `inertial_position` and `radius` to RoadGeometry::FindRoadPosition().
+  void FindRoadPositions(const maliput::api::InertialPosition& inertial_position, double radius);
 
-  /// Redirects `lane_position` to `lane_id`'s Lane::ToGeoPosition().
-  void ToGeoPosition(const maliput::api::LaneId& lane_id, const maliput::api::LanePosition& lane_position);
+  /// Redirects `lane_position` to `lane_id`'s Lane::ToInertialPosition().
+  void ToInertialPosition(const maliput::api::LaneId& lane_id, const maliput::api::LanePosition& lane_position);
 
-  /// Redirects `geo_position` to `lane_id`'s Lane::ToLanePosition().
-  void ToLanePosition(const maliput::api::LaneId& lane_id, const maliput::api::GeoPosition& geo_position);
+  /// Redirects `inertial_position` to `lane_id`'s Lane::ToLanePosition().
+  void ToLanePosition(const maliput::api::LaneId& lane_id, const maliput::api::InertialPosition& inertial_position);
 
-  /// Redirects `geo_position` to RoadGeometry::ToRoadPosition().
-  void ToRoadPosition(const maliput::api::GeoPosition& geo_position);
+  /// Redirects `inertial_position` to RoadGeometry::ToRoadPosition().
+  void ToRoadPosition(const maliput::api::InertialPosition& inertial_position);
 
   /// Looks for all the maximum speed limits allowed at `lane_id`.
   void GetMaxSpeedLimit(const maliput::api::LaneId& lane_id);

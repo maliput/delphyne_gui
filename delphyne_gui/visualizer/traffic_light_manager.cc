@@ -196,7 +196,7 @@ void TrafficLightManager::RemoveBlinkingLight(const maliput::api::rules::UniqueB
 }
 
 void TrafficLightManager::CreateSingleTrafficLight(const maliput::api::rules::TrafficLight* _trafficLight) {
-  const maliput::api::GeoPosition& traffic_light_world_position = _trafficLight->position_road_network();
+  const maliput::api::InertialPosition& traffic_light_world_position = _trafficLight->position_road_network();
   const maliput::api::Rotation& traffic_light_world_rotation = _trafficLight->orientation_road_network();
 
   TrafficLightManager::TrafficLightMesh traffic_light_mesh;
@@ -210,10 +210,10 @@ void TrafficLightManager::CreateSingleTrafficLight(const maliput::api::rules::Tr
 }
 
 void TrafficLightManager::CreateBulbGroup(const maliput::api::rules::BulbGroup* _bulbGroup,
-                                          const maliput::api::GeoPosition& _trafficLightWorldPosition,
+                                          const maliput::api::InertialPosition& _trafficLightWorldPosition,
                                           const maliput::api::Rotation& _trafficLightWorldRotation,
                                           TrafficLightManager::TrafficLightMesh* _trafficLightMesh) {
-  const maliput::api::GeoPosition bulb_group_world_position =
+  const maliput::api::InertialPosition bulb_group_world_position =
       _trafficLightWorldPosition + _bulbGroup->position_traffic_light();
   const maliput::api::Rotation bulb_group_world_rotation = maliput::api::Rotation::FromQuat(
       _trafficLightWorldRotation.quat() * (_bulbGroup->orientation_traffic_light().quat()));
@@ -263,8 +263,8 @@ void TrafficLightManager::CreateBulbGroup(const maliput::api::rules::BulbGroup* 
 
 maliput::api::rules::Bulb::BoundingBox TrafficLightManager::CreateSingleBulb(
     const maliput::api::rules::UniqueBulbId& _uniqueBulbId, const maliput::api::rules::Bulb* _single_bulb,
-    const maliput::api::GeoPosition& _bulbGroupWorldPosition, const maliput::api::Rotation& _bulbGroupWorldRotation,
-    BulbMeshes* _bulbGroup) {
+    const maliput::api::InertialPosition& _bulbGroupWorldPosition,
+    const maliput::api::Rotation& _bulbGroupWorldRotation, BulbMeshes* _bulbGroup) {
   const maliput::api::rules::Bulb::BoundingBox& bb = _single_bulb->bounding_box();
   // Bulb's bounding box is in terms of 1 meter per unit coordinate. We consider that this bounding box is
   // symmetric and will be used as a scale vector to set the proper size of the bulb in the visualizer.
@@ -312,7 +312,8 @@ maliput::api::rules::Bulb::BoundingBox TrafficLightManager::CreateSingleBulb(
   bulb_world_bounding_box.p_BMax.z() = world_bounding_box_max.Z() * std::abs(max_scale.z());
 
   visual->SetWorldScale(max_scale.x(), max_scale.y(), max_scale.z());
-  const maliput::api::GeoPosition bulb_world_position = _bulbGroupWorldPosition + _single_bulb->position_bulb_group();
+  const maliput::api::InertialPosition bulb_world_position =
+      _bulbGroupWorldPosition + _single_bulb->position_bulb_group();
   visual->SetWorldRotation(bulb_rotation.roll(), bulb_rotation.pitch(), bulb_rotation.yaw());
   visual->SetWorldPosition(bulb_world_position.x(), bulb_world_position.y(), bulb_world_position.z());
   SetBulbMaterial(_uniqueBulbId, visual, _single_bulb->color(), _single_bulb->GetDefaultState());

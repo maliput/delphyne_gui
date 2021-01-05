@@ -55,7 +55,7 @@ MOBIL controlled cars running in a closed-loop maliput road.
 ##############################################################################
 
 
-def lane_position_to_geo_pose2d(road_geometry, lane_id, lane_position):
+def lane_position_to_inertial_pose2d(road_geometry, lane_id, lane_position):
 
     from delphyne.blackboard.providers import resolve
     lane_id = resolve(lane_id, road_geometry)
@@ -63,10 +63,10 @@ def lane_position_to_geo_pose2d(road_geometry, lane_id, lane_position):
 
     road_index = road_geometry.ById()
     lane = road_index.GetLane(lane_id)
-    geo_position = lane.ToGeoPosition(lane_position)
-    geo_orientation = lane.GetOrientation(lane_position)
-    initial_x, initial_y, _ = geo_position.xyz()
-    initial_heading = geo_orientation.rpy().yaw_angle()
+    inertial_position = lane.ToInertialPosition(lane_position)
+    inertial_orientation = lane.GetOrientation(lane_position)
+    initial_x, initial_y, _ = inertial_position.xyz()
+    initial_heading = inertial_orientation.rpy().yaw_angle()
     return initial_x, initial_y, initial_heading
 
 
@@ -111,7 +111,7 @@ def create_city_scenario_subtree(num_rail_cars, num_mobil_cars):
                 name='mobil{}'.format(m),
                 speed=mobilcar_speed,
                 initial_pose=functools.partial(
-                    lane_position_to_geo_pose2d,
+                    lane_position_to_inertial_pose2d,
                     lane_id=provider.random_lane,
                     lane_position=provider.random_lane_position
                 )

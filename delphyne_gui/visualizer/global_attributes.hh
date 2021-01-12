@@ -30,7 +30,7 @@ class GlobalAttributes {
   /// \throws std::runtime_error When key or value any item of @p argv are empty
   /// strings.
  public:
-  static void ParseArguments(int argc, const char** argv);
+  static void ParseArguments(int argc, const char* const* argv);
 
   /// \brief Query the @p key existence.
   /// \param[in] key A string to index the value.

@@ -68,7 +68,7 @@ std::pair<std::string, std::string> ExtractKeyAndValue(const std::string& arg) {
 
 std::map<std::string, std::string> GlobalAttributes::globalAttributes;
 
-void GlobalAttributes::ParseArguments(int argc, const char** argv) {
+void GlobalAttributes::ParseArguments(int argc, const char* const* argv) {
   if (argc < 0) {
     ignerr << "argc should be positive.\n";
     throw std::runtime_error("argc should be positive.");

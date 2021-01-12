@@ -55,7 +55,5 @@ int main(int _argc, char** _argv) {
   // Run window
   app.exec();
 
-  std::cout << "After run" << std::endl;
-
   return 0;
 }

@@ -105,19 +105,19 @@ std::ostream& operator<<(std::ostream& out, const maliput::api::rules::RightOfWa
 }
 
 /////////////////////////////////////////////////
-void RoadNetworkQuery::FindRoadPositions(const maliput::api::GeoPosition& geo_position, double radius) {
+void RoadNetworkQuery::FindRoadPositions(const maliput::api::InertialPosition& inertial_position, double radius) {
   const std::vector<maliput::api::RoadPositionResult> results =
-      rn_->road_geometry()->FindRoadPositions(geo_position, radius);
+      rn_->road_geometry()->FindRoadPositions(inertial_position, radius);
 
-  (*out_) << "FindRoadPositions(geo_position:" << geo_position << ", radius: " << radius << ")" << std::endl;
+  (*out_) << "FindRoadPositions(inertial_position:" << inertial_position << ", radius: " << radius << ")" << std::endl;
   for (const maliput::api::RoadPositionResult& result : results) {
     (*out_) << "              : Result: " << result << std::endl;
   }
 }
 
 /////////////////////////////////////////////////
-void RoadNetworkQuery::ToGeoPosition(const maliput::api::LaneId& lane_id,
-                                     const maliput::api::LanePosition& lane_position) {
+void RoadNetworkQuery::ToInertialPosition(const maliput::api::LaneId& lane_id,
+                                          const maliput::api::LanePosition& lane_position) {
   const maliput::api::Lane* lane = rn_->road_geometry()->ById().GetLane(lane_id);
 
   if (lane == nullptr) {
@@ -125,39 +125,40 @@ void RoadNetworkQuery::ToGeoPosition(const maliput::api::LaneId& lane_id,
     return;
   }
 
-  const maliput::api::GeoPosition geo_position = lane->ToGeoPosition(lane_position);
+  const maliput::api::InertialPosition inertial_position = lane->ToInertialPosition(lane_position);
 
-  (*out_) << "(" << lane_id.string() << ")->ToGeoPosition(lane_position: " << lane_position << ")" << std::endl;
-  (*out_) << "              : Result: geo_position:" << geo_position << std::endl;
+  (*out_) << "(" << lane_id.string() << ")->ToInertialPosition(lane_position: " << lane_position << ")" << std::endl;
+  (*out_) << "              : Result: inertial_position:" << inertial_position << std::endl;
 
-  const maliput::api::RoadPositionResult result = rn_->road_geometry()->ToRoadPosition(geo_position);
+  const maliput::api::RoadPositionResult result = rn_->road_geometry()->ToRoadPosition(inertial_position);
 
-  (*out_) << "              : Result round_trip geo_position" << result.nearest_position
+  (*out_) << "              : Result round_trip inertial_position" << result.nearest_position
           << ", with distance: " << result.distance << std::endl;
   (*out_) << "              : RoadPosition: " << result.road_position << std::endl;
 }
 
 /////////////////////////////////////////////////
 void RoadNetworkQuery::ToLanePosition(const maliput::api::LaneId& lane_id,
-                                      const maliput::api::GeoPosition& geo_position) {
+                                      const maliput::api::InertialPosition& inertial_position) {
   const maliput::api::Lane* lane = rn_->road_geometry()->ById().GetLane(lane_id);
   if (lane == nullptr) {
     (*out_) << "              : Result: Could not find lane. " << std::endl;
     return;
   }
 
-  const maliput::api::LanePositionResult result = lane->ToLanePosition(geo_position);
+  const maliput::api::LanePositionResult result = lane->ToLanePosition(inertial_position);
 
-  (*out_) << "(" << lane_id.string() << ")->ToLanePosition(geo_position: " << geo_position << ")" << std::endl;
+  (*out_) << "(" << lane_id.string() << ")->ToLanePosition(inertial_position: " << inertial_position << ")"
+          << std::endl;
   (*out_) << "              : Result: lane_pos:" << result.lane_position << ", nearest_pos: " << result.nearest_position
           << ", with distance: " << result.distance << std::endl;
 }
 
 /////////////////////////////////////////////////
-void RoadNetworkQuery::ToRoadPosition(const maliput::api::GeoPosition& geo_position) {
-  const maliput::api::RoadPositionResult result = rn_->road_geometry()->ToRoadPosition(geo_position, std::nullopt);
+void RoadNetworkQuery::ToRoadPosition(const maliput::api::InertialPosition& inertial_position) {
+  const maliput::api::RoadPositionResult result = rn_->road_geometry()->ToRoadPosition(inertial_position, std::nullopt);
 
-  (*out_) << "ToRoadPosition(geo_position: " << geo_position << ")" << std::endl;
+  (*out_) << "ToRoadPosition(inertial_position: " << inertial_position << ")" << std::endl;
   (*out_) << "              : Result: nearest_pos:" << result.nearest_position << " with distance: " << result.distance
           << std::endl;
   (*out_) << "                RoadPosition: " << result.road_position << std::endl;
@@ -503,7 +504,7 @@ static const double kBranchPointHeightOffset{3.};
 // @p laneEnd.lane at @p laneEnd.end extent.
 ignition::math::Vector3d LaneEndWorldPosition(const maliput::api::LaneEnd& laneEnd) {
   const double s_position = laneEnd.end == maliput::api::LaneEnd::Which::kStart ? 0. : laneEnd.lane->length();
-  const maliput::api::GeoPosition position = laneEnd.lane->ToGeoPosition({s_position, 0., 0.});
+  const maliput::api::InertialPosition position = laneEnd.lane->ToInertialPosition({s_position, 0., 0.});
   return {position.x(), position.y(), position.z() + kBranchPointHeightOffset};
 }
 
@@ -534,7 +535,7 @@ MaliputLabel LabelFor(const maliput::api::BranchPoint& bp) {
 MaliputLabel LabelFor(const maliput::api::Lane& lane) {
   MaliputLabel label;
   label.text = lane.id().string();
-  const maliput::api::GeoPosition position = lane.ToGeoPosition({lane.length() / 2., 0., 0.});
+  const maliput::api::InertialPosition position = lane.ToInertialPosition({lane.length() / 2., 0., 0.});
   label.position.Set(position.x(), position.y(), position.z() + kLaneHeightOffset);
   label.labelType = MaliputLabelType::kLane;
   return label;
@@ -594,8 +595,8 @@ const maliput::api::Lane* MaliputViewerModel::GetLaneFromWorldPosition(const ign
   const maliput::api::RoadGeometry* rg =
       this->roadGeometry ? this->roadGeometry.get() : this->roadNetwork->road_geometry();
   DELPHYNE_DEMAND(rg != nullptr);
-  const maliput::api::GeoPosition geo_pos(_position.X(), _position.Y(), _position.Z());
-  return rg->ToRoadPosition(geo_pos).road_position.lane;
+  const maliput::api::InertialPosition inertial_pos(_position.X(), _position.Y(), _position.Z());
+  return rg->ToRoadPosition(inertial_pos).road_position.lane;
 }
 
 ///////////////////////////////////////////////////////

@@ -64,4 +64,7 @@ def create_argument_parser(title, content, default_duration=-1.0):
     parser.add_argument('-b', '--bare', action='store_true',
                         default=False, help=('Run simulation with no '
                                              'visualizer (default: False)'))
+    parser.add_argument('-y', '--layout', default="layout_with_teleop.config",
+                        action='store', type=str,
+                        help='Custom layout config file (default: layout_with_teleop.config)')
     return parser

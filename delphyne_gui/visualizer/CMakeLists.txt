@@ -1,14 +1,14 @@
 include (${project_cmake_dir}/Utils.cmake)
 
 # ----------------------------------------
-# MaliputMesh library.
+# maliput_mesh library.
 add_library(maliput_mesh
   maliput_mesh_converter.cc
 )
 add_library(delphyne_gui::maliput_mesh ALIAS maliput_mesh)
 set_target_properties(maliput_mesh
   PROPERTIES
-    OUTPUT_NAME MaliputMesh
+    OUTPUT_NAME delphyne_gui_maliput_mesh
 )
 
 ament_target_dependencies(maliput_mesh
@@ -31,14 +31,14 @@ install(
   ARCHIVE DESTINATION lib
 )
 
-# GlobalAttributes library.
+# global_attributes library.
 add_library(global_attributes
   global_attributes.cc
 )
 add_library(delphyne_gui::global_attributes ALIAS global_attributes)
 set_target_properties(global_attributes
   PROPERTIES
-    OUTPUT_NAME GlobalAttributes
+    OUTPUT_NAME delphyne_gui_global_attributes
 )
 
 target_link_libraries(global_attributes
@@ -78,7 +78,7 @@ add_library(maliput_viewer_widget
 add_library(delphyne_gui::maliput_viewer_widget ALIAS maliput_viewer_widget)
 set_target_properties(maliput_viewer_widget
   PROPERTIES
-    OUTPUT_NAME MaliputViewerWidget
+    OUTPUT_NAME delphyne_gui_maliput_viewer_widget
 )
 
 ament_target_dependencies(maliput_viewer_widget
@@ -111,8 +111,6 @@ install(
 )
 
 # RenderWidget GUI plugin.
-set(render_widget RenderWidget)
-
 QT5_WRAP_CPP(RenderWidget_MOC render_widget.hh)
 
 add_library(render_widget
@@ -123,7 +121,7 @@ add_library(render_widget
 add_library(delphyne_gui::render_widget ALIAS render_widget)
 set_target_properties(render_widget
   PROPERTIES
-    OUTPUT_NAME RenderWidget
+    OUTPUT_NAME delphyne_gui_render_widget
 )
 
 target_link_libraries(render_widget
@@ -156,7 +154,7 @@ add_library(teleop_widget
 add_library(delphyne_gui::teleop_widget ALIAS teleop_widget)
 set_target_properties(teleop_widget
   PROPERTIES
-    OUTPUT_NAME TeleopWidget
+    OUTPUT_NAME delphyne_gui_teleop_widget
 )
 
 target_link_libraries(teleop_widget
@@ -195,7 +193,7 @@ add_library(playback_widget
 add_library(delphyne_gui::playback_widget ALIAS playback_widget)
 set_target_properties(playback_widget
   PROPERTIES
-    OUTPUT_NAME PlaybackWidget
+    OUTPUT_NAME delphyne_gui_playback_widget
 )
 
 target_link_libraries(playback_widget

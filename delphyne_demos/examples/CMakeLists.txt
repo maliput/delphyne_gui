@@ -18,6 +18,7 @@ install(
     delphyne_realtime
     delphyne_roads
     delphyne_scriptlets
+    delphyne_trip_integration
   DESTINATION
     bin
 )

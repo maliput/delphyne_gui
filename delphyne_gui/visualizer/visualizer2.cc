@@ -21,14 +21,16 @@ namespace visualizer {
 namespace {
 
 /// Constants.
-static const char versionStr[] = "Visualizer 0.2.0";
-static const std::string initialConfigFile =
-    ignition::common::joinPaths(DELPHYNE_INITIAL_CONFIG_PATH, "layout2_with_teleop.config");
+constexpr char kVersionStr[] = "Visualizer 0.2.0";
+constexpr char kDefaultLayout[] = "layout2_with_teleop.config";
 
 /////////////////////////////////////////////////
 int Main(int argc, char** argv) {
+  static const std::string initialConfigFile =
+      ignition::common::joinPaths(DELPHYNE_INITIAL_CONFIG_PATH, kDefaultLayout);
+
   ignition::common::Console::SetVerbosity(3);
-  ignmsg << versionStr << std::endl;
+  ignmsg << kVersionStr << std::endl;
 
   if (argc > 1) {
     delphyne::gui::GlobalAttributes::ParseArguments(argc - 1, &(argv[1]));
@@ -38,7 +40,7 @@ int Main(int argc, char** argv) {
   // python), we need to ensure that it's not using a block buffer
   // to display everything that goes to the stdout in realtime.
   if (delphyne::gui::GlobalAttributes::HasArgument("use-line-buffer")) {
-    std::string use_line_buffer_arg = delphyne::gui::GlobalAttributes::GetArgument("use-line-buffer");
+    const std::string use_line_buffer_arg = delphyne::gui::GlobalAttributes::GetArgument("use-line-buffer");
     if (use_line_buffer_arg == "yes") {
       setlinebuf(stdout);
     }

@@ -65,8 +65,6 @@ int main(int argc, const char* argv[]) {
     package_manager->Use(std::make_unique<delphyne::utility::SystemPackage>());
   }
 
-  Q_INIT_RESOURCE(resources);
-
   // Initialize app
   ignition::gui::initApp();
 

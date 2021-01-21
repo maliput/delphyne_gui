@@ -16,18 +16,22 @@
 
 #include "global_attributes.hh"
 
+namespace delphyne_gui {
+namespace visualizer {
+namespace {
+
 /// Constants.
 static const char versionStr[] = "Visualizer 0.2.0";
 static const std::string initialConfigFile =
     ignition::common::joinPaths(DELPHYNE_INITIAL_CONFIG_PATH, "layout2_with_teleop.config");
 
 /////////////////////////////////////////////////
-int main(int _argc, char** _argv) {
+int Main(int argc, char** argv) {
   ignition::common::Console::SetVerbosity(3);
   ignmsg << versionStr << std::endl;
 
-  if (_argc > 1) {
-    delphyne::gui::GlobalAttributes::ParseArguments(_argc - 1, &(_argv[1]));
+  if (argc > 1) {
+    delphyne::gui::GlobalAttributes::ParseArguments(argc - 1, &(argv[1]));
   }
 
   // If we run the visualizer as a child process (like a demo written in
@@ -41,7 +45,7 @@ int main(int _argc, char** _argv) {
   }
 
   // Create app
-  ignition::gui::Application app(_argc, _argv);
+  ignition::gui::Application app(argc, argv);
 
   // Load plugins / config
   if (!app.LoadConfig(initialConfigFile)) {
@@ -57,3 +61,9 @@ int main(int _argc, char** _argv) {
 
   return 0;
 }
+
+}  // namespace
+}  // namespace visualizer
+}  // namespace delphyne_gui
+
+int main(int argc, char** argv) { return delphyne_gui::visualizer::Main(argc, argv); }

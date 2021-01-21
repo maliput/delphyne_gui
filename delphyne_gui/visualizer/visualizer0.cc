@@ -21,6 +21,10 @@
 
 #include "global_attributes.hh"
 
+namespace delphyne_gui {
+namespace visualizer {
+namespace {
+
 /// Constants.
 static const char versionStr[] = "Visualizer 0.1.0";
 static const std::string initialConfigFile =
@@ -38,7 +42,7 @@ std::string defaultConfigPath() {
 }
 
 /////////////////////////////////////////////////
-int main(int argc, const char* argv[]) {
+int Main(int argc, const char* argv[]) {
   ignition::common::Console::SetVerbosity(3);
   ignmsg << versionStr << std::endl;
 
@@ -142,3 +146,9 @@ int main(int argc, const char* argv[]) {
 
   return 0;
 }
+
+}  // namespace
+}  // namespace visualizer
+}  // namespace delphyne_gui
+
+int main(int argc, const char* argv[]) { return delphyne_gui::visualizer::Main(argc, argv); }

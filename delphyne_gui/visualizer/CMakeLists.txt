@@ -221,14 +221,34 @@ include_directories(
   ${CMAKE_SOURCE_DIR}
 )
 
-# Visualizer
+# Visualizer with ign-gui0
+add_executable(visualizer0
+  visualizer0.cc
+)
+
+target_link_libraries(visualizer0
+  ignition-common3::ignition-common3
+  ignition-gui0::ignition-gui0
+  ${Qt5Core_LIBRARIES}
+  ${Qt5Widgets_LIBRARIES}
+  delphyne::utility
+  global_attributes
+)
+
+install(
+  TARGETS visualizer0
+  EXPORT ${PROJECT_NAME}-targets
+  DESTINATION ${BIN_INSTALL_DIR}
+)
+
+# Visualizer with ign-gui2
 add_executable(visualizer
-  visualizer.cc
+  visualizer2.cc
 )
 
 target_link_libraries(visualizer
   ignition-common3::ignition-common3
-  ignition-gui0::ignition-gui0
+  ignition-gui2::ignition-gui2
   ${Qt5Core_LIBRARIES}
   ${Qt5Widgets_LIBRARIES}
   delphyne::utility
@@ -248,6 +268,7 @@ install(
     layout_with_teleop.config
     layout_maliput_viewer.config
     layout_for_playback.config
+    layout2_with_teleop.config
   DESTINATION
     ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/delphyne/layouts
 )

@@ -44,13 +44,23 @@ else()
 endif()
 
 ########################################
-# Find ignition gui
+# Find ignition gui0
 find_package(ignition-gui0 0.1 QUIET)
 if (NOT ignition-gui0_FOUND)
   message(STATUS "Looking for ignition-gui0-config.cmake - not found")
   BUILD_ERROR ("Missing: Ignition gui0 library (libignition-gui0-dev).")
 else()
   message(STATUS "Looking for ignition-gui0-config.cmake - found")
+endif()
+
+########################################
+# Find ignition gui2
+find_package(ignition-gui2 QUIET)
+if (NOT ignition-gui2_FOUND)
+  message(STATUS "Looking for ignition-gui2-config.cmake - not found")
+  BUILD_ERROR ("Missing: Ignition gui2 library (libignition-gui2-dev).")
+else()
+  message(STATUS "Looking for ignition-gui2-config.cmake - found")
 endif()
 
 ########################################
@@ -88,6 +98,16 @@ endif()
 find_package (Qt5OpenGL)
 if (NOT Qt5OpenGL_FOUND)
   BUILD_ERROR("Missing: Qt5OpenGL")
+endif()
+
+find_package (Qt5Quick)
+if (NOT Qt5Quick_FOUND)
+  BUILD_ERROR("Missing: Qt5Quick")
+endif()
+
+find_package (Qt5QuickControls2)
+if (NOT Qt5QuickControls2_FOUND)
+  BUILD_ERROR("Missing: Qt5QuickControls2")
 endif()
 
 find_package (Qt5Test)

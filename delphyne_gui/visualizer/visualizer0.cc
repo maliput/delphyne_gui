@@ -21,10 +21,13 @@
 
 #include "global_attributes.hh"
 
+namespace delphyne_gui {
+namespace visualizer {
+namespace {
+
 /// Constants.
-static const char versionStr[] = "Visualizer 0.1.0";
-static const std::string initialConfigFile =
-    ignition::common::joinPaths(DELPHYNE_INITIAL_CONFIG_PATH, "layout_with_teleop.config");
+constexpr char kVersionStr[] = "Visualizer 0.1.0";
+constexpr char kDefaultLayout[] = "layout2_with_teleop.config";
 
 /////////////////////////////////////////////////
 /// \brief Get the path of the default configuration file for Delphyne.
@@ -38,9 +41,12 @@ std::string defaultConfigPath() {
 }
 
 /////////////////////////////////////////////////
-int main(int argc, const char* argv[]) {
+int Main(int argc, const char* argv[]) {
+  static const std::string initialConfigFile =
+      ignition::common::joinPaths(DELPHYNE_INITIAL_CONFIG_PATH, kDefaultLayout);
+
   ignition::common::Console::SetVerbosity(3);
-  ignmsg << versionStr << std::endl;
+  ignmsg << kVersionStr << std::endl;
 
   if (argc > 1) {
     delphyne::gui::GlobalAttributes::ParseArguments(argc - 1, &(argv[1]));
@@ -50,7 +56,7 @@ int main(int argc, const char* argv[]) {
   // python), we need to ensure that it's not using a block buffer
   // to display everything that goes to the stdout in realtime.
   if (delphyne::gui::GlobalAttributes::HasArgument("use-line-buffer")) {
-    std::string use_line_buffer_arg = delphyne::gui::GlobalAttributes::GetArgument("use-line-buffer");
+    const std::string use_line_buffer_arg = delphyne::gui::GlobalAttributes::GetArgument("use-line-buffer");
     if (use_line_buffer_arg == "yes") {
       setlinebuf(stdout);
     }
@@ -64,8 +70,6 @@ int main(int argc, const char* argv[]) {
   } else {
     package_manager->Use(std::make_unique<delphyne::utility::SystemPackage>());
   }
-
-  Q_INIT_RESOURCE(resources);
 
   // Initialize app
   ignition::gui::initApp();
@@ -113,7 +117,7 @@ int main(int argc, const char* argv[]) {
   ignition::gui::createMainWindow();
 
   auto win = ignition::gui::mainWindow();
-  win->setWindowTitle(versionStr);
+  win->setWindowTitle(kVersionStr);
 
   for (auto pluginInjectionEntry : pluginInjectionList) {
     const std::string& receiverPluginName = std::get<0>(pluginInjectionEntry);
@@ -144,3 +148,9 @@ int main(int argc, const char* argv[]) {
 
   return 0;
 }
+
+}  // namespace
+}  // namespace visualizer
+}  // namespace delphyne_gui
+
+int main(int argc, const char* argv[]) { return delphyne_gui::visualizer::Main(argc, argv); }

@@ -133,6 +133,7 @@ def main():
             if not args.bare:
                 delphyne_gui.utilities.launch_visualizer(
                     launch_manager, bundle_path=bundle_path,
+                    ign_visualizer="visualizer0",
                     # Injects PlaybackWidget below RenderWidget
                     # if the former is not present in the layout.
                     plugin_injection="RenderWidget/PlaybackWidget"

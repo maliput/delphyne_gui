@@ -134,13 +134,14 @@ KNOWN_ROADS = {
         'moving_forward': True,
         'linear_tolerance': 1e-3,
     },
-    'RRFigure8': {
-        'description': '8-shaped road ',
-        'lane_id': '1_0_1',
-        'lane_position': 0.,
-        'moving_forward': True,
-        'linear_tolerance': 5e-2,
-    },
+    # TODO(maliput_malidrive#6): Restore once we have the right tolerance value.
+    # 'RRFigure8': {
+    #     'description': '8-shaped road ',
+    #     'lane_id': '1_0_1',
+    #     'lane_position': 0.,
+    #     'moving_forward': True,
+    #     'linear_tolerance': 2e-1,
+    # },
     'Town01': {
         'description': 'Grid city',
         'lane_id': '25_0_-1',
@@ -155,13 +156,14 @@ KNOWN_ROADS = {
         'moving_forward': True,
         'linear_tolerance': 5e-2,
     },
-    'Town03': {
-        'description': 'Grid city',
-        'lane_id': '352_1_-1',
-        'lane_position': 0.,
-        'moving_forward': True,
-        'linear_tolerance': 5e-2,
-    },
+    # TODO(maliput_malidrive#6): Restore once we have the right tolerance value.
+    # 'Town03': {
+    #    'description': 'Grid city',
+    #    'lane_id': '352_1_-1',
+    #    'lane_position': 0.,
+    #    'moving_forward': True,
+    #    'linear_tolerance': 5e-2,
+    #},
     'Town04': {
         'description': 'Grid city',
         'lane_id': '735_0_-4',

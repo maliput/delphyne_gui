@@ -97,6 +97,7 @@ $ {0} malidrive
 # Main
 ##############################################################################
 
+
 def main():
     """Keeping pylint entertained."""
     args = parse_arguments()

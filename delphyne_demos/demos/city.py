@@ -12,7 +12,6 @@ The city demo.
 
 import functools
 import os.path
-import random
 import sys
 
 import delphyne.trees
@@ -81,7 +80,6 @@ def create_city_scenario_subtree(num_rail_cars, num_mobil_cars):
               .format(os.path.abspath(file_path)))
         sys.exit()
 
-
     scenario_subtree = delphyne.behaviours.roads.Multilane(
         file_path=file_path, name="little_city"
     )
@@ -91,7 +89,6 @@ def create_city_scenario_subtree(num_rail_cars, num_mobil_cars):
     )
 
     # Sets up all railcars.
-    railcar_speed = 5.0  # (m/s)
     for n in range(num_rail_cars):
         scenario_subtree.add_child(
             delphyne.behaviours.agents.RailCar(

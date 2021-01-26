@@ -71,6 +71,7 @@ to `1.6` to depict how dynamic real-time rate impacts on the simulation.
         """.format(os.path.basename(sys.argv[0])))
     return parser.parse_args()
 
+
 def create_realtime_scenario_subtree():
     scenario_subtree = delphyne.behaviours.roads.Road()
     scenario_subtree.add_child(

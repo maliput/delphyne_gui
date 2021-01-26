@@ -163,7 +163,7 @@ KNOWN_ROADS = {
     #    'lane_position': 0.,
     #    'moving_forward': True,
     #    'linear_tolerance': 5e-2,
-    #},
+    # },
     'Town04': {
         'description': 'Grid city',
         'lane_id': '735_0_-4',
@@ -288,7 +288,8 @@ def main():
     if 'lane_id' in road:
         lane_id = road['lane_id']
     else:
-        lane_provider = delphyne.blackboard.providers.LaneLocationProvider(distance_between_agents=1.0)
+        lane_provider =                                                                    \
+            delphyne.blackboard.providers.LaneLocationProvider(distance_between_agents=1.0)
         lane_id = lane_provider.random_lane
 
     features = delphyne_roads.ObjFeatures()
@@ -300,7 +301,8 @@ def main():
 
     simulation_tree = delphyne.trees.BehaviourTree(
         root=create_mali_scenario_subtree(road['file_path'], features,
-            road['lane_position'], road['moving_forward'], lane_id, road['linear_tolerance']))
+                                          road['lane_position'], road['moving_forward'],
+                                          lane_id, road['linear_tolerance']))
 
     sim_runner_time_step = 0.015
     simulation_tree.setup(

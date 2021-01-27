@@ -11,6 +11,8 @@
   <exec_depend>delphyne_gui</exec_depend>
   <exec_depend>ament_cmake</exec_depend>
 
+  <test_depend>ament_cmake_flake8</test_depend>
+
   <export>
     <build_type>ament_cmake</build_type>
   </export>

@@ -8,6 +8,7 @@
 ##############################################################################
 
 import os
+import sys
 import time
 
 import delphyne.utilities

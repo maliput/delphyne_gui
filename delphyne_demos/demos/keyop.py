@@ -15,7 +15,6 @@ from select import select
 import atexit
 import sys
 import termios
-import time
 
 import delphyne.trees
 import delphyne.behaviours
@@ -113,6 +112,7 @@ keyboard on the GUI's teleop widget. In the console, we can toggle
         )
     return parser.parse_args()
 
+
 def create_scenario_subtree():
     scenario_subtree = delphyne.behaviours.roads.Road()
     scenario_subtree.add_child(
@@ -143,7 +143,8 @@ def main():
 
     keyboard = KeyboardHandler()
 
-    # We add it as a step callback because the runner gets stuck in a while loop until it's unpaused.
+    # We add it as a step callback because the runner
+    # gets stuck in a while loop until it's unpaused.
     # See simulation_runner.cc line 185 at delphyne's repository.
     simulation_tree.runner.add_step_callback(
         lambda: demo_callback(simulation_tree, keyboard,

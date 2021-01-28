@@ -27,7 +27,7 @@ namespace {
 
 /// Constants.
 constexpr char kVersionStr[] = "Visualizer 0.1.0";
-constexpr char kDefaultLayout[] = "layout2_with_teleop.config";
+constexpr char kDefaultLayout[] = "layout_with_teleop.config";
 
 /////////////////////////////////////////////////
 /// \brief Get the path of the default configuration file for Delphyne.

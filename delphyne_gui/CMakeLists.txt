@@ -251,8 +251,10 @@ add_subdirectory(python)
 ament_environment_hooks(setup.sh.in)
 
 #################################################
-# Installs maliput_viewer.sh as a shortcut to run the visualizer.
-install (PROGRAMS tools/maliput_viewer.sh DESTINATION ${BIN_INSTALL_DIR})
+# Installs maliput_viewer0.sh and maliput_viewer2.sh as a shortcut to run both
+# visualizers.
+install (PROGRAMS tools/maliput_viewer0.sh DESTINATION ${BIN_INSTALL_DIR})
+install (PROGRAMS tools/maliput_viewer2.sh DESTINATION ${BIN_INSTALL_DIR})
 
 # Installs prereqs.
 install (PROGRAMS prereqs DESTINATION ${CMAKE_INSTALL_DATADIR})

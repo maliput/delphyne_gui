@@ -228,7 +228,9 @@ else (build_errors)
   add_subdirectory(visualizer)
   if (BUILD_TESTING)
     find_package(ament_cmake_clang_format REQUIRED)
+    find_package(ament_cmake_flake8 REQUIRED)
     add_subdirectory(test)
+    ament_flake8("--config" ${CMAKE_CURRENT_SOURCE_DIR}/.flake8)
     ament_clang_format(CONFIG_FILE ${CMAKE_CURRENT_SOURCE_DIR}/../.clang-format)
   endif()
 
@@ -249,8 +251,10 @@ add_subdirectory(python)
 ament_environment_hooks(setup.sh.in)
 
 #################################################
-# Installs maliput_viewer.sh as a shortcut to run the visualizer.
-install (PROGRAMS tools/maliput_viewer.sh DESTINATION ${BIN_INSTALL_DIR})
+# Installs maliput_viewer0.sh and maliput_viewer2.sh as a shortcut to run both
+# visualizers.
+install (PROGRAMS tools/maliput_viewer0.sh DESTINATION ${BIN_INSTALL_DIR})
+install (PROGRAMS tools/maliput_viewer2.sh DESTINATION ${BIN_INSTALL_DIR})
 
 # Installs prereqs.
 install (PROGRAMS prereqs DESTINATION ${CMAKE_INSTALL_DATADIR})

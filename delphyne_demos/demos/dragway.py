@@ -61,10 +61,10 @@ def create_dragway_scenario_subtree():
             times=[0.0, 5.0, 10.0, 15.0, 20.0],
             headings=[0.0, 0.0, 0.0, 0.0, 0.0],
             waypoints=[
-                [0.0,   -5.55, 0.0],  # pylint: disable=C0326
-                [10.0,  -5.55, 0.0],  # pylint: disable=C0326
-                [30.0,  -5.55, 0.0],  # pylint: disable=C0326
-                [60.0,  -5.55, 0.0],  # pylint: disable=C0326
+                [0.0,   -5.55, 0.0],  # noqa: E241
+                [10.0,  -5.55, 0.0],  # noqa: E241
+                [30.0,  -5.55, 0.0],  # noqa: E241
+                [60.0,  -5.55, 0.0],  # noqa: E241
                 [100.0, -5.55, 0.0]
             ]
         ),

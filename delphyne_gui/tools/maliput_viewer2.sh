@@ -28,9 +28,9 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-# Shortcut to run `visualizer` with the layout for the MaliputViewer.
+# Shortcut to run `visualizer0` with the layout for the MaliputViewer.
 # CLI arguments will be forwarded to `visualizer`.
 # It is assumed that the environment is already configured.
-visualizer \
+visualizer2 \
   --layout=${DELPHYNE_GUI_RESOURCE_ROOT}/layouts/layout_maliput_viewer.config \
   "$@"

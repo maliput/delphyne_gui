@@ -26,6 +26,16 @@ find_package(PythonInterp 3.6 REQUIRED)
 # Unfortunately no easy way to get site-packages / dist-packages
 set(PYTHON_INSTALL_DIR lib/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/site-packages)
 
+##############################################################################
+# Tests
+##############################################################################
+
+if(BUILD_TESTING)
+  find_package(ament_cmake_flake8 REQUIRED)
+  enable_testing()
+  ament_flake8("--config" ${CMAKE_CURRENT_SOURCE_DIR}/.flake8)
+endif()
+
 add_subdirectory(demos)
 add_subdirectory(examples)
 add_subdirectory(test)

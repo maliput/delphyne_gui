@@ -105,8 +105,8 @@ def create_gazoo_scenario_subtree(filename, mobil_cars_num):
                 name=str(robot_id),
                 initial_pose=(
                     -10.0 + x_offset * (1 + i / 3),
-                     0.0 + y_offset * (i % 3),
-                     0.0
+                    0.0 + y_offset * (i % 3),
+                    0.0
                 ),
                 speed=velocity_base * i
             )
@@ -143,7 +143,7 @@ def main():
         root=create_gazoo_scenario_subtree(filename, mobil_cars_num)
     )
 
-    sim_runner_time_step=0.015
+    sim_runner_time_step = 0.015
     simulation_tree.setup(
         realtime_rate=args.realtime_rate,
         start_paused=args.paused,

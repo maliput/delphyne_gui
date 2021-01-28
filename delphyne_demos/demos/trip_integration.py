@@ -15,7 +15,6 @@ from select import select
 import atexit
 import sys
 import termios
-import time
 
 import delphyne.trees
 import delphyne.behaviours
@@ -81,9 +80,9 @@ def parse_arguments():
     parser = helpers.create_argument_parser(
         "Keyboard teleop demo of a car with no physical constraints",
         """
-A simple demo for operating a very basic car obeying no phystical 
+A simple demo for operating a very basic car obeying no phystical
 constraints whatsoever.  The purpose is to demonstrate basic usage
-for further integration and as a starting point for integration with 
+for further integration and as a starting point for integration with
 other agent modeling frameworks.  The car can be operated using the
 <i>-<k>-<j>-<l> keys.
         """

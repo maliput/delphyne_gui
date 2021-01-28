@@ -132,8 +132,9 @@ class RenderWidget : public ignition::gui::Plugin {
 
  private:
   /// \brief Set the initial scene
-  /// \param[in] request The scene to be loaded
-  void OnSetScene(const ignition::msgs::Scene& request);
+  /// \param[in] reply The scene to be loaded
+  /// \param[in] result True if the scene request was successful, false otherwise
+  void OnSetScene(const ignition::msgs::Scene& reply, const bool result);
 
   /// \brief Internal method to create the render window the first time
   /// RenderWidget::showEvent is called.

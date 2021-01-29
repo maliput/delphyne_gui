@@ -157,11 +157,11 @@ KNOWN_ROADS = {
         'linear_tolerance': 5e-2,
     },
     'Town03': {
-       'description': 'Grid city',
-       'lane_id': '352_1_-1',
-       'lane_position': 0.,
-       'moving_forward': True,
-       'linear_tolerance': 2e-1,
+        'description': 'Grid city',
+        'lane_id': '352_1_-1',
+        'lane_position': 0.,
+        'moving_forward': True,
+        'linear_tolerance': 2e-1,
     },
     'Town04': {
         'description': 'Grid city',
@@ -298,11 +298,12 @@ def main():
     features.draw_lane_haze = False
     features.draw_branch_points = False
 
+    angular_tolerance = 1e-3 if 'angular_tolerance' not in road else road['angular_tolerance']
     simulation_tree = delphyne.trees.BehaviourTree(
         root=create_mali_scenario_subtree(road['file_path'], features,
-            road['lane_position'], road['moving_forward'], lane_id, road['linear_tolerance'],
-            angular_tolerance=1e-3 if 'angular_tolerance' not in road else road['angular_tolerance']))
-
+                                          road['lane_position'], road['moving_forward'],
+                                          lane_id, road['linear_tolerance'],
+                                          angular_tolerance=angular_tolerance))
 
     sim_runner_time_step = 0.015
     simulation_tree.setup(

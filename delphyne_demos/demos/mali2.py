@@ -134,14 +134,14 @@ KNOWN_ROADS = {
         'moving_forward': True,
         'linear_tolerance': 1e-3,
     },
-    # TODO(maliput_malidrive#6): Restore once we have the right tolerance value.
-    # 'RRFigure8': {
-    #     'description': '8-shaped road ',
-    #     'lane_id': '1_0_1',
-    #     'lane_position': 0.,
-    #     'moving_forward': True,
-    #     'linear_tolerance': 2e-1,
-    # },
+    'RRFigure8': {
+        'description': '8-shaped road ',
+        'lane_id': '1_0_1',
+        'lane_position': 0.,
+        'moving_forward': True,
+        'linear_tolerance': 3e-1,
+        'angular_tolerance': 3e-1,
+    },
     'Town01': {
         'description': 'Grid city',
         'lane_id': '25_0_-1',
@@ -156,14 +156,13 @@ KNOWN_ROADS = {
         'moving_forward': True,
         'linear_tolerance': 5e-2,
     },
-    # TODO(maliput_malidrive#6): Restore once we have the right tolerance value.
-    # 'Town03': {
-    #    'description': 'Grid city',
-    #    'lane_id': '352_1_-1',
-    #    'lane_position': 0.,
-    #    'moving_forward': True,
-    #    'linear_tolerance': 5e-2,
-    # },
+    'Town03': {
+        'description': 'Grid city',
+        'lane_id': '352_1_-1',
+        'lane_position': 0.,
+        'moving_forward': True,
+        'linear_tolerance': 2e-1,
+    },
     'Town04': {
         'description': 'Grid city',
         'lane_id': '735_0_-4',
@@ -299,10 +298,12 @@ def main():
     features.draw_lane_haze = False
     features.draw_branch_points = False
 
+    angular_tolerance = 1e-3 if 'angular_tolerance' not in road else road['angular_tolerance']
     simulation_tree = delphyne.trees.BehaviourTree(
         root=create_mali_scenario_subtree(road['file_path'], features,
                                           road['lane_position'], road['moving_forward'],
-                                          lane_id, road['linear_tolerance']))
+                                          lane_id, road['linear_tolerance'],
+                                          angular_tolerance=angular_tolerance))
 
     sim_runner_time_step = 0.015
     simulation_tree.setup(

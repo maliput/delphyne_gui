@@ -115,23 +115,8 @@ RenderWidget::RenderWidget(QWidget*) : Plugin(), initializedScene(false), engine
   QObject::connect(this, SIGNAL(NewDraw(const ignition::msgs::Model_V&)), this,
                    SLOT(UpdateScene(const ignition::msgs::Model_V&)));
 
-  // Setting up a unique-named service name
-  // i.e: Scene_8493201843;
-  int randomId = ignition::math::Rand::IntUniform(1, ignition::math::MAX_I32);
-  std::string sceneServiceName = "Scene_" + std::to_string(randomId);
-  sceneRequestMsg.set_response_topic(sceneServiceName);
-
-  // Advertise the service with the unique name generated above
-  if (!node.Advertise(sceneServiceName, &RenderWidget::OnSetScene, this)) {
-    ignerr << "Error advertising service [" << sceneServiceName << "]" << std::endl;
-  }
-
-  ignition::msgs::Boolean response;
-  unsigned int timeout = 100;
-  bool result;
-
-  // Request a scene to be published into the unique-named channel
-  this->node.Request("/get_scene", sceneRequestMsg, timeout, response, result);
+  // Request a scene
+  this->node.Request("/get_scene", &RenderWidget::OnSetScene, this);
 }
 
 /////////////////////////////////////////////////
@@ -239,7 +224,11 @@ std::string RenderWidget::ConfigStr() const {
 }
 
 /////////////////////////////////////////////////
-void RenderWidget::OnSetScene(const ignition::msgs::Scene& request) { emit this->NewInitialScene(request); }
+void RenderWidget::OnSetScene(const ignition::msgs::Scene& reply, const bool result) {
+  if (result) {
+    emit this->NewInitialScene(reply);
+  }
+}
 
 /////////////////////////////////////////////////
 void RenderWidget::OnUpdateScene(const ignition::msgs::Model_V& _msg) { emit this->NewDraw(_msg); }

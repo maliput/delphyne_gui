@@ -7,9 +7,7 @@
   <maintainer email="daniel.stonier@tri.global">Daniel Stonier</maintainer>
   <license file="../LICENSE">BSD 3-Clause</license>
 
-  <!-- Packages not present in rosdep DB -->
-  <build_depend>libqt5multimedia5</build_depend>
-
+  <build_depend>libqt5-multimedia</build_depend>
   <build_depend>libogre-dev</build_depend>
   <build_depend>libqt5-opengl-dev</build_depend>
   <build_depend>libqwt-qt5-dev</build_depend>

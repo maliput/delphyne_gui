@@ -379,13 +379,6 @@ ignition::rendering::VisualPtr RenderWidget::RenderMesh(const ignition::msgs::Vi
                                         std::max(maxXYZ.Y() + _vis.pose().position().y(), maxBBScene.Y()),
                                         std::max(maxXYZ.Z() + _vis.pose().position().z(), maxBBScene.Z()));
 
-  if (mesh_uri.Query().Str().find("culling=off") != std::string::npos) {
-    DELPHYNE_VALIDATE(mesh->GeometryCount() == 1, std::runtime_error, "Expected one geometry.");
-    auto subMesh = mesh->GeometryByIndex(0);
-    /* TODO: Enable once ignition-rendering2 supports culling
-    subMesh->Material()->SetCulling(ignition::rendering::CullMode::CM_NONE);*/
-  }
-
   setPoseFromMessage(_vis, mesh);
 
   return mesh;

@@ -20,8 +20,8 @@ set_target_properties(origin_display
 target_link_libraries(origin_display
   ignition-common3::ignition-common3
   ignition-gui0::ignition-gui0
-  ignition-msgs4::ignition-msgs4
-  ignition-transport7::ignition-transport7
+  ignition-msgs5::ignition-msgs5
+  ignition-transport8::ignition-transport8
   ${Qt5Core_LIBRARIES}
   ${Qt5Widgets_LIBRARIES}
   delphyne::protobuf_messages
@@ -51,8 +51,8 @@ set_target_properties(agent_info_display
 target_link_libraries(agent_info_display
   ignition-common3::ignition-common3
   ignition-gui0::ignition-gui0
-  ignition-msgs4::ignition-msgs4
-  ignition-transport7::ignition-transport7
+  ignition-msgs5::ignition-msgs5
+  ignition-transport8::ignition-transport8
   ${Qt5Core_LIBRARIES}
   ${Qt5Widgets_LIBRARIES}
   delphyne::protobuf_messages

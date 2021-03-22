@@ -91,8 +91,8 @@ target_link_libraries(maliput_viewer_widget
   global_attributes
   ignition-common3::ignition-common3
   ignition-gui0::ignition-gui0
-  ignition-msgs4::ignition-msgs4
-  ignition-rendering2::ignition-rendering2
+  ignition-msgs5::ignition-msgs5
+  ignition-rendering3::ignition-rendering3
   maliput_mesh
   ${Qt5Core_LIBRARIES}
   ${Qt5Widgets_LIBRARIES}
@@ -127,9 +127,9 @@ set_target_properties(render_widget
 target_link_libraries(render_widget
   ignition-common3::ignition-common3
   ignition-gui0::ignition-gui0
-  ignition-msgs4::ignition-msgs4
-  ignition-rendering2::ignition-rendering2
-  ignition-transport7::ignition-transport7
+  ignition-msgs5::ignition-msgs5
+  ignition-rendering3::ignition-rendering3
+  ignition-transport8::ignition-transport8
   ${Qt5Core_LIBRARIES}
   ${Qt5Widgets_LIBRARIES}
   delphyne::protobuf_messages
@@ -160,8 +160,8 @@ set_target_properties(teleop_widget
 target_link_libraries(teleop_widget
   ignition-common3::ignition-common3
   ignition-gui0::ignition-gui0
-  ignition-msgs4::ignition-msgs4
-  ignition-transport7::ignition-transport7
+  ignition-msgs5::ignition-msgs5
+  ignition-transport8::ignition-transport8
   ${Qt5Core_LIBRARIES}
   ${Qt5Widgets_LIBRARIES}
   delphyne::protobuf_messages
@@ -199,8 +199,8 @@ set_target_properties(playback_widget
 target_link_libraries(playback_widget
   ignition-common3::ignition-common3
   ignition-gui0::ignition-gui0
-  ignition-msgs4::ignition-msgs4
-  ignition-transport7::ignition-transport7
+  ignition-msgs5::ignition-msgs5
+  ignition-transport8::ignition-transport8
   ${Qt5Core_LIBRARIES}
   ${Qt5Widgets_LIBRARIES}
   delphyne::protobuf_messages
@@ -241,14 +241,14 @@ install(
   DESTINATION ${BIN_INSTALL_DIR}
 )
 
-# Visualizer with ign-gui2
+# Visualizer with ign-gui3
 add_executable(visualizer
   visualizer2.cc
 )
 
 target_link_libraries(visualizer
   ignition-common3::ignition-common3
-  ignition-gui2::ignition-gui2
+  ignition-gui3::ignition-gui3
   ${Qt5Core_LIBRARIES}
   ${Qt5Widgets_LIBRARIES}
   delphyne::utility

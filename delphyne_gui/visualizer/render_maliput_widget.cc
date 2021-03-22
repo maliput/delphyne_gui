@@ -298,7 +298,7 @@ void RenderMaliputWidget::CreateBranchPointLabelMaterial(ignition::rendering::Ma
 /////////////////////////////////////////////////
 void RenderMaliputWidget::RenderRoadMeshes(const std::map<std::string, std::unique_ptr<MaliputMesh>>& _maliputMeshes) {
   for (const auto& it : _maliputMeshes) {
-    /* TODO: Enable once ignition-rendering2 supports culling
+    /* TODO: Enable once ignition-rendering3 supports culling
     material->SetCulling(ignition::rendering::CullMode::CM_NONE);*/
 
     // Checks if the mesh to be rendered already exists or not.

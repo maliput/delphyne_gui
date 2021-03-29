@@ -128,7 +128,7 @@ def main():
     with open_log_file(args.log_file) as (topic_log_path, bundle_path):
         launch_manager = delphyne_gui.launcher.Launcher()
         try:
-            replayer = "replayer"
+            replayer = "delphyne_replayer"
             launch_manager.launch([replayer, topic_log_path])
             if not args.bare:
                 delphyne_gui.utilities.launch_visualizer(

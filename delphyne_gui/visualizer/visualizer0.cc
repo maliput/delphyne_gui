@@ -147,7 +147,7 @@ int Main(int argc, const char* argv[]) {
     ignition::gui::addPluginsToWindow();
     injectedWidget = win->findChild<ignition::gui::Dock*>(QString(std::get<2>(pluginInjectionEntry).c_str()));
     if (!injectedWidget) {
-      ignerr << "Plugin named " << std::get<2>(pluginInjectionEntry).c_str() << " couldn't been found." << std::endl;
+      ignerr << "Plugin named " << std::get<2>(pluginInjectionEntry).c_str() << " couldn't be found." << std::endl;
       continue;
     }
     const Qt::Orientation& splitOrientation = std::get<3>(pluginInjectionEntry);

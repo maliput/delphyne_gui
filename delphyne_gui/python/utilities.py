@@ -56,7 +56,7 @@ def launch_interactive_simulation(simulation_runner,
 
 
 def launch_visualizer(launcher_manager, layout_filename=None,
-                      plugin_injection=None, bundle_path=None,
+                      plugin_injection=None, plugin_name=None, bundle_path=None,
                       ign_visualizer=None):
     """
     Launches the project's visualizer with a given layout and using the
@@ -75,6 +75,8 @@ def launch_visualizer(launcher_manager, layout_filename=None,
     ign_visualizer_args.append("--use-line-buffer=yes")
     if plugin_injection:
         ign_visualizer_args.append("--inject-plugin=" + plugin_injection)
+    if plugin_name:
+        ign_visualizer_args.append("--plugin-name=" + plugin_name)
     if bundle_path:
         ign_visualizer_args.append("--package=" + bundle_path)
     launcher_manager.launch([ign_visualizer] + ign_visualizer_args)

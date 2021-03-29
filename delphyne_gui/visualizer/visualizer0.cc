@@ -98,7 +98,8 @@ int Main(int argc, const char* argv[]) {
   // horizontal splits and `receiver/injected` for vertical
   // splits.
   std::regex injectionPattern{"(\\w+)\\s*(/|-)\\s*(\\w+)"};
-  std::vector<std::tuple<std::string, std::string, Qt::Orientation>> pluginInjectionList;
+  // Holds a <receiver plugin, injected plugin, plugin name, orientation> tuple.
+  std::vector<std::tuple<std::string, std::string, std::string, Qt::Orientation>> pluginInjectionList;
   if (delphyne::gui::GlobalAttributes::HasArgument("inject-plugin")) {
     const std::string injectPluginArg = delphyne::gui::GlobalAttributes::GetArgument("inject-plugin");
     std::smatch match;
@@ -106,11 +107,18 @@ int Main(int argc, const char* argv[]) {
       const std::string& receiverPluginName = match[1];
       const Qt::Orientation splitOrientation = match[2] == "/" ? Qt::Vertical : Qt::Horizontal;
       const std::string& injectedPluginName = match[3];
-      pluginInjectionList.push_back(std::make_tuple(receiverPluginName, injectedPluginName, splitOrientation));
+      pluginInjectionList.push_back(
+          std::make_tuple(receiverPluginName, injectedPluginName, injectedPluginName, splitOrientation));
     } else {
       ignerr << "Ill formed --inject-plugin=" << injectPluginArg << " argument."
              << " Missing '@'." << std::endl;
     }
+  }
+  if (delphyne::gui::GlobalAttributes::HasArgument("plugin-name")) {
+    if (!delphyne::gui::GlobalAttributes::HasArgument("inject-plugin")) {
+      ignerr << "'--plugin-name' Option only available with plugin injection: '--inject-plugin' option" << std::endl;
+    }
+    std::get<2>(pluginInjectionList[0]) = delphyne::gui::GlobalAttributes::GetArgument("plugin-name");
   }
 
   // Create main window
@@ -137,8 +145,12 @@ int Main(int argc, const char* argv[]) {
       continue;
     }
     ignition::gui::addPluginsToWindow();
-    injectedWidget = win->findChild<ignition::gui::Dock*>(QString(injectedPluginName.c_str()));
-    const Qt::Orientation& splitOrientation = std::get<2>(pluginInjectionEntry);
+    injectedWidget = win->findChild<ignition::gui::Dock*>(QString(std::get<2>(pluginInjectionEntry).c_str()));
+    if (!injectedWidget) {
+      ignerr << "Plugin named " << std::get<2>(pluginInjectionEntry).c_str() << " couldn't been found." << std::endl;
+      continue;
+    }
+    const Qt::Orientation& splitOrientation = std::get<3>(pluginInjectionEntry);
     win->splitDockWidget(receiverWidget, injectedWidget, splitOrientation);
   }
 

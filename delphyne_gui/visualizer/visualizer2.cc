@@ -56,7 +56,7 @@ int Main(int argc, char** argv) {
 
   // Customize main window
   auto win = app.findChild<ignition::gui::MainWindow*>()->QuickWindow();
-  win->setProperty("title", "Hello Window!");
+  win->setProperty("title", kVersionStr);
 
   // Run window
   app.exec();

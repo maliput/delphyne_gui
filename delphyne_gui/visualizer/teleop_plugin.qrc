@@ -1,0 +1,5 @@
+<!DOCTYPE RCC><RCC version="1.0">
+  <qresource prefix="TeleopPlugin/">
+    <file>TeleopPlugin.qml</file>
+  </qresource>
+</RCC>

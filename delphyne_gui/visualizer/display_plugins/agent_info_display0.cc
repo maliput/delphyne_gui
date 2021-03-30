@@ -13,7 +13,7 @@
 
 #include "delphyne/protobuf/agent_state_v.pb.h"
 
-#include "agent_info_display.hh"
+#include "agent_info_display0.hh"
 
 namespace delphyne {
 namespace gui {

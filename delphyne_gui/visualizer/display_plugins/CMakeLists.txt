@@ -36,19 +36,19 @@ install(
 )
 
 # Agent Info display plugin.
-QT5_WRAP_CPP(AgentInfoDisplay_MOC agent_info_display.hh)
+QT5_WRAP_CPP(AgentInfoDisplay0_MOC agent_info_display0.hh)
 
-add_library(agent_info_display
-  ${CMAKE_CURRENT_SOURCE_DIR}/agent_info_display.cc
-  ${AgentInfoDisplay_MOC}
+add_library(agent_info_display0
+  ${CMAKE_CURRENT_SOURCE_DIR}/agent_info_display0.cc
+  ${AgentInfoDisplay0_MOC}
 )
-add_library(delphyne_gui::agent_info_display ALIAS agent_info_display)
-set_target_properties(agent_info_display
+add_library(delphyne_gui::agent_info_display0 ALIAS agent_info_display0)
+set_target_properties(agent_info_display0
   PROPERTIES
-    OUTPUT_NAME delphyne_gui_agent_info_display
+    OUTPUT_NAME delphyne_gui_agent_info_display0
 )
 
-target_link_libraries(agent_info_display
+target_link_libraries(agent_info_display0
   ignition-common3::ignition-common3
   ignition-gui0::ignition-gui0
   ignition-msgs5::ignition-msgs5
@@ -59,7 +59,7 @@ target_link_libraries(agent_info_display
 )
 
 install(
-  TARGETS agent_info_display
+  TARGETS agent_info_display0
   EXPORT ${PROJECT_NAME}-targets
   RUNTIME DESTINATION bin
   LIBRARY DESTINATION lib

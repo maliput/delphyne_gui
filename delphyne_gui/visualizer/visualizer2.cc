@@ -3,6 +3,8 @@
 #include <iostream>
 #include <string>
 
+#include <delphyne/utility/package.h>
+
 #include <ignition/common/Console.hh>
 #include <ignition/common/Filesystem.hh>
 
@@ -23,6 +25,17 @@ namespace {
 /// Constants.
 constexpr char kVersionStr[] = "Visualizer 0.2.0";
 constexpr char kDefaultLayout[] = "layout2_with_teleop.config";
+
+/////////////////////////////////////////////////
+/// \brief Get the path of the default configuration file for Delphyne.
+/// \return The default configuration path.
+std::string defaultConfigPath() {
+  std::string homePath;
+  ignition::common::env("HOME", homePath);
+  std::string defaultConfigPath = ignition::common::joinPaths(homePath, ".delphyne", "delphyne.config");
+
+  return defaultConfigPath;
+}
 
 /////////////////////////////////////////////////
 int Main(int argc, char** argv) {
@@ -46,15 +59,41 @@ int Main(int argc, char** argv) {
     }
   }
 
-  // Create app
-  ignition::gui::Application app(argc, argv);
-
-  // Load plugins / config
-  if (!app.LoadConfig(initialConfigFile)) {
-    return 1;
+  // Parse custom config file from args.
+  delphyne::utility::PackageManager* package_manager = delphyne::utility::PackageManager::Instance();
+  if (delphyne::gui::GlobalAttributes::HasArgument("package")) {
+    package_manager->Use(
+        std::make_unique<delphyne::utility::BundledPackage>(delphyne::gui::GlobalAttributes::GetArgument("package")));
+  } else {
+    package_manager->Use(std::make_unique<delphyne::utility::SystemPackage>());
   }
 
-  // Customize main window
+  // Initialize app
+  ignition::gui::Application app(argc, argv);
+
+  // Set the default location for saving user settings.
+  app.SetDefaultConfigPath(defaultConfigPath());
+
+  // Look for all plugins in the same place
+  app.SetPluginPathEnv("VISUALIZER_PLUGIN_PATH");
+
+  // Then look for plugins on compile-time defined path.
+  // Plugins installed by gazebo end up here
+  app.AddPluginPath(PLUGIN_INSTALL_PATH);
+
+  // Attempt to load window layout from parsed arguments.
+  bool layout_loaded = delphyne::gui::GlobalAttributes::HasArgument("layout") &&
+                       app.LoadConfig(delphyne::gui::GlobalAttributes::GetArgument("layout"));
+  // If no layout was found, attempt to use the default config file.
+  layout_loaded = layout_loaded || app.LoadDefaultConfig();
+  // If that's not available either, load it from initial config file.
+  layout_loaded = layout_loaded || app.LoadConfig(initialConfigFile);
+  // If no layout has been loaded so far, exit the application.
+  if (!layout_loaded) return 1;
+
+  // Create main window
+  // this is a placeholder comment to ease comparisons with visualizer0.cc
+
   auto win = app.findChild<ignition::gui::MainWindow*>()->QuickWindow();
   win->setProperty("title", kVersionStr);
 

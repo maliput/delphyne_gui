@@ -32,9 +32,7 @@ constexpr char kDefaultLayout[] = "layout2_with_teleop.config";
 std::string defaultConfigPath() {
   std::string homePath;
   ignition::common::env("HOME", homePath);
-  std::string defaultConfigPath = ignition::common::joinPaths(homePath, ".delphyne", "delphyne.config");
-
-  return defaultConfigPath;
+  return ignition::common::joinPaths(homePath, ".delphyne", "delphyne.config");
 }
 
 /////////////////////////////////////////////////
@@ -89,7 +87,10 @@ int Main(int argc, char** argv) {
   // If that's not available either, load it from initial config file.
   layout_loaded = layout_loaded || app.LoadConfig(initialConfigFile);
   // If no layout has been loaded so far, exit the application.
-  if (!layout_loaded) return 1;
+  if (!layout_loaded) {
+    ignerr << "Unable to load a configuration file, exiting." << std::endl;
+    return 1;
+  }
 
   // Create main window
   // this is a placeholder comment to ease comparisons with visualizer0.cc

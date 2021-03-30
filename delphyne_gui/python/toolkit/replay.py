@@ -136,7 +136,8 @@ def main():
                     ign_visualizer="visualizer0",
                     # Injects PlaybackWidget below RenderWidget
                     # if the former is not present in the layout.
-                    plugin_injection="RenderWidget/PlaybackWidget"
+                    plugin_injection="RenderWidget/delphyne_gui_playback_widget",
+                    plugin_name="PlaybackWidget"
                 )
                 launch_manager.wait(float("Inf"))
         except RuntimeError as error_msg:

@@ -24,9 +24,9 @@ from contextlib import contextmanager
 
 @contextmanager
 def launch_interactive_simulation(simulation_runner,
-                                  layout="layout_with_teleop.config",
+                                  layout=None,
                                   bare=False, ign_visualizer=None):
-    """Defines a context manager function used to hande the execution of an
+    """Defines a context manager function used to handle the execution of an
     interactive simulation. An interactive simulation launches the delphyne
     visualizer in a separate process and ends the simulation when the
     visualizer is closed."""

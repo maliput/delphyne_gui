@@ -5,19 +5,19 @@ include_directories(
 )
 
 # Origin display plugin.
-QT5_WRAP_CPP(OriginDisplay_MOC origin_display.hh)
+QT5_WRAP_CPP(OriginDisplay0_MOC origin_display0.hh)
 
-add_library(origin_display
-  ${CMAKE_CURRENT_SOURCE_DIR}/origin_display.cc
-  ${OriginDisplay_MOC}
+add_library(origin_display0
+  ${CMAKE_CURRENT_SOURCE_DIR}/origin_display0.cc
+  ${OriginDisplay0_MOC}
 )
-add_library(delphyne_gui::origin_display ALIAS origin_display)
-set_target_properties(origin_display
+add_library(delphyne_gui::origin_display0 ALIAS origin_display0)
+set_target_properties(origin_display0
   PROPERTIES
-    OUTPUT_NAME delphyne_gui_origin_display
+    OUTPUT_NAME delphyne_gui_origin_display0
 )
 
-target_link_libraries(origin_display
+target_link_libraries(origin_display0
   ignition-common3::ignition-common3
   ignition-gui0::ignition-gui0
   ignition-msgs5::ignition-msgs5
@@ -28,7 +28,7 @@ target_link_libraries(origin_display
 )
 
 install(
-  TARGETS origin_display
+  TARGETS origin_display0
   EXPORT ${PROJECT_NAME}-targets
   RUNTIME DESTINATION bin
   LIBRARY DESTINATION lib

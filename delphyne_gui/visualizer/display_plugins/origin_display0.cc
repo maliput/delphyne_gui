@@ -4,7 +4,7 @@
 #include <ignition/common/PluginMacros.hh>
 #include <ignition/rendering/Text.hh>
 
-#include "origin_display.hh"
+#include "origin_display0.hh"
 
 using namespace delphyne;
 using namespace gui;

@@ -10,6 +10,9 @@ Rectangle {
   Layout.minimumWidth: 460
   Layout.minimumHeight: 175
 
+  /**
+   * True when is playing.
+   */
   property var isPlaying: true
 
   /**
@@ -46,7 +49,9 @@ Rectangle {
     width: playButton.width * 0.8
     Layout.minimumWidth: width
     Layout.leftMargin: 10
-    onClicked: { PlaybackPlugin.OnRewindButtonPush(); }
+    onClicked: {
+      PlaybackPlugin.OnRewindButtonPush();
+    }
     Material.background: Material.primary
   }
 
@@ -66,13 +71,13 @@ Rectangle {
     anchors.leftMargin : 10
     anchors.verticalCenter : rewindButton.verticalCenter
     onClicked: {
-          if (isPlaying){
-            PlaybackPlugin.OnPauseButtonPush();
-            isPlaying=false;
-          } else {
-            PlaybackPlugin.OnPlayButtonPush();
-            isPlaying=true;
-          }
+      if (isPlaying){
+        PlaybackPlugin.OnPauseButtonPush();
+        isPlaying=false;
+      } else {
+        PlaybackPlugin.OnPlayButtonPush();
+        isPlaying=true;
+      }
     }
     Material.background: Material.primary
   }
@@ -93,10 +98,15 @@ Rectangle {
     anchors.left : playButton.right
     anchors.leftMargin : 10
     anchors.verticalCenter : playButton.verticalCenter
-    onClicked: { PlaybackPlugin.OnStepButtonPush(spinBox.value); }
+    onClicked: {
+      PlaybackPlugin.OnStepButtonPush(spinBox.value);
+    }
     Material.background: Material.primary
   }
 
+  /**
+   * SpinBox
+   */
   SpinBox {
     id: spinBox
     value: 50
@@ -105,6 +115,9 @@ Rectangle {
     anchors.verticalCenter : stepButton.verticalCenter
   }
 
+  /**
+   * ms text
+   */
   Text {
     anchors.left : spinBox.right
     anchors.verticalCenter : spinBox.verticalCenter
@@ -113,6 +126,9 @@ Rectangle {
     styleColor: "gray"
   }
 
+  /**
+   * Current time text
+   */
   Text {
     id: currentTimeText
     anchors.left : rewindButton.left
@@ -121,6 +137,9 @@ Rectangle {
     font.pointSize: 10; text: PlaybackPlugin.currentTime ; styleColor: "gray"
   }
 
+  /**
+   * Timeline slider
+   */
   Slider {
     id: slider
     height: 50
@@ -129,12 +148,12 @@ Rectangle {
     anchors.left : currentTimeText.right
     anchors.leftMargin: 20
     handle: Rectangle {
-        x: slider.leftPadding + slider.visualPosition * (slider.availableWidth - width)
-        y: slider.topPadding + slider.availableHeight / 2 - height / 2
-        implicitWidth: 10
-        implicitHeight: 25
-        color: slider.pressed ? "#f0f0f0" : "#f6f6f6"
-        border.color: "black"
+      x: slider.leftPadding + slider.visualPosition * (slider.availableWidth - width)
+      y: slider.topPadding + slider.availableHeight / 2 - height / 2
+      implicitWidth: 10
+      implicitHeight: 25
+      color: slider.pressed ? "#f0f0f0" : "#f6f6f6"
+      border.color: "black"
     }
 
     from: 0
@@ -143,6 +162,10 @@ Rectangle {
     stepSize: 0.01
 
   }
+
+  /**
+   * Current/End time text.
+   */
   Text {
     id: currentEndTimeText
     anchors.left : slider.right

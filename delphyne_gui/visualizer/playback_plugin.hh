@@ -34,7 +34,7 @@ class PlaybackPlugin : public ignition::gui::Plugin {
   PlaybackPlugin();
 
   /// Destructor
-  virtual ~PlaybackPlugin();
+  virtual ~PlaybackPlugin() = default;
 
   /// Called by Ignition GUI when plugin is instantiated.
   /// \param[in] _pluginElem XML configuration for this plugin.
@@ -48,13 +48,13 @@ class PlaybackPlugin : public ignition::gui::Plugin {
 
   Q_INVOKABLE bool IsSliderPressed() const;
 
-  Q_INVOKABLE void SetSimTime(const QString& simTime);
+  Q_INVOKABLE void SetSimTime(const QString& _simTime);
 
-  Q_INVOKABLE void SetCurrentTime(const QString& currentTime);
+  Q_INVOKABLE void SetCurrentTime(const QString& _currentTime);
 
-  Q_INVOKABLE void SetSliderValue(const QString& sliderValue);
+  Q_INVOKABLE void SetSliderValue(const QString& _sliderValue);
 
-  Q_INVOKABLE void SetIsSliderPressed(bool isSliderPressed);
+  Q_INVOKABLE void SetIsSliderPressed(bool _isSliderPressed);
 
  signals:
   /// @{ Signals to notify that properties changed.
@@ -76,13 +76,13 @@ class PlaybackPlugin : public ignition::gui::Plugin {
   void OnPlayButtonPush();
 
   // A slot to react to a step button push.
-  // @param[in] stepValue Value to step.
-  void OnStepButtonPush(const QString& stepValue);
+  // @param[in] _stepValue Value to step.
+  void OnStepButtonPush(const QString& _stepValue);
 
   // A slot to react to a slider interaction.
-  // @param[in] sliderValue Value of the slider.
+  // @param[in] _sliderValue Value of the slider.
   // @return The value of the slider.
-  QString OnSliderDrop(const QString& sliderValue);
+  QString OnSliderDrop(const QString& _sliderValue);
 
  private:
   // Holds the start, current and end time of the simulation.
@@ -100,8 +100,8 @@ class PlaybackPlugin : public ignition::gui::Plugin {
   static constexpr const char* const kSeekServiceName{"/replayer/seek"};
 
   // Playback status topic subscription callback.
-  // @param[in] status The playback status message received.
-  void OnStatusMessage(const ignition::msgs::PlaybackStatus& status);
+  // @param[in] _msg The playback status message received.
+  void OnStatusMessage(const ignition::msgs::PlaybackStatus& _msg);
 
   // Issues a playback pause request.
   void RequestPause();
@@ -109,26 +109,26 @@ class PlaybackPlugin : public ignition::gui::Plugin {
   // Issues a playback resume request.
   void RequestResume();
 
-  // Issues a playback step request, using the given @p step_size.
-  void RequestStep(const ignition::msgs::Duration& step_size);
+  // Issues a playback step request, using the given @p _stepSize.
+  void RequestStep(const ignition::msgs::Duration& _stepSize);
 
-  // Issues a playback seek request, to the given @p seek_offset
+  // Issues a playback seek request, to the given @p _seekOffset
   // from playback start.
-  void RequestSeek(const ignition::msgs::Duration& seek_offset);
+  void RequestSeek(const ignition::msgs::Duration& _seekOffset);
 
   /// \brief Holds sim time
-  QString simTime_;
+  QString simTime;
   /// \brief Holds current time
-  QString currentTime_;
+  QString currentTime;
   /// \brief Holds slider value
-  QString sliderValue_;
+  QString sliderValue;
   /// \brief Holds the status of the slider
-  bool isSliderPressed_{false};
+  bool isSliderPressed{false};
 
   // An ignition transport node.
-  ignition::transport::Node node_;
+  ignition::transport::Node node;
 
-  SimTimes time_status_;
+  SimTimes timeStatus;
 };
 
 }  // namespace gui

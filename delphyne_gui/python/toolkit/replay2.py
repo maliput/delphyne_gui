@@ -4,9 +4,20 @@
 #
 
 """
-The replay tool.
-"""
+Replays a simulation out of a log file previously obtained.
+The layout used for the window is `layout2_for_playback` which
+posses a playback widget for rewinding, pausing and stepping forward the
+simulation.
 
+-- How to use:
+1 - To use this application a log file is needed.
+    (e.g.: `delphyne_demos` package allows you to get a log file when running its demos)
+    "delphyne_gazoo -l -f <path/to/somewhere/my_awesome_log_file.log>"
+
+2 - Execute the application using the log as argument:
+    "delphyne_replay2 <path/to/somewhere/my_awesome_log_file.log>"
+
+"""
 ##############################################################################
 # Imports
 ##############################################################################

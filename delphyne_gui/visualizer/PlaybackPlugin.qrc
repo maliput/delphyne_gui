@@ -1,0 +1,5 @@
+<!DOCTYPE RCC><RCC version="1.0">
+  <qresource prefix="PlaybackPlugin/">
+    <file>PlaybackPlugin.qml</file>
+  </qresource>
+</RCC>

@@ -1,5 +1,11 @@
 include (${project_cmake_dir}/Utils.cmake)
 
+include_directories(
+  ${Qt5Core_INCLUDE_DIRS}
+  ${CMAKE_BINARY_DIR}/include
+  ${CMAKE_SOURCE_DIR}
+)
+
 # ----------------------------------------
 # maliput_mesh library.
 add_library(maliput_mesh
@@ -175,12 +181,6 @@ install(
   ARCHIVE DESTINATION lib
 )
 
-include_directories(
-  ${Qt5Core_INCLUDE_DIRS}
-  ${CMAKE_BINARY_DIR}/include
-  ${CMAKE_SOURCE_DIR}
-)
-
 # PlaybackWidget GUI plugin.
 QT5_WRAP_CPP(PlaybackWidget_MOC playback_widget.hh)
 QT5_ADD_RESOURCES(PlaybackWidget_resources_RCC playback.qrc)
@@ -213,12 +213,6 @@ install(
   RUNTIME DESTINATION bin
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib
-)
-
-include_directories(
-  ${Qt5Core_INCLUDE_DIRS}
-  ${CMAKE_BINARY_DIR}/include
-  ${CMAKE_SOURCE_DIR}
 )
 
 #-------------------------------------------------------------------------------
@@ -257,10 +251,49 @@ install(
   ARCHIVE DESTINATION lib
 )
 
-include_directories(
-  ${Qt5Core_INCLUDE_DIRS}
-  ${CMAKE_BINARY_DIR}/include
-  ${CMAKE_SOURCE_DIR}
+#-------------------------------------------------------------------------------
+
+# PlaybackWidget (ign-gui 3)
+QT5_WRAP_CPP(PlaybackPlugin_MOC playback_plugin.hh)
+QT5_ADD_RESOURCES(PlaybackPlugin_resources_RCC PlaybackPlugin.qrc)
+
+add_library(PlaybackPlugin
+  ${CMAKE_CURRENT_SOURCE_DIR}/playback_plugin.cc
+  ${PlaybackPlugin_MOC}
+  ${PlaybackPlugin_resources_RCC}
+)
+add_library(delphyne_gui::PlaybackPlugin ALIAS PlaybackPlugin)
+set_target_properties(PlaybackPlugin
+  PROPERTIES
+    OUTPUT_NAME PlaybackPlugin
+)
+
+ament_target_dependencies(PlaybackPlugin
+  "maliput"
+)
+
+target_link_libraries(PlaybackPlugin
+  PUBLIC
+    ignition-common3::ignition-common3
+    ignition-gui3::ignition-gui3
+    ignition-msgs5::ignition-msgs5
+    ignition-transport8::ignition-transport8
+    ${Qt5Core_LIBRARIES}
+    ${Qt5Qml_LIBRARIES}
+    ${Qt5Widgets_LIBRARIES}
+    delphyne::protobuf_messages
+    delphyne::public_headers
+    maliput::common
+  PRIVATE
+    ignition-plugin1::register
+)
+
+install(
+  TARGETS PlaybackPlugin
+  EXPORT ${PROJECT_NAME}-targets
+  RUNTIME DESTINATION bin
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib
 )
 
 #-------------------------------------------------------------------------------
@@ -312,6 +345,7 @@ install(
     layout_with_teleop.config
     layout_maliput_viewer.config
     layout_for_playback.config
+    layout2_for_playback.config
     layout2_with_teleop.config
   DESTINATION
     ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/delphyne/layouts

@@ -1,7 +1,6 @@
 // Copyright 2021 Toyota Research Institute
 #include "origin_display.hh"
 
-#include <array>
 #include <cmath>
 
 #include <ignition/common/Console.hh>
@@ -23,6 +22,11 @@ void OriginDisplay::LoadConfig(const tinyxml2::XMLElement* _pluginElem) {
     // Update the requested scene name even it fails to load.
     if (auto elem = _pluginElem->FirstChildElement("scene")) {
       sceneName = elem->GetText();
+    }
+    // Similarly with the visibility flag.
+    if (auto elem = _pluginElem->FirstChildElement("visible")) {
+      elem->QueryBoolText(&isVisible);
+      IsVisibleChanged();
     }
   }
 
@@ -62,7 +66,7 @@ void OriginDisplay::timerEvent(QTimerEvent* _event) {
   DrawAxes(scene);
 }
 
-void OriginDisplay::DrawAxes(ignition::rendering::ScenePtr scene) const {
+void OriginDisplay::DrawAxes(ignition::rendering::ScenePtr scene) {
   constexpr double kAxisRadius{0.02};
   constexpr double kAxisLength{10000.0};
   constexpr double kAxisHalfLength{kAxisLength / 2.0};
@@ -72,7 +76,6 @@ void OriginDisplay::DrawAxes(ignition::rendering::ScenePtr scene) const {
   scene->RootVisual()->AddChild(visual);
 
   // Create the visual axes.
-  std::array<ignition::rendering::VisualPtr, 3> axes;
   for (auto& axis : axes) {
     axis = scene->CreateVisual();
     if (!axis) {
@@ -104,6 +107,18 @@ void OriginDisplay::DrawAxes(ignition::rendering::ScenePtr scene) const {
   // Add the three visual axes.
   for (auto& axis : axes) {
     visual->AddChild(axis);
+  }
+
+  // Set the visibility of the visuals
+  ChangeAxesVisibility();
+}
+
+void OriginDisplay::ChangeAxesVisibility() {
+  bool newIsVisibleValue = isVisible;
+  if (axes[0] != nullptr) {
+    for (auto& axis : axes) {
+      axis->SetVisible(newIsVisibleValue);
+    }
   }
 }
 

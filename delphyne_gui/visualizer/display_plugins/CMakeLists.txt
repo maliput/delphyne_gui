@@ -65,3 +65,39 @@ install(
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib
 )
+
+#-------------------------------------------------------------------------------
+# Origin display (ign-gui 3)
+QT5_WRAP_CPP(OriginDisplay_MOC origin_display.hh)
+QT5_ADD_RESOURCES(OriginDisplay_RCC origin_display.qrc)
+
+add_library(OriginDisplay
+  ${CMAKE_CURRENT_SOURCE_DIR}/origin_display.cc
+  ${OriginDisplay_MOC}
+  ${OriginDisplay_RCC}
+)
+add_library(delphyne_gui::OriginDisplay ALIAS OriginDisplay)
+set_target_properties(OriginDisplay
+  PROPERTIES
+    OUTPUT_NAME OriginDisplay
+)
+
+target_link_libraries(OriginDisplay
+  PUBLIC
+    ignition-common3::ignition-common3
+    ignition-gui3::ignition-gui3
+    ignition-math6::ignition-math6
+    ignition-rendering3::ignition-rendering3
+    ${Qt5Core_LIBRARIES}
+    ${Qt5Widgets_LIBRARIES}
+  PRIVATE
+    ignition-plugin1::register
+)
+
+install(
+  TARGETS OriginDisplay
+  EXPORT ${PROJECT_NAME}-targets
+  RUNTIME DESTINATION bin
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib
+)

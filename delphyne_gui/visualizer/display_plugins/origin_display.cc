@@ -114,7 +114,7 @@ void OriginDisplay::DrawAxes(ignition::rendering::ScenePtr scene) {
 }
 
 void OriginDisplay::ChangeAxesVisibility() {
-  bool newIsVisibleValue = isVisible;
+  const bool newIsVisibleValue = isVisible;
   if (axes[0] != nullptr) {
     for (auto& axis : axes) {
       axis->SetVisible(newIsVisibleValue);

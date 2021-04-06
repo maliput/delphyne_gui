@@ -6,98 +6,95 @@ import QtQuick.Controls.Material 2.1
 import QtQuick.Layouts 1.3
 
 Rectangle {
-  property var isPlaying: true
-
   id: playbackWidget
-
   Layout.minimumWidth: 460
   Layout.minimumHeight: 175
 
-  Button {
+  property var isPlaying: true
+
+  /**
+   * Play icon
+   */
+  property string playIcon: "\u25B6"
+
+    /**
+   * Play icon
+   */
+  property string rewindIcon: "\u25C4"
+
+  /**
+   * Pause icon
+   */
+  property string pauseIcon: "\u275A\u275A"
+
+  /**
+   * Step icon
+   */
+  property string stepIcon: "\u25B8\u25B8"
+
+  /**
+   * Rewind
+   */
+  RoundButton {
     id: rewindButton
     x: 10
     y: 10
-    Image {
-      anchors.centerIn: rewindButton
-      sourceSize.height: rewindButton.background.height - 6
-      height: sourceSize.height
-      source: "icons/rewind.svg"
-    }
-    background: Rectangle {
-        implicitWidth: 40
-        implicitHeight: 40
-        opacity: enabled ? 1 : 0.3
-        border.width: 2
-        radius: 5
-        color: rewindButton.pressed ? "grey" : "transparent"
-    }
+    visible: showPlay
+    text: rewindIcon
+    checkable: true
+    height: playButton.height * 0.8
+    width: playButton.width * 0.8
+    Layout.minimumWidth: width
+    Layout.leftMargin: 10
     onClicked: { PlaybackPlugin.OnRewindButtonPush(); }
+    Material.background: Material.primary
   }
 
-  Button {
-    id: pauseButton
-    Image {
-      anchors.centerIn: pauseButton
-      sourceSize.height: pauseButton.background.height - 6
-      height: sourceSize.height
-      source: "icons/pause.svg"
-    }
-    background: Rectangle {
-        implicitWidth: 40
-        implicitHeight: 40
-        opacity: enabled ? 1 : 0.3
-        border.width: 2
-        radius: 5
-        color: isPlaying ? "transparent" : "grey"
-    }
+  /**
+   * Pause/Play
+   */
+  RoundButton {
+    id: playButton
+    visible: showPlay
+    text: isPlaying ? pauseIcon : playIcon
+    checkable: true
+    width: 60
+    height: 60
+    Layout.minimumWidth: width
+    Layout.leftMargin: 10
     anchors.left : rewindButton.right
     anchors.leftMargin : 10
     anchors.verticalCenter : rewindButton.verticalCenter
-    onClicked: { PlaybackPlugin.OnPauseButtonPush();
-                isPlaying=false; }
-  }
-  Button {
-    id: playButton
-    Image {
-      anchors.centerIn: playButton
-      sourceSize.height: playButton.background.height - 6
-      height: sourceSize.height
-      source: "icons/play.svg"
+    onClicked: {
+          if (isPlaying){
+            PlaybackPlugin.OnPauseButtonPush();
+            isPlaying=false;
+          } else {
+            PlaybackPlugin.OnPlayButtonPush();
+            isPlaying=true;
+          }
     }
-    background: Rectangle {
-        implicitWidth: 40
-        implicitHeight: 40
-        opacity: enabled ? 1 : 0.3
-        border.width: 2
-        radius: 5
-        color: !isPlaying ? "transparent" : "grey"
-    }
-    anchors.left : pauseButton.right
-    anchors.leftMargin : 10
-    anchors.verticalCenter : pauseButton.verticalCenter
-    onClicked: { PlaybackPlugin.OnPlayButtonPush(); isPlaying=true;}
+    Material.background: Material.primary
   }
-  Button {
+
+  /**
+   * Step
+   */
+  RoundButton {
     id: stepButton
-    Image {
-      anchors.centerIn: stepButton
-      sourceSize.height: stepButton.background.height - 6
-      height: sourceSize.height
-      source: "icons/step.svg"
-    }
-    background: Rectangle {
-        implicitWidth: 40
-        implicitHeight: 40
-        opacity: enabled ? 1 : 0.3
-        border.width: 2
-        radius: 5
-        color: !isPlaying ? stepButton.pressed ? "grey" : "transparent" : "grey"
-    }
+    visible: showPlay
+    text: stepIcon
+    checkable: true
+    height: playButton.height * 0.8
+    width: playButton.width * 0.8
+    Layout.minimumWidth: width
+    Layout.leftMargin: 10
     enabled: isPlaying ? false : true
     anchors.left : playButton.right
     anchors.leftMargin : 10
     anchors.verticalCenter : playButton.verticalCenter
     onClicked: { PlaybackPlugin.OnStepButtonPush(spinBox.value); }
+    Material.background: Material.primary
   }
 
   SpinBox {

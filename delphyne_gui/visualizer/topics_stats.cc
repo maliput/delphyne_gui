@@ -5,6 +5,7 @@
 #include <iostream>
 #include <sstream>
 
+#include <ignition/common/Console.hh>
 #include <ignition/plugin/Register.hh>
 
 namespace delphyne {
@@ -58,7 +59,7 @@ void TopicsStats::OnMessage(const char* /*_msgData*/, const size_t _size,
 
   const auto& statsPair = rawData.find(topic);
   if (statsPair == rawData.end()) {
-    std::cerr << "Unable to find stats for [" << topic << "]" << std::endl;
+    ignerr << "Unable to find stats for [" << topic << "]" << std::endl;
     return;
   }
 
@@ -105,7 +106,7 @@ void TopicsStats::timerEvent(QTimerEvent*) {
       auto cb =
           std::bind(&TopicsStats::OnMessage, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
       if (!node.SubscribeRaw(topic, cb)) {
-        std::cerr << "Error subscribing to [" << topic << "]" << std::endl;
+        ignerr << "Error subscribing to [" << topic << "]" << std::endl;
         continue;
       }
       // Start tracking stats for this topic.

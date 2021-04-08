@@ -7,24 +7,6 @@ import QtQuick.Layouts 1.3
 Rectangle {
   ListModel {
     id: tableModel
-    ListElement {
-        topic: "/topic/example1"
-        messages: "245"
-        frequency: "15"
-        bandwidth: "20.15"
-    }
-    ListElement {
-        topic: "/topic/example2"
-        messages: "245"
-        frequency: "15"
-        bandwidth: "20.15"
-    }
-    ListElement {
-        topic: "/topic/example3"
-        messages: "245"
-        frequency: "15"
-        bandwidth: "20.15"
-    }
   }
 
   id: topicStats
@@ -32,29 +14,42 @@ Rectangle {
   anchors.fill: parent
   Layout.minimumWidth: 300
   Layout.minimumHeight: 250
+
   TableView {
+    id: tableView
+    objectName: "tableView"
     width: parent.width
     height: parent.height
     TableViewColumn {
         role: "topic"
         title: "Topic"
-        width: parent.width/4
+        width: tableView.width/4
     }
     TableViewColumn {
         role: "messages"
         title: "Messages"
-        width: parent.width/4
+        width: tableView.width/4
     }
     TableViewColumn {
         role: "frequency"
         title: "Frequency [Hz]"
-        width: parent.width/4
+        width: tableView.width/4
     }
     TableViewColumn {
         role: "bandwidth"
         title: "Bandwidth [B/s]"
-        width: parent.width/4
+        width: tableView.width/4
     }
     model: tableModel
+  }
+
+  Connections {
+      target: TopicsStats
+      onDataChanged: {
+        tableModel.clear()
+        for (var i = 0; i < TopicsStats.data.length; i=i+4)  {
+          tableModel.append({"topic": TopicsStats.data[i], "messages": TopicsStats.data[i+1], "frequency" : TopicsStats.data[i+2] , "bandwidth" : TopicsStats.data[i+3]})
+        }
+      }
   }
 }

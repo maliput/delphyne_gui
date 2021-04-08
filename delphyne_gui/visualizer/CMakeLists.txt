@@ -264,7 +264,9 @@ add_library(TopicsStats
 add_library(delphyne_gui::TopicsStats ALIAS TopicsStats)
 set_target_properties(TopicsStats
   PROPERTIES
-    OUTPUT_NAME TopicsStats
+    # TODO(francocipollone): Use TopicsStats instead when ign-gui0 is removed from workspace
+    #                        otherwise it collides with ign-gui0's TopicStats version.
+    OUTPUT_NAME TopicsStatsPlugin
 )
 
 target_link_libraries(TopicsStats

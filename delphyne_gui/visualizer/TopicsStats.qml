@@ -1,3 +1,5 @@
+// Copyright 2021 Toyota Research Institute
+
 import QtQuick 2.9
 import QtQuick.Controls 2.2
 import QtQuick.Controls 1.4
@@ -42,7 +44,6 @@ Rectangle {
   // Table of stats.
   TableView {
     id: tableView
-    objectName: "tableView"
     anchors.top: searchBar.bottom
     anchors.left: parent.left
     width: parent.width
@@ -50,27 +51,23 @@ Rectangle {
     TableViewColumn {
         role: "topic"
         title: "Topic"
-        width: tableView.width/4
     }
     TableViewColumn {
         role: "messages"
         title: "Messages"
-        width: tableView.width/4
     }
     TableViewColumn {
         role: "frequency"
-        title: "Frequency [Hz]"
-        width: tableView.width/4
+        title: "Frequency"
     }
     TableViewColumn {
         role: "bandwidth"
-        title: "Bandwidth [B/s]"
-        width: tableView.width/4
+        title: "Bandwidth"
     }
     model: ListModel {
       id: tableModel
       // This list will be updated dynamically when
-      // there is new data to show
+      // new data is presented.
     }
   }
 
@@ -79,8 +76,11 @@ Rectangle {
       target: TopicsStats
       onDataChanged: {
         tableModel.clear()
-        for (var i = 0; i < TopicsStats.data.length; i=i+4)  {
-          tableModel.append({"topic": TopicsStats.data[i], "messages": TopicsStats.data[i+1], "frequency" : TopicsStats.data[i+2] , "bandwidth" : TopicsStats.data[i+3]})
+        for (var i = 0; i < TopicsStats.data.length; i = i + 4)  {
+          tableModel.append({"topic": TopicsStats.data[i],
+                             "messages": TopicsStats.data[i+1],
+                             "frequency" : TopicsStats.data[i+2],
+                             "bandwidth" : TopicsStats.data[i+3]})
         }
       }
   }

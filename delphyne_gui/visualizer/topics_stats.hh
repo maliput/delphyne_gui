@@ -31,9 +31,13 @@ public:
   // Documentation inherited
   virtual void LoadConfig(const tinyxml2::XMLElement *_pluginElem);
 
+ protected slots:
+
+  void SearchTopic(const QString& _topic);
+
  protected:
   /// @brief Timer event callback which handles the publication of new data in the table.
-  void timerEvent(QTimerEvent* event) override;
+  void timerEvent(QTimerEvent* _event) override;
 
 private:
   static constexpr int kTimerPeriodInMs{1000};
@@ -47,6 +51,14 @@ private:
   ///   this is parsed to get the four values for each row.
   ///
   QStringList data;
+
+  /// Contains the stats of the topics.
+  /// The key of `rawData` is the topic name, and value is a map containing the value of
+  /// `messages`, `frequency` and `bandwidth`.
+  /// This way the table will be automatically ordered by topic name.
+  std::map<std::string, std::map<std::string, std::string>> rawData;
+  std::string topicFilter{""};
+
   int counter{0};
 };
 

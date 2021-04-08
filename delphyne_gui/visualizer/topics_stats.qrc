@@ -1,5 +1,6 @@
 <!DOCTYPE RCC><RCC version="1.0">
   <qresource prefix="TopicsStats/">
     <file>TopicsStats.qml</file>
+    <file>icons/search.svg</file>
   </qresource>
 </RCC>

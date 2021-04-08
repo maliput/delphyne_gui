@@ -5,19 +5,46 @@ import QtQuick.Controls.Material 2.1
 import QtQuick.Layouts 1.3
 
 Rectangle {
-  ListModel {
-    id: tableModel
-  }
-
   id: topicStats
   color: "transparent"
   anchors.fill: parent
   Layout.minimumWidth: 300
   Layout.minimumHeight: 250
 
+  // Search bar.
+  RowLayout {
+      id: searchBar
+      width: parent.width
+      height: 50
+
+      Image {
+        id: searchImg
+        source: "icons/search.svg"
+        anchors.left: parent.left
+        anchors.leftMargin: 5
+      }
+
+      TextField {
+          id: searchText
+          anchors.left: searchImg.right
+          anchors.leftMargin: 5
+          anchors.right: parent.right
+          anchors.rightMargin: 5
+          Layout.fillWidth: true
+
+          placeholderText: qsTr("Topic to be searched...")
+          onTextChanged: {
+            TopicsStats.SearchTopic(text)
+          }
+      }
+  }
+
+  // Table of stats.
   TableView {
     id: tableView
     objectName: "tableView"
+    anchors.top: searchBar.bottom
+    anchors.left: parent.left
     width: parent.width
     height: parent.height
     TableViewColumn {
@@ -40,9 +67,14 @@ Rectangle {
         title: "Bandwidth [B/s]"
         width: tableView.width/4
     }
-    model: tableModel
+    model: ListModel {
+      id: tableModel
+      // This list will be updated dynamically when
+      // there is new data to show
+    }
   }
 
+  // When new data arrives the table is updated.
   Connections {
       target: TopicsStats
       onDataChanged: {

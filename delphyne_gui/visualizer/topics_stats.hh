@@ -14,7 +14,7 @@ class TopicsStats : public ignition::gui::Plugin {
   // TODO(francocipollone): Use QHash<QString,QString> when using a new version of QT instead of QStringList.
   Q_PROPERTY(QStringList data READ Data WRITE SetData NOTIFY DataChanged)
 
-public:
+ public:
   Q_INVOKABLE QStringList Data() const;
 
   Q_INVOKABLE void SetData(const QStringList& _Data);
@@ -31,7 +31,7 @@ public:
   virtual ~TopicsStats() = default;
 
   // Documentation inherited
-  virtual void LoadConfig(const tinyxml2::XMLElement *_pluginElem);
+  virtual void LoadConfig(const tinyxml2::XMLElement* _pluginElem);
 
  protected slots:
 
@@ -45,8 +45,8 @@ public:
   /// \brief Timer period.
   static constexpr int kTimerPeriodInMs{1000};
 
-  class BasicStats{
-  public:
+  class BasicStats {
+   public:
     /// \brief Total number of messages received.
     uint64_t numMessages = 0;
 
@@ -63,9 +63,7 @@ public:
   /// \param[in] _msgData string of a serialized protobuf message.
   /// \param[in] _size Number of bytes in the serialized message data.
   /// \param[in] _info Meta-information about the message received.
-  void OnMessage(const char *_msgData,
-                const size_t _size,
-                const ignition::transport::MessageInfo &_info);
+  void OnMessage(const char* _msgData, const size_t _size, const ignition::transport::MessageInfo& _info);
 
   /// \brief Update the stats of the GUI.
   void UpdateGUIStats();

@@ -1,9 +1,9 @@
 // Copyright 2021 Toyota Research Institute
 #include "topics_stats.hh"
 
+#include <iomanip>
 #include <iostream>
 #include <sstream>
-#include <iomanip>
 
 #include <ignition/plugin/Register.hh>
 
@@ -13,50 +13,50 @@ namespace {
 
 // \brief Convert @p _value into an string selecting the @p _precision and adding the @p _unit to the
 //        value
-std::string ToStringWithPrecision(double _value, int _precision, const std::string& _unit = ""){
+std::string ToStringWithPrecision(double _value, int _precision, const std::string& _unit = "") {
   std::stringstream sstr;
   sstr << std::fixed << std::setprecision(_precision) << _value;
-  if(!_unit.empty()){
+  if (!_unit.empty()) {
     sstr << " " << _unit;
   }
   return sstr.str();
 }
 
 // \Returns True when @p _subStr is contained in _mainStr.
-bool IsSubStr(const std::string & _mainStr, const std::string &_subStr){
+bool IsSubStr(const std::string& _mainStr, const std::string& _subStr) {
   const std::string::size_type n = _mainStr.find(_subStr);
   return n == std::string::npos ? false : true;
 }
 
 // Get a string containing the bandwith and its correspondant unit.
 // \param _bytesLastSec Number of bytes in the a second.
-std::string GetBandwidth(uint64_t _bytesInASec){
-    std::string units;
-    if (_bytesInASec < 1000) {
-      units = "B/s";
-    } else if (_bytesInASec < 1000000) {
-      _bytesInASec /= 1000.0;
-      units = "KB/s";
-    } else {
-      _bytesInASec /= 1000000.0;
-      units = "MB/s";
-    }
-    return ToStringWithPrecision(_bytesInASec, 2, units);
+std::string GetBandwidth(uint64_t _bytesInASec) {
+  std::string units;
+  if (_bytesInASec < 1000) {
+    units = "B/s";
+  } else if (_bytesInASec < 1000000) {
+    _bytesInASec /= 1000.0;
+    units = "KB/s";
+  } else {
+    _bytesInASec /= 1000000.0;
+    units = "MB/s";
+  }
+  return ToStringWithPrecision(_bytesInASec, 2, units);
 }
 
-} // namespace
+}  // namespace
 
 TopicsStats::TopicsStats() : Plugin() { timer.start(kTimerPeriodInMs, this); }
 
-void TopicsStats::LoadConfig(const tinyxml2::XMLElement * /*_pluginElem*/) {
+void TopicsStats::LoadConfig(const tinyxml2::XMLElement* /*_pluginElem*/) {
   if (this->title.empty()) this->title = "Topics Stats";
 }
 
-void TopicsStats::OnMessage(const char */*_msgData*/, const size_t _size,
-    const ignition::transport::MessageInfo &_info) {
+void TopicsStats::OnMessage(const char* /*_msgData*/, const size_t _size,
+                            const ignition::transport::MessageInfo& _info) {
   const auto topic = _info.Topic();
 
-  const auto &statsPair = rawData.find(topic);
+  const auto& statsPair = rawData.find(topic);
   if (statsPair == rawData.end()) {
     std::cerr << "Unable to find stats for [" << topic << "]" << std::endl;
     return;
@@ -72,19 +72,14 @@ void TopicsStats::OnMessage(const char */*_msgData*/, const size_t _size,
   statsPair->second.numBytesLastSec += _size;
 }
 
-QStringList TopicsStats::Data() const {
-  return data;
-}
+QStringList TopicsStats::Data() const { return data; }
 
-void TopicsStats::SetData(const QStringList& _Data){
+void TopicsStats::SetData(const QStringList& _Data) {
   data = _Data;
   DataChanged();
 }
 
-void TopicsStats::SearchTopic(const QString& _topic){
-  topicFilter = _topic.toStdString();
-}
-
+void TopicsStats::SearchTopic(const QString& _topic) { topicFilter = _topic.toStdString(); }
 
 void TopicsStats::timerEvent(QTimerEvent*) {
   // Get all the unique topics.
@@ -105,11 +100,10 @@ void TopicsStats::timerEvent(QTimerEvent*) {
   // Add new topics.
   for (auto i = 0u; i < topics.size(); ++i) {
     auto topic = topics.at(i);
-    if (std::find(prevTopics.begin(),
-          prevTopics.end(), topic) == prevTopics.end()) {
+    if (std::find(prevTopics.begin(), prevTopics.end(), topic) == prevTopics.end()) {
       // Subscribe to the topic.
-      auto cb = std::bind(&TopicsStats::OnMessage, this, std::placeholders::_1,
-        std::placeholders::_2, std::placeholders::_3);
+      auto cb =
+          std::bind(&TopicsStats::OnMessage, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
       if (!node.SubscribeRaw(topic, cb)) {
         std::cerr << "Error subscribing to [" << topic << "]" << std::endl;
         continue;
@@ -124,13 +118,15 @@ void TopicsStats::timerEvent(QTimerEvent*) {
   prevTopics = topics;
 }
 
-void TopicsStats::UpdateGUIStats(){
+void TopicsStats::UpdateGUIStats() {
   std::map<std::string, BasicStats> afterFilterData;
-  std::for_each(rawData.cbegin(), rawData.cend(), [&afterFilterData, &topicFilter = this->topicFilter](const std::pair<std::string, BasicStats> _topicStats){
-    if(IsSubStr(_topicStats.first, topicFilter)){
-      afterFilterData[_topicStats.first] = _topicStats.second;
-    }
-  });
+  std::for_each(
+      rawData.cbegin(), rawData.cend(),
+      [&afterFilterData, &topicFilter = this->topicFilter](const std::pair<std::string, BasicStats> _topicStats) {
+        if (IsSubStr(_topicStats.first, topicFilter)) {
+          afterFilterData[_topicStats.first] = _topicStats.second;
+        }
+      });
 
   data.clear();
   for (const auto& topicData : afterFilterData) {
@@ -143,14 +139,14 @@ void TopicsStats::UpdateGUIStats(){
 }
 
 void TopicsStats::ResetStats() {
-  for (auto &topicPair : rawData) {
+  for (auto& topicPair : rawData) {
     topicPair.second.numMessagesLastSec = 0;
     topicPair.second.numBytesLastSec = 0;
   }
 }
 
-} // namespace gui
-} // namespace delphyne
+}  // namespace gui
+}  // namespace delphyne
 
 // Register this plugin
 IGNITION_ADD_PLUGIN(delphyne::gui::TopicsStats, ignition::gui::Plugin)

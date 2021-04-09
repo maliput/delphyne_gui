@@ -23,12 +23,6 @@ std::string ToStringWithPrecision(double _value, int _precision, const std::stri
   return sstr.str();
 }
 
-// \Returns True when @p _subStr is contained in _mainStr.
-bool IsSubStr(const std::string& _mainStr, const std::string& _subStr) {
-  const std::string::size_type n = _mainStr.find(_subStr);
-  return n == std::string::npos ? false : true;
-}
-
 // Get a string containing the bandwith and its correspondant unit.
 // \param _bytesLastSec Number of bytes in the a second.
 std::string GetBandwidth(uint64_t _bytesInASec) {
@@ -36,13 +30,13 @@ std::string GetBandwidth(uint64_t _bytesInASec) {
   if (_bytesInASec < 1000) {
     units = "B/s";
   } else if (_bytesInASec < 1000000) {
-    _bytesInASec /= 1000.0;
+    _bytesInASec /= 1000u;
     units = "KB/s";
   } else {
-    _bytesInASec /= 1000000.0;
+    _bytesInASec /= 1000000u;
     units = "MB/s";
   }
-  return ToStringWithPrecision(_bytesInASec, 2, units);
+  return ToStringWithPrecision(_bytesInASec, 2 /* decimal places */, units);
 }
 
 }  // namespace
@@ -67,17 +61,17 @@ void TopicsStats::OnMessage(const char* /*_msgData*/, const size_t _size,
   statsPair->second.numMessages++;
 
   // Update the number of messages received during the last second.
-  statsPair->second.numMessagesLastSec++;
+  statsPair->second.numMessagesInLastSec++;
 
   // Update the number of bytes received during the last second.
-  statsPair->second.numBytesLastSec += _size;
+  statsPair->second.numBytesInLastSec += _size;
 }
 
-QStringList TopicsStats::Data() const { return data; }
+QStringList TopicsStats::DisplayedTopicData() const { return displayedTopicData; }
 
-void TopicsStats::SetData(const QStringList& _Data) {
-  data = _Data;
-  DataChanged();
+void TopicsStats::SetDisplayedTopicData(const QStringList& _data) {
+  displayedTopicData = _data;
+  DisplayedTopicDataChanged();
 }
 
 void TopicsStats::SearchTopic(const QString& _topic) { topicFilter = _topic.toStdString(); }
@@ -100,7 +94,7 @@ void TopicsStats::timerEvent(QTimerEvent*) {
 
   // Add new topics.
   for (auto i = 0u; i < topics.size(); ++i) {
-    auto topic = topics.at(i);
+    const std::string& topic = topics.at(i);
     if (std::find(prevTopics.begin(), prevTopics.end(), topic) == prevTopics.end()) {
       // Subscribe to the topic.
       auto cb =
@@ -124,25 +118,26 @@ void TopicsStats::UpdateGUIStats() {
   std::for_each(
       rawData.cbegin(), rawData.cend(),
       [&afterFilterData, &topicFilter = this->topicFilter](const std::pair<std::string, BasicStats> _topicStats) {
-        if (IsSubStr(_topicStats.first, topicFilter)) {
+        if (_topicStats.first.find(topicFilter) != std::string::npos) {
           afterFilterData[_topicStats.first] = _topicStats.second;
         }
       });
 
-  data.clear();
+  displayedTopicData.clear();
   for (const auto& topicData : afterFilterData) {
-    data.append(QString::fromStdString(topicData.first));
-    data.append(QString::number(topicData.second.numMessages));
-    data.append(QString::fromStdString(ToStringWithPrecision(topicData.second.numMessagesLastSec, 0, "Hz")));
-    data.append(QString::fromStdString(GetBandwidth(topicData.second.numBytesLastSec)));
+    displayedTopicData.append(QString::fromStdString(topicData.first));
+    displayedTopicData.append(QString::number(topicData.second.numMessages));
+    displayedTopicData.append(
+        QString::fromStdString(ToStringWithPrecision(topicData.second.numMessagesInLastSec, 0, "Hz")));
+    displayedTopicData.append(QString::fromStdString(GetBandwidth(topicData.second.numBytesInLastSec)));
   }
-  DataChanged();
+  DisplayedTopicDataChanged();
 }
 
 void TopicsStats::ResetStats() {
   for (auto& topicPair : rawData) {
-    topicPair.second.numMessagesLastSec = 0;
-    topicPair.second.numBytesLastSec = 0;
+    topicPair.second.numMessagesInLastSec = 0;
+    topicPair.second.numBytesInLastSec = 0;
   }
 }
 

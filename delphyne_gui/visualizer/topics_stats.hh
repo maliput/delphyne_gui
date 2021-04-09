@@ -1,6 +1,11 @@
 // Copyright 2021 Toyota Research Institute
 #pragma once
 
+#include <cstdint>
+#include <map>
+#include <string>
+#include <vector>
+
 #include <ignition/gui/Plugin.hh>
 #include <ignition/transport/Node.hh>
 
@@ -11,27 +16,24 @@ namespace gui {
 class TopicsStats : public ignition::gui::Plugin {
   Q_OBJECT
 
-  // TODO(francocipollone): Use QHash<QString,QString> when using a new version of QT instead of QStringList.
-  Q_PROPERTY(QStringList data READ Data WRITE SetData NOTIFY DataChanged)
+  Q_PROPERTY(QStringList displayedTopicData READ DisplayedTopicData WRITE SetDisplayedTopicData NOTIFY
+                 DisplayedTopicDataChanged)
 
  public:
-  Q_INVOKABLE QStringList Data() const;
+  Q_INVOKABLE QStringList DisplayedTopicData() const;
 
-  Q_INVOKABLE void SetData(const QStringList& _Data);
-
- signals:
-  /// Signals to notify that the property has changed.
-  void DataChanged();
+  Q_INVOKABLE void SetDisplayedTopicData(const QStringList& _data);
 
  public:
   /// \brief Constructor.
   TopicsStats();
 
-  /// \brief Destructor
-  virtual ~TopicsStats() = default;
-
   // Documentation inherited
-  virtual void LoadConfig(const tinyxml2::XMLElement* _pluginElem);
+  void LoadConfig(const tinyxml2::XMLElement* _pluginElem) override;
+
+ signals:
+  /// Signals to notify that the property has changed.
+  void DisplayedTopicDataChanged();
 
  protected slots:
 
@@ -51,10 +53,10 @@ class TopicsStats : public ignition::gui::Plugin {
     uint64_t numMessages = 0;
 
     /// \brief Number of messages received during the last second.
-    uint64_t numMessagesLastSec = 0;
+    uint64_t numMessagesInLastSec = 0;
 
     /// \brief Number of bytes received during the last second.
-    uint64_t numBytesLastSec = 0;
+    uint64_t numBytesInLastSec = 0;
   };
 
   /// \brief Function called each time a topic update is received.
@@ -83,7 +85,7 @@ class TopicsStats : public ignition::gui::Plugin {
   ///  The list is expected to be comformed using blocks of
   ///  [`topic`, `messages`, `frequency`, `bandwidth`]. In the QML file
   ///   this is parsed to get the four values for each row.
-  QStringList data;
+  QStringList displayedTopicData;
 
   /// \brief Holds a user search by topic.
   std::string topicFilter{""};

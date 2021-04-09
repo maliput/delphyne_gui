@@ -74,13 +74,13 @@ Rectangle {
   // When new data arrives the table is updated.
   Connections {
       target: TopicsStats
-      onDataChanged: {
+      onDisplayedTopicDataChanged: {
         tableModel.clear()
-        for (var i = 0; i < TopicsStats.data.length; i = i + 4)  {
-          tableModel.append({"topic": TopicsStats.data[i],
-                             "messages": TopicsStats.data[i+1],
-                             "frequency" : TopicsStats.data[i+2],
-                             "bandwidth" : TopicsStats.data[i+3]})
+        for (var i = 0; i < TopicsStats.displayedTopicData.length; i = i + 4)  {
+          tableModel.append({"topic": TopicsStats.displayedTopicData[i],
+                             "messages": TopicsStats.displayedTopicData[i+1],
+                             "frequency" : TopicsStats.displayedTopicData[i+2],
+                             "bandwidth" : TopicsStats.displayedTopicData[i+3]})
         }
       }
   }

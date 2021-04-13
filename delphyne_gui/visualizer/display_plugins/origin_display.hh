@@ -12,7 +12,7 @@ namespace delphyne {
 namespace gui {
 
 /// @brief Implements a plugin to display the Inertial Frame axes in the scene.
-/// @details ign-gui3 does not have DisplayPlugins, so this plugin implements
+/// @details ign-gui3 does not have DisplayPlugins, so this plugin
 ///          implements a slightly different logic to what the original ign-gui0
 ///          DisplayPlugin did. It gets the scene name from the plugin
 ///          configuration and tries to get a pointer to it. If the scene is not

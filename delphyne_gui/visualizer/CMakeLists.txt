@@ -7,30 +7,35 @@ include_directories(
 )
 
 # ----------------------------------------
-# maliput_mesh library.
-add_library(maliput_mesh
+# maliput_viewer_model library.
+add_library(maliput_viewer_model
+  maliput_viewer_model.cc
   maliput_mesh_converter.cc
 )
-add_library(delphyne_gui::maliput_mesh ALIAS maliput_mesh)
-set_target_properties(maliput_mesh
+add_library(delphyne_gui::maliput_viewer_model ALIAS maliput_viewer_model)
+set_target_properties(maliput_viewer_model
   PROPERTIES
-    OUTPUT_NAME delphyne_gui_maliput_mesh
+    OUTPUT_NAME delphyne_gui_maliput_viewer_model
 )
 
-ament_target_dependencies(maliput_mesh
+ament_target_dependencies(maliput_viewer_model
   "maliput"
+  "maliput_multilane"
 )
 
-target_link_libraries(maliput_mesh
+target_link_libraries(maliput_viewer_model
   ${drake_LIBRARIES}
-  ignition-common3::ignition-common3
   delphyne::public_headers
+  delphyne::roads_utilities
+  ignition-common3::ignition-common3
+  ignition-rendering3::ignition-rendering3
   maliput::api
   maliput::utilities
+  maliput_multilane::maliput_multilane
 )
 
 install(
-  TARGETS maliput_mesh
+  TARGETS maliput_viewer_model
   EXPORT ${PROJECT_NAME}-targets
   RUNTIME DESTINATION bin
   LIBRARY DESTINATION lib
@@ -66,7 +71,6 @@ QT5_ADD_RESOURCES(MaliputViewerPlugin_RCC maliput_viewer_plugin.qrc)
 
 add_library(MaliputViewerPlugin
   ${CMAKE_CURRENT_SOURCE_DIR}/maliput_viewer_plugin.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/maliput_viewer_model.cc
   ${MaliputViewerPlugin_headers_MOC}
   ${MaliputViewerPlugin_RCC}
 )
@@ -76,21 +80,13 @@ set_target_properties(MaliputViewerPlugin
     OUTPUT_NAME MaliputViewerPlugin
 )
 
-ament_target_dependencies(MaliputViewerPlugin
-  "maliput"
-  "maliput_multilane"
-)
-
 target_link_libraries(MaliputViewerPlugin
-    delphyne::roads_utilities
     delphyne_gui::global_attributes
+    delphyne_gui::maliput_viewer_model
     ignition-gui3::ignition-gui3
     ignition-common3::ignition-common3
     ignition-transport8::ignition-transport8
     ignition-rendering3::ignition-rendering3
-    maliput::api
-    maliput_mesh
-    maliput_multilane::maliput_multilane
     ${Qt5Core_LIBRARIES}
     ${Qt5Widgets_LIBRARIES}
     ignition-plugin1::register
@@ -116,7 +112,6 @@ add_library(maliput_viewer_widget
   ${CMAKE_CURRENT_SOURCE_DIR}/maliput_viewer_widget.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/render_maliput_widget.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/rules_visualizer_widget.cc
-  maliput_viewer_model.cc
   orbit_view_control.cc
   render_maliput_widget.cc
   arrow_mesh.cc
@@ -133,25 +128,16 @@ set_target_properties(maliput_viewer_widget
     OUTPUT_NAME delphyne_gui_maliput_viewer_widget
 )
 
-ament_target_dependencies(maliput_viewer_widget
-  "maliput"
-  "maliput_multilane"
-)
-
 target_link_libraries(maliput_viewer_widget
   ${drake_LIBRARIES}
-  global_attributes
+  delphyne_gui::global_attributes
+  delphyne_gui::maliput_viewer_model
   ignition-common3::ignition-common3
   ignition-gui0::ignition-gui0
   ignition-msgs5::ignition-msgs5
   ignition-rendering3::ignition-rendering3
-  maliput_mesh
   ${Qt5Core_LIBRARIES}
   ${Qt5Widgets_LIBRARIES}
-  delphyne::roads_utilities
-  maliput::api
-  maliput_multilane::maliput_multilane
-  maliput::utilities
 )
 
 install(

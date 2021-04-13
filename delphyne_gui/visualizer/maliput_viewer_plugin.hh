@@ -40,8 +40,24 @@ class MaliputViewerPlugin : public ignition::gui::Plugin {
   /// @brief The scene name.
   static constexpr char const* kSceneName = "scene";
 
-  /// \brief Load meshes for the road and the labels.
-  void LoadMeshes();
+  /// \brief Fills a material for a lane label.
+  /// \param[in] _material Material to be filled.
+  static void CreateLaneLabelMaterial(ignition::rendering::MaterialPtr& _material);
+
+  /// \brief Fills a material for a branch point label.
+  /// \param[in] _material Material to be filled.
+  static void CreateBranchPointLabelMaterial(ignition::rendering::MaterialPtr& _material);
+
+  /// \brief Fills @p _ignitionMaterial with @p _maliputMaterial properties.
+  /// \param[in] _maliputMaterial Material properties.
+  /// \param[in] _ignitionMaterial A valid ignition::rendering::MaterialPtr.
+  /// \return True when @p _maliputMaterial is valid and @p _ignitionMaterial
+  /// can be filled.
+  static bool FillMaterial(const maliput::utility::Material* _maliputMaterial,
+                           ignition::rendering::MaterialPtr& _ignitionMaterial);
+
+  /// \brief Renders meshes for the road and the labels.
+  void RenderMeshes();
 
   /// \brief Builds visuals for each mesh inside @p _maliputMeshes that is
   /// enabled.
@@ -51,22 +67,6 @@ class MaliputViewerPlugin : public ignition::gui::Plugin {
   /// \brief Builds visuals for each label inside @p _labels that is enabled.
   /// \param[in] _labels A map of labels to render.
   void RenderLabels(const std::map<std::string, MaliputLabel>& _labels);
-
-  /// \brief Fills a material for a lane label.
-  /// \param[in] _material Material to be filled.
-  void CreateLaneLabelMaterial(ignition::rendering::MaterialPtr& _material) const;
-
-  /// \brief Fills a material for a branch point label.
-  /// \param[in] _material Material to be filled.
-  void CreateBranchPointLabelMaterial(ignition::rendering::MaterialPtr& _material) const;
-
-  /// \brief Fills @p _ignitionMaterial with @p _maliputMaterial properties.
-  /// \param[in] _maliputMaterial Material properties.
-  /// \param[in] _ignitionMaterial A valid ignition::rendering::MaterialPtr.
-  /// \return True when @p _maliputMaterial is valid and @p _ignitionMaterial
-  /// can be filled.
-  bool FillMaterial(const maliput::utility::Material* _maliputMaterial,
-                    ignition::rendering::MaterialPtr& _ignitionMaterial) const;
 
   /// \brief Configurate scene.
   void ConfigurateScene();

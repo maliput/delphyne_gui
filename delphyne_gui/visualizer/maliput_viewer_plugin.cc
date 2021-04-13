@@ -45,20 +45,20 @@ void MaliputViewerPlugin::timerEvent(QTimerEvent* _event) {
     return;
   }
   timer.stop();
-  LoadMeshes();
+  ConfigurateScene();
+  RenderMeshes();
 }
 
-void MaliputViewerPlugin::LoadMeshes() {
-  ConfigurateScene();
-  ignmsg << "Loading Road meshes..." << std::endl;
+void MaliputViewerPlugin::RenderMeshes() {
+  ignmsg << "Rendering Road meshes..." << std::endl;
   RenderRoadMeshes(model->Meshes());
-  ignmsg << "Loading Label meshes..." << std::endl;
+  ignmsg << "Rendering Label meshes..." << std::endl;
   RenderLabels(model->Labels());
 }
 
 void MaliputViewerPlugin::RenderRoadMeshes(const std::map<std::string, std::unique_ptr<MaliputMesh>>& _maliputMeshes) {
   for (const auto& id_mesh : _maliputMeshes) {
-    ignmsg << "Loading road mesh: " << id_mesh.first << std::endl;
+    ignmsg << "Rendering road mesh: " << id_mesh.first << std::endl;
     if (!id_mesh.second->enabled) {
       ignmsg << "Road mesh " << id_mesh.first << " is disabled." << std::endl;
       continue;
@@ -103,7 +103,7 @@ void MaliputViewerPlugin::RenderRoadMeshes(const std::map<std::string, std::uniq
 
 void MaliputViewerPlugin::RenderLabels(const std::map<std::string, MaliputLabel>& _labels) {
   for (const auto& id_mesh : _labels) {
-    ignmsg << "Loading label mesh: " << id_mesh.first << std::endl;
+    ignmsg << "Rendering label mesh: " << id_mesh.first << std::endl;
     if (!id_mesh.second.enabled) {
       ignmsg << "Label mesh " << id_mesh.first << " is disabled." << std::endl;
       continue;
@@ -147,7 +147,7 @@ void MaliputViewerPlugin::RenderLabels(const std::map<std::string, MaliputLabel>
   }
 }
 
-void MaliputViewerPlugin::CreateLaneLabelMaterial(ignition::rendering::MaterialPtr& _material) const {
+void MaliputViewerPlugin::CreateLaneLabelMaterial(ignition::rendering::MaterialPtr& _material) {
   _material->SetDiffuse(0.8, 0.8, 0.0);
   _material->SetAmbient(1.0, 1.0, 0.0);
   _material->SetSpecular(1.0, 1.0, 0.5);
@@ -155,7 +155,7 @@ void MaliputViewerPlugin::CreateLaneLabelMaterial(ignition::rendering::MaterialP
   _material->SetTransparency(0.5);
 }
 
-void MaliputViewerPlugin::CreateBranchPointLabelMaterial(ignition::rendering::MaterialPtr& _material) const {
+void MaliputViewerPlugin::CreateBranchPointLabelMaterial(ignition::rendering::MaterialPtr& _material) {
   _material->SetDiffuse(0.0, 0.7, 0.0);
   _material->SetAmbient(1.0, 1.0, 0.0);
   _material->SetSpecular(1.0, 1.0, 0.5);
@@ -164,7 +164,7 @@ void MaliputViewerPlugin::CreateBranchPointLabelMaterial(ignition::rendering::Ma
 }
 
 bool MaliputViewerPlugin::FillMaterial(const maliput::utility::Material* _maliputMaterial,
-                                       ignition::rendering::MaterialPtr& _ignitionMaterial) const {
+                                       ignition::rendering::MaterialPtr& _ignitionMaterial) {
   if (!_maliputMaterial) {
     return false;
   }
@@ -203,7 +203,8 @@ void MaliputViewerPlugin::LoadConfig(const tinyxml2::XMLElement* _pluginElem) {
     timer.start(kTimerPeriodInMs, this);
     return;
   }
-  LoadMeshes();
+  ConfigurateScene();
+  RenderMeshes();
 }
 
 void MaliputViewerPlugin::ConfigurateScene() {

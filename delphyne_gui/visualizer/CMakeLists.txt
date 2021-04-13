@@ -31,7 +31,6 @@ target_link_libraries(maliput_viewer_model
   ignition-rendering3::ignition-rendering3
   maliput::api
   maliput::utilities
-  maliput_multilane::maliput_multilane
 )
 
 install(

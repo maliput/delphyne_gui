@@ -6,6 +6,7 @@
 #include <ignition/plugin/Register.hh>
 #include <ignition/rendering/RenderEngine.hh>
 #include <ignition/rendering/RenderingIface.hh>
+#include <ignition/rendering/Text.hh>
 #include <ignition/rendering/Visual.hh>
 
 #include "global_attributes.hh"
@@ -51,55 +52,115 @@ void MaliputViewerPlugin::LoadMeshes() {
   ConfigurateScene();
   ignmsg << "Loading Road meshes..." << std::endl;
   RenderRoadMeshes(model->Meshes());
+  ignmsg << "Loading Label meshes..." << std::endl;
+  RenderLabels(model->Labels());
 }
 
 void MaliputViewerPlugin::RenderRoadMeshes(const std::map<std::string, std::unique_ptr<MaliputMesh>>& _maliputMeshes) {
   for (const auto& id_mesh : _maliputMeshes) {
-    ignmsg << "Loading " << id_mesh.first << std::endl;
+    ignmsg << "Loading road mesh: " << id_mesh.first << std::endl;
     if (!id_mesh.second->enabled) {
-      ignmsg << "Mesh " << id_mesh.first << " is disabled." << std::endl;
-
-    } else {
-      ignition::rendering::VisualPtr visual;
-      // Creates a material for the visual.
-      ignition::rendering::MaterialPtr material = scene->CreateMaterial();
-      if (!material) {
-        ignerr << "Failed to create material.\n";
-        continue;
-      }
-      visual = scene->CreateVisual();
-      if (!visual) {
-        ignerr << "Failed to create visual.\n";
-        continue;
-      }
-      // Adds the visual to the map for later reference.
-      meshes[id_mesh.first] = visual;
-      // Sets the pose of the mesh.
-      visual->SetLocalPose(ignition::math::Pose3d(0, 0, 0, 1, 0, 0, 0));
-      // Loads the mesh into the visual.
-      if (id_mesh.second->mesh.get() == nullptr) {
-        ignerr << id_mesh.first << "'s mesh pointer is nullptr" << std::endl;
-        continue;
-      }
-      ignition::rendering::MeshDescriptor descriptor(id_mesh.second->mesh.get());
-      descriptor.Load();
-      ignition::rendering::MeshPtr meshGeom = scene->CreateMesh(descriptor);
-      visual->AddGeometry(meshGeom);
-      // Adds the mesh to the parent root visual.
-      rootVisual->AddChild(visual);
-
-      // Applies the correct material to the mesh.
-      if (!FillMaterial(id_mesh.second->material.get(), material)) {
-        ignerr << "Failed to fill " << id_mesh.first << " material information.\n";
-        continue;
-      } else {
-        ignmsg << id_mesh.first << " material information is filled.\n";
-      }
-
-      visual->SetMaterial(material);
-      visual->SetVisible(id_mesh.second->visible);
+      ignmsg << "Road mesh " << id_mesh.first << " is disabled." << std::endl;
+      continue;
     }
+    ignition::rendering::VisualPtr visual;
+    // Creates a material for the visual.
+    ignition::rendering::MaterialPtr material = scene->CreateMaterial();
+    if (!material) {
+      ignerr << "Failed to create material.\n";
+      continue;
+    }
+    visual = scene->CreateVisual();
+    if (!visual) {
+      ignerr << "Failed to create visual.\n";
+      continue;
+    }
+    // Adds the visual to the map for later reference.
+    meshes[id_mesh.first] = visual;
+    // Sets the pose of the mesh.
+    visual->SetLocalPose(ignition::math::Pose3d(0, 0, 0, 1, 0, 0, 0));
+    // Loads the mesh into the visual.
+    if (id_mesh.second->mesh.get() == nullptr) {
+      ignerr << id_mesh.first << "'s mesh pointer is nullptr" << std::endl;
+      continue;
+    }
+    ignition::rendering::MeshDescriptor descriptor(id_mesh.second->mesh.get());
+    descriptor.Load();
+    ignition::rendering::MeshPtr meshGeom = scene->CreateMesh(descriptor);
+    visual->AddGeometry(meshGeom);
+    // Adds the mesh to the parent root visual.
+    rootVisual->AddChild(visual);
+
+    // Applies the correct material to the mesh.
+    if (!FillMaterial(id_mesh.second->material.get(), material)) {
+      ignerr << "Failed to fill " << id_mesh.first << " material information.\n";
+      continue;
+    }
+    visual->SetMaterial(material);
+    visual->SetVisible(id_mesh.second->visible);
   }
+}
+
+void MaliputViewerPlugin::RenderLabels(const std::map<std::string, MaliputLabel>& _labels) {
+  for (const auto& id_mesh : _labels) {
+    ignmsg << "Loading label mesh: " << id_mesh.first << std::endl;
+    if (!id_mesh.second.enabled) {
+      ignmsg << "Label mesh " << id_mesh.first << " is disabled." << std::endl;
+      continue;
+    }
+    ignition::rendering::VisualPtr visual;
+    // Creates a material for the visual.
+    ignition::rendering::MaterialPtr material = scene->CreateMaterial();
+    if (!material) {
+      ignerr << "Failed to create material.\n";
+      continue;
+    }
+    visual = scene->CreateVisual();
+    if (!visual) {
+      ignerr << "Failed to create visual.\n";
+      continue;
+    }
+    // Adds the visual to the map for later reference.
+    textLabels[id_mesh.second.text] = visual;
+    visual->SetLocalPose(ignition::math::Pose3d(id_mesh.second.position, ignition::math::Quaterniond()));
+    // Creates the text geometry.
+    ignition::rendering::TextPtr textGeometry = scene->CreateText();
+    textGeometry->SetFontName("Liberation Sans");
+    textGeometry->SetTextString(id_mesh.second.text);
+    textGeometry->SetShowOnTop(true);
+    textGeometry->SetTextAlignment(ignition::rendering::TextHorizontalAlign::CENTER,
+                                   ignition::rendering::TextVerticalAlign::CENTER);
+    visual->AddGeometry(textGeometry);
+    // Adds the mesh to the parent root visual.
+    rootVisual->AddChild(visual);
+    // Assigns a material for the visual.
+    if (id_mesh.second.labelType == MaliputLabelType::kLane) {
+      CreateLaneLabelMaterial(material);
+    } else if (id_mesh.second.labelType == MaliputLabelType::kBranchPoint) {
+      CreateBranchPointLabelMaterial(material);
+    } else {
+      ignerr << "Unsupported label type for: " << id_mesh.second.text << std::endl;
+    }
+    // Applies the correct material to the mesh.
+    visual->SetMaterial(material);
+    visual->SetVisible(id_mesh.second.visible);
+  }
+}
+
+void MaliputViewerPlugin::CreateLaneLabelMaterial(ignition::rendering::MaterialPtr& _material) const {
+  _material->SetDiffuse(0.8, 0.8, 0.0);
+  _material->SetAmbient(1.0, 1.0, 0.0);
+  _material->SetSpecular(1.0, 1.0, 0.5);
+  _material->SetShininess(10.);
+  _material->SetTransparency(0.5);
+}
+
+void MaliputViewerPlugin::CreateBranchPointLabelMaterial(ignition::rendering::MaterialPtr& _material) const {
+  _material->SetDiffuse(0.0, 0.7, 0.0);
+  _material->SetAmbient(1.0, 1.0, 0.0);
+  _material->SetSpecular(1.0, 1.0, 0.5);
+  _material->SetShininess(10.);
+  _material->SetTransparency(0.5);
 }
 
 bool MaliputViewerPlugin::FillMaterial(const maliput::utility::Material* _maliputMaterial,

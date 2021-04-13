@@ -48,6 +48,18 @@ class MaliputViewerPlugin : public ignition::gui::Plugin {
   /// \param[in] _maliputMeshes A map of meshes to render.
   void RenderRoadMeshes(const std::map<std::string, std::unique_ptr<MaliputMesh>>& _maliputMeshes);
 
+  /// \brief Builds visuals for each label inside @p _labels that is enabled.
+  /// \param[in] _labels A map of labels to render.
+  void RenderLabels(const std::map<std::string, MaliputLabel>& _labels);
+
+  /// \brief Fills a material for a lane label.
+  /// \param[in] _material Material to be filled.
+  void CreateLaneLabelMaterial(ignition::rendering::MaterialPtr& _material) const;
+
+  /// \brief Fills a material for a branch point label.
+  /// \param[in] _material Material to be filled.
+  void CreateBranchPointLabelMaterial(ignition::rendering::MaterialPtr& _material) const;
+
   /// \brief Fills @p _ignitionMaterial with @p _maliputMaterial properties.
   /// \param[in] _maliputMaterial Material properties.
   /// \param[in] _ignitionMaterial A valid ignition::rendering::MaterialPtr.
@@ -70,6 +82,9 @@ class MaliputViewerPlugin : public ignition::gui::Plugin {
 
   /// \brief Map of mesh visual pointers.
   std::map<std::string, ignition::rendering::VisualPtr> meshes;
+
+  /// \brief Map of text labels visual pointers.
+  std::map<std::string, ignition::rendering::VisualPtr> textLabels;
 
   /// \brief Holds a pointer to the scene.
   ignition::rendering::ScenePtr scene{nullptr};

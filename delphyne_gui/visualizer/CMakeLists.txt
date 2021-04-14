@@ -409,6 +409,7 @@ install(
 )
 
 add_subdirectory(display_plugins)
+add_subdirectory(topic_interface_plugin)
 
 if(BUILD_TESTING)
   add_subdirectory(test)

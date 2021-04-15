@@ -33,12 +33,32 @@ class MaliputViewerPlugin : public ignition::gui::Plugin {
   ///        the scene is not ready yet.
   void timerEvent(QTimerEvent* _event) override;
 
+ protected slots:
+  /// \brief Clears the visualizer, loads the new set of meshes and text labels.
+  /// \param[in] _mapFile The path to the map file to load and visualize.
+  void OnNewRoadNetwork(const QString& _mapFile);
+
+  /// \brief Saves the new path to the road rulebook to be loaded.
+  /// \param[in] _roadRulebookFile The path to the road rulebook file.
+  void OnNewRoadRulebook(const QString& _roadRulebookFile);
+
+  /// \brief Saves the new path to the traffic light book to be loaded.
+  /// \param[in] _trafficLightBookFile The path to the traffic light book file.
+  void OnNewTrafficLightBook(const QString& _trafficLightBookFile);
+
+  /// \brief Saves the new path to the phase ring book to be loaded.
+  /// \param[in] _phaseRingBookFile The path to the phase ring book file.
+  void OnNewPhaseRingBook(const QString& _phaseRingBookFile);
+
  private:
   /// @brief The period in milliseconds of the timer to try to load the meshes.
   static constexpr int kTimerPeriodInMs{500};
 
   /// @brief The scene name.
   static constexpr char const* kSceneName = "scene";
+
+  /// @brief The rendering engine name.
+  static constexpr char const* kEngineName = "ogre";
 
   /// \brief Fills a material for a lane label.
   /// \param[in] _material Material to be filled.
@@ -68,13 +88,25 @@ class MaliputViewerPlugin : public ignition::gui::Plugin {
   /// \param[in] _labels A map of labels to render.
   void RenderLabels(const std::map<std::string, MaliputLabel>& _labels);
 
+  /// \brief Clears all the references to text labels, meshes and the scene.
+  void Clear();
+
   /// \brief Configurate scene.
   void ConfigurateScene();
 
-  /// @brief The rendering engine name.
-  const std::string kEngineName{"ogre"};
+  /// \brief Holds the map file path.
+  std::string mapFile{""};
 
-  /// @brief Triggers an event every `kTimerPeriodInMs` to try to load the meshes.
+  /// \brief Holds the road rulebook file path.
+  std::string roadRulebookFile{""};
+
+  /// \brief Holds the traffic light book file path.
+  std::string trafficLightBookFile{""};
+
+  /// \brief Holds the phase ring book file path.
+  std::string phaseRingBookFile{""};
+
+  /// @brief Triggers an event every `kTimerPeriodInMs` to try to get the scene.
   QBasicTimer timer;
 
   /// \brief Root visual where all the child mesh visuals are added.

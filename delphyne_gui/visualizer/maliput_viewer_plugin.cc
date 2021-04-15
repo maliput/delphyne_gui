@@ -13,6 +13,17 @@
 
 namespace delphyne {
 namespace gui {
+namespace {
+
+// \brief Returns the absolute path from @p fileUrl.
+// \details `fileUrl` is expected to be conformed as:
+//          "file://" + "absolute path"
+std::string GetPathFromFileUrl(const std::string& fileUrl) {
+  static constexpr char const* kFileUrlLabel = "file://";
+  return fileUrl.substr(fileUrl.find(kFileUrlLabel) + strlen(kFileUrlLabel));
+}
+
+}  // namespace
 
 MaliputViewerPlugin::MaliputViewerPlugin() : Plugin() {
   model = std::make_unique<MaliputViewerModel>();
@@ -25,9 +36,26 @@ MaliputViewerPlugin::MaliputViewerPlugin() : Plugin() {
     model->Load(GlobalAttributes::GetArgument("xodr_file"));
   } else if (GlobalAttributes::HasArgument("yaml_file")) {
     model->Load(GlobalAttributes::GetArgument("yaml_file"));
-  } else {
-    ignerr << "There is no xodr_file nor yaml_file provided by CLI to be loaded. " << std::endl;
   }
+}
+
+void MaliputViewerPlugin::OnNewRoadNetwork(const QString& _mapFile) {
+  Clear();
+  mapFile = GetPathFromFileUrl(_mapFile.toStdString());
+  model->Load(mapFile, roadRulebookFile, trafficLightBookFile, phaseRingBookFile);
+  RenderMeshes();
+}
+
+void MaliputViewerPlugin::OnNewRoadRulebook(const QString& _roadRulebookFile) {
+  roadRulebookFile = GetPathFromFileUrl(_roadRulebookFile.toStdString());
+}
+
+void MaliputViewerPlugin::OnNewTrafficLightBook(const QString& _trafficLightBookFile) {
+  trafficLightBookFile = GetPathFromFileUrl(_trafficLightBookFile.toStdString());
+}
+
+void MaliputViewerPlugin::OnNewPhaseRingBook(const QString& _phaseRingBookFile) {
+  phaseRingBookFile = GetPathFromFileUrl(_phaseRingBookFile.toStdString());
 }
 
 void MaliputViewerPlugin::timerEvent(QTimerEvent* _event) {
@@ -145,6 +173,19 @@ void MaliputViewerPlugin::RenderLabels(const std::map<std::string, MaliputLabel>
     visual->SetMaterial(material);
     visual->SetVisible(id_mesh.second.visible);
   }
+}
+
+void MaliputViewerPlugin::Clear() {
+  // Clears the text labels.
+  for (auto it : textLabels) {
+    this->rootVisual->RemoveChild(it.second);
+  }
+  // Clears the meshes.
+  for (auto it : meshes) {
+    this->rootVisual->RemoveChild(it.second);
+  }
+  textLabels.clear();
+  meshes.clear();
 }
 
 void MaliputViewerPlugin::CreateLaneLabelMaterial(ignition::rendering::MaterialPtr& _material) {

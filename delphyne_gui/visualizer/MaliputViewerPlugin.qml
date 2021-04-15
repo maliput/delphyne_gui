@@ -19,6 +19,7 @@ Rectangle {
     source: "FileSelectionArea.qml"
   }
   ToolSeparator {
+    id: fileSectionSeparator
     orientation: Qt.Horizontal
     anchors.top: filesLoader.bottom
     anchors.topMargin: 15
@@ -26,5 +27,14 @@ Rectangle {
     anchors.leftMargin: 10
     anchors.right: parent.right
     anchors.rightMargin: 10
+  }
+  // Layers Selection Panel
+  Loader {
+    id: layersLoader
+    width: parent.width
+    source: "LayersSelectionArea.qml"
+    anchors.top: fileSectionSeparator.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
   }
 }

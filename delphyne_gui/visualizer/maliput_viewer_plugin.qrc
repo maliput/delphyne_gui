@@ -2,5 +2,6 @@
   <qresource prefix="MaliputViewerPlugin/">
     <file>MaliputViewerPlugin.qml</file>
     <file>FileSelectionArea.qml</file>
+    <file>LayersSelectionArea.qml</file>
   </qresource>
 </RCC>

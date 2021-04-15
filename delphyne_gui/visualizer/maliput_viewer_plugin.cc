@@ -15,6 +15,11 @@ namespace delphyne {
 namespace gui {
 namespace {
 
+// \returns True when @p keyword is found in @p word.
+bool FoundKeyword(const std::string& word, const std::string& keyword) {
+  return word.find(keyword) != std::string::npos;
+}
+
 // \brief Returns the absolute path from @p fileUrl.
 // \details `fileUrl` is expected to be conformed as:
 //          "file://" + "absolute path"
@@ -48,6 +53,25 @@ void MaliputViewerPlugin::OnNewRoadNetwork(const QString& _mapFile, const QStrin
   trafficLightBookFile = GetPathFromFileUrl(_trafficLightBookFile.toStdString());
   phaseRingBookFile = GetPathFromFileUrl(_phaseRingBookFile.toStdString());
   model->Load(mapFile, roadRulebookFile, trafficLightBookFile, phaseRingBookFile);
+  emit LayerCheckboxesChanged();
+  RenderMeshes();
+}
+
+void MaliputViewerPlugin::OnNewMeshLayerSelection(const QString& _layer, bool _state) {
+  static constexpr char const* kAll{"all"};
+  const std::string layer{_layer.toStdString()};
+  const std::size_t all_keyword = layer.find(kAll);
+  // If the keyword "all" is found, enable all of the parsed type.
+  if (FoundKeyword(layer, kAll)) {
+    const std::string keyword = layer.substr(0, all_keyword);
+    for (auto const& it : this->model->Meshes()) {
+      if (FoundKeyword(it.first, keyword)) {
+        this->model->SetLayerState(it.first, _state);
+      }
+    }
+  } else {
+    this->model->SetLayerState(layer, _state);
+  }
   RenderMeshes();
 }
 
@@ -80,45 +104,56 @@ void MaliputViewerPlugin::RenderMeshes() {
 void MaliputViewerPlugin::RenderRoadMeshes(const std::map<std::string, std::unique_ptr<MaliputMesh>>& _maliputMeshes) {
   for (const auto& id_mesh : _maliputMeshes) {
     ignmsg << "Rendering road mesh: " << id_mesh.first << std::endl;
+
+    // Checks if the mesh to be rendered already exists or not.
+    const auto meshExists = meshes.find(id_mesh.first);
+
     if (!id_mesh.second->enabled) {
       ignmsg << "Road mesh " << id_mesh.first << " is disabled." << std::endl;
+      // If the mesh already exists, set visibility to false.
+      if (meshExists != this->meshes.end()) {
+        meshes[id_mesh.first]->SetVisible(false);
+      }
       continue;
     }
-    ignition::rendering::VisualPtr visual;
-    // Creates a material for the visual.
-    ignition::rendering::MaterialPtr material = scene->CreateMaterial();
-    if (!material) {
-      ignerr << "Failed to create material.\n";
-      continue;
-    }
-    visual = scene->CreateVisual();
-    if (!visual) {
-      ignerr << "Failed to create visual.\n";
-      continue;
-    }
-    // Adds the visual to the map for later reference.
-    meshes[id_mesh.first] = visual;
-    // Sets the pose of the mesh.
-    visual->SetLocalPose(ignition::math::Pose3d(0, 0, 0, 1, 0, 0, 0));
-    // Loads the mesh into the visual.
-    if (id_mesh.second->mesh.get() == nullptr) {
-      ignerr << id_mesh.first << "'s mesh pointer is nullptr" << std::endl;
-      continue;
-    }
-    ignition::rendering::MeshDescriptor descriptor(id_mesh.second->mesh.get());
-    descriptor.Load();
-    ignition::rendering::MeshPtr meshGeom = scene->CreateMesh(descriptor);
-    visual->AddGeometry(meshGeom);
-    // Adds the mesh to the parent root visual.
-    rootVisual->AddChild(visual);
+    // If the mesh doesn't exist, it creates new one.
+    if (meshExists == this->meshes.end()) {
+      ignition::rendering::VisualPtr visual;
+      // Creates a material for the visual.
+      ignition::rendering::MaterialPtr material = scene->CreateMaterial();
+      if (!material) {
+        ignerr << "Failed to create material.\n";
+        continue;
+      }
+      visual = scene->CreateVisual();
+      if (!visual) {
+        ignerr << "Failed to create visual.\n";
+        continue;
+      }
+      // Adds the visual to the map for later reference.
+      meshes[id_mesh.first] = visual;
+      // Sets the pose of the mesh.
+      visual->SetLocalPose(ignition::math::Pose3d(0, 0, 0, 1, 0, 0, 0));
+      // Loads the mesh into the visual.
+      if (id_mesh.second->mesh.get() == nullptr) {
+        ignerr << id_mesh.first << "'s mesh pointer is nullptr" << std::endl;
+        continue;
+      }
+      ignition::rendering::MeshDescriptor descriptor(id_mesh.second->mesh.get());
+      descriptor.Load();
+      ignition::rendering::MeshPtr meshGeom = scene->CreateMesh(descriptor);
+      visual->AddGeometry(meshGeom);
+      // Adds the mesh to the parent root visual.
+      rootVisual->AddChild(visual);
 
-    // Applies the correct material to the mesh.
-    if (!FillMaterial(id_mesh.second->material.get(), material)) {
-      ignerr << "Failed to fill " << id_mesh.first << " material information.\n";
-      continue;
+      // Applies the correct material to the mesh.
+      if (!FillMaterial(id_mesh.second->material.get(), material)) {
+        ignerr << "Failed to fill " << id_mesh.first << " material information.\n";
+        continue;
+      }
+      visual->SetMaterial(material);
     }
-    visual->SetMaterial(material);
-    visual->SetVisible(id_mesh.second->visible);
+    meshes.at(id_mesh.first)->SetVisible(id_mesh.second->visible);
   }
 }
 

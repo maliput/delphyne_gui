@@ -18,4 +18,13 @@ Rectangle {
     width: parent.width
     source: "FileSelectionArea.qml"
   }
+  ToolSeparator {
+    orientation: Qt.Horizontal
+    anchors.top: filesLoader.bottom
+    anchors.topMargin: 15
+    anchors.left: parent.left
+    anchors.leftMargin: 10
+    anchors.right: parent.right
+    anchors.rightMargin: 10
+  }
 }

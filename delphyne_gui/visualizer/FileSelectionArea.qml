@@ -35,6 +35,17 @@ GridLayout {
   property string mapFilePath: ""
 
   /**
+  * Title text
+  */
+  Text {
+    id: titleText
+    Layout.columnSpan: 2
+    anchors.horizontalCenter: parent.horizontalCenter
+    font.pointSize: 10
+    text: "FILES SELECTION"
+  }
+
+  /**
   * Mapfile selecting button
   */
   FileDialog {
@@ -46,12 +57,12 @@ GridLayout {
     selectMultiple : false
     sidebarVisible : true
     onAccepted: {
-        console.log("Map file selection: You chose: " + mapFileDialog.fileUrl)
-        mapFilePath = mapFileDialog.fileUrl
-        MaliputViewerPlugin.OnNewRoadNetwork(mapFilePath)
+      console.log("Map file selection: You chose: " + mapFileDialog.fileUrl)
+      mapFilePath = mapFileDialog.fileUrl
+      MaliputViewerPlugin.OnNewRoadNetwork(mapFilePath)
     }
     onRejected: {
-        console.log("Map file selection: Canceled")
+      console.log("Map file selection: Canceled")
     }
     visible: false
   }
@@ -88,12 +99,12 @@ GridLayout {
     selectMultiple : false
     sidebarVisible : true
     onAccepted: {
-        console.log("RoadRuleBook selection: You chose: " + roadRulebookDialog.fileUrl)
-        roadRulebookPath = roadRulebookDialog.fileUrl
-        MaliputViewerPlugin.OnNewRoadRulebook(roadRulebookPath)
+      console.log("RoadRuleBook selection: You chose: " + roadRulebookDialog.fileUrl)
+      roadRulebookPath = roadRulebookDialog.fileUrl
+      MaliputViewerPlugin.OnNewRoadRulebook(roadRulebookPath)
     }
     onRejected: {
-        console.log("RoadRuleBook selection: Canceled")
+      console.log("RoadRuleBook selection: Canceled")
     }
     visible: false
   }
@@ -127,12 +138,12 @@ GridLayout {
     selectMultiple : false
     sidebarVisible : true
     onAccepted: {
-        console.log("TrafficLightBook selection: You chose: " + trafficLightBookDialog.fileUrl)
-        trafficLightBookPath = trafficLightBookDialog.fileUrl
-        MaliputViewerPlugin.OnNewTrafficLightBook(trafficLightBookPath)
+      console.log("TrafficLightBook selection: You chose: " + trafficLightBookDialog.fileUrl)
+      trafficLightBookPath = trafficLightBookDialog.fileUrl
+      MaliputViewerPlugin.OnNewTrafficLightBook(trafficLightBookPath)
     }
     onRejected: {
-        console.log("TrafficLightBook selection: Canceled")
+      console.log("TrafficLightBook selection: Canceled")
     }
     visible: false
   }
@@ -166,12 +177,12 @@ GridLayout {
     selectMultiple : false
     sidebarVisible : true
     onAccepted: {
-        console.log("PhaseRingBook selection: You chose: " + phaseRingBookDialog.fileUrl)
-        phaseRingBookPath = phaseRingBookDialog.fileUrl
-        MaliputViewerPlugin.OnNewPhaseRingBook(phaseRingBookPath)
+      console.log("PhaseRingBook selection: You chose: " + phaseRingBookDialog.fileUrl)
+      phaseRingBookPath = phaseRingBookDialog.fileUrl
+      MaliputViewerPlugin.OnNewPhaseRingBook(phaseRingBookPath)
     }
     onRejected: {
-        console.log("PhaseRingBook selection: Canceled")
+      console.log("PhaseRingBook selection: Canceled")
     }
     visible: false
   }

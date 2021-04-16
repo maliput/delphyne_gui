@@ -18,9 +18,10 @@ namespace {
 // \brief Returns the absolute path from @p fileUrl.
 // \details `fileUrl` is expected to be conformed as:
 //          "file://" + "absolute path"
+//          If `fileUrl` is empty returns an empty string.
 std::string GetPathFromFileUrl(const std::string& fileUrl) {
   static constexpr char const* kFileUrlLabel = "file://";
-  return fileUrl.substr(fileUrl.find(kFileUrlLabel) + strlen(kFileUrlLabel));
+  return fileUrl.empty() ? fileUrl : fileUrl.substr(fileUrl.find(kFileUrlLabel) + strlen(kFileUrlLabel));
 }
 
 }  // namespace
@@ -39,23 +40,15 @@ MaliputViewerPlugin::MaliputViewerPlugin() : Plugin() {
   }
 }
 
-void MaliputViewerPlugin::OnNewRoadNetwork(const QString& _mapFile) {
+void MaliputViewerPlugin::OnNewRoadNetwork(const QString& _mapFile, const QString& _roadRulebookFile,
+                                           const QString& _trafficLightBookFile, const QString& _phaseRingBookFile) {
   Clear();
   mapFile = GetPathFromFileUrl(_mapFile.toStdString());
+  roadRulebookFile = GetPathFromFileUrl(_roadRulebookFile.toStdString());
+  trafficLightBookFile = GetPathFromFileUrl(_trafficLightBookFile.toStdString());
+  phaseRingBookFile = GetPathFromFileUrl(_phaseRingBookFile.toStdString());
   model->Load(mapFile, roadRulebookFile, trafficLightBookFile, phaseRingBookFile);
   RenderMeshes();
-}
-
-void MaliputViewerPlugin::OnNewRoadRulebook(const QString& _roadRulebookFile) {
-  roadRulebookFile = GetPathFromFileUrl(_roadRulebookFile.toStdString());
-}
-
-void MaliputViewerPlugin::OnNewTrafficLightBook(const QString& _trafficLightBookFile) {
-  trafficLightBookFile = GetPathFromFileUrl(_trafficLightBookFile.toStdString());
-}
-
-void MaliputViewerPlugin::OnNewPhaseRingBook(const QString& _phaseRingBookFile) {
-  phaseRingBookFile = GetPathFromFileUrl(_phaseRingBookFile.toStdString());
 }
 
 void MaliputViewerPlugin::timerEvent(QTimerEvent* _event) {

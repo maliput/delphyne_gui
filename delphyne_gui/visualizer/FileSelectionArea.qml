@@ -46,48 +46,6 @@ GridLayout {
   }
 
   /**
-  * Mapfile selecting button
-  */
-  FileDialog {
-    id: mapFileDialog
-    title: "Please choose a map to load"
-    nameFilters: [ "XODR files (*.xodr)", "YAML files (*.yaml)", "All files (*)" ]
-    selectExisting : true
-    selectFolder : false
-    selectMultiple : false
-    sidebarVisible : true
-    onAccepted: {
-      console.log("Map file selection: You chose: " + mapFileDialog.fileUrl)
-      mapFilePath = mapFileDialog.fileUrl
-      MaliputViewerPlugin.OnNewRoadNetwork(mapFilePath)
-    }
-    onRejected: {
-      console.log("Map file selection: Canceled")
-    }
-    visible: false
-  }
-  TextField {
-    id: mapFilePathTextField
-    Layout.fillWidth: true
-    Layout.columnSpan: 2
-    readOnly: true
-    text: mapFilePath
-    placeholderText: qsTr("Load an .xodr or yaml map...")
-  }
-  Button {
-    id: loadFileButton
-    text: "LOAD"
-    checkable: false
-    Layout.columnSpan: 2
-    Layout.fillWidth: true
-    onClicked: {
-      mapFileDialog.visible = true
-    }
-    Material.background: Material.primary
-  }
-
-
-  /**
   * RoadRulebook selecting button
   */
   FileDialog {
@@ -101,7 +59,6 @@ GridLayout {
     onAccepted: {
       console.log("RoadRuleBook selection: You chose: " + roadRulebookDialog.fileUrl)
       roadRulebookPath = roadRulebookDialog.fileUrl
-      MaliputViewerPlugin.OnNewRoadRulebook(roadRulebookPath)
     }
     onRejected: {
       console.log("RoadRuleBook selection: Canceled")
@@ -140,7 +97,6 @@ GridLayout {
     onAccepted: {
       console.log("TrafficLightBook selection: You chose: " + trafficLightBookDialog.fileUrl)
       trafficLightBookPath = trafficLightBookDialog.fileUrl
-      MaliputViewerPlugin.OnNewTrafficLightBook(trafficLightBookPath)
     }
     onRejected: {
       console.log("TrafficLightBook selection: Canceled")
@@ -179,7 +135,6 @@ GridLayout {
     onAccepted: {
       console.log("PhaseRingBook selection: You chose: " + phaseRingBookDialog.fileUrl)
       phaseRingBookPath = phaseRingBookDialog.fileUrl
-      MaliputViewerPlugin.OnNewPhaseRingBook(phaseRingBookPath)
     }
     onRejected: {
       console.log("PhaseRingBook selection: Canceled")
@@ -200,6 +155,60 @@ GridLayout {
     Layout.preferredWidth: parent.width * 0.3
     onClicked: {
       phaseRingBookDialog.visible = true
+    }
+    Material.background: Material.primary
+  }
+
+  /**
+  * Mapfile selecting button
+  */
+  FileDialog {
+    id: mapFileDialog
+    title: "Please choose a map to load"
+    nameFilters: [ "XODR files (*.xodr)", "YAML files (*.yaml)", "All files (*)" ]
+    selectExisting : true
+    selectFolder : false
+    selectMultiple : false
+    sidebarVisible : true
+    onAccepted: {
+      console.log("Map file selection: You chose: " + mapFileDialog.fileUrl)
+      mapFilePath = mapFileDialog.fileUrl
+    }
+    onRejected: {
+      console.log("Map file selection: Canceled")
+    }
+    visible: false
+  }
+
+  TextField {
+    id: mapFilePathTextField
+    Layout.fillWidth: true
+    readOnly: true
+    text: mapFilePath
+    placeholderText: qsTr("Select an XODR or YAML map file...")
+  }
+  Button {
+    id: mapFileButton
+    text: "Map file"
+    checkable: false
+    Layout.preferredWidth: parent.width * 0.3
+    onClicked: {
+      mapFileDialog.visible = true
+    }
+    Material.background: Material.primary
+  }
+
+  /*
+  * Load button
+  */
+  Button {
+    id: loadButton
+    text: "LOAD"
+    checkable: false
+    Layout.columnSpan: 2
+    Layout.fillWidth: true
+    onClicked: {
+      MaliputViewerPlugin.OnNewRoadNetwork(mapFilePath, roadRulebookPath, trafficLightBookPath, phaseRingBookPath)
     }
     Material.background: Material.primary
   }

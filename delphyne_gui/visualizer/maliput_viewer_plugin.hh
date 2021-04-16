@@ -34,21 +34,13 @@ class MaliputViewerPlugin : public ignition::gui::Plugin {
   void timerEvent(QTimerEvent* _event) override;
 
  protected slots:
-  /// \brief Clears the visualizer, loads the new set of meshes and text labels.
+  /// \brief Clears the visualizer, loads a RoadNetwork and update the GUI with meshes and labels.
   /// \param[in] _mapFile The path to the map file to load and visualize.
-  void OnNewRoadNetwork(const QString& _mapFile);
-
-  /// \brief Saves the new path to the road rulebook to be loaded.
   /// \param[in] _roadRulebookFile The path to the road rulebook file.
-  void OnNewRoadRulebook(const QString& _roadRulebookFile);
-
-  /// \brief Saves the new path to the traffic light book to be loaded.
   /// \param[in] _trafficLightBookFile The path to the traffic light book file.
-  void OnNewTrafficLightBook(const QString& _trafficLightBookFile);
-
-  /// \brief Saves the new path to the phase ring book to be loaded.
   /// \param[in] _phaseRingBookFile The path to the phase ring book file.
-  void OnNewPhaseRingBook(const QString& _phaseRingBookFile);
+  void OnNewRoadNetwork(const QString& _mapFile, const QString& _roadRulebookFile, const QString& _trafficLightBookFile,
+                        const QString& _phaseRingBookFile);
 
  private:
   /// @brief The period in milliseconds of the timer to try to load the meshes.

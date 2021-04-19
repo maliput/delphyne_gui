@@ -31,9 +31,13 @@ class MaliputViewerPlugin : public ignition::gui::Plugin {
   /// \param[in] _pluginElem XML configuration for this plugin.
   void LoadConfig(const tinyxml2::XMLElement* _pluginElem) override;
 
-  Q_INVOKABLE QList<bool> LayerCheckboxes() { return kDefaultLayersSelection; }
+  /// Called when a new RoadNetwork is loaded to default the checkboxes' state
+  /// in the layers selection panel for the meshes.
+  Q_INVOKABLE QList<bool> LayerCheckboxes() const;
 
  signals:
+  /// \brief Signal emitted to reset the checkboxes' state for the layers visualization
+  ///        when a new RoadNetwork is loaded.
   void LayerCheckboxesChanged();
 
  protected:
@@ -98,12 +102,6 @@ class MaliputViewerPlugin : public ignition::gui::Plugin {
 
   /// \brief Configurate scene.
   void ConfigurateScene();
-
-  /// \brief Default layer selection for UI's checkboxes.
-  const QList<bool> kDefaultLayersSelection{true /* asphalt */,      true /* lane */,
-                                            true /* marker */,       true /* h_bounds */,
-                                            true /* branchpoint */,  false /* grayed_asphalt */,
-                                            false /* grayed_lane */, false /* grayed_marker */};
 
   /// \brief Holds the map file path.
   std::string mapFile{""};

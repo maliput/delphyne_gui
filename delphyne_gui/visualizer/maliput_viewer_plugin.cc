@@ -45,6 +45,14 @@ MaliputViewerPlugin::MaliputViewerPlugin() : Plugin() {
   }
 }
 
+QList<bool> MaliputViewerPlugin::LayerCheckboxes() const {
+  // Returns the checkboxes' state by default.
+  return {true /* asphalt */,      true /* lane */,
+          true /* marker */,       true /* h_bounds */,
+          true /* branchpoint */,  false /* grayed_asphalt */,
+          false /* grayed_lane */, false /* grayed_marker */};
+}
+
 void MaliputViewerPlugin::OnNewRoadNetwork(const QString& _mapFile, const QString& _roadRulebookFile,
                                            const QString& _trafficLightBookFile, const QString& _phaseRingBookFile) {
   Clear();

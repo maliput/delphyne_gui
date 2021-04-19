@@ -8,7 +8,7 @@ import QtQuick.Layouts 1.3
 
 // Panel that contains checkboxs to enable or disable layers.
 GridLayout {
-  id: filesSelectionArea
+  id: layersVisualizationPanel
   columns: 3
   anchors.left: parent.left
   anchors.leftMargin: 10

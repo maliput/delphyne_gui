@@ -20,6 +20,9 @@ namespace gui {
 class MaliputViewerPlugin : public ignition::gui::Plugin {
   Q_OBJECT
 
+  /// Property used to load the default state of layers visualization in its correspondant UI's checkboxes.
+  Q_PROPERTY(QList<bool> layerCheckboxes READ LayerCheckboxes NOTIFY LayerCheckboxesChanged)
+
  public:
   /// \brief Default constructor.
   MaliputViewerPlugin();
@@ -27,6 +30,15 @@ class MaliputViewerPlugin : public ignition::gui::Plugin {
   /// Called by Ignition GUI when plugin is instantiated.
   /// \param[in] _pluginElem XML configuration for this plugin.
   void LoadConfig(const tinyxml2::XMLElement* _pluginElem) override;
+
+  /// Called when a new RoadNetwork is loaded to default the checkboxes' state
+  /// in the layers selection panel for the meshes.
+  Q_INVOKABLE QList<bool> LayerCheckboxes() const;
+
+ signals:
+  /// \brief Signal emitted to reset the checkboxes' state for the layers visualization
+  ///        when a new RoadNetwork is loaded.
+  void LayerCheckboxesChanged();
 
  protected:
   /// @brief Timer event callback which handles the logic to load the meshes when
@@ -41,6 +53,11 @@ class MaliputViewerPlugin : public ignition::gui::Plugin {
   /// \param[in] _phaseRingBookFile The path to the phase ring book file.
   void OnNewRoadNetwork(const QString& _mapFile, const QString& _roadRulebookFile, const QString& _trafficLightBookFile,
                         const QString& _phaseRingBookFile);
+
+  /// \brief Change the visibility of the layers.
+  /// \param[in] _layer The layer to change its visibility.
+  /// \param[in] _state The state of the visibility checkbox.
+  void OnNewMeshLayerSelection(const QString& _layer, bool _state);
 
  private:
   /// @brief The period in milliseconds of the timer to try to load the meshes.

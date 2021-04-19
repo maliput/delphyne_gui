@@ -53,8 +53,17 @@ QList<bool> MaliputViewerPlugin::LayerCheckboxes() const {
           false /* grayed_lane */, false /* grayed_marker */};
 }
 
+QList<bool> MaliputViewerPlugin::LabelCheckboxes() const {
+  // Returns the checkboxes' state by default.
+  return {true /* lane */, true /* branch_point */};
+}
+
 void MaliputViewerPlugin::OnNewRoadNetwork(const QString& _mapFile, const QString& _roadRulebookFile,
                                            const QString& _trafficLightBookFile, const QString& _phaseRingBookFile) {
+  if (_mapFile.isEmpty()) {
+    ignerr << "Select the map file before clicking the LOAD button." << std::endl;
+    return;
+  }
   Clear();
   mapFile = GetPathFromFileUrl(_mapFile.toStdString());
   roadRulebookFile = GetPathFromFileUrl(_roadRulebookFile.toStdString());
@@ -62,6 +71,7 @@ void MaliputViewerPlugin::OnNewRoadNetwork(const QString& _mapFile, const QStrin
   phaseRingBookFile = GetPathFromFileUrl(_phaseRingBookFile.toStdString());
   model->Load(mapFile, roadRulebookFile, trafficLightBookFile, phaseRingBookFile);
   emit LayerCheckboxesChanged();
+  emit LabelCheckboxesChanged();
   RenderMeshes();
 }
 
@@ -72,15 +82,25 @@ void MaliputViewerPlugin::OnNewMeshLayerSelection(const QString& _layer, bool _s
   // If the keyword "all" is found, enable all of the parsed type.
   if (FoundKeyword(layer, kAll)) {
     const std::string keyword = layer.substr(0, all_keyword);
-    for (auto const& it : this->model->Meshes()) {
+    for (auto const& it : model->Meshes()) {
       if (FoundKeyword(it.first, keyword)) {
-        this->model->SetLayerState(it.first, _state);
+        model->SetLayerState(it.first, _state);
       }
     }
   } else {
-    this->model->SetLayerState(layer, _state);
+    model->SetLayerState(layer, _state);
   }
-  RenderMeshes();
+  RenderRoadMeshes(model->Meshes());
+}
+
+void MaliputViewerPlugin::OnNewTextLabelSelection(const QString& _label, bool _state) {
+  const std::string label{_label.toStdString()};
+  for (auto const& it : model->Labels()) {
+    if (FoundKeyword(it.first, label)) {
+      model->SetTextLabelState(it.first, _state);
+    }
+  }
+  RenderLabels(model->Labels());
 }
 
 void MaliputViewerPlugin::timerEvent(QTimerEvent* _event) {
@@ -125,7 +145,7 @@ void MaliputViewerPlugin::RenderRoadMeshes(const std::map<std::string, std::uniq
       continue;
     }
     // If the mesh doesn't exist, it creates new one.
-    if (meshExists == this->meshes.end()) {
+    if (meshExists == meshes.end()) {
       ignition::rendering::VisualPtr visual;
       // Creates a material for the visual.
       ignition::rendering::MaterialPtr material = scene->CreateMaterial();
@@ -166,48 +186,57 @@ void MaliputViewerPlugin::RenderRoadMeshes(const std::map<std::string, std::uniq
 }
 
 void MaliputViewerPlugin::RenderLabels(const std::map<std::string, MaliputLabel>& _labels) {
-  for (const auto& id_mesh : _labels) {
-    ignmsg << "Rendering label mesh: " << id_mesh.first << std::endl;
-    if (!id_mesh.second.enabled) {
-      ignmsg << "Label mesh " << id_mesh.first << " is disabled." << std::endl;
+  for (const auto& id_label : _labels) {
+    ignmsg << "Rendering label mesh: " << id_label.first << std::endl;
+    // Checks if the text labels to be rendered already exists or not.
+    const auto labelExists = textLabels.find(id_label.first);
+    if (!id_label.second.enabled) {
+      ignmsg << "Label mesh " << id_label.first << " is disabled." << std::endl;
+      // If the text label already exists, set visibility to false.
+      if (labelExists != textLabels.end()) {
+        textLabels[id_label.first]->SetVisible(false);
+      }
       continue;
     }
+    // If the text label doesn't exist, it creates new one.
     ignition::rendering::VisualPtr visual;
-    // Creates a material for the visual.
-    ignition::rendering::MaterialPtr material = scene->CreateMaterial();
-    if (!material) {
-      ignerr << "Failed to create material.\n";
-      continue;
+    if (labelExists == textLabels.end()) {
+      // Creates a material for the visual.
+      ignition::rendering::MaterialPtr material = scene->CreateMaterial();
+      if (!material) {
+        ignerr << "Failed to create material.\n";
+        continue;
+      }
+      visual = scene->CreateVisual();
+      if (!visual) {
+        ignerr << "Failed to create visual.\n";
+        continue;
+      }
+      // Adds the visual to the map for later reference.
+      textLabels[id_label.first] = visual;
+      visual->SetLocalPose(ignition::math::Pose3d(id_label.second.position, ignition::math::Quaterniond()));
+      // Creates the text geometry.
+      ignition::rendering::TextPtr textGeometry = scene->CreateText();
+      textGeometry->SetFontName("Liberation Sans");
+      textGeometry->SetTextString(id_label.second.text);
+      textGeometry->SetShowOnTop(true);
+      textGeometry->SetTextAlignment(ignition::rendering::TextHorizontalAlign::CENTER,
+                                     ignition::rendering::TextVerticalAlign::CENTER);
+      visual->AddGeometry(textGeometry);
+      // Adds the mesh to the parent root visual.
+      rootVisual->AddChild(visual);
+      // Assigns a material for the visual.
+      if (id_label.second.labelType == MaliputLabelType::kLane) {
+        CreateLaneLabelMaterial(material);
+      } else if (id_label.second.labelType == MaliputLabelType::kBranchPoint) {
+        CreateBranchPointLabelMaterial(material);
+      } else {
+        ignerr << "Unsupported label type for: " << id_label.first << std::endl;
+      }
+      // Applies the correct material to the mesh.
+      visual->SetMaterial(material);
     }
-    visual = scene->CreateVisual();
-    if (!visual) {
-      ignerr << "Failed to create visual.\n";
-      continue;
-    }
-    // Adds the visual to the map for later reference.
-    textLabels[id_mesh.second.text] = visual;
-    visual->SetLocalPose(ignition::math::Pose3d(id_mesh.second.position, ignition::math::Quaterniond()));
-    // Creates the text geometry.
-    ignition::rendering::TextPtr textGeometry = scene->CreateText();
-    textGeometry->SetFontName("Liberation Sans");
-    textGeometry->SetTextString(id_mesh.second.text);
-    textGeometry->SetShowOnTop(true);
-    textGeometry->SetTextAlignment(ignition::rendering::TextHorizontalAlign::CENTER,
-                                   ignition::rendering::TextVerticalAlign::CENTER);
-    visual->AddGeometry(textGeometry);
-    // Adds the mesh to the parent root visual.
-    rootVisual->AddChild(visual);
-    // Assigns a material for the visual.
-    if (id_mesh.second.labelType == MaliputLabelType::kLane) {
-      CreateLaneLabelMaterial(material);
-    } else if (id_mesh.second.labelType == MaliputLabelType::kBranchPoint) {
-      CreateBranchPointLabelMaterial(material);
-    } else {
-      ignerr << "Unsupported label type for: " << id_mesh.second.text << std::endl;
-    }
-    // Applies the correct material to the mesh.
-    visual->SetMaterial(material);
-    visual->SetVisible(id_mesh.second.visible);
+    textLabels.at(id_label.first)->SetVisible(id_label.second.visible);
   }
 }
 

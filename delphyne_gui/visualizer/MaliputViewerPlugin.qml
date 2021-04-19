@@ -37,4 +37,23 @@ Rectangle {
     anchors.left: parent.left
     anchors.right: parent.right
   }
+  ToolSeparator {
+    id: layersVisualizationSeparator
+    orientation: Qt.Horizontal
+    anchors.top: layersLoader.bottom
+    anchors.topMargin: 15
+    anchors.left: parent.left
+    anchors.leftMargin: 10
+    anchors.right: parent.right
+    anchors.rightMargin: 10
+  }
+  // Label Selection Panel
+  Loader {
+    id: labelsLoader
+    width: parent.width
+    source: "LabelsSelectionArea.qml"
+    anchors.top: layersVisualizationSeparator.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+  }
 }

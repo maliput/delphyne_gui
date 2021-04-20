@@ -42,7 +42,7 @@ GridLayout {
   }
 
   /**
-  * Lane checkbox
+  * BranchPoint checkbox
   */
   CheckBox {
     id: labelBranchPoint

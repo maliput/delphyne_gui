@@ -100,6 +100,13 @@ void MaliputViewerPlugin::OnNewTextLabelSelection(const QString& _label, bool _s
       model->SetTextLabelState(it.first, _state);
     }
   }
+  // TODO(#): There shouldn't be a need to clear the generated labels
+  //          each time the visualization of the labels changes.
+  for (auto it : textLabels) {
+    this->rootVisual->RemoveChild(it.second);
+  }
+  textLabels.clear();
+
   RenderLabels(model->Labels());
 }
 
@@ -199,8 +206,8 @@ void MaliputViewerPlugin::RenderLabels(const std::map<std::string, MaliputLabel>
       continue;
     }
     // If the text label doesn't exist, it creates new one.
-    ignition::rendering::VisualPtr visual;
     if (labelExists == textLabels.end()) {
+      ignition::rendering::VisualPtr visual;
       // Creates a material for the visual.
       ignition::rendering::MaterialPtr material = scene->CreateMaterial();
       if (!material) {

@@ -42,17 +42,19 @@ std::ostream& operator<<(std::ostream& os, const MessageWidget::Variant& value) 
 }
 
 std::ostream& operator<<(std::ostream& os, const MessageWidget& message) {
-  os << "{ type: " << message.TypeName() << ", is_compound: " << std::boolalpha << message.IsCompound();
+  os << "{ type: " << message.TypeName();
+  os << ", is_compound: " << std::boolalpha << message.IsCompound();
   if (!message.IsCompound()) {
     os << ", value: " << message.Value();
   } else {
-    os << "{ ";
+    os << ", children: { ";
     for (const auto& key_message : message.Children()) {
       os << "{ ";
       os << key_message.first << ": ";
       os << *key_message.second;
       os << " }, ";
     }
+    os << "}, ";
   }
   os << " }";
   return os;

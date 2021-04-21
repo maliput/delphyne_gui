@@ -6,8 +6,10 @@
 #include <cstdint>
 #include <iostream>
 #include <sstream>
+#include <utility>
 
 #include <ignition/common/Console.hh>
+#include <ignition/gui/Application.hh>
 #include <ignition/plugin/Register.hh>
 
 namespace delphyne {
@@ -17,7 +19,7 @@ namespace {
 // @{ TODO(#332): Remove this once we have multiple widgets that we can display
 //                each type.
 std::ostream& operator<<(std::ostream& os, const MessageWidget::Variant& value) {
-  os << "{ ";
+  // os << "{ ";
   if (value.doubleVal.has_value()) {
     os << value.doubleVal.value();
   } else if (value.floatVal.has_value()) {
@@ -35,9 +37,10 @@ std::ostream& operator<<(std::ostream& os, const MessageWidget::Variant& value) 
   } else if (value.stringVal.has_value()) {
     os << value.stringVal.value();
   } else if (value.enumVal.has_value()) {
-    os << " value: " << value.enumVal.value().value << ", name: " << value.enumVal.value().name;
+    // os << " value: " << value.enumVal.value().value << ", name: " << value.enumVal.value().name;
+    os << value.enumVal.value().name;
   }
-  os << " }";
+  // os << " }";
   return os;
 }
 
@@ -62,6 +65,17 @@ std::ostream& operator<<(std::ostream& os, const MessageWidget& message) {
 // @}
 
 }  // namespace
+
+TopicInterfacePlugin::TopicInterfacePlugin() : ignition::gui::Plugin() {
+  messageModel = new MessageModel;
+  ignition::gui::App()->Engine()->rootContext()->setContextProperty("MessageModel", messageModel);
+}
+
+QStandardItemModel* TopicInterfacePlugin::Model() {
+  std::lock_guard<std::mutex> lock(mutex);
+  ignerr << *messageWidget << std::endl;
+  return reinterpret_cast<QStandardItemModel *>(messageModel);
+}
 
 void TopicInterfacePlugin::LoadConfig(const tinyxml2::XMLElement* _pluginElem) {
   if (title.empty()) {
@@ -88,14 +102,61 @@ void TopicInterfacePlugin::LoadConfig(const tinyxml2::XMLElement* _pluginElem) {
   if (!node.Subscribe(topicName, &TopicInterfacePlugin::OnMessage, this)) {
     ignerr << "Failed to subscribe to topic [" << topicName << "]" << std::endl;
   }
+
+  timer = new QTimer();
+  connect(timer, SIGNAL(timeout()), this, SLOT(UpdateModel()));
+  timer->start(5000);
+}
+
+void TopicInterfacePlugin::UpdateModel() {
+  // Remove everything.
+  auto root = messageModel->invisibleRootItem();
+  int rows = root->rowCount();
+  while (rows != 0) {
+    root->removeRow(0);
+    rows--;
+  }
+
+  // Load the message values.
+  std::lock_guard<std::mutex> lock(mutex);
+  VisitMessageWidgets("root", root, messageWidget.get());
+}
+
+void TopicInterfacePlugin::VisitMessageWidgets(const std::string& _name, QStandardItem* _parent, MessageWidget* _messageWidget) {
+  ignerr << "Visiting: " << _name << std::endl;
+  if (_messageWidget->IsCompound()) {
+    const QString name = QString::fromStdString(_name);
+    const QString type = QString::fromStdString(messageWidget->TypeName());
+    const QString data("");
+
+    QStandardItem *item = new QStandardItem(name);
+    item->setData(QVariant(name), MessageModel::kNameRole);
+    item->setData(QVariant(type), MessageModel::kTypeRole);
+    item->setData(QVariant(data), MessageModel::kDataRole);
+    _parent->appendRow(item);
+
+    for (const auto& name_child : _messageWidget->Children()) {
+      VisitMessageWidgets(name_child.first, item, name_child.second.get());
+    }
+  } else {
+    const QString name = QString::fromStdString(_name);
+    const QString type = QString::fromStdString(_messageWidget->TypeName());
+
+    std::stringstream ss;
+    ss << _messageWidget->Value();
+    const QString data = QString::fromStdString(ss.str());
+
+    QStandardItem *item = new QStandardItem(name);
+    item->setData(QVariant(name), MessageModel::kNameRole);
+    item->setData(QVariant(type), MessageModel::kTypeRole);
+    item->setData(QVariant(data), MessageModel::kDataRole);
+    _parent->appendRow(item);
+  }
 }
 
 void TopicInterfacePlugin::OnMessage(const google::protobuf::Message& _msg) {
   std::lock_guard<std::mutex> lock(mutex);
   messageWidget = std::make_unique<MessageWidget>(&_msg);
-  // TODO(#332): Instead of serializing to string. Create multiple widgets that
-  //             display this information in the UI.
-  ignerr << *messageWidget << std::endl;
 }
 
 }  // namespace gui

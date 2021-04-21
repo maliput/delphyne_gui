@@ -5,6 +5,7 @@
 #include <memory>
 #include <mutex>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 #include <ignition/gui/Plugin.hh>
@@ -14,6 +15,23 @@
 
 namespace delphyne {
 namespace gui {
+
+/// \brief Model implementation to visualize the data in a TreeView.
+class MessageModel : public QStandardItemModel {
+ public:
+  static constexpr int kNameRole{101};
+  static constexpr int kTypeRole{102};
+  static constexpr int kDataRole{103};
+
+  /// \brief roles and names of the model
+  QHash<int, QByteArray> roleNames() const override {
+    return {
+      {kNameRole, "name"},
+      {kTypeRole, "type"},
+      {kDataRole, "data"},
+    };
+  }
+};
 
 /// @brief Implements a topic interface plugin.
 /// @details The plugin subscribes to an ignition topic and updates in the UI
@@ -34,12 +52,16 @@ class TopicInterfacePlugin : public ignition::gui::Plugin {
 
  public:
   /// @brief Constructor.
-  TopicInterfacePlugin() = default;
+  TopicInterfacePlugin();
 
   /// @brief Loads the plugin configuration.
   /// @details See class description for the expected configuration.
   /// @param _pluginElem The XML configuration of this plugin.
   void LoadConfig(const tinyxml2::XMLElement* _pluginElem) override;
+
+  /// \brief Get the model of msgs & fields
+  /// \return Pointer to the model of msgs & fields
+  QStandardItemModel* Model();
 
   /// @brief Callback executed when there is a new message from the topic.
   /// @details @p _msg is converted into a MessageWidget and set to be
@@ -47,7 +69,17 @@ class TopicInterfacePlugin : public ignition::gui::Plugin {
   /// @param _msg The received message.
   void OnMessage(const google::protobuf::Message& _msg);
 
+ public slots:
+
+  /// \brief update the model according to the changes of the topics
+  void UpdateModel();
+
  private:
+
+  /// \brief Visits nodes in @p _messageWidget and adds them as new rows of a
+  ///        @p _parent item. Node name is @p _name.
+  void VisitMessageWidgets(const std::string& _name, QStandardItem* _parent, MessageWidget* _messageWidget);
+
   /// @brief The type of the message to receive.
   std::string msgType{};
 
@@ -66,8 +98,10 @@ class TopicInterfacePlugin : public ignition::gui::Plugin {
   /// \brief Mutex to protect message buffer.
   std::mutex mutex;
 
-  /// @brief Transport publisher.
-  std::unique_ptr<ignition::transport::Node::Publisher> publisher;
+  // ComponentsModel componentsModel;
+  MessageModel* messageModel{nullptr};
+
+  QTimer *timer{nullptr};
 };
 
 }  // namespace gui

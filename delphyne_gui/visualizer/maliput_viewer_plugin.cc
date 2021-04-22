@@ -100,8 +100,8 @@ void MaliputViewerPlugin::OnNewTextLabelSelection(const QString& _label, bool _s
       model->SetTextLabelState(it.first, _state);
     }
   }
-  // TODO(#): There shouldn't be a need to clear the generated labels
-  //          each time the visualization of the labels changes.
+  // TODO(#387): There shouldn't be a need to clear the generated labels
+  //             each time the visualization of the labels changes.
   for (auto it : textLabels) {
     this->rootVisual->RemoveChild(it.second);
   }

@@ -23,8 +23,6 @@ namespace gui {
 ///          and get its fields.
 ///          - Use `<topic>ignition_topic_name</topic>` to configure the topic
 ///            name.
-///          - Use `<message_type>message::type::goes::here</message_type>` to
-///            indicate the topic to receive.
 ///          - Via the xml plugin configuration one can generate a blacklist of
 ///            types. Use multiple nodes like
 ///            `<hide>type::name::goes::here</hide>` to omit displaying that
@@ -49,11 +47,6 @@ class TopicInterfacePlugin : public ignition::gui::Plugin {
   /// @param _msg The received message.
   void OnMessage(const google::protobuf::Message& _msg);
 
- public slots:
-
- signals:
-
- protected:
  private:
   /// @brief The type of the message to receive.
   std::string msgType{};

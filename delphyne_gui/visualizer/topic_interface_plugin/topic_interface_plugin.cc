@@ -77,26 +77,10 @@ void TopicInterfacePlugin::LoadConfig(const tinyxml2::XMLElement* _pluginElem) {
     if (auto xmlTopicName = _pluginElem->FirstChildElement("topic")) {
       topicName = xmlTopicName->GetText();
     }
-    if (auto xmlMessageType = _pluginElem->FirstChildElement("message_type")) {
-      msgType = xmlMessageType->GetText();
-    }
-    if (msgType.empty()) {
-      ignwarn << "Message type not specified, widget will be constructed "
-              << "according to the first message received on topic [" << topicName << "]." << std::endl;
-    }
     // Visibility per widget.
     for (auto xmlHideWidgetElement = _pluginElem->FirstChildElement("hide"); xmlHideWidgetElement != nullptr;
          xmlHideWidgetElement = xmlHideWidgetElement->NextSiblingElement("hide")) {
       hideWidgets.push_back(xmlHideWidgetElement->GetText());
-    }
-  }
-
-  // Build the message widget.
-  if (!msgType.empty()) {
-    auto newMsg = ignition::msgs::Factory::New(msgType, "");
-    if (!newMsg) {
-      ignerr << "Unable to create message of type[" << msgType << "] "
-             << "widget will be initialized when a message is received." << std::endl;
     }
   }
 

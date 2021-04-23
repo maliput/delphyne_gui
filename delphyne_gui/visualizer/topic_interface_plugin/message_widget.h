@@ -106,9 +106,9 @@ class MessageWidget {
   const std::unordered_map<std::string, std::unique_ptr<MessageWidget>>& Children() const { return children; }
 
  private:
-  /// @brief Parses @p msg and stores the values into `variantValue` or
-  ///        `children`.
-  void Parse(google::protobuf::Message* msg);
+  /// @brief Parses @p _msg and stores children MessageWidget into
+  ////       `variantValue`.
+  void Parse(google::protobuf::Message* _msg);
 
   /// @brief Holds the type name of the data.
   std::string typeName{""};

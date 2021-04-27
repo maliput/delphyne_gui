@@ -23,6 +23,9 @@ class MaliputViewerPlugin : public ignition::gui::Plugin {
   /// Property used to load the default state of layers visualization in its correspondant UI's checkboxes.
   Q_PROPERTY(QList<bool> layerCheckboxes READ LayerCheckboxes NOTIFY LayerCheckboxesChanged)
 
+  /// Property used to load the default state of labels visualization in its correspondant UI's checkboxes.
+  Q_PROPERTY(QList<bool> labelCheckboxes READ LabelCheckboxes NOTIFY LabelCheckboxesChanged)
+
  public:
   /// \brief Default constructor.
   MaliputViewerPlugin();
@@ -35,10 +38,18 @@ class MaliputViewerPlugin : public ignition::gui::Plugin {
   /// in the layers selection panel for the meshes.
   Q_INVOKABLE QList<bool> LayerCheckboxes() const;
 
+  /// Called when a new RoadNetwork is loaded to default the checkboxes' state
+  /// in the label selection panel.
+  Q_INVOKABLE QList<bool> LabelCheckboxes() const;
+
  signals:
   /// \brief Signal emitted to reset the checkboxes' state for the layers visualization
   ///        when a new RoadNetwork is loaded.
   void LayerCheckboxesChanged();
+
+  /// \brief Signal emitted to reset the checkboxes' state for the label visualization
+  ///        when a new RoadNetwork is loaded.
+  void LabelCheckboxesChanged();
 
  protected:
   /// @brief Timer event callback which handles the logic to load the meshes when
@@ -58,6 +69,11 @@ class MaliputViewerPlugin : public ignition::gui::Plugin {
   /// \param[in] _layer The layer to change its visibility.
   /// \param[in] _state The state of the visibility checkbox.
   void OnNewMeshLayerSelection(const QString& _layer, bool _state);
+
+  /// \brief Change the visibility of the labels.
+  /// \param[in] _label Name of the label.
+  /// \param[in] _state The state of the visibility checkbox.
+  void OnNewTextLabelSelection(const QString& _label, bool _state);
 
  private:
   /// @brief The period in milliseconds of the timer to try to load the meshes.

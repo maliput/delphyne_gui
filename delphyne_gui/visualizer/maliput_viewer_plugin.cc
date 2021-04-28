@@ -3,6 +3,7 @@
 #include "maliput_viewer_plugin.hh"
 
 #include <ignition/common/Console.hh>
+#include <ignition/gui/Conversions.hh>
 #include <ignition/plugin/Register.hh>
 #include <ignition/rendering/RenderEngine.hh>
 #include <ignition/rendering/RenderingIface.hh>
@@ -321,9 +322,15 @@ void MaliputViewerPlugin::LoadConfig(const tinyxml2::XMLElement* _pluginElem) {
 }
 
 void MaliputViewerPlugin::Initialize() {
+  rayQuery = scene->CreateRayQuery();
   rootVisual = scene->RootVisual();
   if (!rootVisual) {
     ignerr << "Failed to find the root visual" << std::endl;
+    return;
+  }
+  camera = std::dynamic_pointer_cast<ignition::rendering::Camera>(rootVisual->ChildByIndex(0));
+  if (!camera) {
+    ignerr << "Failed to find the camera" << std::endl;
     return;
   }
   // Lights.
@@ -360,12 +367,37 @@ void MaliputViewerPlugin::Initialize() {
 bool MaliputViewerPlugin::eventFilter(QObject* _obj, QEvent* _event) {
   if (_event->type() == QEvent::Type::MouseButtonPress) {
     QMouseEvent* mouseEvent = static_cast<QMouseEvent*>(_event);
-    if (mouseEvent) {
-      std::cout << "\t(x , y) : ( " << mouseEvent->x() << " , " << mouseEvent->y() << " )" << std::endl;
+    if (mouseEvent && mouseEvent->button() == Qt::LeftButton) {
+      MouseClickHandler(mouseEvent);
     }
   }
   // Standard event processing
   return QObject::eventFilter(_obj, _event);
+}
+
+void MaliputViewerPlugin::MouseClickHandler(QMouseEvent* _mouseEvent) {
+  const auto rayQueryResult = ScreenToScene(_mouseEvent->x(), _mouseEvent->y());
+  if (rayQueryResult.distance > -1) {
+    const maliput::api::Lane* lane = model->GetLaneFromWorldPosition(rayQueryResult.point);
+    if (lane) {
+      const std::string& lane_id = lane->id().string();
+      ignmsg << "Clicked lane ID: " << lane_id << std::endl;
+    }
+  }
+}
+
+ignition::rendering::RayQueryResult MaliputViewerPlugin::ScreenToScene(int screenX, int screenY) const {
+  // Normalize point on the image
+  const double width = camera->ImageWidth();
+  const double height = camera->ImageHeight();
+
+  const double nx = 2.0 * screenX / width - 1.0;
+  const double ny = 1.0 - 2.0 * screenY / height;
+
+  // Make a ray query
+  rayQuery->SetFromCamera(camera, {nx, ny});
+
+  return rayQuery->ClosestPoint();
 }
 
 }  // namespace gui

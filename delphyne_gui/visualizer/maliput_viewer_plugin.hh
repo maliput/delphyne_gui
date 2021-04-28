@@ -8,6 +8,7 @@
 
 #include <ignition/common/MouseEvent.hh>
 #include <ignition/gui/Plugin.hh>
+#include <ignition/rendering/RayQuery.hh>
 #include <ignition/rendering/RenderTypes.hh>
 #include <ignition/rendering/Scene.hh>
 
@@ -107,6 +108,10 @@ class MaliputViewerPlugin : public ignition::gui::Plugin {
   /// \brief Renders meshes for the road and the labels.
   void RenderMeshes();
 
+  void MouseClickHandler(QMouseEvent* _mouseEvent);
+
+  ignition::rendering::RayQueryResult ScreenToScene(int screenX, int screenY) const;
+
   /// \brief Builds visuals for each mesh inside @p _maliputMeshes that is
   /// enabled.
   /// \param[in] _maliputMeshes A map of meshes to render.
@@ -148,6 +153,12 @@ class MaliputViewerPlugin : public ignition::gui::Plugin {
 
   /// \brief Holds a pointer to the scene.
   ignition::rendering::ScenePtr scene{nullptr};
+
+  /// \brief Holds a pointer to a ray query.
+  ignition::rendering::RayQueryPtr rayQuery{nullptr};
+
+  /// \brief Holds a pointer to the camera.
+  ignition::rendering::CameraPtr camera{};
 
   /// \brief Model that holds the meshes and the visualization status.
   std::unique_ptr<MaliputViewerModel> model{};

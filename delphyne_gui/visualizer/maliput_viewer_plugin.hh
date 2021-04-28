@@ -6,6 +6,7 @@
 
 #include <maliput/api/road_geometry.h>
 
+#include <ignition/common/MouseEvent.hh>
 #include <ignition/gui/Plugin.hh>
 #include <ignition/rendering/RenderTypes.hh>
 #include <ignition/rendering/Scene.hh>
@@ -55,6 +56,8 @@ class MaliputViewerPlugin : public ignition::gui::Plugin {
   /// @brief Timer event callback which handles the logic to load the meshes when
   ///        the scene is not ready yet.
   void timerEvent(QTimerEvent* _event) override;
+
+  bool eventFilter(QObject* _obj, QEvent* _event) override;
 
  protected slots:
   /// \brief Clears the visualizer, loads a RoadNetwork and update the GUI with meshes and labels.
@@ -116,8 +119,8 @@ class MaliputViewerPlugin : public ignition::gui::Plugin {
   /// \brief Clears all the references to text labels, meshes and the scene.
   void Clear();
 
-  /// \brief Configurate scene.
-  void ConfigurateScene();
+  /// \brief Configurate scene and install event filter.
+  void Initialize();
 
   /// \brief Holds the map file path.
   std::string mapFile{""};

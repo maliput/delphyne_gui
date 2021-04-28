@@ -125,7 +125,7 @@ void MaliputViewerPlugin::timerEvent(QTimerEvent* _event) {
     return;
   }
   timer.stop();
-  ConfigurateScene();
+  Initialize();
   RenderMeshes();
 }
 
@@ -316,11 +316,11 @@ void MaliputViewerPlugin::LoadConfig(const tinyxml2::XMLElement* _pluginElem) {
     timer.start(kTimerPeriodInMs, this);
     return;
   }
-  ConfigurateScene();
+  Initialize();
   RenderMeshes();
 }
 
-void MaliputViewerPlugin::ConfigurateScene() {
+void MaliputViewerPlugin::Initialize() {
   rootVisual = scene->RootVisual();
   if (!rootVisual) {
     ignerr << "Failed to find the root visual" << std::endl;
@@ -340,6 +340,32 @@ void MaliputViewerPlugin::ConfigurateScene() {
   directionalLight->SetDiffuseColor(lightRed, lightGreen, lightBlue);
   directionalLight->SetSpecularColor(lightRed, lightGreen, lightBlue);
   rootVisual->AddChild(directionalLight);
+
+  // Install event filter to get mouse event on the scene.
+  QList<Plugin*> plugins = parent()->findChildren<Plugin*>();
+  Plugin* scene3D{nullptr};
+  for (auto& plugin : plugins) {
+    if (std::string(plugin->metaObject()->className()).find("Scene3D") != std::string::npos) {
+      scene3D = plugin;
+      break;
+    }
+  }
+  if (!scene3D) {
+    ignerr << "Scene3D plugin wasn't found." << std::endl;
+  }
+  auto renderWindowItem = scene3D->PluginItem()->findChild<QQuickItem*>();
+  renderWindowItem->installEventFilter(this);
+}
+
+bool MaliputViewerPlugin::eventFilter(QObject* _obj, QEvent* _event) {
+  if (_event->type() == QEvent::Type::MouseButtonPress) {
+    QMouseEvent* mouseEvent = static_cast<QMouseEvent*>(_event);
+    if (mouseEvent) {
+      std::cout << "\t(x , y) : ( " << mouseEvent->x() << " , " << mouseEvent->y() << " )" << std::endl;
+    }
+  }
+  // Standard event processing
+  return QObject::eventFilter(_obj, _event);
 }
 
 }  // namespace gui

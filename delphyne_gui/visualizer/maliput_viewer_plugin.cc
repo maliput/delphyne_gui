@@ -1,8 +1,10 @@
 // Copyright 2021 Toyota Research Institute
-
 #include "maliput_viewer_plugin.hh"
 
+#include <algorithm>
+
 #include <ignition/common/Console.hh>
+#include <ignition/gui/Conversions.hh>
 #include <ignition/plugin/Register.hh>
 #include <ignition/rendering/RenderEngine.hh>
 #include <ignition/rendering/RenderingIface.hh>
@@ -125,7 +127,7 @@ void MaliputViewerPlugin::timerEvent(QTimerEvent* _event) {
     return;
   }
   timer.stop();
-  ConfigurateScene();
+  Initialize();
   RenderMeshes();
 }
 
@@ -301,6 +303,10 @@ void MaliputViewerPlugin::LoadConfig(const tinyxml2::XMLElement* _pluginElem) {
     ignerr << "Error reading plugin XML element " << std::endl;
   }
 
+  if (auto elem = _pluginElem->FirstChildElement("main_scene_plugin_title")) {
+    mainScene3dPluginTitle = elem->GetText();
+  }
+
   // Get the render engine.
   // Note: we don't support other engines than Ogre.
   auto engine = ignition::rendering::engine(kEngineName);
@@ -316,14 +322,20 @@ void MaliputViewerPlugin::LoadConfig(const tinyxml2::XMLElement* _pluginElem) {
     timer.start(kTimerPeriodInMs, this);
     return;
   }
-  ConfigurateScene();
+  Initialize();
   RenderMeshes();
 }
 
-void MaliputViewerPlugin::ConfigurateScene() {
+void MaliputViewerPlugin::Initialize() {
+  rayQuery = scene->CreateRayQuery();
   rootVisual = scene->RootVisual();
   if (!rootVisual) {
     ignerr << "Failed to find the root visual" << std::endl;
+    return;
+  }
+  camera = std::dynamic_pointer_cast<ignition::rendering::Camera>(rootVisual->ChildByIndex(0));
+  if (!camera) {
+    ignerr << "Failed to find the camera" << std::endl;
     return;
   }
   // Lights.
@@ -340,6 +352,63 @@ void MaliputViewerPlugin::ConfigurateScene() {
   directionalLight->SetDiffuseColor(lightRed, lightGreen, lightBlue);
   directionalLight->SetSpecularColor(lightRed, lightGreen, lightBlue);
   rootVisual->AddChild(directionalLight);
+
+  // Install event filter to get mouse event from the main scene.
+  const ignition::gui::Plugin* scene3D = FilterPluginsByTitle(mainScene3dPluginTitle);
+  if (!scene3D) {
+    const std::string msg{"Scene3D plugin titled '" + mainScene3dPluginTitle + "' wasn't found"};
+    ignerr << msg << std::endl;
+    MALIPUT_THROW_MESSAGE(msg);
+  }
+  auto renderWindowItem = scene3D->PluginItem()->findChild<QQuickItem*>();
+  if (!renderWindowItem) {
+    const std::string msg{"Scene3D's renderWindowItem child isn't found"};
+    ignerr << msg << std::endl;
+    MALIPUT_THROW_MESSAGE(msg);
+  }
+  renderWindowItem->installEventFilter(this);
+}
+
+ignition::gui::Plugin* MaliputViewerPlugin::FilterPluginsByTitle(const std::string& _pluginTitle) {
+  QList<ignition::gui::Plugin*> plugins = parent()->findChildren<ignition::gui::Plugin*>();
+  auto plugin = std::find_if(std::begin(plugins), std::end(plugins), [&_pluginTitle](ignition::gui::Plugin* _plugin) {
+    return _plugin->Title() == _pluginTitle;
+  });
+  return plugin == plugins.end() ? nullptr : *plugin;
+}
+
+bool MaliputViewerPlugin::eventFilter(QObject* _obj, QEvent* _event) {
+  if (_event->type() == QEvent::Type::MouseButtonPress) {
+    const QMouseEvent* mouseEvent = static_cast<QMouseEvent*>(_event);
+    if (mouseEvent && mouseEvent->button() == Qt::LeftButton) {
+      MouseClickHandler(mouseEvent);
+    }
+  }
+  // Standard event processing
+  return QObject::eventFilter(_obj, _event);
+}
+
+void MaliputViewerPlugin::MouseClickHandler(const QMouseEvent* _mouseEvent) {
+  const auto rayQueryResult = ScreenToScene(_mouseEvent->x(), _mouseEvent->y());
+  if (rayQueryResult.distance >= 0) {
+    const maliput::api::Lane* lane = model->GetLaneFromWorldPosition(rayQueryResult.point);
+    if (lane) {
+      ignmsg << "Clicked lane ID: " << lane->id().string() << std::endl;
+    }
+  }
+}
+
+ignition::rendering::RayQueryResult MaliputViewerPlugin::ScreenToScene(int _screenX, int _screenY) const {
+  // Normalize point on the image
+  const double width = camera->ImageWidth();
+  const double height = camera->ImageHeight();
+
+  const double nx = 2.0 * _screenX / width - 1.0;
+  const double ny = 1.0 - 2.0 * _screenY / height;
+
+  // Make a ray query
+  rayQuery->SetFromCamera(camera, {nx, ny});
+  return rayQuery->ClosestPoint();
 }
 
 }  // namespace gui

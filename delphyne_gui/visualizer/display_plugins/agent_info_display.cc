@@ -7,6 +7,9 @@
 #include <sstream>
 
 #include <ignition/common/Console.hh>
+#include <ignition/gui/Application.hh>
+#include <ignition/gui/GuiEvents.hh>
+#include <ignition/gui/MainWindow.hh>
 #include <ignition/plugin/Register.hh>
 #include <ignition/rendering/RenderEngine.hh>
 #include <ignition/rendering/RenderingIface.hh>
@@ -42,39 +45,29 @@ void AgentInfoDisplay::LoadConfig(const tinyxml2::XMLElement* _pluginElem) {
     }
   }
 
-  // Try to store the scene pointer. Set a timer if it's not ready yet.
-  auto engine = ignition::rendering::engine(kEngineName);
-  scenePtr = engine->SceneByName(this->sceneName);
-  if (!scenePtr) {
-    ignwarn << "Scene \"" << this->sceneName << "\" not found, agent info display plugin won't work until the scene is created."
-            << " Trying again in " << kTimerPeriodInMs << "ms" << std::endl;
-    timer.start(kTimerPeriodInMs, this);
-    return;
-  }
-
-  // Subscribe to agent info once the scene pointer is found
-  this->node.Subscribe("agents/state", &AgentInfoDisplay::OnAgentState, this);
+  ignition::gui::App()->findChild<ignition::gui::MainWindow *>()->installEventFilter(this);
 }
 
 /////////////////////////////////////////////////
-void AgentInfoDisplay::timerEvent(QTimerEvent* _event) {
-  if (_event->timerId() != timer.timerId()) {
-    return;
+bool AgentInfoDisplay::eventFilter(QObject* _obj, QEvent* _event) {
+  if (_event->type() == ignition::gui::events::Render::kType) {
+    if (nullptr == this->scenePtr) {
+      auto engine = ignition::rendering::engine(kEngineName);
+      this->scenePtr = engine->SceneByName(this->sceneName);
+      if (nullptr == this->scenePtr) {
+        ignwarn << "Scene \"" << this->sceneName << "\" not found, "
+                << "agent info display plugin won't work until the scene is created." << std::endl;
+      } else {
+        // Subscribe to agent info once the scene pointer is found
+        this->node.Subscribe("agents/state", &AgentInfoDisplay::OnAgentState, this);
+      }
+    } else if (this->dirty) {
+      this->ProcessMsg();
+    }
   }
 
-  // Get the render engine.
-  // Note: we don't support other engines than Ogre.
-  auto engine = ignition::rendering::engine(kEngineName);
-  scenePtr = engine->SceneByName(this->sceneName);
-  if (!scenePtr) {
-    ignwarn << "Scene \"" << this->sceneName << "\" not found yet. Trying again in "
-            << " Trying again in " << kTimerPeriodInMs << "ms" << std::endl;
-    return;
-  }
-  timer.stop();
-
-  // Subscribe to agent info once the scene pointer is found
-  this->node.Subscribe("agents/state", &AgentInfoDisplay::OnAgentState, this);
+  // Standard event processing
+  return QObject::eventFilter(_obj, _event);
 }
 
 /////////////////////////////////////////////////
@@ -82,7 +75,7 @@ void AgentInfoDisplay::OnAgentState(const ignition::msgs::AgentState_V& _msg) {
   std::lock_guard<std::recursive_mutex> lock(this->mutex);
 
   this->msg.CopyFrom(_msg);
-  QMetaObject::invokeMethod(this, "ProcessMsg");
+  this->dirty = true;
 }
 
 /////////////////////////////////////////////////
@@ -103,6 +96,10 @@ void AgentInfoDisplay::ProcessMsg() {
 
     UpdateAgentLabel(agent, agentName, agentInfoText);
   }
+
+  ChangeAgentInfoVisibility();
+
+  this->dirty = false;
 }
 
 /////////////////////////////////////////////////

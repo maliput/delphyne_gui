@@ -34,7 +34,7 @@ class AgentInfoDisplay : public ignition::gui::Plugin {
  public:
   AgentInfoDisplay() = default;
 
-  /// @brief Loads the plugin configuration and tries to render the agent info in the
+  /// @brief Loads the plugin configuration.
   ///        scene.
   /// @details When the scene is not available, a timer is started to try every
   ///          `kTimerPeriodInMs` ms to load the agent info.
@@ -47,7 +47,7 @@ class AgentInfoDisplay : public ignition::gui::Plugin {
   Q_INVOKABLE void SetIsVisible(bool _isVisible) {
     isVisible = _isVisible;
     IsVisibleChanged();
-    ChangeAgentInfoVisibility();
+    dirty = true;
   }
   /// @}
 
@@ -57,20 +57,17 @@ class AgentInfoDisplay : public ignition::gui::Plugin {
  signals:
   void IsVisibleChanged();
 
- protected:
-  /// @brief Timer event callback which handles the logic to draw the axes when
-  ///        the scene is not ready yet.
-  void timerEvent(QTimerEvent* _event) override;
-
  private:
-  /// @brief The period in milliseconds of the timer to try to draw the axes.
-  static constexpr int kTimerPeriodInMs{500};
+  /// @brief Callback for all installed event filters. On Render events, if the scene pointer
+  /// is not yet available, it will try to get it and then subscibe to the agent info topic if
+  /// successful. On subsequent calls, it will create and update text geometries if new data
+  /// is available (indicated by the dirty flag).
+  /// @param[in] _obj Object that received the event
+  /// @param[in] _event Event
+  bool eventFilter(QObject* _obj, QEvent* _event) override;
 
   /// @brief The rendering engine name.
   const std::string kEngineName{"ogre"};
-
-  /// @brief Triggers an event every `kTimerPeriodInMs` to try to draw the agent info.
-  QBasicTimer timer;
 
   /// @brief The scene name.
   std::string sceneName{"scene"};
@@ -80,6 +77,9 @@ class AgentInfoDisplay : public ignition::gui::Plugin {
 
   /// @brief Holds the visibility status of the agent info.
   bool isVisible{true};
+
+  /// @brief Flag to indicate that new data is available for rendering.
+  bool dirty{false};
 
   /// @brief Message holding latest agent states
   ignition::msgs::AgentState_V msg;

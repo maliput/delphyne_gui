@@ -45,7 +45,7 @@ void AgentInfoDisplay::LoadConfig(const tinyxml2::XMLElement* _pluginElem) {
     }
   }
 
-  ignition::gui::App()->findChild<ignition::gui::MainWindow *>()->installEventFilter(this);
+  ignition::gui::App()->findChild<ignition::gui::MainWindow*>()->installEventFilter(this);
 }
 
 /////////////////////////////////////////////////
@@ -114,9 +114,8 @@ std::string AgentInfoDisplay::NameFromAgent(const ignition::msgs::AgentState& ag
 }
 
 /////////////////////////////////////////////////
-std::shared_ptr<AgentInfoText> AgentInfoDisplay::CreateAgentText(
-    const std::string& _agentName, ignition::rendering::ScenePtr _scenePtr) {
-
+std::shared_ptr<AgentInfoText> AgentInfoDisplay::CreateAgentText(const std::string& _agentName,
+                                                                 ignition::rendering::ScenePtr _scenePtr) {
   auto agentInfoText = std::make_shared<AgentInfoText>();
 
   agentInfoText->text = _scenePtr->CreateText();

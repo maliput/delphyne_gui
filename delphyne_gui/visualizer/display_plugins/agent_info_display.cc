@@ -175,7 +175,6 @@ void AgentInfoDisplay::UpdateAgentLabel(const ignition::msgs::AgentState& _agent
 void AgentInfoDisplay::ChangeAgentInfoVisibility() {
   const bool newIsVisibleValue = isVisible;
   for (auto& nameToAgentInfoText : mapAgentInfoText) {
-    auto name = nameToAgentInfoText.first;
     auto agentInfoText = nameToAgentInfoText.second;
     if (agentInfoText && agentInfoText->textVis) {
       agentInfoText->textVis->SetVisible(newIsVisibleValue);

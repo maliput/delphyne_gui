@@ -138,20 +138,14 @@ std::shared_ptr<AgentInfoText> AgentInfoDisplay::CreateAgentText(const std::stri
 /////////////////////////////////////////////////
 void AgentInfoDisplay::UpdateAgentLabel(const ignition::msgs::AgentState& _agent, const std::string& _agentName,
                                         std::shared_ptr<AgentInfoText> _agentInfoText) {
-  double x = 0.0;
-  double y = 0.0;
-  double z = 0.0;
+  ignition::math::Vector3d pos;
   double roll = 0.0;
   double pitch = 0.0;
   double yaw = 0.0;
-  double vx = 0.0;
-  double vy = 0.0;
-  double vz = 0.0;
+  ignition::math::Vector3d linear_velocity;
 
   if (_agent.has_position()) {
-    x = _agent.position().x();
-    y = _agent.position().y();
-    z = _agent.position().z();
+    pos = ignition::msgs::Convert(_agent.position());
   }
   if (_agent.has_orientation()) {
     roll = _agent.orientation().roll();
@@ -159,22 +153,21 @@ void AgentInfoDisplay::UpdateAgentLabel(const ignition::msgs::AgentState& _agent
     yaw = _agent.orientation().yaw();
   }
   if (_agent.has_linear_velocity()) {
-    vx = _agent.linear_velocity().x();
-    vy = _agent.linear_velocity().y();
-    vz = _agent.linear_velocity().z();
+    linear_velocity = ignition::msgs::Convert(_agent.linear_velocity());
   }
 
   std::stringstream ss;
-  ss << _agentName << ":\n pos:(x:" << std::setprecision(2) << x << ",y:" << y << ",z:" << z << ",yaw:" << yaw << ")"
-     << "\n vel:(x:" << vx << ",y:" << vy << ",z:" << vz << ")";
+  ss << std::setprecision(2);
+  ss << _agentName << ":\n pos:(" << pos << "), yaw:(" << yaw << ")\n vel:(" << linear_velocity << ")";
   _agentInfoText->text->SetTextString(ss.str());
-  _agentInfoText->textVis->SetLocalPose(ignition::math::Pose3d(x, y, z + 2.6, roll, pitch, yaw));
+  _agentInfoText->textVis->SetLocalPose(ignition::math::Pose3d(pos.X(), pos.Y(), pos.Z() + 2.6, roll, pitch, yaw));
 }
 
 /////////////////////////////////////////////////
 void AgentInfoDisplay::ChangeAgentInfoVisibility() {
   const bool newIsVisibleValue = isVisible;
   for (auto& nameToAgentInfoText : mapAgentInfoText) {
+    auto name = nameToAgentInfoText.first;
     auto agentInfoText = nameToAgentInfoText.second;
     if (agentInfoText && agentInfoText->textVis) {
       agentInfoText->textVis->SetVisible(newIsVisibleValue);

@@ -9,7 +9,7 @@ Rectangle {
   Layout.minimumHeight: 110
   Layout.fillWidth: true
 
-  // Checkbox to toggle agent info text visibility.
+  // Checkbox to toggle axes visibility.
   RowLayout {
     CheckBox {
       id: visibilityCheckbox

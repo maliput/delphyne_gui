@@ -54,10 +54,14 @@ class MaliputViewerPlugin : public ignition::gui::Plugin {
   void LabelCheckboxesChanged();
 
  protected:
-  /// @brief Timer event callback which handles the logic to load the meshes when
+  /// \brief Timer event callback which handles the logic to load the meshes when
   ///        the scene is not ready yet.
   void timerEvent(QTimerEvent* _event) override;
 
+  /// \brief Intercepts an @p _event delivered to other object @p _obj.
+  /// \details We are particularly interested in QMouseEvents happening within the main scene.
+  ///          This method is called automatically by the QT Event System iff the event filter was installed
+  ///          in the target object. \see QObject::installEventFilter method.
   bool eventFilter(QObject* _obj, QEvent* _event) override;
 
  protected slots:
@@ -86,6 +90,9 @@ class MaliputViewerPlugin : public ignition::gui::Plugin {
   /// @brief The scene name.
   static constexpr char const* kSceneName = "scene";
 
+  /// @brief The Scene3D instance holding the main scene.
+  static constexpr char const* kMainScene3dPlugin = "Main3DScene";
+
   /// @brief The rendering engine name.
   static constexpr char const* kEngineName = "ogre";
 
@@ -108,8 +115,14 @@ class MaliputViewerPlugin : public ignition::gui::Plugin {
   /// \brief Renders meshes for the road and the labels.
   void RenderMeshes();
 
+  /// \brief Handles the left click mouse event.
+  /// @param[in] _mouseEvent QMouseEvent pointer.
   void MouseClickHandler(QMouseEvent* _mouseEvent);
 
+  /// \brief Performs a raycast on the screen.
+  /// \param[in] screenX X screen's coordinate.
+  /// \param[in] screenY Y screen's coordinate.
+  /// \return A ignition::rendering::RayQueryResult.
   ignition::rendering::RayQueryResult ScreenToScene(int screenX, int screenY) const;
 
   /// \brief Builds visuals for each mesh inside @p _maliputMeshes that is
@@ -124,7 +137,9 @@ class MaliputViewerPlugin : public ignition::gui::Plugin {
   /// \brief Clears all the references to text labels, meshes and the scene.
   void Clear();
 
-  /// \brief Configurate scene and install event filter.
+  /// \brief Configurate scene and install event filter for filtering QMouseEvents.
+  /// \details To install the event filter the Scene3D plugin hosting the scene
+  ///          is expected to be titled as #kMainScene3dPlugin.
   void Initialize();
 
   /// \brief Holds the map file path.

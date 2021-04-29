@@ -348,20 +348,22 @@ void MaliputViewerPlugin::Initialize() {
   directionalLight->SetSpecularColor(lightRed, lightGreen, lightBlue);
   rootVisual->AddChild(directionalLight);
 
-  // Install event filter to get mouse event on the scene.
+  // Install event filter to get mouse event from the main scene.
   QList<Plugin*> plugins = parent()->findChildren<Plugin*>();
   Plugin* scene3D{nullptr};
   for (auto& plugin : plugins) {
-    if (std::string(plugin->metaObject()->className()).find("Scene3D") != std::string::npos) {
+    if (plugin->Title() == kMainScene3dPlugin) {
       scene3D = plugin;
       break;
     }
   }
   if (!scene3D) {
-    ignerr << "Scene3D plugin wasn't found." << std::endl;
+    ignerr << "Scene3D plugin titled '" << kMainScene3dPlugin << "' wasn't found. MouseEvents won't be filtered."
+           << std::endl;
+  } else {
+    auto renderWindowItem = scene3D->PluginItem()->findChild<QQuickItem*>();
+    renderWindowItem->installEventFilter(this);
   }
-  auto renderWindowItem = scene3D->PluginItem()->findChild<QQuickItem*>();
-  renderWindowItem->installEventFilter(this);
 }
 
 bool MaliputViewerPlugin::eventFilter(QObject* _obj, QEvent* _event) {
@@ -396,7 +398,6 @@ ignition::rendering::RayQueryResult MaliputViewerPlugin::ScreenToScene(int scree
 
   // Make a ray query
   rayQuery->SetFromCamera(camera, {nx, ny});
-
   return rayQuery->ClosestPoint();
 }
 

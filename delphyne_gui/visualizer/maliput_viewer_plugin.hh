@@ -19,6 +19,11 @@ namespace gui {
 
 /// \brief Loads a road geometry out of a xodr file or a yaml file.
 ///        Meshes are created and displayed in the scene.
+///
+/// ## Configuration
+///
+/// * \<main_scene_plugin_title\> : Title of the Scene3D plugin instance that manages the main scene.
+///                                 Defaults to '3D Scene'.
 class MaliputViewerPlugin : public ignition::gui::Plugin {
   Q_OBJECT
 
@@ -58,10 +63,9 @@ class MaliputViewerPlugin : public ignition::gui::Plugin {
   ///        the scene is not ready yet.
   void timerEvent(QTimerEvent* _event) override;
 
-  /// \brief Intercepts an @p _event delivered to other object @p _obj.
-  /// \details We are particularly interested in QMouseEvents happening within the main scene.
-  ///          This method is called automatically by the QT Event System iff the event filter was installed
-  ///          in the target object. \see QObject::installEventFilter method.
+  /// \brief Filters QMouseEvents from a Scene3D plugin whose title matches with <main_scene_plugin_title>.
+  /// \details To make this method be called by Qt Event System, install the event filter in target object.
+  ///          \see QObject::installEventFilter() method.
   bool eventFilter(QObject* _obj, QEvent* _event) override;
 
  protected slots:
@@ -115,16 +119,6 @@ class MaliputViewerPlugin : public ignition::gui::Plugin {
   /// \brief Renders meshes for the road and the labels.
   void RenderMeshes();
 
-  /// \brief Handles the left click mouse event.
-  /// @param[in] _mouseEvent QMouseEvent pointer.
-  void MouseClickHandler(QMouseEvent* _mouseEvent);
-
-  /// \brief Performs a raycast on the screen.
-  /// \param[in] screenX X screen's coordinate.
-  /// \param[in] screenY Y screen's coordinate.
-  /// \return A ignition::rendering::RayQueryResult.
-  ignition::rendering::RayQueryResult ScreenToScene(int screenX, int screenY) const;
-
   /// \brief Builds visuals for each mesh inside @p _maliputMeshes that is
   /// enabled.
   /// \param[in] _maliputMeshes A map of meshes to render.
@@ -142,6 +136,21 @@ class MaliputViewerPlugin : public ignition::gui::Plugin {
   ///          is expected to be titled as #kMainScene3dPlugin.
   void Initialize();
 
+  /// \brief Handles the left click mouse event.
+  /// @param[in] _mouseEvent QMouseEvent pointer.
+  void MouseClickHandler(const QMouseEvent* _mouseEvent);
+
+  /// \brief Performs a raycast on the screen.
+  /// \param[in] screenX X screen's coordinate.
+  /// \param[in] screenY Y screen's coordinate.
+  /// \return A ignition::rendering::RayQueryResult.
+  ignition::rendering::RayQueryResult ScreenToScene(int _screenX, int _screenY) const;
+
+  /// \brief Filters by title all the children of the parent plugin.
+  /// \param _pluginTitle Title of the ignition::gui::plugin.
+  /// \return A pointer to the plugin if found, nullptr otherwise.
+  ignition::gui::Plugin* FilterPluginsByTitle(const std::string& _pluginTitle);
+
   /// \brief Holds the map file path.
   std::string mapFile{""};
 
@@ -153,6 +162,9 @@ class MaliputViewerPlugin : public ignition::gui::Plugin {
 
   /// \brief Holds the phase ring book file path.
   std::string phaseRingBookFile{""};
+
+  /// \brief Holds the title of the main Scene3D plugin.
+  std::string mainScene3dPluginTitle{"3D Scene"};
 
   /// @brief Triggers an event every `kTimerPeriodInMs` to try to get the scene.
   QBasicTimer timer;

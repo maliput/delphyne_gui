@@ -1,6 +1,7 @@
 // Copyright 2021 Toyota Research Institute
-
 #include "maliput_viewer_plugin.hh"
+
+#include <algorithm>
 
 #include <ignition/common/Console.hh>
 #include <ignition/gui/Conversions.hh>
@@ -302,6 +303,10 @@ void MaliputViewerPlugin::LoadConfig(const tinyxml2::XMLElement* _pluginElem) {
     ignerr << "Error reading plugin XML element " << std::endl;
   }
 
+  if (auto elem = _pluginElem->FirstChildElement("main_scene_plugin_title")) {
+    mainScene3dPluginTitle = elem->GetText();
+  }
+
   // Get the render engine.
   // Note: we don't support other engines than Ogre.
   auto engine = ignition::rendering::engine(kEngineName);
@@ -349,26 +354,32 @@ void MaliputViewerPlugin::Initialize() {
   rootVisual->AddChild(directionalLight);
 
   // Install event filter to get mouse event from the main scene.
-  QList<Plugin*> plugins = parent()->findChildren<Plugin*>();
-  Plugin* scene3D{nullptr};
-  for (auto& plugin : plugins) {
-    if (plugin->Title() == kMainScene3dPlugin) {
-      scene3D = plugin;
-      break;
-    }
-  }
+  const ignition::gui::Plugin* scene3D = FilterPluginsByTitle(mainScene3dPluginTitle);
   if (!scene3D) {
-    ignerr << "Scene3D plugin titled '" << kMainScene3dPlugin << "' wasn't found. MouseEvents won't be filtered."
-           << std::endl;
-  } else {
-    auto renderWindowItem = scene3D->PluginItem()->findChild<QQuickItem*>();
-    renderWindowItem->installEventFilter(this);
+    const std::string msg{"Scene3D plugin titled '" + mainScene3dPluginTitle + "' wasn't found"};
+    ignerr << msg << std::endl;
+    MALIPUT_THROW_MESSAGE(msg);
   }
+  auto renderWindowItem = scene3D->PluginItem()->findChild<QQuickItem*>();
+  if (!renderWindowItem) {
+    const std::string msg{"Scene3D's renderWindowItem child isn't found"};
+    ignerr << msg << std::endl;
+    MALIPUT_THROW_MESSAGE(msg);
+  }
+  renderWindowItem->installEventFilter(this);
+}
+
+ignition::gui::Plugin* MaliputViewerPlugin::FilterPluginsByTitle(const std::string& _pluginTitle) {
+  QList<ignition::gui::Plugin*> plugins = parent()->findChildren<ignition::gui::Plugin*>();
+  auto plugin = std::find_if(std::begin(plugins), std::end(plugins), [&_pluginTitle](ignition::gui::Plugin* _plugin) {
+    return _plugin->Title() == _pluginTitle;
+  });
+  return plugin == plugins.end() ? nullptr : *plugin;
 }
 
 bool MaliputViewerPlugin::eventFilter(QObject* _obj, QEvent* _event) {
   if (_event->type() == QEvent::Type::MouseButtonPress) {
-    QMouseEvent* mouseEvent = static_cast<QMouseEvent*>(_event);
+    const QMouseEvent* mouseEvent = static_cast<QMouseEvent*>(_event);
     if (mouseEvent && mouseEvent->button() == Qt::LeftButton) {
       MouseClickHandler(mouseEvent);
     }
@@ -377,24 +388,23 @@ bool MaliputViewerPlugin::eventFilter(QObject* _obj, QEvent* _event) {
   return QObject::eventFilter(_obj, _event);
 }
 
-void MaliputViewerPlugin::MouseClickHandler(QMouseEvent* _mouseEvent) {
+void MaliputViewerPlugin::MouseClickHandler(const QMouseEvent* _mouseEvent) {
   const auto rayQueryResult = ScreenToScene(_mouseEvent->x(), _mouseEvent->y());
-  if (rayQueryResult.distance > -1) {
+  if (rayQueryResult.distance >= 0) {
     const maliput::api::Lane* lane = model->GetLaneFromWorldPosition(rayQueryResult.point);
     if (lane) {
-      const std::string& lane_id = lane->id().string();
-      ignmsg << "Clicked lane ID: " << lane_id << std::endl;
+      ignmsg << "Clicked lane ID: " << lane->id().string() << std::endl;
     }
   }
 }
 
-ignition::rendering::RayQueryResult MaliputViewerPlugin::ScreenToScene(int screenX, int screenY) const {
+ignition::rendering::RayQueryResult MaliputViewerPlugin::ScreenToScene(int _screenX, int _screenY) const {
   // Normalize point on the image
   const double width = camera->ImageWidth();
   const double height = camera->ImageHeight();
 
-  const double nx = 2.0 * screenX / width - 1.0;
-  const double ny = 1.0 - 2.0 * screenY / height;
+  const double nx = 2.0 * _screenX / width - 1.0;
+  const double ny = 1.0 - 2.0 * _screenY / height;
 
   // Make a ray query
   rayQuery->SetFromCamera(camera, {nx, ny});

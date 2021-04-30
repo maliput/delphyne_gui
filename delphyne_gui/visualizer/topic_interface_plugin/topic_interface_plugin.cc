@@ -123,10 +123,9 @@ void TopicInterfacePlugin::UpdateModel() {
 }
 
 void TopicInterfacePlugin::VisitMessageWidgets(const std::string& _name, QStandardItem* _parent, MessageWidget* _messageWidget) {
-  ignerr << "Visiting: " << _name << std::endl;
   if (_messageWidget->IsCompound()) {
     const QString name = QString::fromStdString(_name);
-    const QString type = QString::fromStdString(messageWidget->TypeName());
+    const QString type = QString::fromStdString(_messageWidget->TypeName());
     const QString data("");
 
     QStandardItem *item = new QStandardItem(name);

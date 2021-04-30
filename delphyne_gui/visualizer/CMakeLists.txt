@@ -41,6 +41,32 @@ install(
   ARCHIVE DESTINATION lib
 )
 
+# ----------------------------------------
+# arrow_mesh library.
+add_library(arrow_mesh
+  arrow_mesh.cc
+)
+add_library(delphyne_gui::arrow_mesh ALIAS arrow_mesh)
+set_target_properties(arrow_mesh
+  PROPERTIES
+    OUTPUT_NAME delphyne_gui_arrow_mesh
+)
+
+target_link_libraries(arrow_mesh
+  ${drake_LIBRARIES}
+  ignition-common3::ignition-common3
+  ignition-math6::ignition-math6
+  ignition-rendering3::ignition-rendering3
+)
+
+install(
+  TARGETS arrow_mesh
+  EXPORT ${PROJECT_NAME}-targets
+  RUNTIME DESTINATION bin
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib
+)
+
 # global_attributes library.
 add_library(global_attributes
   global_attributes.cc
@@ -80,6 +106,7 @@ set_target_properties(MaliputViewerPlugin
 )
 
 target_link_libraries(MaliputViewerPlugin
+    delphyne_gui::arrow_mesh
     delphyne_gui::global_attributes
     delphyne_gui::maliput_viewer_model
     ignition-gui3::ignition-gui3
@@ -129,6 +156,7 @@ set_target_properties(maliput_viewer_widget
 
 target_link_libraries(maliput_viewer_widget
   ${drake_LIBRARIES}
+  delphyne_gui::arrow_mesh
   delphyne_gui::global_attributes
   delphyne_gui::maliput_viewer_model
   ignition-common3::ignition-common3

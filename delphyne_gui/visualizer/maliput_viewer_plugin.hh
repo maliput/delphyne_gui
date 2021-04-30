@@ -12,6 +12,7 @@
 #include <ignition/rendering/RenderTypes.hh>
 #include <ignition/rendering/Scene.hh>
 
+#include "arrow_mesh.hh"
 #include "maliput_viewer_model.hh"
 
 namespace delphyne {
@@ -64,6 +65,7 @@ class MaliputViewerPlugin : public ignition::gui::Plugin {
   void timerEvent(QTimerEvent* _event) override;
 
   /// \brief Filters QMouseEvents from a Scene3D plugin whose title matches with <main_scene_plugin_title>.
+  ///        Filters ignition::gui::events::Render events to update the animation of the arrow mesh.
   /// \details To make this method be called by Qt Event System, install the event filter in target object.
   ///          \see QObject::installEventFilter() method.
   bool eventFilter(QObject* _obj, QEvent* _event) override;
@@ -189,6 +191,9 @@ class MaliputViewerPlugin : public ignition::gui::Plugin {
 
   /// \brief Model that holds the meshes and the visualization status.
   std::unique_ptr<MaliputViewerModel> model{};
+
+  /// \brief Arrow that points the location clicked in the visualizer.
+  std::unique_ptr<ArrowMesh> arrow;
 };
 
 }  // namespace gui

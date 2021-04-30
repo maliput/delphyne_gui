@@ -4,12 +4,16 @@
 #include <algorithm>
 
 #include <ignition/common/Console.hh>
+#include <ignition/gui/Application.hh>
 #include <ignition/gui/Conversions.hh>
+#include <ignition/gui/GuiEvents.hh>
+#include <ignition/gui/MainWindow.hh>
 #include <ignition/plugin/Register.hh>
 #include <ignition/rendering/RenderEngine.hh>
 #include <ignition/rendering/RenderingIface.hh>
 #include <ignition/rendering/Text.hh>
 #include <ignition/rendering/Visual.hh>
+#include <maliput/common/maliput_throw.h>
 
 #include "global_attributes.hh"
 
@@ -367,6 +371,10 @@ void MaliputViewerPlugin::Initialize() {
     MALIPUT_THROW_MESSAGE(msg);
   }
   renderWindowItem->installEventFilter(this);
+  ignition::gui::App()->findChild<ignition::gui::MainWindow*>()->installEventFilter(this);
+
+  // Create arrow mesh and link it to the scene.
+  arrow = std::make_unique<ArrowMesh>(this->scene, 0.5);
 }
 
 ignition::gui::Plugin* MaliputViewerPlugin::FilterPluginsByTitle(const std::string& _pluginTitle) {
@@ -384,6 +392,9 @@ bool MaliputViewerPlugin::eventFilter(QObject* _obj, QEvent* _event) {
       MouseClickHandler(mouseEvent);
     }
   }
+  if (_event->type() == ignition::gui::events::Render::kType) {
+    arrow->Update();
+  }
   // Standard event processing
   return QObject::eventFilter(_obj, _event);
 }
@@ -394,7 +405,11 @@ void MaliputViewerPlugin::MouseClickHandler(const QMouseEvent* _mouseEvent) {
     const maliput::api::Lane* lane = model->GetLaneFromWorldPosition(rayQueryResult.point);
     if (lane) {
       ignmsg << "Clicked lane ID: " << lane->id().string() << std::endl;
+      arrow->SelectAt(rayQueryResult.distance, rayQueryResult.point);
+      arrow->SetVisibility(true);
     }
+  } else {
+    arrow->SetVisibility(false);
   }
 }
 

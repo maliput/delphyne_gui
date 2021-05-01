@@ -85,7 +85,7 @@ void AgentInfoDisplay::ProcessMsg() {
   for (int i = 0; i < this->msg.states_size(); ++i) {
     ignition::msgs::AgentState agent = this->msg.states(i);
     std::shared_ptr<AgentInfoText> agentInfoText;
-    std::string agentName = NameFromAgent(agent);
+    const std::string agentName = NameFromAgent(agent);
 
     // Step 2 from above if necessary
     if (mapAgentInfoText.find(agentName) == mapAgentInfoText.end()) {

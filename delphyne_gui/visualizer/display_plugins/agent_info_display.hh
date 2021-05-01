@@ -19,10 +19,11 @@ struct AgentInfoText;
 /// @brief Implements a plugin to display the state information for agents in the scene.
 /// @details ign-gui3 does not have DisplayPlugins, so this plugin
 ///          implements a slightly different logic to what the original ign-gui0
-///          DisplayPlugin did. It gets the scene name from the plugin
-///          configuration and tries to get a pointer to it. If the scene is not
-///          available, then it starts a timer and tries periodically to
-///          retrieve the scene.
+///          DisplayPlugin did. It subscribes to events emitted by the MainWindow and
+///          checks for `ignition::gui::events::Render` to make rendering calls. On its
+///          first Render event, it gets a pointer to the scene and subscribes to the
+///          agent info topic. On subsequent Render events, it checks for new agent info
+///          data and creates or updates a text geometry to display this data.
 ///          Typically, this plugin goes hand in hand with the Scene3D plugin.
 ///          The plugin UI has a checkbox to toggle visibility. It is paired
 ///          with `isVisible`
@@ -35,10 +36,6 @@ class AgentInfoDisplay : public ignition::gui::Plugin {
   AgentInfoDisplay() = default;
 
   /// @brief Loads the plugin configuration.
-  ///        scene.
-  /// @details When the scene is not available, a timer is started to try every
-  ///          `kTimerPeriodInMs` ms to load the agent info.
-  ///          It only works with ogre rendering engine.
   void LoadConfig(const tinyxml2::XMLElement* _pluginElem) override;
 
   /// @{ isVisible accessors.

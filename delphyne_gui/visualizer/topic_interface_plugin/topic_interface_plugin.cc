@@ -79,6 +79,11 @@ std::string RemoveNumberingField(const std::string& _fieldName) {
   return std::regex_replace(_fieldName, kNumberFieldRegex, kRegexReplacement);
 }
 
+std::string GetSimpleName(const std::string _fullName) {
+  const auto pos = _fullName.rfind("::");
+  return pos == std::string::npos ? _fullName : _fullName.substr(pos + strlen("::"));
+}
+
 }  // namespace
 
 TopicInterfacePlugin::TopicInterfacePlugin() : ignition::gui::Plugin() {
@@ -150,7 +155,7 @@ void TopicInterfacePlugin::VisitMessageWidgets(const std::string& _name, QStanda
   }
 
   if (_messageWidget->IsCompound()) {
-    const QString name = QString::fromStdString(_name);
+    const QString name = QString::fromStdString(GetSimpleName(_name));
     const QString type = QString::fromStdString(_messageWidget->TypeName());
     const QString data("");
 
@@ -164,7 +169,7 @@ void TopicInterfacePlugin::VisitMessageWidgets(const std::string& _name, QStanda
       VisitMessageWidgets(name_child.first, item, name_child.second.get());
     }
   } else {
-    const QString name = QString::fromStdString(_name);
+    const QString name = QString::fromStdString(GetSimpleName(_name));
     const QString type = QString::fromStdString(_messageWidget->TypeName());
 
     std::stringstream ss;
@@ -182,7 +187,6 @@ void TopicInterfacePlugin::VisitMessageWidgets(const std::string& _name, QStanda
 void TopicInterfacePlugin::OnMessage(const google::protobuf::Message& _msg) {
   std::lock_guard<std::mutex> lock(mutex);
   messageWidget = std::make_unique<MessageWidget>("", &_msg);
-
 }
 
 }  // namespace gui

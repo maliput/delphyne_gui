@@ -37,7 +37,7 @@ GridLayout {
     text: qsTr("Lane")
     checked: true
     onClicked : {
-      MaliputViewerPlugin.OnNewTextLabelSelection("lane", checked);
+      MaliputViewerPlugin.OnNewTextLabelSelection("lane_labels", checked);
     }
   }
 
@@ -49,7 +49,7 @@ GridLayout {
     text: qsTr("BranchPoint")
     checked: true
     onClicked : {
-      MaliputViewerPlugin.OnNewTextLabelSelection("branch_point", checked);
+      MaliputViewerPlugin.OnNewTextLabelSelection("branch_point_labels", checked);
     }
   }
 

@@ -50,48 +50,60 @@ class MessageWidget {
   /// @{ Multiple constructors for the different types.
   ///    TODO(#332): Improve this using template constructors. Probably, Variant
   ///                needs to change to std::variant.
-  explicit MessageWidget(double _value) {
+  explicit MessageWidget(const std::string& _name, double _value) {
+    name = _name;
     typeName = typeid(_value).name();
     variantValue.doubleVal = _value;
   }
-  explicit MessageWidget(float _value) {
+  explicit MessageWidget(const std::string& _name, float _value) {
+    name = _name;
     typeName = typeid(_value).name();
     variantValue.floatVal = _value;
   }
-  explicit MessageWidget(int64_t _value) {
+  explicit MessageWidget(const std::string& _name, int64_t _value) {
+    name = _name;
     typeName = typeid(_value).name();
     variantValue.int64Val = _value;
   }
-  explicit MessageWidget(int32_t _value) {
+  explicit MessageWidget(const std::string& _name, int32_t _value) {
+    name = _name;
     typeName = typeid(_value).name();
     variantValue.int32Val = _value;
   }
-  explicit MessageWidget(uint64_t _value) {
+  explicit MessageWidget(const std::string& _name, uint64_t _value) {
+    name = _name;
     typeName = typeid(_value).name();
     variantValue.uInt64Val = _value;
   }
-  explicit MessageWidget(uint32_t _value) {
+  explicit MessageWidget(const std::string& _name, uint32_t _value) {
+    name = _name;
     typeName = typeid(_value).name();
     variantValue.uInt32Val = _value;
   }
-  explicit MessageWidget(bool _value) {
+  explicit MessageWidget(const std::string& _name, bool _value) {
+    name = _name;
     typeName = typeid(_value).name();
     variantValue.boolVal = _value;
   }
-  explicit MessageWidget(std::string _value) {
+  explicit MessageWidget(const std::string& _name, const std::string& _value) {
+    name = _name;
     typeName = typeid(_value).name();
     variantValue.stringVal = _value;
   }
-  explicit MessageWidget(EnumValue _value) {
+  explicit MessageWidget(const std::string& _name, EnumValue _value) {
+    name = _name;
     typeName = typeid(_value).name();
     variantValue.enumVal = _value;
   }
-  explicit MessageWidget(const google::protobuf::Message* _msg) {
+  explicit MessageWidget(const std::string& _name, const google::protobuf::Message* _msg) {
+    name = _name;
     auto msg = _msg->New();
     msg->CopyFrom(*_msg);
-    Parse(msg);
+    Parse(name, msg);
   }
   /// @}
+
+  std::string Name() const { return name; }
 
   /// @return The type name of the message.
   std::string TypeName() const { return typeName; }
@@ -108,7 +120,9 @@ class MessageWidget {
  private:
   /// @brief Parses @p _msg and stores children MessageWidget into
   ////       `variantValue`.
-  void Parse(google::protobuf::Message* _msg);
+  void Parse(const std::string& _scopedName, google::protobuf::Message* _msg);
+
+  std::string name{""};
 
   /// @brief Holds the type name of the data.
   std::string typeName{""};

@@ -5,6 +5,7 @@
 #include <chrono>
 #include <cstdint>
 #include <iostream>
+#include <regex>
 #include <sstream>
 #include <utility>
 
@@ -64,6 +65,20 @@ std::ostream& operator<<(std::ostream& os, const MessageWidget& message) {
 }
 // @}
 
+std::string StringToLowerCase(const std::string& _str) {
+  std::string result(_str);
+  for (auto it = result.begin() ; it != result.end(); ++it) {
+    *it = std::tolower(*it);
+  }
+  return result;
+}
+
+std::string RemoveNumberingField(const std::string& _fieldName) {
+  static const std::regex kNumberFieldRegex("(::([0-9]))+");
+  static const std::string kRegexReplacement("");
+  return std::regex_replace(_fieldName, kNumberFieldRegex, kRegexReplacement);
+}
+
 }  // namespace
 
 TopicInterfacePlugin::TopicInterfacePlugin() : ignition::gui::Plugin() {
@@ -105,7 +120,7 @@ void TopicInterfacePlugin::LoadConfig(const tinyxml2::XMLElement* _pluginElem) {
 
   timer = new QTimer();
   connect(timer, SIGNAL(timeout()), this, SLOT(UpdateModel()));
-  timer->start(5000);
+  timer->start(10000);
 }
 
 void TopicInterfacePlugin::UpdateModel() {
@@ -123,6 +138,17 @@ void TopicInterfacePlugin::UpdateModel() {
 }
 
 void TopicInterfacePlugin::VisitMessageWidgets(const std::string& _name, QStandardItem* _parent, MessageWidget* _messageWidget) {
+
+  // Does not visit blacklisted items.
+  if (std::find_if(hideWidgets.begin(), hideWidgets.end(),
+                   // amendedName is the name of the field but it applies a lower case transformation
+                   // and removes the "::X::" of the name when it represents a repeated field.
+                   [amendedName = RemoveNumberingField(StringToLowerCase(_name))](const std::string& hideTopic) {
+                     return amendedName == StringToLowerCase(hideTopic);
+                   }) != hideWidgets.end()) {
+    return;
+  }
+
   if (_messageWidget->IsCompound()) {
     const QString name = QString::fromStdString(_name);
     const QString type = QString::fromStdString(_messageWidget->TypeName());
@@ -155,7 +181,8 @@ void TopicInterfacePlugin::VisitMessageWidgets(const std::string& _name, QStanda
 
 void TopicInterfacePlugin::OnMessage(const google::protobuf::Message& _msg) {
   std::lock_guard<std::mutex> lock(mutex);
-  messageWidget = std::make_unique<MessageWidget>(&_msg);
+  messageWidget = std::make_unique<MessageWidget>("", &_msg);
+
 }
 
 }  // namespace gui

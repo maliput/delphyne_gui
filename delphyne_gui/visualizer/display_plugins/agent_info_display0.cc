@@ -49,22 +49,6 @@ class AgentInfoDisplayPrivate {
 
  public:
   std::map<std::string, std::shared_ptr<AgentInfoText>> agentInfoText;
-
-  /// \brief Text size in pixels
- public:
-  unsigned int textSize = 15;
-
-  /// \brief Horizontal padding away from the image border
- public:
-  int horizontalPadding = 20;
-
-  /// \brief Vertical padding away from the image border
- public:
-  int verticalPadding = 20;
-
-  /// \brief Color of the text
- public:
-  ignition::math::Color textColor = ignition::math::Color::White;
 };
 }  // namespace display_plugins
 }  // namespace gui

@@ -36,7 +36,7 @@ GridLayout {
     anchors.top: titleText.bottom
     anchors.left: parent.left
     width: parent.width
-    height: parent.height
+    Layout.preferredHeight: 100
     Layout.fillWidth: true
     selectionMode: 1 /* Single Selection */
     TableViewColumn {

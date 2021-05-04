@@ -63,7 +63,7 @@ void MessageWidget::Parse(const std::string& _scopedName, google::protobuf::Mess
           const std::string enumName = enumValueDescriptor->name();
           children[itemName] = std::make_unique<MessageWidget>(itemName, EnumValue{enumValue, enumName});
         } else {
-          // ignwarn << "Unhandled message type [" << fieldDescriptor->type_name() << "]" << std::endl;
+          // Unhandled message type.
         }
       }
     } else {  // It's not a repeated message, then we just need to parse them.
@@ -100,7 +100,7 @@ void MessageWidget::Parse(const std::string& _scopedName, google::protobuf::Mess
         const std::string enumName = enumValueDescriptor->name();
         children[scopedName] = std::make_unique<MessageWidget>(scopedName, EnumValue{enumValue, enumName});
       } else {
-        // ignwarn << "Unhandled message type [" << fieldDescriptor->type_name() << "]" << std::endl;
+        // Unhandled message type.
       }
     }
   }

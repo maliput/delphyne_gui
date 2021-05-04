@@ -103,6 +103,9 @@ class MessageWidget {
   }
   /// @}
 
+  /// @return Then full name of this item in the proto message hierarchy. It
+  ///         uses "::" to separate field names and injects "::X::" where X is
+  ///         a non-negative number to differentiate repeated fields.
   std::string Name() const { return name; }
 
   /// @return The type name of the message.
@@ -122,6 +125,7 @@ class MessageWidget {
   ////       `variantValue`.
   void Parse(const std::string& _scopedName, google::protobuf::Message* _msg);
 
+  /// @brief This message full name.
   std::string name{""};
 
   /// @brief Holds the type name of the data.

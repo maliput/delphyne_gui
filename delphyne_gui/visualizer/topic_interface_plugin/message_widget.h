@@ -6,7 +6,7 @@
 #include <string>
 #include <type_traits>
 #include <typeinfo>
-#include <unordered_map>
+#include <map>
 
 #include <google/protobuf/descriptor.h>
 #include <google/protobuf/message.h>
@@ -115,7 +115,7 @@ class MessageWidget {
   Variant Value() const { return variantValue; }
 
   /// @return The children dictionary.
-  const std::unordered_map<std::string, std::unique_ptr<MessageWidget>>& Children() const { return children; }
+  const std::map<std::string, std::unique_ptr<MessageWidget>>& Children() const { return children; }
 
  private:
   /// @brief Parses @p _msg and stores children MessageWidget into
@@ -131,7 +131,7 @@ class MessageWidget {
   Variant variantValue;
 
   /// @brief Holds the children, nested values.
-  std::unordered_map<std::string, std::unique_ptr<MessageWidget>> children;
+  std::map<std::string, std::unique_ptr<MessageWidget>> children;
 };
 
 }  // namespace gui

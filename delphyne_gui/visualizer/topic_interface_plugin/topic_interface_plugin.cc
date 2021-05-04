@@ -18,10 +18,8 @@ namespace delphyne {
 namespace gui {
 namespace {
 
-// @{ TODO(#332): Remove this once we have multiple widgets that we can display
-//                each type.
+// Serializes a @p value into @p os.
 std::ostream& operator<<(std::ostream& os, const MessageWidget::Variant& value) {
-  // os << "{ ";
   if (value.doubleVal.has_value()) {
     os << value.doubleVal.value();
   } else if (value.floatVal.has_value()) {
@@ -38,14 +36,14 @@ std::ostream& operator<<(std::ostream& os, const MessageWidget::Variant& value) 
     os << std::boolalpha << value.boolVal.value();
   } else if (value.stringVal.has_value()) {
     os << value.stringVal.value();
+    os << value.stringVal.value();
   } else if (value.enumVal.has_value()) {
-    // os << " value: " << value.enumVal.value().value << ", name: " << value.enumVal.value().name;
     os << value.enumVal.value().name;
   }
-  // os << " }";
   return os;
 }
 
+// Serializes a @p message into @p os.
 std::ostream& operator<<(std::ostream& os, const MessageWidget& message) {
   os << "{ type: " << message.TypeName();
   os << ", is_compound: " << std::boolalpha << message.IsCompound();
@@ -64,8 +62,9 @@ std::ostream& operator<<(std::ostream& os, const MessageWidget& message) {
   os << " }";
   return os;
 }
-// @}
 
+
+// @returns A lower case string with the contents of @p _str.
 std::string StringToLowerCase(const std::string& _str) {
   std::string result(_str);
   for (auto it = result.begin() ; it != result.end(); ++it) {
@@ -74,12 +73,18 @@ std::string StringToLowerCase(const std::string& _str) {
   return result;
 }
 
+// Field names are called: `attribute0::attribute1::N::attribute2::M::attribute3`
+// where N and M are non-negative numbers. This function returns
+// `attribute0::attribute1::attribute2::attribute3` when @p _fieldName contains
+// the aforementioned contents.
 std::string RemoveNumberingField(const std::string& _fieldName) {
   static const std::regex kNumberFieldRegex("(::([0-9]))+");
   static const std::string kRegexReplacement("");
   return std::regex_replace(_fieldName, kNumberFieldRegex, kRegexReplacement);
 }
 
+// @returns A string with the name of the field without the chain of attribute
+// names from the root message. "::" is used to split field names.
 std::string GetSimpleName(const std::string _fullName) {
   const auto pos = _fullName.rfind("::");
   return pos == std::string::npos ? _fullName : _fullName.substr(pos + strlen("::"));
@@ -103,6 +108,8 @@ void TopicInterfacePlugin::LoadConfig(const tinyxml2::XMLElement* _pluginElem) {
     title = "Topic interface";
   }
 
+  int uiTimerPeriodMs = kUiTimerPerdiodMs;
+
   if (_pluginElem) {
     // Widget UI title.
     if (auto xmlTitle = _pluginElem->FirstChildElement("title")) {
@@ -117,6 +124,10 @@ void TopicInterfacePlugin::LoadConfig(const tinyxml2::XMLElement* _pluginElem) {
          xmlHideWidgetElement = xmlHideWidgetElement->NextSiblingElement("hide")) {
       hideWidgets.push_back(xmlHideWidgetElement->GetText());
     }
+    // UI update period.
+    if (auto xmlUiUpdatePeriodMs = _pluginElem->FirstChildElement("ui_update_period_ms")) {
+      xmlUiUpdatePeriodMs->QueryIntText(&uiTimerPeriodMs);
+    }
   }
 
   // Subscribe
@@ -124,23 +135,30 @@ void TopicInterfacePlugin::LoadConfig(const tinyxml2::XMLElement* _pluginElem) {
     ignerr << "Failed to subscribe to topic [" << topicName << "]" << std::endl;
   }
 
+  // @{ Configures the timer that will be used to update the view.
   timer = new QTimer();
-  connect(timer, SIGNAL(timeout()), this, SLOT(UpdateModel()));
-  timer->start(10000);
+  connect(timer, SIGNAL(timeout()), this, SLOT(UpdateView()));
+  timer->start(uiTimerPeriodMs);
+  // @}
 }
 
-void TopicInterfacePlugin::UpdateModel() {
-  // Remove everything.
+void TopicInterfacePlugin::UpdateView() {
   auto root = messageModel->invisibleRootItem();
+
+  // TODO(#332): Change this to update the nodes instead of removing and adding
+  //             them on every update.
+  // @{ Remove everything.
   int rows = root->rowCount();
   while (rows != 0) {
     root->removeRow(0);
     rows--;
   }
+  // @}
 
-  // Load the message values.
+  // @{ Load the message values.
   std::lock_guard<std::mutex> lock(mutex);
   VisitMessageWidgets("root", root, messageWidget.get());
+  // @}
 }
 
 void TopicInterfacePlugin::VisitMessageWidgets(const std::string& _name, QStandardItem* _parent, MessageWidget* _messageWidget) {

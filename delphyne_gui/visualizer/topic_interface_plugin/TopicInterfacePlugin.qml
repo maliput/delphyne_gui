@@ -1,3 +1,9 @@
+// Copyright 2021 Toyota Research Institute
+/*
+This file has been inspired in https://github.com/ignitionrobotics/ign-gui/blob/ign-gui3/src/plugins/topic_viewer/TopicViewer.qml
+See https://github.com/ignitionrobotics/ign-gui/blob/ign-gui3/LICENSE for its license.
+*/
+
 import QtQml.Models 2.2
 import QtQuick 2.0
 import QtQuick.Controls 1.4

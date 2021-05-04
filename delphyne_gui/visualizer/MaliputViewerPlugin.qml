@@ -56,4 +56,23 @@ Rectangle {
     anchors.left: parent.left
     anchors.right: parent.right
   }
+  ToolSeparator {
+    id: selectedLanesSeparator
+    orientation: Qt.Horizontal
+    anchors.top: labelsLoader.bottom
+    anchors.topMargin: 15
+    anchors.left: parent.left
+    anchors.leftMargin: 10
+    anchors.right: parent.right
+    anchors.rightMargin: 10
+  }
+  // Selected Lanes Panel
+  Loader {
+    id: selectedLanesLoader
+    width: parent.width
+    source: "SelectedLanesArea.qml"
+    anchors.top: selectedLanesSeparator.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+  }
 }

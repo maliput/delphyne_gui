@@ -4,5 +4,6 @@
     <file>FileSelectionArea.qml</file>
     <file>LayersSelectionArea.qml</file>
     <file>LabelsSelectionArea.qml</file>
+    <file>SelectedLanesArea.qml</file>
   </qresource>
 </RCC>

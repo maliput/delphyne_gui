@@ -66,7 +66,7 @@ std::ostream& operator<<(std::ostream& os, const MessageWidget& message) {
 // @returns A lower case string with the contents of @p _str.
 std::string StringToLowerCase(const std::string& _str) {
   std::string result(_str);
-  for (auto it = result.begin() ; it != result.end(); ++it) {
+  for (auto it = result.begin(); it != result.end(); ++it) {
     *it = std::tolower(*it);
   }
   return result;
@@ -99,7 +99,7 @@ TopicInterfacePlugin::TopicInterfacePlugin() : ignition::gui::Plugin() {
 QStandardItemModel* TopicInterfacePlugin::Model() {
   std::lock_guard<std::mutex> lock(mutex);
   ignerr << *messageWidget << std::endl;
-  return reinterpret_cast<QStandardItemModel *>(messageModel);
+  return reinterpret_cast<QStandardItemModel*>(messageModel);
 }
 
 void TopicInterfacePlugin::LoadConfig(const tinyxml2::XMLElement* _pluginElem) {
@@ -160,8 +160,8 @@ void TopicInterfacePlugin::UpdateView() {
   // @}
 }
 
-void TopicInterfacePlugin::VisitMessageWidgets(const std::string& _name, QStandardItem* _parent, MessageWidget* _messageWidget) {
-
+void TopicInterfacePlugin::VisitMessageWidgets(const std::string& _name, QStandardItem* _parent,
+                                               MessageWidget* _messageWidget) {
   // Does not visit blacklisted items.
   if (std::find_if(hideWidgets.begin(), hideWidgets.end(),
                    // amendedName is the name of the field but it applies a lower case transformation
@@ -177,7 +177,7 @@ void TopicInterfacePlugin::VisitMessageWidgets(const std::string& _name, QStanda
     const QString type = QString::fromStdString(_messageWidget->TypeName());
     const QString data("");
 
-    QStandardItem *item = new QStandardItem(name);
+    QStandardItem* item = new QStandardItem(name);
     item->setData(QVariant(name), MessageModel::kNameRole);
     item->setData(QVariant(type), MessageModel::kTypeRole);
     item->setData(QVariant(data), MessageModel::kDataRole);
@@ -194,7 +194,7 @@ void TopicInterfacePlugin::VisitMessageWidgets(const std::string& _name, QStanda
     ss << _messageWidget->Value();
     const QString data = QString::fromStdString(ss.str());
 
-    QStandardItem *item = new QStandardItem(name);
+    QStandardItem* item = new QStandardItem(name);
     item->setData(QVariant(name), MessageModel::kNameRole);
     item->setData(QVariant(type), MessageModel::kTypeRole);
     item->setData(QVariant(data), MessageModel::kDataRole);

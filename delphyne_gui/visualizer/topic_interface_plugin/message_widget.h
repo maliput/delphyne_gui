@@ -1,12 +1,12 @@
 // Copyright 2021 Toyota Research Institute
 #pragma once
 
+#include <map>
 #include <memory>
 #include <optional>
 #include <string>
 #include <type_traits>
 #include <typeinfo>
-#include <map>
 
 #include <google/protobuf/descriptor.h>
 #include <google/protobuf/message.h>

@@ -26,9 +26,9 @@ class MessageModel : public QStandardItemModel {
   /// @brief roles and names of the model
   QHash<int, QByteArray> roleNames() const override {
     return {
-      {kNameRole, "name"},
-      {kTypeRole, "type"},
-      {kDataRole, "data"},
+        {kNameRole, "name"},
+        {kTypeRole, "type"},
+        {kDataRole, "data"},
     };
   }
 };
@@ -114,7 +114,7 @@ class TopicInterfacePlugin : public ignition::gui::Plugin {
   MessageModel* messageModel{nullptr};
 
   /// @brief Handles the update in the UI.
-  QTimer *timer{nullptr};
+  QTimer* timer{nullptr};
 };
 
 }  // namespace gui

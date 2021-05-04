@@ -21,7 +21,8 @@ void MessageWidget::Parse(const std::string& _scopedName, google::protobuf::Mess
 
     const auto fieldType = fieldDescriptor->type();
 
-    const std::string scopedName = _scopedName.empty() ? fieldDescriptor->name() : _scopedName + "::" + fieldDescriptor->name();
+    const std::string scopedName =
+        _scopedName.empty() ? fieldDescriptor->name() : _scopedName + "::" + fieldDescriptor->name();
 
     if (fieldDescriptor->is_repeated()) {
       // Parse all fields of the repeated message.

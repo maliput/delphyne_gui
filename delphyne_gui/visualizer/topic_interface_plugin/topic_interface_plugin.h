@@ -43,8 +43,8 @@ class MessageModel : public QStandardItemModel {
 ///            name.
 ///          - Via the xml plugin configuration one can generate a blacklist of
 ///            types. Use multiple nodes like
-///            `<hide>type::name::goes::here</hide>` to omit displaying that
-///            specific type.
+///            `<hide>attribute0::attribute1::attribute2</hide>` to omit
+///            displaying that specific element and all its descendants.
 ///          - Use `<title>My fancy title</title>` to select the widget display
 ///            title.
 class TopicInterfacePlugin : public ignition::gui::Plugin {

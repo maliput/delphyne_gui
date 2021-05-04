@@ -1,8 +1,10 @@
 // Copyright 2021 Toyota Research Institute
 #pragma once
 
+#include <map>
 #include <memory>
 #include <string>
+#include <unordered_map>
 
 #include <maliput/api/road_geometry.h>
 
@@ -14,6 +16,7 @@
 
 #include "arrow_mesh.hh"
 #include "maliput_viewer_model.hh"
+#include "selector.hh"
 
 namespace delphyne {
 namespace gui {
@@ -65,7 +68,8 @@ class MaliputViewerPlugin : public ignition::gui::Plugin {
   void timerEvent(QTimerEvent* _event) override;
 
   /// \brief Filters QMouseEvents from a Scene3D plugin whose title matches with <main_scene_plugin_title>.
-  ///        Filters ignition::gui::events::Render events to update the animation of the arrow mesh.
+  ///        Filters ignition::gui::events::Render events to update the meshes and labels of the roads and the animation
+  ///        of the arrow mesh.
   /// \details To make this method be called by Qt Event System, install the event filter in target object.
   ///          \see QObject::installEventFilter() method.
   bool eventFilter(QObject* _obj, QEvent* _event) override;
@@ -118,8 +122,18 @@ class MaliputViewerPlugin : public ignition::gui::Plugin {
   static bool FillMaterial(const maliput::utility::Material* _maliputMaterial,
                            ignition::rendering::MaterialPtr& _ignitionMaterial);
 
-  /// \brief Renders meshes for the road and the labels.
-  void RenderMeshes();
+  /// \brief Holds flags used to render meshes.
+  struct RenderMeshesOption {
+    /// \brief Set both #executeMeshRendering and #executeLabelRendering to true;
+    void RenderAll() {
+      executeMeshRendering = true;
+      executeLabelRendering = true;
+    }
+    /// Indicates whether meshes must be rendered.
+    bool executeMeshRendering{false};
+    /// Indicates whether labels must be rendered.
+    bool executeLabelRendering{false};
+  } renderMeshesOption;
 
   /// \brief Builds visuals for each mesh inside @p _maliputMeshes that is
   /// enabled.
@@ -153,6 +167,46 @@ class MaliputViewerPlugin : public ignition::gui::Plugin {
   /// \return A pointer to the plugin if found, nullptr otherwise.
   ignition::gui::Plugin* FilterPluginsByTitle(const std::string& _pluginTitle);
 
+  /// \brief Updates all stored visual defaults for the meshes and labels.
+  /// \param[in] _key The key indicating which default to update.
+  /// \param[in] _newValue The new value to set the default value.
+  void UpdateObjectVisualDefaults(const std::string& _key, bool _newValue);
+
+  /// \brief Updates a lane so that if it is selected then all meshes are on, but if it is
+  /// not selected, all meshes are set to the default values.
+  /// \param[in] _id The id of the lane.
+  void UpdateLane(const std::string& _id);
+
+  /// \brief Updates a branch point so that if it is selected then all meshes are on, but if it is
+  /// not selected, all meshes are set to the default values.
+  /// \param[in] _id The id of the branch point.
+  void UpdateBranchPoint(const std::string& _id);
+
+  /// \brief Updates all of the selected regions to the default mesh values.
+  void UpdateSelectedLanesWithDefault();
+
+  /// Keys used by the checkbox logic to visualize different layers and by
+  /// the default map #objectVisualDefaults.
+  /// @{
+  /// \brief Key used to detect an asphalt checkbox event.
+  const std::string kAsphalt{"asphalt"};
+  /// \brief Keyword used by the checkboxes to indicate the new default for all
+  /// of the provided mesh.
+  const std::string kAll{"all"};
+  /// \brief Key for the marker mesh in the default map.
+  const std::string kMarker{"marker"};
+  /// \brief Key for the lane mesh in the default map.
+  const std::string kLane{"lane"};
+  /// \brief Key for the branch point mesh in the default map.
+  const std::string kBranchPoint{"branch_point"};
+  /// \brief Key used to identify labels from meshes.
+  const std::string kLabels{"_labels"};
+  /// \brief Key for the branch point label mesh in the default map.
+  const std::string kBranchPointLabels{kBranchPoint + kLabels};
+  /// \brief Key for the lane label mesh in the default map.
+  const std::string kLaneLabels{kLane + kLabels};
+  /// @}
+
   /// \brief Holds the map file path.
   std::string mapFile{""};
 
@@ -175,10 +229,13 @@ class MaliputViewerPlugin : public ignition::gui::Plugin {
   ignition::rendering::VisualPtr rootVisual;
 
   /// \brief Map of mesh visual pointers.
-  std::map<std::string, ignition::rendering::VisualPtr> meshes;
+  std::unordered_map<std::string, ignition::rendering::VisualPtr> meshes;
 
   /// \brief Map of text labels visual pointers.
-  std::map<std::string, ignition::rendering::VisualPtr> textLabels;
+  std::unordered_map<std::string, ignition::rendering::VisualPtr> textLabels;
+
+  /// \brief A map that contains the default of the checkbox for meshes and labels.
+  std::unordered_map<std::string, bool> objectVisualDefaults;
 
   /// \brief Holds a pointer to the scene.
   ignition::rendering::ScenePtr scene{nullptr};
@@ -194,6 +251,9 @@ class MaliputViewerPlugin : public ignition::gui::Plugin {
 
   /// \brief Arrow that points the location clicked in the visualizer.
   std::unique_ptr<ArrowMesh> arrow;
+
+  /// \brief Selector used for selecting clicked lanes in the visualizer.
+  std::unique_ptr<Selector> selector;
 };
 
 }  // namespace gui

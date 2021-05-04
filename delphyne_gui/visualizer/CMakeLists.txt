@@ -67,6 +67,37 @@ install(
   ARCHIVE DESTINATION lib
 )
 
+# ----------------------------------------
+# selector library.
+add_library(selector
+  selector.cc
+)
+add_library(delphyne_gui::selector ALIAS selector)
+set_target_properties(selector
+  PROPERTIES
+    OUTPUT_NAME delphyne_gui_selector
+)
+
+ament_target_dependencies(selector
+  "maliput"
+)
+
+target_link_libraries(selector
+  delphyne::public_headers
+  ignition-common3::ignition-common3
+  ignition-math6::ignition-math6
+  ignition-rendering3::ignition-rendering3
+  maliput::api
+)
+
+install(
+  TARGETS selector
+  EXPORT ${PROJECT_NAME}-targets
+  RUNTIME DESTINATION bin
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib
+)
+
 # global_attributes library.
 add_library(global_attributes
   global_attributes.cc
@@ -109,6 +140,7 @@ target_link_libraries(MaliputViewerPlugin
     delphyne_gui::arrow_mesh
     delphyne_gui::global_attributes
     delphyne_gui::maliput_viewer_model
+    delphyne_gui::selector
     ignition-gui3::ignition-gui3
     ignition-common3::ignition-common3
     ignition-transport8::ignition-transport8
@@ -141,7 +173,6 @@ add_library(maliput_viewer_widget
   orbit_view_control.cc
   render_maliput_widget.cc
   arrow_mesh.cc
-  selector.cc
   traffic_light_manager.cc
   ${MaliputViewerWidget_MOC}
   ${LayerSelectionWidget_MOC}
@@ -159,6 +190,7 @@ target_link_libraries(maliput_viewer_widget
   delphyne_gui::arrow_mesh
   delphyne_gui::global_attributes
   delphyne_gui::maliput_viewer_model
+  delphyne_gui::selector
   ignition-common3::ignition-common3
   ignition-gui0::ignition-gui0
   ignition-msgs5::ignition-msgs5

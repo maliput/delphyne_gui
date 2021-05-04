@@ -35,6 +35,23 @@ std::string GetPathFromFileUrl(const std::string& fileUrl) {
   return fileUrl.empty() ? fileUrl : fileUrl.substr(fileUrl.find(kFileUrlLabel) + strlen(kFileUrlLabel));
 }
 
+// \brief Obtains the id of a branchpoint or lane from the string used as it's
+//        key value in the mesh map.
+//        e.g: If @p keyword is "lane_1_0_1", it returns "1_0_1";
+// \param[in] keyword The keyword that the lane or branchpoint is associated with in the
+//                    mesh map.
+// \returns The lane or branchpoint id.
+std::string GetID(const std::string& keyword) {
+  const std::size_t firstNum = keyword.find_first_of("0123456789");
+  return keyword.substr(firstNum, keyword.length() - firstNum + 1);
+  ;
+}
+
+// \brief Combines @p _type and @p _id to create a key with the same structure than
+//        used in MaliputViewerModel for the mesh map.
+//        e.g. : if @p _type is "lane" and @p _id is "1_0_1". It returns "lane_" + "1_0_1"
+std::string FromIdToMapKey(const std::string& _type, const std::string& _id) { return _type + "_" + _id; }
+
 }  // namespace
 
 MaliputViewerPlugin::MaliputViewerPlugin() : Plugin() {
@@ -78,42 +95,69 @@ void MaliputViewerPlugin::OnNewRoadNetwork(const QString& _mapFile, const QStrin
   model->Load(mapFile, roadRulebookFile, trafficLightBookFile, phaseRingBookFile);
   emit LayerCheckboxesChanged();
   emit LabelCheckboxesChanged();
-  RenderMeshes();
+  renderMeshesOption.RenderAll();
+}
+
+void MaliputViewerPlugin::UpdateObjectVisualDefaults(const std::string& _key, bool _newValue) {
+  // Store the value the mesh should return to if not selected
+  if (FoundKeyword(_key, kMarker)) {
+    objectVisualDefaults[kMarker] = _newValue;
+  } else if (FoundKeyword(_key, kLaneLabels)) {
+    objectVisualDefaults[kLaneLabels] = _newValue;
+  } else if (FoundKeyword(_key, kBranchPointLabels)) {
+    objectVisualDefaults[kBranchPointLabels] = _newValue;
+  } else if (FoundKeyword(_key, kLane)) {
+    objectVisualDefaults[kLane] = _newValue;
+  } else if (FoundKeyword(_key, kBranchPoint)) {
+    objectVisualDefaults[kBranchPoint] = _newValue;
+  }
 }
 
 void MaliputViewerPlugin::OnNewMeshLayerSelection(const QString& _layer, bool _state) {
-  static constexpr char const* kAll{"all"};
   const std::string layer{_layer.toStdString()};
   const std::size_t all_keyword = layer.find(kAll);
   // If the keyword "all" is found, enable all of the parsed type.
   if (FoundKeyword(layer, kAll)) {
     const std::string keyword = layer.substr(0, all_keyword);
+    UpdateObjectVisualDefaults(layer, _state);
     for (auto const& it : model->Meshes()) {
       if (FoundKeyword(it.first, keyword)) {
-        model->SetLayerState(it.first, _state);
+        const std::string id = GetID(it.first);
+        // If the region is not selected, update with the default setting
+        if (!selector->IsSelected(id)) {
+          // Updates the model.
+          model->SetLayerState(it.first, _state);
+        }
       }
     }
   } else {
     model->SetLayerState(layer, _state);
+    // If the asphalt is turned off, deselect all lanes.
+    if (FoundKeyword(layer, kAsphalt) && !_state) {
+      selector->DeselectAll();
+      arrow->SetVisibility(false);
+    }
   }
-  RenderRoadMeshes(model->Meshes());
+  renderMeshesOption.executeMeshRendering = true;
 }
 
 void MaliputViewerPlugin::OnNewTextLabelSelection(const QString& _label, bool _state) {
   const std::string label{_label.toStdString()};
-  for (auto const& it : model->Labels()) {
-    if (FoundKeyword(it.first, label)) {
-      model->SetTextLabelState(it.first, _state);
+  if (label == kLaneLabels || label == kBranchPointLabels) {
+    UpdateObjectVisualDefaults(label, _state);
+    const std::string keyword = label.substr(0, label.find(kLabels));
+    for (auto const& it : model->Labels()) {
+      if (FoundKeyword(it.first, keyword)) {
+        if (!selector->IsSelected(it.second.text)) {
+          model->SetTextLabelState(it.first, _state);
+        }
+      }
     }
+  } else {
+    model->SetTextLabelState(label, _state);
   }
-  // TODO(#387): There shouldn't be a need to clear the generated labels
-  //             each time the visualization of the labels changes.
-  for (auto it : textLabels) {
-    this->rootVisual->RemoveChild(it.second);
-  }
-  textLabels.clear();
 
-  RenderLabels(model->Labels());
+  renderMeshesOption.executeLabelRendering = true;
 }
 
 void MaliputViewerPlugin::timerEvent(QTimerEvent* _event) {
@@ -132,25 +176,16 @@ void MaliputViewerPlugin::timerEvent(QTimerEvent* _event) {
   }
   timer.stop();
   Initialize();
-  RenderMeshes();
-}
-
-void MaliputViewerPlugin::RenderMeshes() {
-  ignmsg << "Rendering Road meshes..." << std::endl;
-  RenderRoadMeshes(model->Meshes());
-  ignmsg << "Rendering Label meshes..." << std::endl;
-  RenderLabels(model->Labels());
+  renderMeshesOption.RenderAll();
 }
 
 void MaliputViewerPlugin::RenderRoadMeshes(const std::map<std::string, std::unique_ptr<MaliputMesh>>& _maliputMeshes) {
   for (const auto& id_mesh : _maliputMeshes) {
-    ignmsg << "Rendering road mesh: " << id_mesh.first << std::endl;
-
     // Checks if the mesh to be rendered already exists or not.
     const auto meshExists = meshes.find(id_mesh.first);
 
     if (!id_mesh.second->enabled) {
-      ignmsg << "Road mesh " << id_mesh.first << " is disabled." << std::endl;
+      igndbg << "Road mesh " << id_mesh.first << " is disabled." << std::endl;
       // If the mesh already exists, set visibility to false.
       if (meshExists != this->meshes.end()) {
         meshes[id_mesh.first]->SetVisible(false);
@@ -159,6 +194,7 @@ void MaliputViewerPlugin::RenderRoadMeshes(const std::map<std::string, std::uniq
     }
     // If the mesh doesn't exist, it creates new one.
     if (meshExists == meshes.end()) {
+      ignmsg << "Rendering road mesh: " << id_mesh.first << std::endl;
       ignition::rendering::VisualPtr visual;
       // Creates a material for the visual.
       ignition::rendering::MaterialPtr material = scene->CreateMaterial();
@@ -200,11 +236,10 @@ void MaliputViewerPlugin::RenderRoadMeshes(const std::map<std::string, std::uniq
 
 void MaliputViewerPlugin::RenderLabels(const std::map<std::string, MaliputLabel>& _labels) {
   for (const auto& id_label : _labels) {
-    ignmsg << "Rendering label mesh: " << id_label.first << std::endl;
     // Checks if the text labels to be rendered already exists or not.
     const auto labelExists = textLabels.find(id_label.first);
     if (!id_label.second.enabled) {
-      ignmsg << "Label mesh " << id_label.first << " is disabled." << std::endl;
+      igndbg << "Label mesh " << id_label.first << " is disabled." << std::endl;
       // If the text label already exists, set visibility to false.
       if (labelExists != textLabels.end()) {
         textLabels[id_label.first]->SetVisible(false);
@@ -213,6 +248,7 @@ void MaliputViewerPlugin::RenderLabels(const std::map<std::string, MaliputLabel>
     }
     // If the text label doesn't exist, it creates new one.
     if (labelExists == textLabels.end()) {
+      ignmsg << "Rendering label mesh: " << id_label.first << std::endl;
       ignition::rendering::VisualPtr visual;
       // Creates a material for the visual.
       ignition::rendering::MaterialPtr material = scene->CreateMaterial();
@@ -254,6 +290,8 @@ void MaliputViewerPlugin::RenderLabels(const std::map<std::string, MaliputLabel>
 }
 
 void MaliputViewerPlugin::Clear() {
+  selector->DeselectAll();
+  arrow->SetVisibility(false);
   // Clears the text labels.
   for (auto it : textLabels) {
     this->rootVisual->RemoveChild(it.second);
@@ -264,6 +302,10 @@ void MaliputViewerPlugin::Clear() {
   }
   textLabels.clear();
   meshes.clear();
+  // Reset default values for meshes' visualization.
+  for (const std::string& key : {kLane, kMarker, kBranchPoint, kBranchPointLabels, kLaneLabels}) {
+    objectVisualDefaults[key] = true;
+  }
 }
 
 void MaliputViewerPlugin::CreateLaneLabelMaterial(ignition::rendering::MaterialPtr& _material) {
@@ -327,7 +369,7 @@ void MaliputViewerPlugin::LoadConfig(const tinyxml2::XMLElement* _pluginElem) {
     return;
   }
   Initialize();
-  RenderMeshes();
+  renderMeshesOption.RenderAll();
 }
 
 void MaliputViewerPlugin::Initialize() {
@@ -357,6 +399,12 @@ void MaliputViewerPlugin::Initialize() {
   directionalLight->SetSpecularColor(lightRed, lightGreen, lightBlue);
   rootVisual->AddChild(directionalLight);
 
+  // Create arrow mesh and link it to the scene.
+  arrow = std::make_unique<ArrowMesh>(this->scene, 0.5);
+  // Create a Selector.
+  selector = std::make_unique<Selector>(this->scene, 0.3 /* scaleX */, 0.5 /* scaleY */, 0.1 /* scaleZ */,
+                                        50 /* poolSize */, 15 /* numLanes */, 0.6 /* minTolerance */);
+
   // Install event filter to get mouse event from the main scene.
   const ignition::gui::Plugin* scene3D = FilterPluginsByTitle(mainScene3dPluginTitle);
   if (!scene3D) {
@@ -372,9 +420,6 @@ void MaliputViewerPlugin::Initialize() {
   }
   renderWindowItem->installEventFilter(this);
   ignition::gui::App()->findChild<ignition::gui::MainWindow*>()->installEventFilter(this);
-
-  // Create arrow mesh and link it to the scene.
-  arrow = std::make_unique<ArrowMesh>(this->scene, 0.5);
 }
 
 ignition::gui::Plugin* MaliputViewerPlugin::FilterPluginsByTitle(const std::string& _pluginTitle) {
@@ -394,6 +439,14 @@ bool MaliputViewerPlugin::eventFilter(QObject* _obj, QEvent* _event) {
   }
   if (_event->type() == ignition::gui::events::Render::kType) {
     arrow->Update();
+    if (renderMeshesOption.executeMeshRendering) {
+      RenderRoadMeshes(model->Meshes());
+      renderMeshesOption.executeMeshRendering = false;
+    }
+    if (renderMeshesOption.executeLabelRendering) {
+      RenderLabels(model->Labels());
+      renderMeshesOption.executeLabelRendering = false;
+    }
   }
   // Standard event processing
   return QObject::eventFilter(_obj, _event);
@@ -405,12 +458,63 @@ void MaliputViewerPlugin::MouseClickHandler(const QMouseEvent* _mouseEvent) {
     const maliput::api::Lane* lane = model->GetLaneFromWorldPosition(rayQueryResult.point);
     if (lane) {
       ignmsg << "Clicked lane ID: " << lane->id().string() << std::endl;
+      selector->SelectLane(lane);
+
+      // Update visualization to default if it is deselected
+      UpdateLane(lane->id().string());
+
+      const std::string start_bp_id = lane->GetBranchPoint(maliput::api::LaneEnd::kStart)->id().string();
+      const std::string end_bp_id = lane->GetBranchPoint(maliput::api::LaneEnd::kFinish)->id().string();
+      UpdateBranchPoint(start_bp_id);
+      UpdateBranchPoint(end_bp_id);
+
       arrow->SelectAt(rayQueryResult.distance, rayQueryResult.point);
       arrow->SetVisibility(true);
     }
   } else {
+    // Nothing was clicked. Remove lane selection and arrow.
+    UpdateSelectedLanesWithDefault();
     arrow->SetVisibility(false);
+    selector->DeselectAll();
   }
+}
+
+void MaliputViewerPlugin::UpdateLane(const std::string& _id) {
+  const bool isLaneVisualized = selector->IsSelected(_id) || objectVisualDefaults[kLane];
+  const bool isMarkerVisualized = selector->IsSelected(_id) || objectVisualDefaults[kMarker];
+  const bool isLaneLabelVisualized = selector->IsSelected(_id) || objectVisualDefaults[kLaneLabels];
+
+  const std::string laneKey = FromIdToMapKey(kLane, _id);
+  const std::string markerKey = FromIdToMapKey(kMarker, _id);
+
+  OnNewMeshLayerSelection(QString::fromStdString(laneKey), isLaneVisualized);
+  OnNewMeshLayerSelection(QString::fromStdString(markerKey), isMarkerVisualized);
+  OnNewTextLabelSelection(QString::fromStdString(laneKey), isLaneLabelVisualized);
+}
+
+void MaliputViewerPlugin::UpdateBranchPoint(const std::string& _id) {
+  const bool isBPMeshVisualized = selector->IsSelected(_id) || objectVisualDefaults[kBranchPoint];
+  const bool isBPLabelVisualized = selector->IsSelected(_id) || objectVisualDefaults[kBranchPointLabels];
+  const std::string key = FromIdToMapKey(kBranchPoint, _id);
+
+  OnNewMeshLayerSelection(QString::fromStdString(key), isBPMeshVisualized);
+  OnNewTextLabelSelection(QString::fromStdString(key), isBPLabelVisualized);
+}
+
+void MaliputViewerPlugin::UpdateSelectedLanesWithDefault() {
+  const std::vector<std::string> selectedLanes = selector->GetSelectedLanes();
+  const std::vector<std::string> selectedBranchPoints = selector->GetSelectedBranchPoints();
+  for (const auto& id : selectedLanes) {
+    model->SetLayerState(FromIdToMapKey(kLane, id), objectVisualDefaults[kLane]);
+    model->SetLayerState(FromIdToMapKey(kMarker, id), objectVisualDefaults[kMarker]);
+    model->SetTextLabelState(FromIdToMapKey(kLane, id), objectVisualDefaults[kLaneLabels]);
+  }
+  for (const auto& id : selectedBranchPoints) {
+    model->SetLayerState(FromIdToMapKey(kBranchPoint, id), objectVisualDefaults[kBranchPoint]);
+    model->SetTextLabelState(FromIdToMapKey(kBranchPoint, id), objectVisualDefaults[kBranchPointLabels]);
+  }
+
+  renderMeshesOption.RenderAll();
 }
 
 ignition::rendering::RayQueryResult MaliputViewerPlugin::ScreenToScene(int _screenX, int _screenY) const {

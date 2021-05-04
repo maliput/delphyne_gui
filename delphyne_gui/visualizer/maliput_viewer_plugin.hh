@@ -6,10 +6,13 @@
 
 #include <maliput/api/road_geometry.h>
 
+#include <ignition/common/MouseEvent.hh>
 #include <ignition/gui/Plugin.hh>
+#include <ignition/rendering/RayQuery.hh>
 #include <ignition/rendering/RenderTypes.hh>
 #include <ignition/rendering/Scene.hh>
 
+#include "arrow_mesh.hh"
 #include "maliput_viewer_model.hh"
 
 namespace delphyne {
@@ -17,11 +20,19 @@ namespace gui {
 
 /// \brief Loads a road geometry out of a xodr file or a yaml file.
 ///        Meshes are created and displayed in the scene.
+///
+/// ## Configuration
+///
+/// * \<main_scene_plugin_title\> : Title of the Scene3D plugin instance that manages the main scene.
+///                                 Defaults to '3D Scene'.
 class MaliputViewerPlugin : public ignition::gui::Plugin {
   Q_OBJECT
 
   /// Property used to load the default state of layers visualization in its correspondant UI's checkboxes.
   Q_PROPERTY(QList<bool> layerCheckboxes READ LayerCheckboxes NOTIFY LayerCheckboxesChanged)
+
+  /// Property used to load the default state of labels visualization in its correspondant UI's checkboxes.
+  Q_PROPERTY(QList<bool> labelCheckboxes READ LabelCheckboxes NOTIFY LabelCheckboxesChanged)
 
  public:
   /// \brief Default constructor.
@@ -35,15 +46,29 @@ class MaliputViewerPlugin : public ignition::gui::Plugin {
   /// in the layers selection panel for the meshes.
   Q_INVOKABLE QList<bool> LayerCheckboxes() const;
 
+  /// Called when a new RoadNetwork is loaded to default the checkboxes' state
+  /// in the label selection panel.
+  Q_INVOKABLE QList<bool> LabelCheckboxes() const;
+
  signals:
   /// \brief Signal emitted to reset the checkboxes' state for the layers visualization
   ///        when a new RoadNetwork is loaded.
   void LayerCheckboxesChanged();
 
+  /// \brief Signal emitted to reset the checkboxes' state for the label visualization
+  ///        when a new RoadNetwork is loaded.
+  void LabelCheckboxesChanged();
+
  protected:
-  /// @brief Timer event callback which handles the logic to load the meshes when
+  /// \brief Timer event callback which handles the logic to load the meshes when
   ///        the scene is not ready yet.
   void timerEvent(QTimerEvent* _event) override;
+
+  /// \brief Filters QMouseEvents from a Scene3D plugin whose title matches with <main_scene_plugin_title>.
+  ///        Filters ignition::gui::events::Render events to update the animation of the arrow mesh.
+  /// \details To make this method be called by Qt Event System, install the event filter in target object.
+  ///          \see QObject::installEventFilter() method.
+  bool eventFilter(QObject* _obj, QEvent* _event) override;
 
  protected slots:
   /// \brief Clears the visualizer, loads a RoadNetwork and update the GUI with meshes and labels.
@@ -59,12 +84,20 @@ class MaliputViewerPlugin : public ignition::gui::Plugin {
   /// \param[in] _state The state of the visibility checkbox.
   void OnNewMeshLayerSelection(const QString& _layer, bool _state);
 
+  /// \brief Change the visibility of the labels.
+  /// \param[in] _label Name of the label.
+  /// \param[in] _state The state of the visibility checkbox.
+  void OnNewTextLabelSelection(const QString& _label, bool _state);
+
  private:
   /// @brief The period in milliseconds of the timer to try to load the meshes.
   static constexpr int kTimerPeriodInMs{500};
 
   /// @brief The scene name.
   static constexpr char const* kSceneName = "scene";
+
+  /// @brief The Scene3D instance holding the main scene.
+  static constexpr char const* kMainScene3dPlugin = "Main3DScene";
 
   /// @brief The rendering engine name.
   static constexpr char const* kEngineName = "ogre";
@@ -100,8 +133,25 @@ class MaliputViewerPlugin : public ignition::gui::Plugin {
   /// \brief Clears all the references to text labels, meshes and the scene.
   void Clear();
 
-  /// \brief Configurate scene.
-  void ConfigurateScene();
+  /// \brief Configurate scene and install event filter for filtering QMouseEvents.
+  /// \details To install the event filter the Scene3D plugin hosting the scene
+  ///          is expected to be titled as #kMainScene3dPlugin.
+  void Initialize();
+
+  /// \brief Handles the left click mouse event.
+  /// @param[in] _mouseEvent QMouseEvent pointer.
+  void MouseClickHandler(const QMouseEvent* _mouseEvent);
+
+  /// \brief Performs a raycast on the screen.
+  /// \param[in] screenX X screen's coordinate.
+  /// \param[in] screenY Y screen's coordinate.
+  /// \return A ignition::rendering::RayQueryResult.
+  ignition::rendering::RayQueryResult ScreenToScene(int _screenX, int _screenY) const;
+
+  /// \brief Filters by title all the children of the parent plugin.
+  /// \param _pluginTitle Title of the ignition::gui::plugin.
+  /// \return A pointer to the plugin if found, nullptr otherwise.
+  ignition::gui::Plugin* FilterPluginsByTitle(const std::string& _pluginTitle);
 
   /// \brief Holds the map file path.
   std::string mapFile{""};
@@ -114,6 +164,9 @@ class MaliputViewerPlugin : public ignition::gui::Plugin {
 
   /// \brief Holds the phase ring book file path.
   std::string phaseRingBookFile{""};
+
+  /// \brief Holds the title of the main Scene3D plugin.
+  std::string mainScene3dPluginTitle{"3D Scene"};
 
   /// @brief Triggers an event every `kTimerPeriodInMs` to try to get the scene.
   QBasicTimer timer;
@@ -130,8 +183,17 @@ class MaliputViewerPlugin : public ignition::gui::Plugin {
   /// \brief Holds a pointer to the scene.
   ignition::rendering::ScenePtr scene{nullptr};
 
+  /// \brief Holds a pointer to a ray query.
+  ignition::rendering::RayQueryPtr rayQuery{nullptr};
+
+  /// \brief Holds a pointer to the camera.
+  ignition::rendering::CameraPtr camera{};
+
   /// \brief Model that holds the meshes and the visualization status.
   std::unique_ptr<MaliputViewerModel> model{};
+
+  /// \brief Arrow that points the location clicked in the visualizer.
+  std::unique_ptr<ArrowMesh> arrow;
 };
 
 }  // namespace gui

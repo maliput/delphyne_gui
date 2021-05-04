@@ -63,7 +63,6 @@ std::ostream& operator<<(std::ostream& os, const MessageWidget& message) {
   return os;
 }
 
-
 // @returns A lower case string with the contents of @p _str.
 std::string StringToLowerCase(const std::string& _str) {
   std::string result(_str);

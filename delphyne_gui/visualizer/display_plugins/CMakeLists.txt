@@ -67,6 +67,43 @@ install(
 )
 
 #-------------------------------------------------------------------------------
+# AgentInfo display (ign-gui 3)
+QT5_WRAP_CPP(AgentInfoDisplay_MOC agent_info_display.hh)
+QT5_ADD_RESOURCES(AgentInfoDisplay_RCC agent_info_display.qrc)
+
+add_library(AgentInfoDisplay
+  ${CMAKE_CURRENT_SOURCE_DIR}/agent_info_display.cc
+  ${AgentInfoDisplay_MOC}
+  ${AgentInfoDisplay_RCC}
+)
+add_library(delphyne_gui::AgentInfoDisplay ALIAS AgentInfoDisplay)
+set_target_properties(AgentInfoDisplay
+  PROPERTIES
+    OUTPUT_NAME AgentInfoDisplay
+)
+
+target_link_libraries(AgentInfoDisplay
+  PUBLIC
+    delphyne::protobuf_messages
+    ignition-common3::ignition-common3
+    ignition-gui3::ignition-gui3
+    ignition-math6::ignition-math6
+    ignition-rendering3::ignition-rendering3
+    ${Qt5Core_LIBRARIES}
+    ${Qt5Widgets_LIBRARIES}
+  PRIVATE
+    ignition-plugin1::register
+)
+
+install(
+  TARGETS AgentInfoDisplay
+  EXPORT ${PROJECT_NAME}-targets
+  RUNTIME DESTINATION bin
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib
+)
+
+#-------------------------------------------------------------------------------
 # Origin display (ign-gui 3)
 QT5_WRAP_CPP(OriginDisplay_MOC origin_display.hh)
 QT5_ADD_RESOURCES(OriginDisplay_RCC origin_display.qrc)

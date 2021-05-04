@@ -114,8 +114,6 @@ void MaliputViewerPlugin::UpdateObjectVisualDefaults(const std::string& _key, bo
 }
 
 void MaliputViewerPlugin::OnNewMeshLayerSelection(const QString& _layer, bool _state) {
-  // static constexpr char const* kAll{"all"};
-  // static constexpr char const* kAsphalt{"asphalt"};
   const std::string layer{_layer.toStdString()};
   const std::size_t all_keyword = layer.find(kAll);
   // If the keyword "all" is found, enable all of the parsed type.

@@ -1,8 +1,10 @@
 // Copyright 2021 Toyota Research Institute
 #pragma once
 
+#include <map>
 #include <memory>
 #include <string>
+#include <unordered_map>
 
 #include <maliput/api/road_geometry.h>
 
@@ -227,13 +229,13 @@ class MaliputViewerPlugin : public ignition::gui::Plugin {
   ignition::rendering::VisualPtr rootVisual;
 
   /// \brief Map of mesh visual pointers.
-  std::map<std::string, ignition::rendering::VisualPtr> meshes;
+  std::unordered_map<std::string, ignition::rendering::VisualPtr> meshes;
 
   /// \brief Map of text labels visual pointers.
-  std::map<std::string, ignition::rendering::VisualPtr> textLabels;
+  std::unordered_map<std::string, ignition::rendering::VisualPtr> textLabels;
 
   /// \brief A map that contains the default of the checkbox for meshes and labels.
-  std::map<std::string, bool> objectVisualDefaults;
+  std::unordered_map<std::string, bool> objectVisualDefaults;
 
   /// \brief Holds a pointer to the scene.
   ignition::rendering::ScenePtr scene{nullptr};

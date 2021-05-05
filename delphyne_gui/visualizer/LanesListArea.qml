@@ -8,7 +8,7 @@ import QtQuick.Layouts 1.3
 
 // Table to list the lanes of the road network.
 GridLayout {
-  id: selectedLanesPanel
+  id: lanesListPanel
   columns: 1
   anchors.left: parent.left
   anchors.leftMargin: 10

@@ -40,7 +40,9 @@ class MaliputViewerPlugin : public ignition::gui::Plugin {
   /// Property used to load the lanes id in the correspondant UI's table.
   Q_PROPERTY(QStringList listLanes READ ListLanes NOTIFY ListLanesChanged)
 
- public:
+  /// Property used to load the rules in the correspondant UI's area.
+  Q_PROPERTY(QString rulesList READ RulesList NOTIFY RulesListChanged)
+
  public:
   /// \brief Default constructor.
   MaliputViewerPlugin();
@@ -51,6 +53,9 @@ class MaliputViewerPlugin : public ignition::gui::Plugin {
 
   /// Called when a new RoadNetwork is loaded to load the ids of the lanes into the table.
   Q_INVOKABLE QStringList ListLanes() const;
+
+  /// Called when a new lane is selected to load the lane's rules into the UI.
+  Q_INVOKABLE QString RulesList() const;
 
   /// Called when a new RoadNetwork is loaded to default the checkboxes' state
   /// in the layers selection panel for the meshes.
@@ -63,6 +68,9 @@ class MaliputViewerPlugin : public ignition::gui::Plugin {
  signals:
   /// \brief Signal emitted to update the id of the lanes in the table.
   void ListLanesChanged();
+
+  /// \brief Signal emitted to update the rules of the selected lane.
+  void RulesListChanged();
 
   /// \brief Signal emitted to reset the checkboxes' state for the layers visualization
   ///        when a new RoadNetwork is loaded.
@@ -202,8 +210,11 @@ class MaliputViewerPlugin : public ignition::gui::Plugin {
   /// \brief Updates all of the selected regions to the default mesh values.
   void UpdateSelectedLanesWithDefault();
 
-  /// \brief Updates the list tha holds the lanes id of the road network.
+  /// \brief Updates the list that holds the lanes id of the road network.
   void UpdateLaneList();
+
+  /// \brief Updates the list that holds the lane's rules of the selected lane.
+  void UpdateRulesList(const std::string& _laneId);
 
   /// Keys used by the checkbox logic to visualize different layers and by
   /// the default map #objectVisualDefaults.
@@ -246,6 +257,9 @@ class MaliputViewerPlugin : public ignition::gui::Plugin {
   ///        The order in this collection will affect the order
   ///        that the lanes id are displayed in the table.
   QStringList listLanes{};
+
+  /// \brief Holds the rules of the last selected lane that are displayed in the UI.
+  QString rulesList{};
 
   /// @brief Triggers an event every `kTimerPeriodInMs` to try to get the scene.
   QBasicTimer timer;

@@ -71,6 +71,8 @@ MaliputViewerPlugin::MaliputViewerPlugin() : Plugin() {
 
 QStringList MaliputViewerPlugin::ListLanes() const { return listLanes; }
 
+QString MaliputViewerPlugin::RulesList() const { return rulesList; }
+
 QList<bool> MaliputViewerPlugin::LayerCheckboxes() const {
   // Returns the checkboxes' state by default.
   return {true /* asphalt */,      true /* lane */,
@@ -181,11 +183,13 @@ void MaliputViewerPlugin::OnTableLaneIdSelection(int _index) {
     ignerr << "There is no loaded lane that matches with this id: " << laneId.toStdString() << std::endl;
     return;
   }
-  ignmsg << "Selected lane ID: " << lane->id().string() << std::endl;
+  const std::string lane_id = lane->id().string();
+  ignmsg << "Selected lane ID: " << lane_id << std::endl;
   selector->SelectLane(lane);
 
   // Update visualization to default if it is deselected
-  UpdateLane(lane->id().string());
+  UpdateLane(lane_id);
+  UpdateRulesList(lane_id);
 
   const std::string start_bp_id = lane->GetBranchPoint(maliput::api::LaneEnd::kStart)->id().string();
   const std::string end_bp_id = lane->GetBranchPoint(maliput::api::LaneEnd::kFinish)->id().string();
@@ -493,9 +497,9 @@ void MaliputViewerPlugin::MouseClickHandler(const QMouseEvent* _mouseEvent) {
       const std::string lane_id = lane->id().string();
       ignmsg << "Clicked lane ID: " << lane_id << std::endl;
       selector->SelectLane(lane);
-
       // Update visualization to default if it is deselected
       UpdateLane(lane_id);
+      UpdateRulesList(lane_id);
 
       const std::string start_bp_id = lane->GetBranchPoint(maliput::api::LaneEnd::kStart)->id().string();
       const std::string end_bp_id = lane->GetBranchPoint(maliput::api::LaneEnd::kFinish)->id().string();
@@ -556,6 +560,13 @@ void MaliputViewerPlugin::UpdateSelectedLanesWithDefault() {
   }
 
   renderMeshesOption.RenderAll();
+}
+
+void MaliputViewerPlugin::UpdateRulesList(const std::string& _laneId) {
+  // TODO: Get rules also having in consideration the phase and phase ring ids.
+  const std::string none{""};
+  rulesList = model->GetRulesOfLane<QString>(none /* phase ring id */, none /* phase_id */, _laneId);
+  emit RulesListChanged();
 }
 
 ignition::rendering::RayQueryResult MaliputViewerPlugin::ScreenToScene(int _screenX, int _screenY) const {

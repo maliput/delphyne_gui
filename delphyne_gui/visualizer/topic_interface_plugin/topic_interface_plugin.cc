@@ -36,7 +36,6 @@ std::ostream& operator<<(std::ostream& os, const MessageWidget::Variant& value) 
     os << std::boolalpha << value.boolVal.value();
   } else if (value.stringVal.has_value()) {
     os << value.stringVal.value();
-    os << value.stringVal.value();
   } else if (value.enumVal.has_value()) {
     os << value.enumVal.value().name;
   }
@@ -98,7 +97,6 @@ TopicInterfacePlugin::TopicInterfacePlugin() : ignition::gui::Plugin() {
 
 QStandardItemModel* TopicInterfacePlugin::Model() {
   std::lock_guard<std::mutex> lock(mutex);
-  ignerr << *messageWidget << std::endl;
   return reinterpret_cast<QStandardItemModel*>(messageModel);
 }
 
@@ -172,34 +170,23 @@ void TopicInterfacePlugin::VisitMessageWidgets(const std::string& _name, QStanda
     return;
   }
 
+  const QString name = QString::fromStdString(GetSimpleName(_name));
+  QStandardItem* item = new QStandardItem(name);
+
+  QString data("");
   if (_messageWidget->IsCompound()) {
-    const QString name = QString::fromStdString(GetSimpleName(_name));
-    const QString type = QString::fromStdString(_messageWidget->TypeName());
-    const QString data("");
-
-    QStandardItem* item = new QStandardItem(name);
-    item->setData(QVariant(name), MessageModel::kNameRole);
-    item->setData(QVariant(type), MessageModel::kTypeRole);
-    item->setData(QVariant(data), MessageModel::kDataRole);
-    _parent->appendRow(item);
-
     for (const auto& name_child : _messageWidget->Children()) {
       VisitMessageWidgets(name_child.first, item, name_child.second.get());
     }
   } else {
-    const QString name = QString::fromStdString(GetSimpleName(_name));
-    const QString type = QString::fromStdString(_messageWidget->TypeName());
-
     std::stringstream ss;
     ss << _messageWidget->Value();
-    const QString data = QString::fromStdString(ss.str());
-
-    QStandardItem* item = new QStandardItem(name);
-    item->setData(QVariant(name), MessageModel::kNameRole);
-    item->setData(QVariant(type), MessageModel::kTypeRole);
-    item->setData(QVariant(data), MessageModel::kDataRole);
-    _parent->appendRow(item);
+    data = QString::fromStdString(ss.str());
   }
+  item->setData(QVariant(name), MessageModel::kNameRole);
+  item->setData(QVariant(QString::fromStdString(_messageWidget->TypeName())), MessageModel::kTypeRole);
+  item->setData(QVariant(data), MessageModel::kDataRole);
+  _parent->appendRow(item);
 }
 
 void TopicInterfacePlugin::OnMessage(const google::protobuf::Message& _msg) {

@@ -179,6 +179,7 @@ void MaliputViewerPlugin::OnTableLaneIdSelection(int _index) {
   const maliput::api::Lane* lane = model->GetLaneFromId(laneId.toStdString());
   if (!lane) {
     ignerr << "There is no loaded lane that matches with this id: " << laneId.toStdString() << std::endl;
+    return;
   }
   ignmsg << "Selected lane ID: " << lane->id().string() << std::endl;
   selector->SelectLane(lane);

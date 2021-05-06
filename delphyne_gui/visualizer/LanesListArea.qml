@@ -45,15 +45,14 @@ GridLayout {
     }
     model: ListModel {
       id: tableModel
-      // This list will be updated dynamically when
-      // new data is presented.
+      // When new data is present, the list gets updated.
     }
     onClicked: {
       MaliputViewerPlugin.OnTableLaneIdSelection(row)
     }
   }
 
-  // When new data arrives the table is updated.
+  // Updates the table when new data is available.
   Connections {
     target: MaliputViewerPlugin
     onListLanesChanged: {

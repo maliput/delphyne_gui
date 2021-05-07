@@ -1,5 +1,9 @@
 <!DOCTYPE RCC><RCC version="1.0">
   <qresource prefix="TopicInterfacePlugin/">
     <file>TopicInterfacePlugin.qml</file>
+    <!-- Copy of https://github.com/ignitionrobotics/ign-gui/blob/ign-gui3/src/plugins/topic_viewer/minus.png . License: https://github.com/ignitionrobotics/ign-gui/blob/ign-gui3/LICENSE -->
+    <file>minus.png</file>
+    <!-- Copy of https://github.com/ignitionrobotics/ign-gui/blob/ign-gui3/src/plugins/topic_viewer/plus.png . License: https://github.com/ignitionrobotics/ign-gui/blob/ign-gui3/LICENSE -->
+    <file>plus.png</file>
   </qresource>
 </RCC>

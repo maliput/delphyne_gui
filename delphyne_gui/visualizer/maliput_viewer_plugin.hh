@@ -37,6 +37,10 @@ class MaliputViewerPlugin : public ignition::gui::Plugin {
   /// Property used to load the default state of labels visualization in its correspondant UI's checkboxes.
   Q_PROPERTY(QList<bool> labelCheckboxes READ LabelCheckboxes NOTIFY LabelCheckboxesChanged)
 
+  /// Property used to load the lanes id in the correspondant UI's table.
+  Q_PROPERTY(QStringList listLanes READ ListLanes NOTIFY ListLanesChanged)
+
+ public:
  public:
   /// \brief Default constructor.
   MaliputViewerPlugin();
@@ -44,6 +48,9 @@ class MaliputViewerPlugin : public ignition::gui::Plugin {
   /// Called by Ignition GUI when plugin is instantiated.
   /// \param[in] _pluginElem XML configuration for this plugin.
   void LoadConfig(const tinyxml2::XMLElement* _pluginElem) override;
+
+  /// Called when a new RoadNetwork is loaded to load the ids of the lanes into the table.
+  Q_INVOKABLE QStringList ListLanes() const;
 
   /// Called when a new RoadNetwork is loaded to default the checkboxes' state
   /// in the layers selection panel for the meshes.
@@ -54,6 +61,9 @@ class MaliputViewerPlugin : public ignition::gui::Plugin {
   Q_INVOKABLE QList<bool> LabelCheckboxes() const;
 
  signals:
+  /// \brief Signal emitted to update the id of the lanes in the table.
+  void ListLanesChanged();
+
   /// \brief Signal emitted to reset the checkboxes' state for the layers visualization
   ///        when a new RoadNetwork is loaded.
   void LayerCheckboxesChanged();
@@ -61,6 +71,9 @@ class MaliputViewerPlugin : public ignition::gui::Plugin {
   /// \brief Signal emitted to reset the checkboxes' state for the label visualization
   ///        when a new RoadNetwork is loaded.
   void LabelCheckboxesChanged();
+
+  /// \brief Signal emitted to indicate which lane id in the table should be highlighted.
+  void tableLaneIdSelection(int _index);
 
  protected:
   /// \brief Timer event callback which handles the logic to load the meshes when
@@ -92,6 +105,10 @@ class MaliputViewerPlugin : public ignition::gui::Plugin {
   /// \param[in] _label Name of the label.
   /// \param[in] _state The state of the visibility checkbox.
   void OnNewTextLabelSelection(const QString& _label, bool _state);
+
+  /// \brief Manages the selection of lanes id from the table.
+  /// \param[in] _index Correspondant to the position of the row in the table.
+  void OnTableLaneIdSelection(int _index);
 
  private:
   /// @brief The period in milliseconds of the timer to try to load the meshes.
@@ -185,6 +202,9 @@ class MaliputViewerPlugin : public ignition::gui::Plugin {
   /// \brief Updates all of the selected regions to the default mesh values.
   void UpdateSelectedLanesWithDefault();
 
+  /// \brief Updates the list tha holds the lanes id of the road network.
+  void UpdateLaneList();
+
   /// Keys used by the checkbox logic to visualize different layers and by
   /// the default map #objectVisualDefaults.
   /// @{
@@ -221,6 +241,11 @@ class MaliputViewerPlugin : public ignition::gui::Plugin {
 
   /// \brief Holds the title of the main Scene3D plugin.
   std::string mainScene3dPluginTitle{"3D Scene"};
+
+  /// \brief Holds the lanes id that are shown in the table.
+  ///        The order in this collection will affect the order
+  ///        that the lanes id are displayed in the table.
+  QStringList listLanes{};
 
   /// @brief Triggers an event every `kTimerPeriodInMs` to try to get the scene.
   QBasicTimer timer;

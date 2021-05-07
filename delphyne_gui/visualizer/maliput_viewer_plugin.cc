@@ -2,6 +2,7 @@
 #include "maliput_viewer_plugin.hh"
 
 #include <algorithm>
+#include <vector>
 
 #include <ignition/common/Console.hh>
 #include <ignition/gui/Application.hh>
@@ -68,6 +69,8 @@ MaliputViewerPlugin::MaliputViewerPlugin() : Plugin() {
   }
 }
 
+QStringList MaliputViewerPlugin::ListLanes() const { return listLanes; }
+
 QList<bool> MaliputViewerPlugin::LayerCheckboxes() const {
   // Returns the checkboxes' state by default.
   return {true /* asphalt */,      true /* lane */,
@@ -93,9 +96,19 @@ void MaliputViewerPlugin::OnNewRoadNetwork(const QString& _mapFile, const QStrin
   trafficLightBookFile = GetPathFromFileUrl(_trafficLightBookFile.toStdString());
   phaseRingBookFile = GetPathFromFileUrl(_phaseRingBookFile.toStdString());
   model->Load(mapFile, roadRulebookFile, trafficLightBookFile, phaseRingBookFile);
+  UpdateLaneList();
   emit LayerCheckboxesChanged();
   emit LabelCheckboxesChanged();
   renderMeshesOption.RenderAll();
+}
+
+void MaliputViewerPlugin::UpdateLaneList() {
+  std::vector<std::string> laneIds = model->GetAllLaneIds<std::vector<std::string>>();
+  std::sort(laneIds.begin(), laneIds.end());
+  listLanes.clear();
+  std::for_each(laneIds.cbegin(), laneIds.cend(),
+                [& list = this->listLanes](const std::string& _id) { list.append(QString::fromStdString(_id)); });
+  emit ListLanesChanged();
 }
 
 void MaliputViewerPlugin::UpdateObjectVisualDefaults(const std::string& _key, bool _newValue) {
@@ -158,6 +171,26 @@ void MaliputViewerPlugin::OnNewTextLabelSelection(const QString& _label, bool _s
   }
 
   renderMeshesOption.executeLabelRendering = true;
+}
+void MaliputViewerPlugin::OnTableLaneIdSelection(int _index) {
+  // Because the table is filled in the same order that the table's index increases,
+  // we can easily get the lane id out of the index of the table.
+  const QString& laneId = listLanes[_index];
+  const maliput::api::Lane* lane = model->GetLaneFromId(laneId.toStdString());
+  if (!lane) {
+    ignerr << "There is no loaded lane that matches with this id: " << laneId.toStdString() << std::endl;
+    return;
+  }
+  ignmsg << "Selected lane ID: " << lane->id().string() << std::endl;
+  selector->SelectLane(lane);
+
+  // Update visualization to default if it is deselected
+  UpdateLane(lane->id().string());
+
+  const std::string start_bp_id = lane->GetBranchPoint(maliput::api::LaneEnd::kStart)->id().string();
+  const std::string end_bp_id = lane->GetBranchPoint(maliput::api::LaneEnd::kFinish)->id().string();
+  UpdateBranchPoint(start_bp_id);
+  UpdateBranchPoint(end_bp_id);
 }
 
 void MaliputViewerPlugin::timerEvent(QTimerEvent* _event) {
@@ -457,11 +490,12 @@ void MaliputViewerPlugin::MouseClickHandler(const QMouseEvent* _mouseEvent) {
   if (rayQueryResult.distance >= 0) {
     const maliput::api::Lane* lane = model->GetLaneFromWorldPosition(rayQueryResult.point);
     if (lane) {
-      ignmsg << "Clicked lane ID: " << lane->id().string() << std::endl;
+      const std::string lane_id = lane->id().string();
+      ignmsg << "Clicked lane ID: " << lane_id << std::endl;
       selector->SelectLane(lane);
 
       // Update visualization to default if it is deselected
-      UpdateLane(lane->id().string());
+      UpdateLane(lane_id);
 
       const std::string start_bp_id = lane->GetBranchPoint(maliput::api::LaneEnd::kStart)->id().string();
       const std::string end_bp_id = lane->GetBranchPoint(maliput::api::LaneEnd::kFinish)->id().string();
@@ -470,6 +504,13 @@ void MaliputViewerPlugin::MouseClickHandler(const QMouseEvent* _mouseEvent) {
 
       arrow->SelectAt(rayQueryResult.distance, rayQueryResult.point);
       arrow->SetVisibility(true);
+
+      // Update selected table's lane id.
+      for (int i = 0; i < listLanes.length(); ++i) {
+        if (listLanes[i].toStdString() == lane_id) {
+          tableLaneIdSelection(i);
+        }
+      }
     }
   } else {
     // Nothing was clicked. Remove lane selection and arrow.

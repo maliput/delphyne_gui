@@ -28,7 +28,8 @@ void MessageWidget::Parse(const std::string& _scopedName, google::protobuf::Mess
       // Parse all fields of the repeated message.
       for (int count = 0; count < reflection->FieldSize(*_msg, fieldDescriptor); ++count) {
         // Append number to name to differentiate between repeated variables.
-        const std::string itemName = scopedName + "::" + std::to_string(count);
+        // To make it more easy to visualize, they are 1-indexed.
+        const std::string itemName = scopedName + "::" + std::to_string(count + 1);
         // Evaluate the type.
         if (fieldType == google::protobuf::FieldDescriptor::TYPE_MESSAGE) {
           auto& value = reflection->GetRepeatedMessage(*_msg, fieldDescriptor, count);

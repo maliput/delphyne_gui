@@ -87,10 +87,15 @@ class TopicInterfacePlugin : public ignition::gui::Plugin {
   ///          recursively over the children nodes of @p _messageWidget. For
   ///          each node in @p _messageWidget, a new MessageModel is added with
   ///          the its contents.
+  ///          When @p _messageWidget is a top level message item, its children
+  ///          will be added to the parent UI element but not itself.
   /// @param _name The name of @p _messageWidget node.
   /// @param _parent The parent of @p _messageWidget node.
-  /// @param _parent The parent of @p _messageWidget node.
-  void VisitMessageWidgets(const std::string& _name, QStandardItem* _parent, MessageWidget* _messageWidget);
+  /// @param _messageWidget The message to fill in an UI item.
+  /// @param _isTopLevel Whether @p _messageWidget is a top level item in the
+  ///        tree hierarchy.
+  void VisitMessageWidgets(const std::string& _name, QStandardItem* _parent, MessageWidget* _messageWidget,
+                           bool _isTopLevel);
 
   /// @brief The type of the message to receive.
   std::string msgType{};

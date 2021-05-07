@@ -173,12 +173,12 @@ void TopicInterfacePlugin::UpdateView() {
 
   // @{ Load the message values.
   std::lock_guard<std::mutex> lock(mutex);
-  VisitMessageWidgets("root", root, messageWidget.get());
+  VisitMessageWidgets("", root, messageWidget.get(), true /* top level item */);
   // @}
 }
 
 void TopicInterfacePlugin::VisitMessageWidgets(const std::string& _name, QStandardItem* _parent,
-                                               MessageWidget* _messageWidget) {
+                                               MessageWidget* _messageWidget, bool _isTopLevel) {
   // Does not visit blacklisted items.
   if (std::find_if(hideWidgets.begin(), hideWidgets.end(),
                    // amendedName is the name of the field but it applies a lower case transformation
@@ -196,17 +196,22 @@ void TopicInterfacePlugin::VisitMessageWidgets(const std::string& _name, QStanda
   QString data("");
   if (_messageWidget->IsCompound()) {
     for (const auto& name_child : _messageWidget->Children()) {
-      VisitMessageWidgets(name_child.first, item, name_child.second.get());
+      VisitMessageWidgets(name_child.first, _isTopLevel ? _parent : item, name_child.second.get(),
+                          false /* not a top level element */);
     }
   } else {
     std::stringstream ss;
     ss << _messageWidget->Value();
     data = QString::fromStdString(ss.str());
   }
-  item->setData(QVariant(name), MessageModel::kNameRole);
-  item->setData(QVariant(QString::fromStdString(_messageWidget->TypeName())), MessageModel::kTypeRole);
-  item->setData(QVariant(data), MessageModel::kDataRole);
-  _parent->appendRow(item);
+  // When the item is a top level message, it is not added to the UI but its
+  // children are.
+  if (!_isTopLevel) {
+    item->setData(QVariant(name), MessageModel::kNameRole);
+    item->setData(QVariant(QString::fromStdString(_messageWidget->TypeName())), MessageModel::kTypeRole);
+    item->setData(QVariant(data), MessageModel::kDataRole);
+    _parent->appendRow(item);
+  }
 }
 
 void TopicInterfacePlugin::OnMessage(const google::protobuf::Message& _msg) {

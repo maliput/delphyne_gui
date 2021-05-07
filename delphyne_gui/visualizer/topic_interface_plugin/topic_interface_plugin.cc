@@ -88,6 +88,25 @@ std::string GetSimpleName(const std::string _fullName) {
   return pos == std::string::npos ? _fullName : _fullName.substr(pos + strlen("::"));
 }
 
+// @returns Given @p _fullName that has the following structure:
+// "a::b::x::c::y::d::z" where "{a, b, c, d}" are types names and "{x, y, z}"
+// are numbers because they name repeated fields, this function returns "d: z".
+// When there are none occurrences of "::", this function returns @p _fullName.
+std::string GetRepeatedName(const std::string _fullName) {
+  auto pos = _fullName.rfind("::");
+  // TODO(#332): separator was not found, this is an error when calling this
+  //             function as it assumes the field is repeated.
+  if (pos == std::string::npos) {
+    return _fullName;
+  }
+  const std::string lastName = _fullName.substr(pos + strlen("::"));
+  const std::string scopedName = _fullName.substr(0, pos);
+  pos = scopedName.rfind("::");
+
+  return pos == std::string::npos ? (scopedName + ": " + lastName)
+                                  : (scopedName.substr(pos + strlen("::")) + ": " + lastName);
+}
+
 }  // namespace
 
 TopicInterfacePlugin::TopicInterfacePlugin() : ignition::gui::Plugin() {
@@ -170,7 +189,8 @@ void TopicInterfacePlugin::VisitMessageWidgets(const std::string& _name, QStanda
     return;
   }
 
-  const QString name = QString::fromStdString(GetSimpleName(_name));
+  const QString name =
+      QString::fromStdString(_messageWidget->IsRepeated() ? GetRepeatedName(_name) : GetSimpleName(_name));
   QStandardItem* item = new QStandardItem(name);
 
   QString data("");
@@ -191,7 +211,7 @@ void TopicInterfacePlugin::VisitMessageWidgets(const std::string& _name, QStanda
 
 void TopicInterfacePlugin::OnMessage(const google::protobuf::Message& _msg) {
   std::lock_guard<std::mutex> lock(mutex);
-  messageWidget = std::make_unique<MessageWidget>("", &_msg);
+  messageWidget = std::make_unique<MessageWidget>("", &_msg, false /* is not repeated */);
 }
 
 }  // namespace gui

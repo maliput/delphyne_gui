@@ -6,6 +6,8 @@
 #include <string>
 #include <unordered_map>
 
+#include <QStandardItem>
+
 #include <maliput/api/road_geometry.h>
 
 #include <ignition/common/MouseEvent.hh>
@@ -20,6 +22,59 @@
 
 namespace delphyne {
 namespace gui {
+
+/// Model for describing a tree view for the phase rings and their phases.
+/// Treeview example:
+///
+/// PhaseRing#1
+///          |_____ PhaseA#1
+///          |_____ PhaseA#2
+/// PhaseRing#2
+///          |_____ PhaseB#1
+///          |_____ PhaseB#2
+///
+///
+class PhaseTreeModel : public QStandardItemModel {
+  Q_OBJECT
+ public:
+  PhaseTreeModel(QObject* parent);
+
+  /// Adds a new row to the treeview to group all the phases of a new phase ring.
+  /// \param[in] _phaseRingName Unique name of the new phase ring.
+  void AddPhaseRing(const std::string& _phaseRingName);
+
+  /// Adds a new row under the @p _phaseRingName row to indicate a new phase.
+  /// \param[in] _phaseName Unique name in the phase ring for the new phase.
+  /// \param[in] _phaseRingName Name of the existing phase ring where the new phase should be added.
+  /// \note The phase ring should be previously added using #AddPhaseRing method.
+  void AddPhaseToPhaseRing(const std::string& _phaseName, const std::string& _phaseRingName);
+
+  /// \param[in] _phaseRingItem QStandardItem pointer.
+  /// \returns true if the item corresponds to a valid previously added phase ring.
+  bool IsPhaseRingItem(const QStandardItem* _phaseRingItem) const;
+
+  /// \param[in] _phaseItem Phase item.
+  /// \param[in] _phaseRingItem Phase ring item.
+  /// \returns true when the phase item corresponds to a valid previously added phase under the provided phase ring.
+  bool IsPhaseItem(const QStandardItem* _phaseItem, const QStandardItem* _phaseRingItem) const;
+
+  /// Clear the model.
+  void Clear();
+
+ private:
+  /// Holds a phase ring item for the tree view.
+  struct PhaseRing {
+    /// Item pointing to the phase ring.
+    QStandardItem* phaseRingItem{nullptr};
+
+    /// Holds a map for the phases items.
+    /// The key is the id of the phase.
+    std::map<std::string, QStandardItem*> phaseIdAndItem;
+  };
+  /// Holds a map for the phase rings items.
+  /// The key is the id of the phase ring.
+  std::map<std::string, PhaseRing> phaseRings;
+};
 
 /// \brief Loads a road geometry out of a xodr file or a yaml file.
 ///        Meshes are created and displayed in the scene.
@@ -117,6 +172,10 @@ class MaliputViewerPlugin : public ignition::gui::Plugin {
   /// \brief Manages the selection of lanes id from the table.
   /// \param[in] _index Correspondant to the position of the row in the table.
   void OnTableLaneIdSelection(int _index);
+
+  /// \brief Manages the selection of phase from the phase ring tree view.
+  /// \param[in] _index Correspondant to the position of the row in the tree view.
+  void OnPhaseSelection(const QModelIndex& _index);
 
  private:
   /// @brief The period in milliseconds of the timer to try to load the meshes.
@@ -261,8 +320,14 @@ class MaliputViewerPlugin : public ignition::gui::Plugin {
   /// \brief Holds the rules of the last selected lane that are displayed in the UI.
   QString rulesList{};
 
-  /// @brief Triggers an event every `kTimerPeriodInMs` to try to get the scene.
+  /// \brief Triggers an event every `kTimerPeriodInMs` to try to get the scene.
   QBasicTimer timer;
+
+  /// \brief Holds the model of the tree view table where the phases are listed.
+  PhaseTreeModel phaseTreeModel{this};
+
+  /// \brief Holds the current selected phase.
+  std::pair<std::string, std::string> currentPhase{"" /* phaseId */, "", /* phaseRingId*/};
 
   /// \brief Root visual where all the child mesh visuals are added.
   ignition::rendering::VisualPtr rootVisual;

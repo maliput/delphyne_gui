@@ -16,9 +16,7 @@ GridLayout {
   anchors.top: parent.top
   Layout.fillWidth: true
 
-  /**
-  * Title text
-  */
+  // Title text.
   Text {
     id: titleText
     Layout.columnSpan: 1

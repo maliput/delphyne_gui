@@ -564,7 +564,7 @@ void MaliputViewerPlugin::UpdateSelectedLanesWithDefault() {
 
 void MaliputViewerPlugin::UpdateRulesList(const std::string& _laneId) {
   // TODO: Get rules also having in consideration the phase and phase ring ids.
-  const std::string none{""};
+  static constexpr char const* none{""};
   rulesList = model->GetRulesOfLane<QString>(none /* phase ring id */, none /* phase_id */, _laneId);
   emit RulesListChanged();
 }

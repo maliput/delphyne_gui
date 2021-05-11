@@ -163,10 +163,9 @@ void TopicInterfacePlugin::VisitMessageWidgets(const std::string& _name, QStanda
   // and removes the "::X::" of the name when it represents a repeated field.
   const std::string amendedName = RemoveNumberingField(StringToLowerCase(_name));
   // Does not visit blacklisted items.
-  if (std::find_if(hideWidgets.begin(), hideWidgets.end(),
-                   [amendedName](const std::string& hideTopic) {
-                     return amendedName == StringToLowerCase(hideTopic);
-                   }) != hideWidgets.end()) {
+  if (std::find_if(hideWidgets.begin(), hideWidgets.end(), [amendedName](const std::string& hideTopic) {
+        return amendedName == StringToLowerCase(hideTopic);
+      }) != hideWidgets.end()) {
     return;
   }
 

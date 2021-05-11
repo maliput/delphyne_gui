@@ -75,4 +75,23 @@ Rectangle {
     anchors.left: parent.left
     anchors.right: parent.right
   }
+  ToolSeparator {
+    id: lanesListLoaderSeparator
+    orientation: Qt.Horizontal
+    anchors.top: lanesListLoader.bottom
+    anchors.topMargin: 0
+    anchors.left: parent.left
+    anchors.leftMargin: 10
+    anchors.right: parent.right
+    anchors.rightMargin: 10
+  }
+  // Rules List Panel
+  Loader {
+    id: rulesListLoader
+    width: parent.width
+    source: "RulesListArea.qml"
+    anchors.top: lanesListLoaderSeparator.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+  }
 }

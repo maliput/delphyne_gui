@@ -151,25 +151,12 @@ void TopicInterfacePlugin::LoadConfig(const tinyxml2::XMLElement* _pluginElem) {
     ignerr << "Failed to subscribe to topic [" << topicName << "]" << std::endl;
   }
 
-  // @{ Configures the timer that will be used to update the view.
-  timer = new QTimer();
-  connect(timer, SIGNAL(timeout()), this, SLOT(UpdateView()));
-  timer->start(uiTimerPeriodMs);
-  // @}
+  // Configures the callback that will be used to update the view.
+  connect(this, SIGNAL(MessageReceived()), this, SLOT(OnMessageReceived()));
 }
 
-void TopicInterfacePlugin::UpdateView() {
+void TopicInterfacePlugin::OnMessageReceived() {
   auto root = messageModel->invisibleRootItem();
-
-  // TODO(#332): Change this to update the nodes instead of removing and adding
-  //             them on every update.
-  // @{ Remove everything.
-  int rows = root->rowCount();
-  while (rows != 0) {
-    root->removeRow(0);
-    rows--;
-  }
-  // @}
 
   // @{ Load the message values.
   std::lock_guard<std::mutex> lock(mutex);
@@ -189,9 +176,19 @@ void TopicInterfacePlugin::VisitMessageWidgets(const std::string& _name, QStanda
     return;
   }
 
+  const QString uniqueName = QString::fromStdString(_name);
   const QString name =
       QString::fromStdString(_messageWidget->IsRepeated() ? GetRepeatedName(_name) : GetSimpleName(_name));
-  QStandardItem* item = new QStandardItem(name);
+
+  QStandardItem* item{nullptr};
+  bool shouldAppendToParent{false};
+  if (items.find(_name) != items.end()) {
+    item = items.at(_name);
+  } else {
+    item = new QStandardItem(name);
+    items.emplace(_name, item);
+    shouldAppendToParent = true;
+  }
 
   QString data("");
   if (_messageWidget->IsCompound()) {
@@ -210,13 +207,16 @@ void TopicInterfacePlugin::VisitMessageWidgets(const std::string& _name, QStanda
     item->setData(QVariant(name), MessageModel::kNameRole);
     item->setData(QVariant(QString::fromStdString(_messageWidget->TypeName())), MessageModel::kTypeRole);
     item->setData(QVariant(data), MessageModel::kDataRole);
-    _parent->appendRow(item);
+    if (shouldAppendToParent) {
+      _parent->appendRow(item);
+    }
   }
 }
 
 void TopicInterfacePlugin::OnMessage(const google::protobuf::Message& _msg) {
   std::lock_guard<std::mutex> lock(mutex);
   messageWidget = std::make_unique<MessageWidget>("", &_msg, false /* is not repeated */);
+  emit MessageReceived();
 }
 
 }  // namespace gui

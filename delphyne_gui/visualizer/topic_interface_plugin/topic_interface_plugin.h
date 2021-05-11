@@ -47,8 +47,6 @@ class MessageModel : public QStandardItemModel {
 ///            displaying that specific element and all its descendants.
 ///          - Use `<title>My fancy title</title>` to select the widget display
 ///            title.
-///          - Use `<ui_update_period_ms>NumberInMs</ui_update_period_ms>` to
-///            define the update period of the UI.
 class TopicInterfacePlugin : public ignition::gui::Plugin {
   Q_OBJECT
 
@@ -75,7 +73,16 @@ class TopicInterfacePlugin : public ignition::gui::Plugin {
  public slots:
 
   /// @brief Updates the UI with the values of messageModel.
-  void UpdateView();
+  /// @details Visits nodes in messageModel and creates / updates QStandardItems
+  ///          which are nested as a tree. New nodes in the tree are also
+  ///          registered in a dictionary for future quick reference when
+  ///          repeatedly calling this method.
+  void OnMessageReceived();
+
+ signals:
+
+  /// @brief Triggered from OnMessage() to synchronize the UI update.
+  void MessageReceived();
 
  private:
   /// @brief Default UI update period in milliseconds.
@@ -118,8 +125,9 @@ class TopicInterfacePlugin : public ignition::gui::Plugin {
   /// @brief ComponentsModel componentsModel;
   MessageModel* messageModel{nullptr};
 
-  /// @brief Handles the update in the UI.
-  QTimer* timer{nullptr};
+  /// @brief Keeps a record of items and their names to avoid creating
+  ///        unnecessary new items.
+  std::unordered_map<std::string, QStandardItem*> items;
 };
 
 }  // namespace gui

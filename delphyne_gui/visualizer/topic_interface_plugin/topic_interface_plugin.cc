@@ -42,26 +42,6 @@ std::ostream& operator<<(std::ostream& os, const MessageWidget::Variant& value) 
   return os;
 }
 
-// Serializes a @p message into @p os.
-std::ostream& operator<<(std::ostream& os, const MessageWidget& message) {
-  os << "{ type: " << message.TypeName();
-  os << ", is_compound: " << std::boolalpha << message.IsCompound();
-  if (!message.IsCompound()) {
-    os << ", value: " << message.Value();
-  } else {
-    os << ", children: { ";
-    for (const auto& key_message : message.Children()) {
-      os << "{ ";
-      os << key_message.first << ": ";
-      os << *key_message.second;
-      os << " }, ";
-    }
-    os << "}, ";
-  }
-  os << " }";
-  return os;
-}
-
 // @returns A lower case string with the contents of @p _str.
 std::string StringToLowerCase(const std::string& _str) {
   std::string result(_str);

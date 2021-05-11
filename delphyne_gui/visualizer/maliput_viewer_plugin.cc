@@ -67,6 +67,7 @@ bool PhaseTreeModel::IsPhaseItem(const QStandardItem* _phaseItem, const QStandar
   const auto phaseRing = phaseRings.find(phaseRingItem);
   if (phaseRing == phaseRings.end()) {
     ignerr << "PhaseRing: " << phaseRingItem << " is missing." << std::endl;
+    return false;
   }
   const std::map<std::string, QStandardItem*>& phasesMap = phaseRings.at(phaseRingItem).phaseIdAndItem;
   const auto phase = phasesMap.find(_phaseItem->text().toStdString());

@@ -107,7 +107,7 @@ void MaliputViewerPlugin::UpdateLaneList() {
   std::sort(laneIds.begin(), laneIds.end());
   listLanes.clear();
   std::for_each(laneIds.cbegin(), laneIds.cend(),
-                [& list = this->listLanes](const std::string& _id) { list.append(QString::fromStdString(_id)); });
+                [&](const std::string& _id) { listLanes.append(QString::fromStdString(_id)); });
   emit ListLanesChanged();
 }
 

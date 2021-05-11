@@ -98,6 +98,37 @@ install(
   ARCHIVE DESTINATION lib
 )
 
+# ----------------------------------------
+# traffic light manager library.
+add_library(traffic_light_manager
+  traffic_light_manager.cc
+)
+add_library(delphyne_gui::traffic_light_manager ALIAS traffic_light_manager)
+set_target_properties(traffic_light_manager
+  PROPERTIES
+    OUTPUT_NAME delphyne_gui_traffic_light_manager
+)
+
+ament_target_dependencies(traffic_light_manager
+  "maliput"
+)
+
+target_link_libraries(traffic_light_manager
+  delphyne::public_headers
+  ignition-common3::ignition-common3
+  ignition-math6::ignition-math6
+  ignition-rendering3::ignition-rendering3
+  maliput::api
+)
+
+install(
+  TARGETS traffic_light_manager
+  EXPORT ${PROJECT_NAME}-targets
+  RUNTIME DESTINATION bin
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib
+)
+
 # global_attributes library.
 add_library(global_attributes
   global_attributes.cc
@@ -141,6 +172,7 @@ target_link_libraries(MaliputViewerPlugin
     delphyne_gui::global_attributes
     delphyne_gui::maliput_viewer_model
     delphyne_gui::selector
+    delphyne_gui::traffic_light_manager
     ignition-gui3::ignition-gui3
     ignition-common3::ignition-common3
     ignition-transport8::ignition-transport8
@@ -172,8 +204,6 @@ add_library(maliput_viewer_widget
   ${CMAKE_CURRENT_SOURCE_DIR}/rules_visualizer_widget.cc
   orbit_view_control.cc
   render_maliput_widget.cc
-  arrow_mesh.cc
-  traffic_light_manager.cc
   ${MaliputViewerWidget_MOC}
   ${LayerSelectionWidget_MOC}
   ${RenderMaliputWidget_MOC}
@@ -191,6 +221,7 @@ target_link_libraries(maliput_viewer_widget
   delphyne_gui::global_attributes
   delphyne_gui::maliput_viewer_model
   delphyne_gui::selector
+  delphyne_gui::traffic_light_manager
   ignition-common3::ignition-common3
   ignition-gui0::ignition-gui0
   ignition-msgs5::ignition-msgs5
@@ -356,7 +387,7 @@ add_library(delphyne_gui::TopicsStats ALIAS TopicsStats)
 set_target_properties(TopicsStats
   PROPERTIES
     # TODO(#379): Use TopicsStats instead after removing ign-gui0 from workspace.
-    OUTPUT_NAME TopicsStatsPlugin
+    OUTPUT_NAME TopicsStats
 )
 
 target_link_libraries(TopicsStats

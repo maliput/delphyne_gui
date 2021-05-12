@@ -11,7 +11,7 @@
 #include <ignition/gui/Plugin.hh>
 #include <ignition/transport.hh>
 
-#include "message_widget.h"
+#include "message.h"
 
 namespace delphyne {
 namespace gui {
@@ -65,7 +65,7 @@ class TopicInterfacePlugin : public ignition::gui::Plugin {
 
   /// @brief Callback executed when there is a new message from the topic.
   /// @details Update the message.
-  /// @details @p _msg is converted into a MessageWidget and set to be
+  /// @details @p _msg is converted into a Message and set to be
   ///          displayed.
   /// @param _msg The received message.
   void OnMessage(const google::protobuf::Message& _msg);
@@ -88,21 +88,20 @@ class TopicInterfacePlugin : public ignition::gui::Plugin {
   /// @brief Default UI update period in milliseconds.
   static constexpr int kUiTimerPerdiodMs{10000};
 
-  /// @brief Visits nodes in @p _messageWidget and adds them as new rows of a
+  /// @brief Visits nodes in @p _message and adds them as new rows of a
   ///        @p _parent item when they are not there.
   /// @details This function implements a visitor pattern and is called
-  ///          recursively over the children nodes of @p _messageWidget. For
-  ///          each node in @p _messageWidget, a new MessageModel is added with
+  ///          recursively over the children nodes of @p _message. For
+  ///          each node in @p _message, a new MessageModel is added with
   ///          the its contents.
-  ///          When @p _messageWidget is a top level message item, its children
+  ///          When @p _message is a top level message item, its children
   ///          will be added to the parent UI element but not itself.
-  /// @param _name The name of @p _messageWidget node.
-  /// @param _parent The parent of @p _messageWidget node.
-  /// @param _messageWidget The message to fill in an UI item.
-  /// @param _isTopLevel Whether @p _messageWidget is a top level item in the
+  /// @param _name The name of @p _message node.
+  /// @param _parent The parent of @p _message node.
+  /// @param _message The message to fill in an UI item.
+  /// @param _isTopLevel Whether @p _message is a top level item in the
   ///        tree hierarchy.
-  void VisitMessageWidgets(const std::string& _name, QStandardItem* _parent, MessageWidget* _messageWidget,
-                           bool _isTopLevel);
+  void VisitMessages(const std::string& _name, QStandardItem* _parent, internal::Message* _message, bool _isTopLevel);
 
   /// @brief The type of the message to receive.
   std::string msgType{};
@@ -114,7 +113,7 @@ class TopicInterfacePlugin : public ignition::gui::Plugin {
   std::vector<std::string> hideWidgets;
 
   /// @brief Latest received message
-  std::unique_ptr<MessageWidget> messageWidget;
+  std::unique_ptr<internal::Message> message;
 
   /// @brief Transport node.
   ignition::transport::Node node;

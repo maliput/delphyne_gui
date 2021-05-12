@@ -19,7 +19,7 @@ namespace gui {
 namespace {
 
 // Serializes a @p value into @p os.
-std::ostream& operator<<(std::ostream& os, const MessageWidget::Variant& value) {
+std::ostream& operator<<(std::ostream& os, const internal::Message::Variant& value) {
   if (value.doubleVal.has_value()) {
     os << value.doubleVal.value();
   } else if (value.floatVal.has_value()) {
@@ -140,16 +140,16 @@ void TopicInterfacePlugin::OnMessageReceived() {
 
   // @{ Load the message values.
   std::lock_guard<std::mutex> lock(mutex);
-  VisitMessageWidgets("", root, messageWidget.get(), true /* top level item */);
+  VisitMessages("", root, message.get(), true /* top level item */);
   // @}
 }
 
-void TopicInterfacePlugin::VisitMessageWidgets(const std::string& _name, QStandardItem* _parent,
-                                               MessageWidget* _messageWidget, bool _isTopLevel) {
+void TopicInterfacePlugin::VisitMessages(const std::string& _name, QStandardItem* _parent, internal::Message* _message,
+                                         bool _isTopLevel) {
+  // Does not visit blacklisted items.
   // amendedName is the name of the field but it applies a lower case transformation
   // and removes the "::X::" of the name when it represents a repeated field.
   const std::string amendedName = RemoveNumberingField(StringToLowerCase(_name));
-  // Does not visit blacklisted items.
   if (std::find_if(hideWidgets.begin(), hideWidgets.end(), [amendedName](const std::string& hideTopic) {
         return amendedName == StringToLowerCase(hideTopic);
       }) != hideWidgets.end()) {
@@ -157,8 +157,7 @@ void TopicInterfacePlugin::VisitMessageWidgets(const std::string& _name, QStanda
   }
 
   const QString uniqueName = QString::fromStdString(_name);
-  const QString name =
-      QString::fromStdString(_messageWidget->IsRepeated() ? GetRepeatedName(_name) : GetSimpleName(_name));
+  const QString name = QString::fromStdString(_message->IsRepeated() ? GetRepeatedName(_name) : GetSimpleName(_name));
 
   QStandardItem* item{nullptr};
   bool shouldAppendToParent{false};
@@ -171,21 +170,21 @@ void TopicInterfacePlugin::VisitMessageWidgets(const std::string& _name, QStanda
   }
 
   QString data("");
-  if (_messageWidget->IsCompound()) {
-    for (const auto& name_child : _messageWidget->Children()) {
-      VisitMessageWidgets(name_child.first, _isTopLevel ? _parent : item, name_child.second.get(),
-                          false /* not a top level element */);
+  if (_message->IsCompound()) {
+    for (const auto& name_child : _message->Children()) {
+      VisitMessages(name_child.first, _isTopLevel ? _parent : item, name_child.second.get(),
+                    false /* not a top level element */);
     }
   } else {
     std::stringstream ss;
-    ss << _messageWidget->Value();
+    ss << _message->Value();
     data = QString::fromStdString(ss.str());
   }
   // When the item is a top level message, it is not added to the UI but its
   // children are.
   if (!_isTopLevel) {
     item->setData(QVariant(name), MessageModel::kNameRole);
-    item->setData(QVariant(QString::fromStdString(_messageWidget->TypeName())), MessageModel::kTypeRole);
+    item->setData(QVariant(QString::fromStdString(_message->TypeName())), MessageModel::kTypeRole);
     item->setData(QVariant(data), MessageModel::kDataRole);
     if (shouldAppendToParent) {
       _parent->appendRow(item);
@@ -195,7 +194,7 @@ void TopicInterfacePlugin::VisitMessageWidgets(const std::string& _name, QStanda
 
 void TopicInterfacePlugin::OnMessage(const google::protobuf::Message& _msg) {
   std::lock_guard<std::mutex> lock(mutex);
-  messageWidget = std::make_unique<MessageWidget>("", &_msg, false /* is not repeated */);
+  message = std::make_unique<internal::Message>("", &_msg, false /* is not repeated */);
   emit MessageReceived();
 }
 

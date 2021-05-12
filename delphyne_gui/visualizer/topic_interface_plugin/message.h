@@ -15,16 +15,17 @@
 
 namespace delphyne {
 namespace gui {
+namespace internal {
 
 /// @brief Holds the information of a google::protobuf::Message to be consumed
 ///        by a Qt widget.
 /// @details Holds a variant like-struct when it is a leaf node in the message
-///          tree ( @see MessageWidget::Variant ). Otherwise, when it is a
-///          compound type, it populates a dictionary of MessageWidgets.
+///          tree ( @see Message::Variant ). Otherwise, when it is a
+///          compound type, it populates a dictionary of Messages.
 ///          See Parse() implementation for a full description of how it uses
 ///          the reflection API in Google Protobuf Message class to get the
 ///          information of each field.
-class MessageWidget {
+class Message {
  public:
   /// Wraps an enumeration field in Google Protobuf.
   struct EnumValue {
@@ -50,61 +51,61 @@ class MessageWidget {
   /// @{ Multiple constructors for the different types.
   ///    TODO(#332): Improve this using template constructors. Probably, Variant
   ///                needs to change to std::variant.
-  explicit MessageWidget(const std::string& _name, double _value, bool _isRepeated) {
+  explicit Message(const std::string& _name, double _value, bool _isRepeated) {
     name = _name;
     typeName = typeid(_value).name();
     variantValue.doubleVal = _value;
     isRepeated = _isRepeated;
   }
-  explicit MessageWidget(const std::string& _name, float _value, bool _isRepeated) {
+  explicit Message(const std::string& _name, float _value, bool _isRepeated) {
     name = _name;
     typeName = typeid(_value).name();
     variantValue.floatVal = _value;
     isRepeated = _isRepeated;
   }
-  explicit MessageWidget(const std::string& _name, int64_t _value, bool _isRepeated) {
+  explicit Message(const std::string& _name, int64_t _value, bool _isRepeated) {
     name = _name;
     typeName = typeid(_value).name();
     variantValue.int64Val = _value;
     isRepeated = _isRepeated;
   }
-  explicit MessageWidget(const std::string& _name, int32_t _value, bool _isRepeated) {
+  explicit Message(const std::string& _name, int32_t _value, bool _isRepeated) {
     name = _name;
     typeName = typeid(_value).name();
     variantValue.int32Val = _value;
     isRepeated = _isRepeated;
   }
-  explicit MessageWidget(const std::string& _name, uint64_t _value, bool _isRepeated) {
+  explicit Message(const std::string& _name, uint64_t _value, bool _isRepeated) {
     name = _name;
     typeName = typeid(_value).name();
     variantValue.uInt64Val = _value;
     isRepeated = _isRepeated;
   }
-  explicit MessageWidget(const std::string& _name, uint32_t _value, bool _isRepeated) {
+  explicit Message(const std::string& _name, uint32_t _value, bool _isRepeated) {
     name = _name;
     typeName = typeid(_value).name();
     variantValue.uInt32Val = _value;
     isRepeated = _isRepeated;
   }
-  explicit MessageWidget(const std::string& _name, bool _value, bool _isRepeated) {
+  explicit Message(const std::string& _name, bool _value, bool _isRepeated) {
     name = _name;
     typeName = typeid(_value).name();
     variantValue.boolVal = _value;
     isRepeated = _isRepeated;
   }
-  explicit MessageWidget(const std::string& _name, const std::string& _value, bool _isRepeated) {
+  explicit Message(const std::string& _name, const std::string& _value, bool _isRepeated) {
     name = _name;
     typeName = typeid(_value).name();
     variantValue.stringVal = _value;
     isRepeated = _isRepeated;
   }
-  explicit MessageWidget(const std::string& _name, EnumValue _value, bool _isRepeated) {
+  explicit Message(const std::string& _name, EnumValue _value, bool _isRepeated) {
     name = _name;
     typeName = typeid(_value).name();
     variantValue.enumVal = _value;
     isRepeated = _isRepeated;
   }
-  explicit MessageWidget(const std::string& _name, const google::protobuf::Message* _msg, bool _isRepeated) {
+  explicit Message(const std::string& _name, const google::protobuf::Message* _msg, bool _isRepeated) {
     name = _name;
     auto msg = _msg->New();
     msg->CopyFrom(*_msg);
@@ -132,10 +133,10 @@ class MessageWidget {
   bool IsRepeated() const { return isRepeated; }
 
   /// @return The children dictionary.
-  const std::map<std::string, std::unique_ptr<MessageWidget>>& Children() const { return children; }
+  const std::map<std::string, std::unique_ptr<Message>>& Children() const { return children; }
 
  private:
-  /// @brief Parses @p _msg and stores children MessageWidget into
+  /// @brief Parses @p _msg and stores children Message into
   ///       `variantValue` using @p _scopedName as `name`.
   void Parse(const std::string& _scopedName, google::protobuf::Message* _msg);
 
@@ -152,8 +153,9 @@ class MessageWidget {
   bool isRepeated{false};
 
   /// @brief Holds the children, nested values.
-  std::map<std::string, std::unique_ptr<MessageWidget>> children;
+  std::map<std::string, std::unique_ptr<Message>> children;
 };
 
+}  // namespace internal
 }  // namespace gui
 }  // namespace delphyne

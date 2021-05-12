@@ -115,13 +115,11 @@ void TopicsStats::timerEvent(QTimerEvent*) {
 
 void TopicsStats::UpdateGUIStats() {
   std::map<std::string, BasicStats> afterFilterData;
-  std::for_each(
-      rawData.cbegin(), rawData.cend(),
-      [&afterFilterData, &topicFilter = this->topicFilter](const std::pair<std::string, BasicStats> _topicStats) {
-        if (_topicStats.first.find(topicFilter) != std::string::npos) {
-          afterFilterData[_topicStats.first] = _topicStats.second;
-        }
-      });
+  std::for_each(rawData.cbegin(), rawData.cend(), [&](const std::pair<std::string, BasicStats> _topicStats) {
+    if (_topicStats.first.find(topicFilter) != std::string::npos) {
+      afterFilterData[_topicStats.first] = _topicStats.second;
+    }
+  });
 
   displayedTopicData.clear();
   for (const auto& topicData : afterFilterData) {

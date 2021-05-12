@@ -42,26 +42,6 @@ std::ostream& operator<<(std::ostream& os, const MessageWidget::Variant& value) 
   return os;
 }
 
-// Serializes a @p message into @p os.
-std::ostream& operator<<(std::ostream& os, const MessageWidget& message) {
-  os << "{ type: " << message.TypeName();
-  os << ", is_compound: " << std::boolalpha << message.IsCompound();
-  if (!message.IsCompound()) {
-    os << ", value: " << message.Value();
-  } else {
-    os << ", children: { ";
-    for (const auto& key_message : message.Children()) {
-      os << "{ ";
-      os << key_message.first << ": ";
-      os << *key_message.second;
-      os << " }, ";
-    }
-    os << "}, ";
-  }
-  os << " }";
-  return os;
-}
-
 // @returns A lower case string with the contents of @p _str.
 std::string StringToLowerCase(const std::string& _str) {
   std::string result(_str);
@@ -179,13 +159,13 @@ void TopicInterfacePlugin::UpdateView() {
 
 void TopicInterfacePlugin::VisitMessageWidgets(const std::string& _name, QStandardItem* _parent,
                                                MessageWidget* _messageWidget, bool _isTopLevel) {
+  // amendedName is the name of the field but it applies a lower case transformation
+  // and removes the "::X::" of the name when it represents a repeated field.
+  const std::string amendedName = RemoveNumberingField(StringToLowerCase(_name));
   // Does not visit blacklisted items.
-  if (std::find_if(hideWidgets.begin(), hideWidgets.end(),
-                   // amendedName is the name of the field but it applies a lower case transformation
-                   // and removes the "::X::" of the name when it represents a repeated field.
-                   [amendedName = RemoveNumberingField(StringToLowerCase(_name))](const std::string& hideTopic) {
-                     return amendedName == StringToLowerCase(hideTopic);
-                   }) != hideWidgets.end()) {
+  if (std::find_if(hideWidgets.begin(), hideWidgets.end(), [amendedName](const std::string& hideTopic) {
+        return amendedName == StringToLowerCase(hideTopic);
+      }) != hideWidgets.end()) {
     return;
   }
 

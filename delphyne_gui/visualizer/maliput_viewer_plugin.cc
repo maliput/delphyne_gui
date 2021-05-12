@@ -171,7 +171,7 @@ void MaliputViewerPlugin::UpdateLaneList() {
   std::sort(laneIds.begin(), laneIds.end());
   listLanes.clear();
   std::for_each(laneIds.cbegin(), laneIds.cend(),
-                [& list = this->listLanes](const std::string& _id) { list.append(QString::fromStdString(_id)); });
+                [&](const std::string& _id) { listLanes.append(QString::fromStdString(_id)); });
   emit ListLanesChanged();
 }
 
@@ -470,6 +470,7 @@ void MaliputViewerPlugin::LoadConfig(const tinyxml2::XMLElement* _pluginElem) {
 
   if (!_pluginElem) {
     ignerr << "Error reading plugin XML element " << std::endl;
+    return;
   }
 
   if (auto elem = _pluginElem->FirstChildElement("main_scene_plugin_title")) {

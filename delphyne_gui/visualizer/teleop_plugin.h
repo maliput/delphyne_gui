@@ -61,7 +61,7 @@ class TeleopPlugin : public ignition::gui::Plugin {
   /// @brief Loads the plugin configuration.
   /// @details Expects to find `car_number` only which is translated to
   //           `teleop/<car_number>` as topic name.
-  void LoadConfig(const tinyxml2::XMLElement* _pluginElem);
+  void LoadConfig(const tinyxml2::XMLElement* _pluginElem) override;
 
   Q_INVOKABLE QString BrakeValue() const { return QString::number(brakeValue, /* format */ 'f', /* precision */ 2); }
 

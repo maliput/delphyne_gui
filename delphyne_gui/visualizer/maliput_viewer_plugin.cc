@@ -55,8 +55,61 @@ std::string FromIdToMapKey(const std::string& _type, const std::string& _id) { r
 
 }  // namespace
 
+PhaseTreeModel::PhaseTreeModel(QObject* parent) : QStandardItemModel(parent) { setColumnCount(1); }
+
+bool PhaseTreeModel::IsPhaseRingItem(const QStandardItem* _phaseRingItem) const {
+  const auto phaseRing = phaseRings.find(_phaseRingItem->text().toStdString());
+  return phaseRing != phaseRings.end();
+}
+
+bool PhaseTreeModel::IsPhaseItem(const QStandardItem* _phaseItem, const QStandardItem* _phaseRingItem) const {
+  const std::string phaseRingItem{_phaseRingItem->text().toStdString()};
+  const auto phaseRing = phaseRings.find(phaseRingItem);
+  if (phaseRing == phaseRings.end()) {
+    ignerr << "PhaseRing: " << phaseRingItem << " is missing." << std::endl;
+    return false;
+  }
+  const std::map<std::string, QStandardItem*>& phasesMap = phaseRings.at(phaseRingItem).phaseIdAndItem;
+  const auto phase = phasesMap.find(_phaseItem->text().toStdString());
+  return phase != phasesMap.end();
+}
+
+void PhaseTreeModel::Clear() {
+  removeRows(0, rowCount());
+  phaseRings.clear();
+}
+
+void PhaseTreeModel::AddPhaseRing(const std::string& _phaseRingName) {
+  if (phaseRings.find(_phaseRingName) != phaseRings.end()) {
+    ignerr << "PhaseRing: " << _phaseRingName << " is repeated." << std::endl;
+    return;
+  }
+  QStandardItem* newPhaseRing = new QStandardItem;
+  newPhaseRing->setText(QString::fromStdString(_phaseRingName));
+  invisibleRootItem()->appendRow(newPhaseRing);
+  phaseRings.emplace(_phaseRingName, PhaseRing{newPhaseRing, {}});
+}
+
+void PhaseTreeModel::AddPhaseToPhaseRing(const std::string& _phaseName, const std::string& _phaseRingName) {
+  auto phaseRing = phaseRings.find(_phaseRingName);
+  if (phaseRing == phaseRings.end()) {
+    ignerr << "Phase: " << _phaseName << "can't be added. PhaseRing: " << _phaseRingName << " is missing." << std::endl;
+    return;
+  }
+  QStandardItem* newPhase = new QStandardItem;
+  newPhase->setText(QString::fromStdString(_phaseName));
+  if (phaseRing->second.phaseIdAndItem.find(_phaseName) != phaseRing->second.phaseIdAndItem.end()) {
+    ignerr << "Phase: " << _phaseName << " is repeated in PhaseRing: " << _phaseRingName << std::endl;
+    return;
+  }
+  phaseRing->second.phaseRingItem->appendRow(newPhase);
+  phaseRing->second.phaseIdAndItem.emplace(_phaseName, newPhase);
+}
+
 MaliputViewerPlugin::MaliputViewerPlugin() : Plugin() {
   model = std::make_unique<MaliputViewerModel>();
+  ignition::gui::App()->Engine()->rootContext()->setContextProperty(QString::fromStdString("PhaseTreeModel"),
+                                                                    &phaseTreeModel);
 
   // Loads the maliput file path if any and parses it.
   if (GlobalAttributes::HasArgument("xodr_file")) {
@@ -102,6 +155,15 @@ void MaliputViewerPlugin::OnNewRoadNetwork(const QString& _mapFile, const QStrin
   emit LayerCheckboxesChanged();
   emit LabelCheckboxesChanged();
   renderMeshesOption.RenderAll();
+
+  // Get phases and update the list.
+  const auto phaseRings = model->GetPhaseRings<std::string>();
+  for (const auto& phaseRing : phaseRings) {
+    phaseTreeModel.AddPhaseRing(phaseRing.first);
+    for (const auto& phase : phaseRing.second) {
+      phaseTreeModel.AddPhaseToPhaseRing(phase, phaseRing.first);
+    }
+  }
 }
 
 void MaliputViewerPlugin::UpdateLaneList() {
@@ -195,6 +257,27 @@ void MaliputViewerPlugin::OnTableLaneIdSelection(int _index) {
   const std::string end_bp_id = lane->GetBranchPoint(maliput::api::LaneEnd::kFinish)->id().string();
   UpdateBranchPoint(start_bp_id);
   UpdateBranchPoint(end_bp_id);
+}
+
+void MaliputViewerPlugin::OnPhaseSelection(const QModelIndex& _index) {
+  const QStandardItem* item = phaseTreeModel.itemFromIndex(_index);
+  if (phaseTreeModel.IsPhaseRingItem(item)) {
+    // Phase changes when phases are selected.
+    return;
+  } else {
+    // Item should be a phase item.
+    const QStandardItem* phaseRingItem = item->parent();
+    if (!phaseTreeModel.IsPhaseRingItem(phaseRingItem)) {
+      ignerr << "Phase cannot be selected, PhaseRing tree isn't coherent" << std::endl;
+      return;
+    }
+    if (!phaseTreeModel.IsPhaseItem(item, phaseRingItem)) {
+      ignerr << "Phase cannot be selected in PhaseRing " << phaseRingItem->text().toStdString() << std::endl;
+      return;
+    }
+    currentPhase.first = item->text().toStdString();
+    currentPhase.second = phaseRingItem->text().toStdString();
+  }
 }
 
 void MaliputViewerPlugin::timerEvent(QTimerEvent* _event) {
@@ -343,6 +426,9 @@ void MaliputViewerPlugin::Clear() {
   for (const std::string& key : {kLane, kMarker, kBranchPoint, kBranchPointLabels, kLaneLabels}) {
     objectVisualDefaults[key] = true;
   }
+  // Reset phase table.
+  phaseTreeModel.Clear();
+  currentPhase = {"" /* phaseId */, "", /* phaseRingId*/};
 }
 
 void MaliputViewerPlugin::CreateLaneLabelMaterial(ignition::rendering::MaterialPtr& _material) {
@@ -394,7 +480,7 @@ void MaliputViewerPlugin::LoadConfig(const tinyxml2::XMLElement* _pluginElem) {
   // Note: we don't support other engines than Ogre.
   auto engine = ignition::rendering::engine(kEngineName);
   if (!engine) {
-    ignerr << "Engine \"" << kEngineName << "\" not supported, origin display plugin won't work." << std::endl;
+    ignerr << "Engine \"" << kEngineName << "\" not supported, maliput viewer plugin won't work." << std::endl;
     return;
   }
   // Get the scene.
@@ -563,9 +649,8 @@ void MaliputViewerPlugin::UpdateSelectedLanesWithDefault() {
 }
 
 void MaliputViewerPlugin::UpdateRulesList(const std::string& _laneId) {
-  // TODO: Get rules also having in consideration the phase and phase ring ids.
-  static constexpr char const* none{""};
-  rulesList = model->GetRulesOfLane<QString>(none /* phase ring id */, none /* phase_id */, _laneId);
+  rulesList =
+      model->GetRulesOfLane<QString>(currentPhase.second /* phaseRingId */, currentPhase.first /* phaseId */, _laneId);
   emit RulesListChanged();
 }
 

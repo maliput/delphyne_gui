@@ -6,5 +6,6 @@
     <file>LabelsSelectionArea.qml</file>
     <file>LanesListArea.qml</file>
     <file>RulesListArea.qml</file>
+    <file>PhaseSelectionArea.qml</file>
   </qresource>
 </RCC>

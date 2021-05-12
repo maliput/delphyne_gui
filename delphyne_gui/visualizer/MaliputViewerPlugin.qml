@@ -66,12 +66,31 @@ Rectangle {
     anchors.right: parent.right
     anchors.rightMargin: 10
   }
+  // Phase selection Panel
+  Loader {
+    id: phaseSelectionLoader
+    width: parent.width
+    source: "PhaseSelectionArea.qml"
+    anchors.top: labelsLoaderSeparator.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+  }
+  ToolSeparator {
+    id: phaseSelectionLoaderSeparator
+    orientation: Qt.Horizontal
+    anchors.top: phaseSelectionLoader.bottom
+    anchors.topMargin: 0
+    anchors.left: parent.left
+    anchors.leftMargin: 10
+    anchors.right: parent.right
+    anchors.rightMargin: 10
+  }
   // Lanes List Panel
   Loader {
     id: lanesListLoader
     width: parent.width
     source: "LanesListArea.qml"
-    anchors.top: labelsLoaderSeparator.bottom
+    anchors.top: phaseSelectionLoaderSeparator.bottom
     anchors.left: parent.left
     anchors.right: parent.right
   }

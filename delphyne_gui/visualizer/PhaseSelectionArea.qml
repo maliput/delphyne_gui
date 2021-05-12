@@ -7,7 +7,7 @@ import QtQuick.Dialogs 1.0
 import QtQuick.Layouts 1.3
 
 GridLayout {
-  id: rulesListPanel
+  id: phaseSelectionPanel
   columns: 1
   anchors.left: parent.left
   anchors.leftMargin: 10
@@ -16,33 +16,32 @@ GridLayout {
   anchors.top: parent.top
   Layout.fillWidth: true
 
-  // Title text.
+  // Title text
   Text {
     id: titleText
     Layout.columnSpan: 1
     anchors.horizontalCenter: parent.horizontalCenter
     Layout.alignment: Qt.AlignVTop | Qt.AlignHCenter
     font.pointSize: 10
-    text: "RULES"
+    text: "PHASE"
   }
 
-  // Text are used to show rules of lanes.
-  TextArea {
-    id: rules
+  TreeView {
+    id: phaseRingTree
+    model: PhaseTreeModel
     anchors.top: titleText.bottom
     anchors.left: parent.left
     width: parent.width
-    Layout.minimumHeight: 100
-    Layout.preferredHeight: 125
-    Layout.maximumHeight: 125
+    Layout.preferredHeight: 100
     Layout.fillWidth: true
-  }
+    TableViewColumn {
+        // 'display' role is the default role when using QStandardItem::setText method.
+        role: "display"
+        title: "Phase Ring"
+    }
 
-  // When new data arrives the table is updated.
-  Connections {
-    target: MaliputViewerPlugin
-    onRulesListChanged: {
-      rules.text = MaliputViewerPlugin.rulesList
+    onClicked: {
+      MaliputViewerPlugin.OnPhaseSelection(index)
     }
   }
 }

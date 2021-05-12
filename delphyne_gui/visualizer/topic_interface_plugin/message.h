@@ -7,6 +7,7 @@
 #include <string>
 #include <type_traits>
 #include <typeinfo>
+#include <variant>
 
 #include <google/protobuf/descriptor.h>
 #include <google/protobuf/message.h>
@@ -33,86 +34,37 @@ class Message {
     std::string name;  ///< The string label the enum has.
   };
 
-  /// Operates as a std::variant from optionals. It simplifies the operation by
-  /// consumers when dealing with the type differences.
+  /// It simplifies the operation by consumers when dealing with the type.
   /// An instance is well-constructed iff none or just one field has a value.
-  struct Variant {
-    std::optional<double> doubleVal{std::nullopt};
-    std::optional<float> floatVal{std::nullopt};
-    std::optional<int64_t> int64Val{std::nullopt};
-    std::optional<int32_t> int32Val{std::nullopt};
-    std::optional<uint64_t> uInt64Val{std::nullopt};
-    std::optional<uint32_t> uInt32Val{std::nullopt};
-    std::optional<bool> boolVal{std::nullopt};
-    std::optional<std::string> stringVal{std::nullopt};
-    std::optional<EnumValue> enumVal{std::nullopt};
-  };
+  using Variant = std::variant<double, float, int64_t, int32_t, uint32_t, uint64_t, bool, std::string, EnumValue>;
 
-  /// @{ Multiple constructors for the different types.
-  ///    TODO(#332): Improve this using template constructors. Probably, Variant
-  ///                needs to change to std::variant.
-  explicit Message(const std::string& _name, double _value, bool _isRepeated) {
+  /// @brief Constructs a Message.
+  ///
+  /// @details It is a template constuctor that behaves differently based on T.
+  ///          When T is one of the possible Variant's types, it just stores the
+  ///          value in `variantValue`. When it is a pointer (it'll compile
+  ///          only for google::protobuf::Message*) it'll forward a copy of
+  ///          @p _value to Parse() nodes.
+  /// @param _name The message name. The fully qualified attribute name will be
+  ///        used when it is recursively built.
+  /// @param _value The value to hold. When it is a pointer, it is assumed to be
+  ///        a google::protobuf::Message* which will request a recursive
+  ///        introspection via Parse() to populate children.
+  /// @param _isRepeated Whether or not this message is a repeated field in a
+  ///        google::protobuf::Message definition.
+  template <typename T>
+  Message(const std::string& _name, T _value, bool _isRepeated) {
     name = _name;
-    typeName = typeid(_value).name();
-    variantValue.doubleVal = _value;
     isRepeated = _isRepeated;
+    if constexpr (std::is_pointer<T>::value) {
+      auto msg = _value->New();
+      msg->CopyFrom(*_value);
+      Parse(name, msg);
+    } else {
+      typeName = typeid(_value).name();
+      variantValue = _value;
+    }
   }
-  explicit Message(const std::string& _name, float _value, bool _isRepeated) {
-    name = _name;
-    typeName = typeid(_value).name();
-    variantValue.floatVal = _value;
-    isRepeated = _isRepeated;
-  }
-  explicit Message(const std::string& _name, int64_t _value, bool _isRepeated) {
-    name = _name;
-    typeName = typeid(_value).name();
-    variantValue.int64Val = _value;
-    isRepeated = _isRepeated;
-  }
-  explicit Message(const std::string& _name, int32_t _value, bool _isRepeated) {
-    name = _name;
-    typeName = typeid(_value).name();
-    variantValue.int32Val = _value;
-    isRepeated = _isRepeated;
-  }
-  explicit Message(const std::string& _name, uint64_t _value, bool _isRepeated) {
-    name = _name;
-    typeName = typeid(_value).name();
-    variantValue.uInt64Val = _value;
-    isRepeated = _isRepeated;
-  }
-  explicit Message(const std::string& _name, uint32_t _value, bool _isRepeated) {
-    name = _name;
-    typeName = typeid(_value).name();
-    variantValue.uInt32Val = _value;
-    isRepeated = _isRepeated;
-  }
-  explicit Message(const std::string& _name, bool _value, bool _isRepeated) {
-    name = _name;
-    typeName = typeid(_value).name();
-    variantValue.boolVal = _value;
-    isRepeated = _isRepeated;
-  }
-  explicit Message(const std::string& _name, const std::string& _value, bool _isRepeated) {
-    name = _name;
-    typeName = typeid(_value).name();
-    variantValue.stringVal = _value;
-    isRepeated = _isRepeated;
-  }
-  explicit Message(const std::string& _name, EnumValue _value, bool _isRepeated) {
-    name = _name;
-    typeName = typeid(_value).name();
-    variantValue.enumVal = _value;
-    isRepeated = _isRepeated;
-  }
-  explicit Message(const std::string& _name, const google::protobuf::Message* _msg, bool _isRepeated) {
-    name = _name;
-    auto msg = _msg->New();
-    msg->CopyFrom(*_msg);
-    Parse(name, msg);
-    isRepeated = _isRepeated;
-  }
-  /// @}
 
   /// @return The full name of this item in the proto message hierarchy. It
   ///         uses "::" to separate field names and injects "::X::" where X is

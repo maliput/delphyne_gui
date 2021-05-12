@@ -18,27 +18,17 @@ namespace delphyne {
 namespace gui {
 namespace {
 
+// Serializes a @p value into @p os. Provides a valid operator overload for
+// internal::Message::EnumValue so the following function's lambda can be
+// resolved.
+std::ostream& operator<<(std::ostream& os, const internal::Message::EnumValue& value) {
+  os << value.name;
+  return os;
+}
+
 // Serializes a @p value into @p os.
 std::ostream& operator<<(std::ostream& os, const internal::Message::Variant& value) {
-  if (value.doubleVal.has_value()) {
-    os << value.doubleVal.value();
-  } else if (value.floatVal.has_value()) {
-    os << value.floatVal.value();
-  } else if (value.int64Val.has_value()) {
-    os << value.int64Val.value();
-  } else if (value.int32Val.has_value()) {
-    os << value.int32Val.value();
-  } else if (value.uInt64Val.has_value()) {
-    os << value.uInt64Val.value();
-  } else if (value.uInt32Val.has_value()) {
-    os << value.uInt32Val.value();
-  } else if (value.boolVal.has_value()) {
-    os << std::boolalpha << value.boolVal.value();
-  } else if (value.stringVal.has_value()) {
-    os << value.stringVal.value();
-  } else if (value.enumVal.has_value()) {
-    os << value.enumVal.value().name;
-  }
+  std::visit([&os](auto&& arg) { os << arg;}, value);
   return os;
 }
 

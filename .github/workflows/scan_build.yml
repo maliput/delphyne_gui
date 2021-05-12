@@ -6,7 +6,6 @@ on:
 
 env:
   PACKAGE_NAME: delphyne_gui
-  EXTRA_PACKAGE_NAME: delphyne_demos
   ROS_DISTRO: dashing
   ROS_WS: maliput_ws
 
@@ -134,5 +133,5 @@ jobs:
         . /opt/ros/${ROS_DISTRO}/setup.bash;
         ./src/${PACKAGE_NAME}/.github/run_scan_build \
             --cmake-args -DCMAKE_LINKER=${LINKER_PATH} \
-            --packages-up-to ${PACKAGE_NAME} ${EXTRA_PACKAGE_NAME} \
+            --packages-up-to ${PACKAGE_NAME} \
             --event-handlers=console_direct+;

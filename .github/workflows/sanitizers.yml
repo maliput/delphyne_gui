@@ -6,7 +6,6 @@ on:
 
 env:
   PACKAGE_NAME: delphyne_gui
-  EXTRA_PACKAGE_NAME: delphyne_demos
   ROS_DISTRO: dashing
   ROS_WS: maliput_ws
   UBSAN_OPTIONS: halt_on_error=1
@@ -145,7 +144,7 @@ jobs:
       working-directory: ${{ env.ROS_WS }}
       run: |
         . /opt/ros/${ROS_DISTRO}/setup.bash;
-        colcon build --packages-up-to ${EXTRA_PACKAGE_NAME} \
+        colcon build --packages-up-to ${PACKAGE_NAME} \
           --cmake-args -DCMAKE_LINKER=${LINKER_PATH} \
           --event-handlers=console_direct+ \
           ${COMPILER_FLAG} \
@@ -166,21 +165,4 @@ jobs:
       run: |
         . /opt/ros/${ROS_DISTRO}/setup.bash;
         colcon test --packages-select ${PACKAGE_NAME} --event-handlers=console_direct+;
-        colcon test-result --verbose;
-    - name: colcon build tests for delphyne_demos
-      shell: bash
-      working-directory: ${{ env.ROS_WS }}
-      run: |
-        . /opt/ros/${ROS_DISTRO}/setup.bash;
-        colcon build --packages-select ${EXTRA_PACKAGE_NAME} \
-          --cmake-args -DCMAKE_LINKER=${LINKER_PATH} \
-          --event-handlers=console_direct+ \
-          ${COMPILER_FLAG} \
-          --cmake-args -DBUILD_TESTING=ON;
-    - name: colcon test for delphyne_demos
-      shell: bash
-      working-directory: ${{ env.ROS_WS }}
-      run: |
-        . /opt/ros/${ROS_DISTRO}/setup.bash;
-        colcon test --packages-select ${EXTRA_PACKAGE_NAME} --event-handlers=console_direct+;
         colcon test-result --verbose;

@@ -164,6 +164,9 @@ void MaliputViewerPlugin::OnNewRoadNetwork(const QString& _mapFile, const QStrin
       phaseTreeModel.AddPhaseToPhaseRing(phase, phaseRing.first);
     }
   }
+
+  // Create traffic light manager.
+  trafficLightManager->CreateTrafficLights(model->GetTrafficLights());
 }
 
 void MaliputViewerPlugin::UpdateLaneList() {
@@ -277,6 +280,8 @@ void MaliputViewerPlugin::OnPhaseSelection(const QModelIndex& _index) {
     }
     currentPhase.first = item->text().toStdString();
     currentPhase.second = phaseRingItem->text().toStdString();
+    trafficLightManager->SetBulbStates(
+        model->GetBulbStates(currentPhase.second /* phaseRingId */, currentPhase.first /* phaseId */));
   }
 }
 
@@ -429,6 +434,9 @@ void MaliputViewerPlugin::Clear() {
   // Reset phase table.
   phaseTreeModel.Clear();
   currentPhase = {"" /* phaseId */, "", /* phaseRingId*/};
+
+  // Resert traffic light manager.
+  trafficLightManager->Clear();
 }
 
 void MaliputViewerPlugin::CreateLaneLabelMaterial(ignition::rendering::MaterialPtr& _material) {
@@ -528,7 +536,7 @@ void MaliputViewerPlugin::Initialize() {
   // Create a Selector.
   selector = std::make_unique<Selector>(this->scene, 0.3 /* scaleX */, 0.5 /* scaleY */, 0.1 /* scaleZ */,
                                         50 /* poolSize */, 15 /* numLanes */, 0.6 /* minTolerance */);
-
+  trafficLightManager = std::make_unique<TrafficLightManager>(this->scene);
   // Install event filter to get mouse event from the main scene.
   const ignition::gui::Plugin* scene3D = FilterPluginsByTitle(mainScene3dPluginTitle);
   if (!scene3D) {
@@ -563,6 +571,7 @@ bool MaliputViewerPlugin::eventFilter(QObject* _obj, QEvent* _event) {
   }
   if (_event->type() == ignition::gui::events::Render::kType) {
     arrow->Update();
+    trafficLightManager->Tick();
     if (renderMeshesOption.executeMeshRendering) {
       RenderRoadMeshes(model->Meshes());
       renderMeshesOption.executeMeshRendering = false;

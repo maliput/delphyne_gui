@@ -19,6 +19,7 @@
 #include "arrow_mesh.hh"
 #include "maliput_viewer_model.hh"
 #include "selector.hh"
+#include "traffic_light_manager.hh"
 
 namespace delphyne {
 namespace gui {
@@ -358,6 +359,9 @@ class MaliputViewerPlugin : public ignition::gui::Plugin {
 
   /// \brief Selector used for selecting clicked lanes in the visualizer.
   std::unique_ptr<Selector> selector;
+
+  /// \brief Manager of traffic lights visualization.
+  std::unique_ptr<TrafficLightManager> trafficLightManager;
 };
 
 }  // namespace gui

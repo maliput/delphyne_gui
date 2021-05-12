@@ -386,7 +386,6 @@ add_library(TopicsStats
 add_library(delphyne_gui::TopicsStats ALIAS TopicsStats)
 set_target_properties(TopicsStats
   PROPERTIES
-    # TODO(#379): Use TopicsStats instead after removing ign-gui0 from workspace.
     OUTPUT_NAME TopicsStats
 )
 

@@ -113,12 +113,12 @@ MaliputViewerPlugin::MaliputViewerPlugin() : Plugin() {
 
   // Loads the maliput file path if any and parses it.
   if (GlobalAttributes::HasArgument("xodr_file")) {
-    if (GlobalAttributes::HasArgument("malidrive_backend")) {
-      model->SetOpenDriveBackend(GlobalAttributes::GetArgument("malidrive_backend"));
-    }
     model->Load(GlobalAttributes::GetArgument("xodr_file"));
   } else if (GlobalAttributes::HasArgument("yaml_file")) {
     model->Load(GlobalAttributes::GetArgument("yaml_file"));
+  }
+  if (GlobalAttributes::HasArgument("malidrive_backend")) {
+    model->SetOpenDriveBackend(GlobalAttributes::GetArgument("malidrive_backend"));
   }
 }
 

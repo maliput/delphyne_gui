@@ -378,10 +378,11 @@ maliput::api::rules::RoadRulebook::QueryResults RoadNetworkQuery::FindRulesFor(c
 /////////////////////////////////////////////////
 void MaliputViewerModel::SetOpenDriveBackend(const std::string& _malidriveBackend) {
   if (_malidriveBackend != "opendrive_sdk" && _malidriveBackend != "malidrive2") {
-    std::cerr << " Unknown OpenDRIVE backend: <" << _malidriveBackend << ">. Using <opendrive_sdk> by default."
-              << std::endl;
+    ignerr << " Unknown OpenDRIVE backend: <" << _malidriveBackend << ">. Using <opendrive_sdk> by default."
+           << std::endl;
     malidriveBackend = "opendrive_sdk";
   } else {
+    ignmsg << "Using " << _malidriveBackend << " backend." << std::endl;
     malidriveBackend = _malidriveBackend;
   }
 }

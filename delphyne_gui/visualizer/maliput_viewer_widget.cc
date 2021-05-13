@@ -148,6 +148,9 @@ void MaliputViewerWidget::OnNewRoadNetwork(const std::string& filePath, const st
 
   // Loads the new file.
   this->model = std::make_unique<MaliputViewerModel>();
+  if (GlobalAttributes::HasArgument("malidrive_backend")) {
+    this->model->SetOpenDriveBackend(GlobalAttributes::GetArgument("malidrive_backend"));
+  }
   this->model->Load(filePath, roadRulebookFilePath, trafficLightRulesFilePath, phaseRingFilePath);
   this->rulesVisualizerWidget->ClearText();
   this->rulesVisualizerWidget->ClearLaneList();

@@ -28,7 +28,7 @@ std::ostream& operator<<(std::ostream& os, const internal::Message::EnumValue& v
 
 // Serializes a @p value into @p os.
 std::ostream& operator<<(std::ostream& os, const internal::Message::Variant& value) {
-  std::visit([&os](auto&& arg) { os << arg;}, value);
+  std::visit([&os](auto&& arg) { os << arg; }, value);
   return os;
 }
 
@@ -94,8 +94,6 @@ void TopicInterfacePlugin::LoadConfig(const tinyxml2::XMLElement* _pluginElem) {
     title = "Topic interface";
   }
 
-  int uiTimerPeriodMs = kUiTimerPerdiodMs;
-
   if (_pluginElem) {
     // Widget UI title.
     if (auto xmlTitle = _pluginElem->FirstChildElement("title")) {
@@ -109,10 +107,6 @@ void TopicInterfacePlugin::LoadConfig(const tinyxml2::XMLElement* _pluginElem) {
     for (auto xmlHideWidgetElement = _pluginElem->FirstChildElement("hide"); xmlHideWidgetElement != nullptr;
          xmlHideWidgetElement = xmlHideWidgetElement->NextSiblingElement("hide")) {
       hideWidgets.push_back(xmlHideWidgetElement->GetText());
-    }
-    // UI update period.
-    if (auto xmlUiUpdatePeriodMs = _pluginElem->FirstChildElement("ui_update_period_ms")) {
-      xmlUiUpdatePeriodMs->QueryIntText(&uiTimerPeriodMs);
     }
   }
 

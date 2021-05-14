@@ -85,9 +85,6 @@ class TopicInterfacePlugin : public ignition::gui::Plugin {
   void MessageReceived();
 
  private:
-  /// @brief Default UI update period in milliseconds.
-  static constexpr int kUiTimerPerdiodMs{10000};
-
   /// @brief Visits nodes in @p _message and adds them as new rows of a
   ///        @p _parent item when they are not there.
   /// @details This function implements a visitor pattern and is called

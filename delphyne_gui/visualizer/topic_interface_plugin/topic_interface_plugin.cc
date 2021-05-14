@@ -64,8 +64,6 @@ std::string GetSimpleName(const std::string _fullName) {
 // When there are none occurrences of "::", this function returns @p _fullName.
 std::string GetRepeatedName(const std::string _fullName) {
   auto pos = _fullName.rfind("::");
-  // TODO(#332): separator was not found, this is an error when calling this
-  //             function as it assumes the field is repeated.
   if (pos == std::string::npos) {
     return _fullName;
   }

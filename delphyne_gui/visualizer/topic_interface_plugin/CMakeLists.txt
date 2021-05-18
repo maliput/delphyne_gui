@@ -11,7 +11,7 @@ QT5_ADD_RESOURCES(TopicInterfacePlugin_RCC topic_interface_plugin.qrc)
 
 add_library(TopicInterfacePlugin
   ${CMAKE_CURRENT_SOURCE_DIR}/topic_interface_plugin.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/message_widget.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/message.cc
   ${TopicInterfacePlugin_MOC}
   ${TopicInterfacePlugin_RCC}
 )

@@ -18,28 +18,18 @@ namespace delphyne {
 namespace gui {
 namespace {
 
-// Serializes a @p value into @p os.
-std::ostream& operator<<(std::ostream& os, const MessageWidget::Variant& value) {
-  if (value.doubleVal.has_value()) {
-    os << value.doubleVal.value();
-  } else if (value.floatVal.has_value()) {
-    os << value.floatVal.value();
-  } else if (value.int64Val.has_value()) {
-    os << value.int64Val.value();
-  } else if (value.int32Val.has_value()) {
-    os << value.int32Val.value();
-  } else if (value.uInt64Val.has_value()) {
-    os << value.uInt64Val.value();
-  } else if (value.uInt32Val.has_value()) {
-    os << value.uInt32Val.value();
-  } else if (value.boolVal.has_value()) {
-    os << std::boolalpha << value.boolVal.value();
-  } else if (value.stringVal.has_value()) {
-    os << value.stringVal.value();
-  } else if (value.enumVal.has_value()) {
-    os << value.enumVal.value().name;
-  }
-  return os;
+// Serializes a @p _value into @p _os. Provides a valid operator overload for
+// internal::Message::EnumValue so the following function's lambda can be
+// resolved.
+std::ostream& operator<<(std::ostream& _os, const internal::Message::EnumValue& _value) {
+  _os << _value.name;
+  return _os;
+}
+
+// Serializes a @p _value into @p _os.
+std::ostream& operator<<(std::ostream& _os, const internal::Message::Variant& _value) {
+  std::visit([&_os](auto&& arg) { _os << arg; }, _value);
+  return _os;
 }
 
 // @returns A lower case string with the contents of @p _str.
@@ -74,8 +64,6 @@ std::string GetSimpleName(const std::string _fullName) {
 // When there are none occurrences of "::", this function returns @p _fullName.
 std::string GetRepeatedName(const std::string _fullName) {
   auto pos = _fullName.rfind("::");
-  // TODO(#332): separator was not found, this is an error when calling this
-  //             function as it assumes the field is repeated.
   if (pos == std::string::npos) {
     return _fullName;
   }
@@ -104,8 +92,6 @@ void TopicInterfacePlugin::LoadConfig(const tinyxml2::XMLElement* _pluginElem) {
     title = "Topic interface";
   }
 
-  int uiTimerPeriodMs = kUiTimerPerdiodMs;
-
   if (_pluginElem) {
     // Widget UI title.
     if (auto xmlTitle = _pluginElem->FirstChildElement("title")) {
@@ -119,10 +105,6 @@ void TopicInterfacePlugin::LoadConfig(const tinyxml2::XMLElement* _pluginElem) {
     for (auto xmlHideWidgetElement = _pluginElem->FirstChildElement("hide"); xmlHideWidgetElement != nullptr;
          xmlHideWidgetElement = xmlHideWidgetElement->NextSiblingElement("hide")) {
       hideWidgets.push_back(xmlHideWidgetElement->GetText());
-    }
-    // UI update period.
-    if (auto xmlUiUpdatePeriodMs = _pluginElem->FirstChildElement("ui_update_period_ms")) {
-      xmlUiUpdatePeriodMs->QueryIntText(&uiTimerPeriodMs);
     }
   }
 
@@ -140,16 +122,16 @@ void TopicInterfacePlugin::OnMessageReceived() {
 
   // @{ Load the message values.
   std::lock_guard<std::mutex> lock(mutex);
-  VisitMessageWidgets("", root, messageWidget.get(), true /* top level item */);
+  VisitMessages("", root, message.get(), true /* top level item */);
   // @}
 }
 
-void TopicInterfacePlugin::VisitMessageWidgets(const std::string& _name, QStandardItem* _parent,
-                                               MessageWidget* _messageWidget, bool _isTopLevel) {
+void TopicInterfacePlugin::VisitMessages(const std::string& _name, QStandardItem* _parent, internal::Message* _message,
+                                         bool _isTopLevel) {
+  // Does not visit blacklisted items.
   // amendedName is the name of the field but it applies a lower case transformation
   // and removes the "::X::" of the name when it represents a repeated field.
   const std::string amendedName = RemoveNumberingField(StringToLowerCase(_name));
-  // Does not visit blacklisted items.
   if (std::find_if(hideWidgets.begin(), hideWidgets.end(), [amendedName](const std::string& hideTopic) {
         return amendedName == StringToLowerCase(hideTopic);
       }) != hideWidgets.end()) {
@@ -157,8 +139,7 @@ void TopicInterfacePlugin::VisitMessageWidgets(const std::string& _name, QStanda
   }
 
   const QString uniqueName = QString::fromStdString(_name);
-  const QString name =
-      QString::fromStdString(_messageWidget->IsRepeated() ? GetRepeatedName(_name) : GetSimpleName(_name));
+  const QString name = QString::fromStdString(_message->IsRepeated() ? GetRepeatedName(_name) : GetSimpleName(_name));
 
   QStandardItem* item{nullptr};
   bool shouldAppendToParent{false};
@@ -171,21 +152,21 @@ void TopicInterfacePlugin::VisitMessageWidgets(const std::string& _name, QStanda
   }
 
   QString data("");
-  if (_messageWidget->IsCompound()) {
-    for (const auto& name_child : _messageWidget->Children()) {
-      VisitMessageWidgets(name_child.first, _isTopLevel ? _parent : item, name_child.second.get(),
-                          false /* not a top level element */);
+  if (_message->IsCompound()) {
+    for (const auto& name_child : _message->Children()) {
+      VisitMessages(name_child.first, _isTopLevel ? _parent : item, name_child.second.get(),
+                    false /* not a top level element */);
     }
   } else {
     std::stringstream ss;
-    ss << _messageWidget->Value();
+    ss << _message->Value();
     data = QString::fromStdString(ss.str());
   }
   // When the item is a top level message, it is not added to the UI but its
   // children are.
   if (!_isTopLevel) {
     item->setData(QVariant(name), MessageModel::kNameRole);
-    item->setData(QVariant(QString::fromStdString(_messageWidget->TypeName())), MessageModel::kTypeRole);
+    item->setData(QVariant(QString::fromStdString(_message->TypeName())), MessageModel::kTypeRole);
     item->setData(QVariant(data), MessageModel::kDataRole);
     if (shouldAppendToParent) {
       _parent->appendRow(item);
@@ -195,7 +176,7 @@ void TopicInterfacePlugin::VisitMessageWidgets(const std::string& _name, QStanda
 
 void TopicInterfacePlugin::OnMessage(const google::protobuf::Message& _msg) {
   std::lock_guard<std::mutex> lock(mutex);
-  messageWidget = std::make_unique<MessageWidget>("", &_msg, false /* is not repeated */);
+  message = std::make_unique<internal::Message>("", &_msg, false /* is not repeated */);
   emit MessageReceived();
 }
 

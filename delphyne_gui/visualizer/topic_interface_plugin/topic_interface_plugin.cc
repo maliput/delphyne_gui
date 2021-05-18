@@ -18,18 +18,18 @@ namespace delphyne {
 namespace gui {
 namespace {
 
-// Serializes a @p value into @p os. Provides a valid operator overload for
+// Serializes a @p _value into @p _os. Provides a valid operator overload for
 // internal::Message::EnumValue so the following function's lambda can be
 // resolved.
-std::ostream& operator<<(std::ostream& os, const internal::Message::EnumValue& value) {
-  os << value.name;
-  return os;
+std::ostream& operator<<(std::ostream& _os, const internal::Message::EnumValue& _value) {
+  _os << _value.name;
+  return _os;
 }
 
-// Serializes a @p value into @p os.
-std::ostream& operator<<(std::ostream& os, const internal::Message::Variant& value) {
-  std::visit([&os](auto&& arg) { os << arg; }, value);
-  return os;
+// Serializes a @p _value into @p _os.
+std::ostream& operator<<(std::ostream& _os, const internal::Message::Variant& _value) {
+  std::visit([&_os](auto&& arg) { _os << arg; }, _value);
+  return _os;
 }
 
 // @returns A lower case string with the contents of @p _str.

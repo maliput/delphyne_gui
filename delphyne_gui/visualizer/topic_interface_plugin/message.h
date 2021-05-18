@@ -20,9 +20,9 @@ namespace internal {
 
 /// @brief Holds the information of a google::protobuf::Message to be consumed
 ///        by a Qt widget.
-/// @details Holds a variant like-struct when it is a leaf node in the message
-///          tree ( @see Message::Variant ). Otherwise, when it is a
-///          compound type, it populates a dictionary of Messages.
+/// @details Holds a variant when it is a leaf node in the message tree
+///          ( @see Message::Variant ). Otherwise, when it is a compound type,
+///          it populates a dictionary of Messages.
 ///          See Parse() implementation for a full description of how it uses
 ///          the reflection API in Google Protobuf Message class to get the
 ///          information of each field.

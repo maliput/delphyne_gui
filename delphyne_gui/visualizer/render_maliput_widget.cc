@@ -271,7 +271,7 @@ bool RenderMaliputWidget::FillMaterial(const maliput::utility::Material* _malipu
                                  _maliputMaterial->specular.y(),
                                  _maliputMaterial->specular.z());
   // clang-format on
-  _ignitionMaterial->SetShininess(_maliputMaterial->shinines);
+  _ignitionMaterial->SetShininess(_maliputMaterial->shininess);
   _ignitionMaterial->SetTransparency(_maliputMaterial->transparency);
 
   return true;

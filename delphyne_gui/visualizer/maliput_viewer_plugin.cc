@@ -467,7 +467,7 @@ bool MaliputViewerPlugin::FillMaterial(const maliput::utility::Material* _malipu
                                 _maliputMaterial->ambient.z());
   _ignitionMaterial->SetSpecular(_maliputMaterial->specular.x(), _maliputMaterial->specular.y(),
                                  _maliputMaterial->specular.z());
-  _ignitionMaterial->SetShininess(_maliputMaterial->shinines);
+  _ignitionMaterial->SetShininess(_maliputMaterial->shininess);
   _ignitionMaterial->SetTransparency(_maliputMaterial->transparency);
 
   return true;

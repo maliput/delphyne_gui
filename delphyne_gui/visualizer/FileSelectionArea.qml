@@ -3,6 +3,7 @@
 import QtQuick 2.9
 import QtQuick.Controls 1.4
 import QtQuick.Controls.Material 2.1
+import QtQuick.Controls.Styles 1.4
 import QtQuick.Dialogs 1.0
 import QtQuick.Layouts 1.3
 
@@ -41,7 +42,7 @@ GridLayout {
     id: titleText
     Layout.columnSpan: 2
     anchors.horizontalCenter: parent.horizontalCenter
-    font.pointSize: 10
+    font.pixelSize: 14
     text: "FILES SELECTION"
   }
 
@@ -71,6 +72,7 @@ GridLayout {
     readOnly: true
     text: roadRulebookPath
     placeholderText: qsTr("Optional: Select a RoadRuleBook file...")
+    font.pixelSize: 12
   }
   Button {
     id: roadRulebookButton
@@ -81,6 +83,17 @@ GridLayout {
       roadRulebookDialog.visible = true
     }
     Material.background: Material.primary
+    style: ButtonStyle {
+      label: Text {
+        renderType: Text.NativeRendering
+        verticalAlignment: Text.AlignVCenter
+        horizontalAlignment: Text.AlignHCenter
+        font.family: "Helvetica"
+        font.pointSize: 10
+        color: "black"
+        text: roadRulebookButton.text
+      }
+    }
   }
 
   /**
@@ -109,6 +122,7 @@ GridLayout {
     readOnly: true
     text: trafficLightBookPath
     placeholderText: qsTr("Optional: Select a TrafficLightBook file...")
+    font.pixelSize: 12
   }
   Button {
     id: trafficLightBookButton
@@ -119,6 +133,17 @@ GridLayout {
       trafficLightBookDialog.visible = true
     }
     Material.background: Material.primary
+    style: ButtonStyle {
+      label: Text {
+        renderType: Text.NativeRendering
+        verticalAlignment: Text.AlignVCenter
+        horizontalAlignment: Text.AlignHCenter
+        font.family: "Helvetica"
+        font.pointSize: 10
+        color: "black"
+        text: trafficLightBookButton.text
+      }
+    }
   }
 
   /**
@@ -147,6 +172,7 @@ GridLayout {
     readOnly: true
     text: phaseRingBookPath
     placeholderText: qsTr("Optional: Select a PhaseRingBook file...")
+    font.pixelSize: 12
   }
   Button {
     id: phaseRingBookButton
@@ -157,6 +183,17 @@ GridLayout {
       phaseRingBookDialog.visible = true
     }
     Material.background: Material.primary
+    style: ButtonStyle {
+      label: Text {
+        renderType: Text.NativeRendering
+        verticalAlignment: Text.AlignVCenter
+        horizontalAlignment: Text.AlignHCenter
+        font.family: "Helvetica"
+        font.pointSize: 10
+        color: "black"
+        text: phaseRingBookButton.text
+      }
+    }
   }
 
   /**
@@ -186,6 +223,7 @@ GridLayout {
     readOnly: true
     text: mapFilePath
     placeholderText: qsTr("Select an XODR or YAML map file...")
+    font.pixelSize: 12
   }
   Button {
     id: mapFileButton
@@ -196,6 +234,17 @@ GridLayout {
       mapFileDialog.visible = true
     }
     Material.background: Material.primary
+    style: ButtonStyle {
+      label: Text {
+        renderType: Text.NativeRendering
+        verticalAlignment: Text.AlignVCenter
+        horizontalAlignment: Text.AlignHCenter
+        font.family: "Helvetica"
+        font.pointSize: 10
+        color: "black"
+        text: mapFileButton.text
+      }
+    }
   }
 
   /*
@@ -211,5 +260,16 @@ GridLayout {
       MaliputViewerPlugin.OnNewRoadNetwork(mapFilePath, roadRulebookPath, trafficLightBookPath, phaseRingBookPath)
     }
     Material.background: Material.primary
+    style: ButtonStyle {
+      label: Text {
+        renderType: Text.NativeRendering
+        verticalAlignment: Text.AlignVCenter
+        horizontalAlignment: Text.AlignHCenter
+        font.family: "Helvetica"
+        font.pointSize: 10
+        color: "black"
+        text: loadButton.text
+      }
+    }
   }
 }

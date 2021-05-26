@@ -22,7 +22,7 @@ GridLayout {
     Layout.columnSpan: 1
     anchors.horizontalCenter: parent.horizontalCenter
     Layout.alignment: Qt.AlignVTop | Qt.AlignHCenter
-    font.pointSize: 10
+    font.pixelSize: 14
     text: "PHASE"
   }
 
@@ -38,6 +38,16 @@ GridLayout {
         // 'display' role is the default role when using QStandardItem::setText method.
         role: "display"
         title: "Phase Ring"
+    }
+    itemDelegate: Item {
+      Text {
+          anchors.verticalCenter: parent.verticalCenter
+          color: styleData.textColor
+          elide: styleData.elideMode
+          font.family: "Helvetica"
+          font.pixelSize: 12
+          text: styleData.value
+      }
     }
 
     onClicked: {

@@ -2,6 +2,7 @@
 
 import QtQuick 2.9
 import QtQuick.Controls 1.4
+import QtQuick.Controls.Styles 1.4
 import QtQuick.Controls.Material 2.1
 import QtQuick.Dialogs 1.0
 import QtQuick.Layouts 1.3
@@ -25,7 +26,7 @@ GridLayout {
     Layout.columnSpan: 3
     anchors.horizontalCenter: parent.horizontalCenter
     Layout.alignment: Qt.AlignVTop | Qt.AlignHCenter
-    font.pointSize: 10
+    font.pixelSize: 14
     text: "MESH LAYERS"
   }
 
@@ -39,6 +40,17 @@ GridLayout {
     onClicked : {
       MaliputViewerPlugin.OnNewMeshLayerSelection("asphalt", checked);
     }
+    style: CheckBoxStyle {
+      label: Text {
+        renderType: Text.NativeRendering
+        verticalAlignment: Text.AlignVCenter
+        horizontalAlignment: Text.AlignHCenter
+        font.family: "Helvetica"
+        font.pixelSize: 12
+        color: "black"
+        text: layerAsphalt.text
+      }
+    }
   }
 
   /**
@@ -50,6 +62,17 @@ GridLayout {
     checked: true
     onClicked : {
       MaliputViewerPlugin.OnNewMeshLayerSelection("lane_all", checked);
+    }
+    style: CheckBoxStyle {
+      label: Text {
+        renderType: Text.NativeRendering
+        verticalAlignment: Text.AlignVCenter
+        horizontalAlignment: Text.AlignHCenter
+        font.family: "Helvetica"
+        font.pixelSize: 12
+        color: "black"
+        text: layerLane.text
+      }
     }
   }
 
@@ -63,6 +86,17 @@ GridLayout {
     onClicked : {
       MaliputViewerPlugin.OnNewMeshLayerSelection("marker_all", checked);
     }
+    style: CheckBoxStyle {
+      label: Text {
+        renderType: Text.NativeRendering
+        verticalAlignment: Text.AlignVCenter
+        horizontalAlignment: Text.AlignHCenter
+        font.family: "Helvetica"
+        font.pixelSize: 12
+        color: "black"
+        text: layerMarker.text
+      }
+    }
   }
 
   /**
@@ -74,6 +108,17 @@ GridLayout {
     checked: true
     onClicked : {
       MaliputViewerPlugin.OnNewMeshLayerSelection("h_bounds", checked);
+    }
+    style: CheckBoxStyle {
+      label: Text {
+        renderType: Text.NativeRendering
+        verticalAlignment: Text.AlignVCenter
+        horizontalAlignment: Text.AlignHCenter
+        font.family: "Helvetica"
+        font.pixelSize: 12
+        color: "black"
+        text: layerHBounds.text
+      }
     }
   }
 
@@ -87,6 +132,17 @@ GridLayout {
     onClicked : {
       MaliputViewerPlugin.OnNewMeshLayerSelection("branch_point_all", checked);
     }
+    style: CheckBoxStyle {
+      label: Text {
+        renderType: Text.NativeRendering
+        verticalAlignment: Text.AlignVCenter
+        horizontalAlignment: Text.AlignHCenter
+        font.family: "Helvetica"
+        font.pixelSize: 12
+        color: "black"
+        text: layerBranchPoint.text
+      }
+    }
   }
 
   /**
@@ -98,6 +154,17 @@ GridLayout {
     checked: false
     onClicked : {
       MaliputViewerPlugin.OnNewMeshLayerSelection("grayed_asphalt", checked);
+    }
+    style: CheckBoxStyle {
+      label: Text {
+        renderType: Text.NativeRendering
+        verticalAlignment: Text.AlignVCenter
+        horizontalAlignment: Text.AlignHCenter
+        font.family: "Helvetica"
+        font.pixelSize: 12
+        color: "black"
+        text: layerGrayedAsphalt.text
+      }
     }
   }
 
@@ -111,6 +178,17 @@ GridLayout {
     onClicked : {
       MaliputViewerPlugin.OnNewMeshLayerSelection("grayed_lane_all", checked);
     }
+    style: CheckBoxStyle {
+      label: Text {
+        renderType: Text.NativeRendering
+        verticalAlignment: Text.AlignVCenter
+        horizontalAlignment: Text.AlignHCenter
+        font.family: "Helvetica"
+        font.pixelSize: 12
+        color: "black"
+        text: layerGrayedLane.text
+      }
+    }
   }
 
   /**
@@ -122,6 +200,17 @@ GridLayout {
     checked: false
     onClicked : {
       MaliputViewerPlugin.OnNewMeshLayerSelection("grayed_marker_all", checked);
+    }
+    style: CheckBoxStyle {
+      label: Text {
+        renderType: Text.NativeRendering
+        verticalAlignment: Text.AlignVCenter
+        horizontalAlignment: Text.AlignHCenter
+        font.family: "Helvetica"
+        font.pixelSize: 12
+        color: "black"
+        text: layerGrayedMarker.text
+      }
     }
   }
 

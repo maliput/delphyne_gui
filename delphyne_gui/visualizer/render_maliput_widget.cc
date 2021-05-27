@@ -32,7 +32,7 @@
 
 #include <memory>
 
-#include "arrow_mesh.hh"
+#include "maliput_viewer_plugin/arrow_mesh.hh"
 
 using namespace delphyne;
 using namespace gui;

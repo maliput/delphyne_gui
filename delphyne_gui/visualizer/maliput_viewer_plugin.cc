@@ -126,6 +126,8 @@ QStringList MaliputViewerPlugin::ListLanes() const { return listLanes; }
 
 QString MaliputViewerPlugin::RulesList() const { return rulesList; }
 
+QString MaliputViewerPlugin::LaneInfo() const { return laneInfo; }
+
 QList<bool> MaliputViewerPlugin::LayerCheckboxes() const {
   // Returns the checkboxes' state by default.
   return {true /* asphalt */,      true /* lane */,
@@ -596,6 +598,7 @@ void MaliputViewerPlugin::MouseClickHandler(const QMouseEvent* _mouseEvent) {
       // Update visualization to default if it is deselected
       UpdateLane(lane_id);
       UpdateRulesList(lane_id);
+      UpdateLaneInfoArea(rayQueryResult.point);
 
       const std::string start_bp_id = lane->GetBranchPoint(maliput::api::LaneEnd::kStart)->id().string();
       const std::string end_bp_id = lane->GetBranchPoint(maliput::api::LaneEnd::kFinish)->id().string();
@@ -618,6 +621,45 @@ void MaliputViewerPlugin::MouseClickHandler(const QMouseEvent* _mouseEvent) {
     arrow->SetVisibility(false);
     selector->DeselectAll();
   }
+}
+
+void MaliputViewerPlugin::UpdateLaneInfoArea(const ignition::math::Vector3d& _pos) {
+  const maliput::api::Lane* lane = model->GetLaneFromWorldPosition(_pos);
+  if (!lane) {
+    return;
+  }
+  const auto lane_pos = lane->ToLanePosition({_pos[0], _pos[1], _pos[2]});
+  // Update message to be displayed in the info area.
+  std::stringstream ss;
+  ss << "----  LANE ID: " << lane->id() << "  -----";
+  ss << "\nLength ------------> " << lane->length() << "m";
+  ss << "\nLanePosition ------> " << lane_pos.lane_position;
+  ss << "\nInertialPosition --> "
+     << "(x = " << _pos[0] << ", y = " << _pos[1] << ", z = " << _pos[2] << ")";
+  ss << "\nRBounds ------> "
+     << "(min: " << lane->lane_bounds(lane_pos.lane_position.s()).min()
+     << ", max: " << lane->lane_bounds(lane_pos.lane_position.s()).max() << ")";
+  ss << "\nHBounds ------> "
+     << "(min: " << lane->elevation_bounds(lane_pos.lane_position.s(), lane_pos.lane_position.r()).min()
+     << ", max: " << lane->elevation_bounds(lane_pos.lane_position.s(), lane_pos.lane_position.r()).max() << ")";
+  ss << "\n----  LANE BOUNDARIES (INERTIAL FRAME)  ----";
+  ss << "\n(s, r, h) ------> (x, y, z)";
+  ss << "\n(0, 0, 0) ----------> " << lane->ToInertialPosition({0., 0., 0.});
+  ss << "\n(0, r_min, 0) ------> " << lane->ToInertialPosition({0., lane->lane_bounds(0.).min(), 0.});
+  ss << "\n(0, r_max, 0) ------> " << lane->ToInertialPosition({0., lane->lane_bounds(0.).max(), 0.});
+  ss << "\n(s_max / 2, 0, 0) ----------> " << lane->ToInertialPosition({lane->length() / 2., 0., 0.});
+  ss << "\n(s_max / 2, r_min, 0) ------> "
+     << lane->ToInertialPosition({lane->length() / 2., lane->lane_bounds(lane->length() / 2.).min(), 0.});
+  ss << "\n(s_max / 2, r_max, 0) ------> "
+     << lane->ToInertialPosition({lane->length() / 2., lane->lane_bounds(lane->length() / 2.).max(), 0.});
+  ss << "\n(s_max, 0, 0) ----------> " << lane->ToInertialPosition({lane->length(), 0., 0.});
+  ss << "\n(s_max, r_min, 0) ------> "
+     << lane->ToInertialPosition({lane->length(), lane->lane_bounds(lane->length()).min(), 0.});
+  ss << "\n(s_max, r_max, 0) ------> "
+     << lane->ToInertialPosition({lane->length(), lane->lane_bounds(lane->length()).max(), 0.});
+
+  laneInfo = QString::fromStdString(ss.str());
+  emit LaneInfoChanged();
 }
 
 void MaliputViewerPlugin::UpdateLane(const std::string& _id) {

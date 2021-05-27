@@ -9,7 +9,8 @@ import QtQuick.Layouts 1.3
 Rectangle {
   id: maliputViewerPlugin
   Layout.minimumWidth: 400
-  Layout.minimumHeight: 175
+  Layout.preferredWidth: 450
+  Layout.minimumHeight: 1100
   anchors.fill: parent
 
   // Files Selection Panel
@@ -66,12 +67,31 @@ Rectangle {
     anchors.right: parent.right
     anchors.rightMargin: 10
   }
+  // Mouse Info Selection Panel
+  Loader {
+    id: mouseInfo
+    width: parent.width
+    source: "InfoArea.qml"
+    anchors.top: labelsLoaderSeparator.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+  }
+  ToolSeparator {
+    id: mouseInfoSeparator
+    orientation: Qt.Horizontal
+    anchors.top: mouseInfo.bottom
+    anchors.topMargin: 15
+    anchors.left: parent.left
+    anchors.leftMargin: 10
+    anchors.right: parent.right
+    anchors.rightMargin: 10
+  }
   // Phase selection Panel
   Loader {
     id: phaseSelectionLoader
     width: parent.width
     source: "PhaseSelectionArea.qml"
-    anchors.top: labelsLoaderSeparator.bottom
+    anchors.top: mouseInfoSeparator.bottom
     anchors.left: parent.left
     anchors.right: parent.right
   }

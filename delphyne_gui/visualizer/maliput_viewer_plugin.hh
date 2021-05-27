@@ -99,6 +99,9 @@ class MaliputViewerPlugin : public ignition::gui::Plugin {
   /// Property used to load the rules in the correspondant UI's area.
   Q_PROPERTY(QString rulesList READ RulesList NOTIFY RulesListChanged)
 
+  /// Property used to load the info about the surface clicked in the correspondant UI's area.
+  Q_PROPERTY(QString laneInfo READ LaneInfo NOTIFY LaneInfoChanged)
+
  public:
   /// \brief Default constructor.
   MaliputViewerPlugin();
@@ -112,6 +115,9 @@ class MaliputViewerPlugin : public ignition::gui::Plugin {
 
   /// Called when a new lane is selected to load the lane's rules into the UI.
   Q_INVOKABLE QString RulesList() const;
+
+  /// Called when a lane is clicked. Update info related to the clicked surface.
+  Q_INVOKABLE QString LaneInfo() const;
 
   /// Called when a new RoadNetwork is loaded to default the checkboxes' state
   /// in the layers selection panel for the meshes.
@@ -127,6 +133,9 @@ class MaliputViewerPlugin : public ignition::gui::Plugin {
 
   /// \brief Signal emitted to update the rules of the selected lane.
   void RulesListChanged();
+
+  /// \brief Signal emitted to update the info about the clicked lane.
+  void LaneInfoChanged();
 
   /// \brief Signal emitted to reset the checkboxes' state for the layers visualization
   ///        when a new RoadNetwork is loaded.
@@ -276,6 +285,10 @@ class MaliputViewerPlugin : public ignition::gui::Plugin {
   /// \brief Updates the list that holds the lane's rules of the selected lane.
   void UpdateRulesList(const std::string& _laneId);
 
+  /// \brief Updates the text related to the clicked surface if any.
+  /// \param[in] _pos Coordinate in the Inertial Frame.
+  void UpdateLaneInfoArea(const ignition::math::Vector3d& _pos);
+
   /// Keys used by the checkbox logic to visualize different layers and by
   /// the default map #objectVisualDefaults.
   /// @{
@@ -320,6 +333,9 @@ class MaliputViewerPlugin : public ignition::gui::Plugin {
 
   /// \brief Holds the rules of the last selected lane that are displayed in the UI.
   QString rulesList{};
+
+  /// \brief Holds the info about the clicked surface that is displayed in the UI.
+  QString laneInfo{};
 
   /// \brief Triggers an event every `kTimerPeriodInMs` to try to get the scene.
   QBasicTimer timer;

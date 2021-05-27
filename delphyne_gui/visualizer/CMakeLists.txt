@@ -338,123 +338,6 @@ install(
 )
 
 #-------------------------------------------------------------------------------
-# Teleop Plugin (ign-gui 3)
-QT5_WRAP_CPP(TeleopPlugin_headers_MOC teleop_plugin.h)
-QT5_ADD_RESOURCES(TeleopPlugin_RCC teleop_plugin.qrc)
-
-add_library(TeleopPlugin
-  ${CMAKE_CURRENT_SOURCE_DIR}/teleop_plugin.cc
-  ${TeleopPlugin_headers_MOC}
-  ${TeleopPlugin_RCC}
-)
-add_library(delphyne_gui::TeleopPlugin ALIAS TeleopPlugin)
-set_target_properties(TeleopPlugin
-  PROPERTIES
-    OUTPUT_NAME TeleopPlugin
-)
-
-target_link_libraries(TeleopPlugin
-  PUBLIC
-    ignition-gui3::ignition-gui3
-    ignition-common3::ignition-common3
-    ignition-transport8::ignition-transport8
-    ${Qt5Core_LIBRARIES}
-    ${Qt5Widgets_LIBRARIES}
-    delphyne::protobuf_messages
-  PRIVATE
-    ignition-plugin1::register
-)
-
-install(
-  TARGETS TeleopPlugin
-  EXPORT ${PROJECT_NAME}-targets
-  RUNTIME DESTINATION bin
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib
-)
-
-#-------------------------------------------------------------------------------
-# TopicsStats Plugin (ign-gui 3)
-QT5_WRAP_CPP(TopicsStats_headers_MOC topics_stats.hh)
-QT5_ADD_RESOURCES(TopicsStats_RCC topics_stats.qrc)
-
-add_library(TopicsStats
-  ${CMAKE_CURRENT_SOURCE_DIR}/topics_stats.cc
-  ${TopicsStats_headers_MOC}
-  ${TopicsStats_RCC}
-)
-add_library(delphyne_gui::TopicsStats ALIAS TopicsStats)
-set_target_properties(TopicsStats
-  PROPERTIES
-    OUTPUT_NAME TopicsStats
-)
-
-target_link_libraries(TopicsStats
-  PUBLIC
-    ignition-gui3::ignition-gui3
-    ignition-common3::ignition-common3
-    ignition-transport8::ignition-transport8
-    ${Qt5Core_LIBRARIES}
-    ${Qt5Widgets_LIBRARIES}
-    delphyne::protobuf_messages
-  PRIVATE
-    ignition-plugin1::register
-)
-
-install(
-  TARGETS TopicsStats
-  EXPORT ${PROJECT_NAME}-targets
-  RUNTIME DESTINATION bin
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib
-)
-
-#-------------------------------------------------------------------------------
-
-# PlaybackWidget (ign-gui 3)
-QT5_WRAP_CPP(PlaybackPlugin_MOC playback_plugin.hh)
-QT5_ADD_RESOURCES(PlaybackPlugin_resources_RCC PlaybackPlugin.qrc)
-
-add_library(PlaybackPlugin
-  ${CMAKE_CURRENT_SOURCE_DIR}/playback_plugin.cc
-  ${PlaybackPlugin_MOC}
-  ${PlaybackPlugin_resources_RCC}
-)
-add_library(delphyne_gui::PlaybackPlugin ALIAS PlaybackPlugin)
-set_target_properties(PlaybackPlugin
-  PROPERTIES
-    OUTPUT_NAME PlaybackPlugin
-)
-
-ament_target_dependencies(PlaybackPlugin
-  "maliput"
-)
-
-target_link_libraries(PlaybackPlugin
-  PUBLIC
-    ignition-common3::ignition-common3
-    ignition-gui3::ignition-gui3
-    ignition-msgs5::ignition-msgs5
-    ignition-transport8::ignition-transport8
-    ${Qt5Core_LIBRARIES}
-    ${Qt5Qml_LIBRARIES}
-    ${Qt5Widgets_LIBRARIES}
-    delphyne::protobuf_messages
-    delphyne::public_headers
-    maliput::common
-  PRIVATE
-    ignition-plugin1::register
-)
-
-install(
-  TARGETS PlaybackPlugin
-  EXPORT ${PROJECT_NAME}-targets
-  RUNTIME DESTINATION bin
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib
-)
-
-#-------------------------------------------------------------------------------
 
 # Visualizer with ign-gui0
 add_executable(visualizer0
@@ -531,7 +414,10 @@ install(
 )
 
 add_subdirectory(display_plugins)
+add_subdirectory(playback_plugin)
+add_subdirectory(teleop_plugin)
 add_subdirectory(topic_interface_plugin)
+add_subdirectory(topics_stats)
 
 if(BUILD_TESTING)
   add_subdirectory(test)

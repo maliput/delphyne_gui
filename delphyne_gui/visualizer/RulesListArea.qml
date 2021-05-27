@@ -22,7 +22,7 @@ GridLayout {
     Layout.columnSpan: 1
     anchors.horizontalCenter: parent.horizontalCenter
     Layout.alignment: Qt.AlignVTop | Qt.AlignHCenter
-    font.pointSize: 10
+    font.pixelSize: 14
     text: "RULES"
   }
 
@@ -36,6 +36,8 @@ GridLayout {
     Layout.preferredHeight: 125
     Layout.maximumHeight: 125
     Layout.fillWidth: true
+    font.pixelSize: 12
+    font.family: "Helvetica"
   }
 
   // When new data arrives the table is updated.

@@ -12,7 +12,7 @@
 #include <ignition/rendering/RayQuery.hh>
 
 #include "layer_selection_widget.hh"
-#include "maliput_viewer_model.hh"
+#include "maliput_viewer_plugin/maliput_viewer_model.hh"
 #include "render_maliput_widget.hh"
 #include "rules_visualizer_widget.hh"
 

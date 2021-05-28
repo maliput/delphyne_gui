@@ -16,7 +16,7 @@
 #include <ignition/rendering/Visual.hh>
 #include <maliput/common/maliput_throw.h>
 
-#include "global_attributes.hh"
+#include "visualizer/global_attributes.hh"
 
 namespace delphyne {
 namespace gui {

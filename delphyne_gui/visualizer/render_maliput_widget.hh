@@ -17,11 +17,11 @@
 
 #include <QtWidgets/QWidget>
 
-#include "arrow_mesh.hh"
-#include "maliput_viewer_model.hh"
+#include "maliput_viewer_plugin/arrow_mesh.hh"
+#include "maliput_viewer_plugin/maliput_viewer_model.hh"
+#include "maliput_viewer_plugin/selector.hh"
+#include "maliput_viewer_plugin/traffic_light_manager.hh"
 #include "orbit_view_control.hh"
-#include "selector.hh"
-#include "traffic_light_manager.hh"
 
 namespace delphyne {
 namespace gui {

@@ -256,7 +256,4 @@ ament_environment_hooks(setup.sh.in)
 install (PROGRAMS tools/maliput_viewer0.sh DESTINATION ${BIN_INSTALL_DIR})
 install (PROGRAMS tools/maliput_viewer2.sh DESTINATION ${BIN_INSTALL_DIR})
 
-# Installs prereqs.
-install (PROGRAMS prereqs DESTINATION ${CMAKE_INSTALL_DATADIR})
-
 ament_package()

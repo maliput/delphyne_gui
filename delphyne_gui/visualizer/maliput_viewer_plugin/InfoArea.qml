@@ -31,9 +31,9 @@ GridLayout {
     anchors.top: titleText.bottom
     anchors.left: parent.left
     width: parent.width
-    Layout.minimumHeight: 80
-    Layout.preferredHeight: 100
-    Layout.maximumHeight: 100
+    Layout.minimumHeight: 100
+    Layout.preferredHeight: 140
+    Layout.maximumHeight: 150
     Layout.fillWidth: true
     font.pixelSize: 12
     font.family: "Helvetica"

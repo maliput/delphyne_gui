@@ -642,6 +642,8 @@ void MaliputViewerPlugin::UpdateLaneInfoArea(const ignition::math::Vector3d& _po
   ss << "\nHBounds ------> "
      << "(min: " << lane->elevation_bounds(lane_pos.lane_position.s(), lane_pos.lane_position.r()).min()
      << ", max: " << lane->elevation_bounds(lane_pos.lane_position.s(), lane_pos.lane_position.r()).max() << ")";
+  ss << "\nSegmentId: ------------> " << lane->segment()->id().string();
+  ss << "\nJunctionId: ------------> " << lane->segment()->junction()->id().string();
   ss << "\n----  LANE BOUNDARIES (INERTIAL FRAME)  ----";
   ss << "\n(s, r, h) ------> (x, y, z)";
   ss << "\n(0, 0, 0) ----------> " << lane->ToInertialPosition({0., 0., 0.});

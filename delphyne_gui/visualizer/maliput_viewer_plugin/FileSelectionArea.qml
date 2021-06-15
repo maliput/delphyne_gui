@@ -73,6 +73,7 @@ GridLayout {
     text: roadRulebookPath
     placeholderText: qsTr("Optional: Select a RoadRuleBook file...")
     font.pixelSize: 12
+    font.family: "Helvetica"
   }
   Button {
     id: roadRulebookButton
@@ -123,6 +124,7 @@ GridLayout {
     text: trafficLightBookPath
     placeholderText: qsTr("Optional: Select a TrafficLightBook file...")
     font.pixelSize: 12
+    font.family: "Helvetica"
   }
   Button {
     id: trafficLightBookButton
@@ -173,6 +175,7 @@ GridLayout {
     text: phaseRingBookPath
     placeholderText: qsTr("Optional: Select a PhaseRingBook file...")
     font.pixelSize: 12
+    font.family: "Helvetica"
   }
   Button {
     id: phaseRingBookButton
@@ -224,6 +227,7 @@ GridLayout {
     text: mapFilePath
     placeholderText: qsTr("Select an XODR or YAML map file...")
     font.pixelSize: 12
+    font.family: "Helvetica"
   }
   Button {
     id: mapFileButton

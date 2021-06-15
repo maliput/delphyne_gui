@@ -26,6 +26,7 @@ GridLayout {
     Layout.columnSpan: 2
     anchors.horizontalCenter: parent.horizontalCenter
     Layout.alignment: Qt.AlignVTop | Qt.AlignHCenter
+    font.family: "Helvetica"
     font.pixelSize: 14
     text: "LABELS"
   }

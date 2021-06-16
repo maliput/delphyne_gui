@@ -21,6 +21,7 @@ GridLayout {
     Layout.columnSpan: 1
     anchors.horizontalCenter: parent.horizontalCenter
     Layout.alignment: Qt.AlignVTop | Qt.AlignHCenter
+    font.family: "Helvetica"
     font.pixelSize: 14
     text: "INFO"
   }

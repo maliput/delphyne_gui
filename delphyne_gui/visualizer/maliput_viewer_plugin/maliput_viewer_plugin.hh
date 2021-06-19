@@ -246,9 +246,9 @@ class MaliputViewerPlugin : public ignition::gui::Plugin {
   ///          is expected to be titled as #kMainScene3dPlugin.
   void Initialize();
 
-  /// \brief Handles the left click mouse event.
-  /// @param[in] _mouseEvent QMouseEvent pointer.
-  void MouseClickHandler(const QMouseEvent* _mouseEvent);
+  /// \brief Handles the point from the ClickToScene events.
+  /// @param[in] _scenePoint Inertial position of a point in the scene.
+  void SceneClickHandler(const ignition::math::Vector3d _scenePoint);
 
   /// \brief Performs a raycast on the screen.
   /// \param[in] screenX X screen's coordinate.

@@ -565,12 +565,7 @@ ignition::gui::Plugin* MaliputViewerPlugin::FilterPluginsByTitle(const std::stri
 }
 
 bool MaliputViewerPlugin::eventFilter(QObject* _obj, QEvent* _event) {
-  if (_event->type() == QEvent::Type::MouseButtonPress) {
-    const QMouseEvent* mouseEvent = static_cast<QMouseEvent*>(_event);
-    if (mouseEvent && mouseEvent->button() == Qt::LeftButton) {
-      MouseClickHandler(mouseEvent);
-    }
-  }
+  using ignition::gui::events::LeftClickToScene;
   if (_event->type() == ignition::gui::events::Render::kType) {
     arrow->Update();
     trafficLightManager->Tick();
@@ -582,37 +577,54 @@ bool MaliputViewerPlugin::eventFilter(QObject* _obj, QEvent* _event) {
       RenderLabels(model->Labels());
       renderMeshesOption.executeLabelRendering = false;
     }
+  } else if (_event->type() == LeftClickToScene::kType) {
+    auto leftClickToScene = static_cast<LeftClickToScene*>(_event);
+    if (leftClickToScene) {
+      SceneClickHandler(leftClickToScene->Point());
+    }
   }
   // Standard event processing
   return QObject::eventFilter(_obj, _event);
 }
 
-void MaliputViewerPlugin::MouseClickHandler(const QMouseEvent* _mouseEvent) {
-  const auto rayQueryResult = ScreenToScene(_mouseEvent->x(), _mouseEvent->y());
-  if (rayQueryResult.distance >= 0) {
-    const maliput::api::Lane* lane = model->GetLaneFromWorldPosition(rayQueryResult.point);
-    if (lane) {
-      const std::string lane_id = lane->id().string();
-      ignmsg << "Clicked lane ID: " << lane_id << std::endl;
-      selector->SelectLane(lane);
-      // Update visualization to default if it is deselected
-      UpdateLane(lane_id);
-      UpdateRulesList(lane_id);
-      UpdateLaneInfoArea(rayQueryResult.point);
+void MaliputViewerPlugin::SceneClickHandler(const ignition::math::Vector3d _scenePoint) {
+  const double kClickDistanceTolerance = 1e-6;
+  // look for lane closest to clicked point
+  if (!model) {
+    return;
+  }
+  const maliput::api::Lane* lane = model->GetLaneFromWorldPosition(_scenePoint);
+  if (lane) {
+    // compute distance from closest point on lane to clicked point
+    const maliput::api::InertialPosition inertialPosition{_scenePoint.X(), _scenePoint.Y(), _scenePoint.Z()};
+    auto lanePositionResult = lane->ToLanePosition(inertialPosition);
+    if (lanePositionResult.distance > kClickDistanceTolerance) {
+      // if clicked point is not on a lane, then reset the lane pointer
+      lane = nullptr;
+    }
+  }
 
-      const std::string start_bp_id = lane->GetBranchPoint(maliput::api::LaneEnd::kStart)->id().string();
-      const std::string end_bp_id = lane->GetBranchPoint(maliput::api::LaneEnd::kFinish)->id().string();
-      UpdateBranchPoint(start_bp_id);
-      UpdateBranchPoint(end_bp_id);
+  if (lane) {
+    const std::string lane_id = lane->id().string();
+    ignmsg << "Clicked lane ID: " << lane_id << std::endl;
+    selector->SelectLane(lane);
+    // Update visualization to default if it is deselected
+    UpdateLane(lane_id);
+    UpdateRulesList(lane_id);
+    UpdateLaneInfoArea(_scenePoint);
 
-      arrow->SelectAt(rayQueryResult.distance, rayQueryResult.point);
-      arrow->SetVisibility(true);
+    const std::string start_bp_id = lane->GetBranchPoint(maliput::api::LaneEnd::kStart)->id().string();
+    const std::string end_bp_id = lane->GetBranchPoint(maliput::api::LaneEnd::kFinish)->id().string();
+    UpdateBranchPoint(start_bp_id);
+    UpdateBranchPoint(end_bp_id);
 
-      // Update selected table's lane id.
-      for (int i = 0; i < listLanes.length(); ++i) {
-        if (listLanes[i].toStdString() == lane_id) {
-          tableLaneIdSelection(i);
-        }
+    arrow->SelectAt(5.0, _scenePoint);
+    arrow->SetVisibility(true);
+
+    // Update selected table's lane id.
+    for (int i = 0; i < listLanes.length(); ++i) {
+      if (listLanes[i].toStdString() == lane_id) {
+        tableLaneIdSelection(i);
       }
     }
   } else {

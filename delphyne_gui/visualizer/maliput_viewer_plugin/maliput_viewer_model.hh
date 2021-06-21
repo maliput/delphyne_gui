@@ -224,6 +224,12 @@ class MaliputViewerModel {
   /// \return Lane associated with that position or nullptr if not found.
   const maliput::api::Lane* GetLaneFromWorldPosition(const ignition::math::Vector3d& _position);
 
+  /// \brief Get the maliput::api::RoadPositionResult associated with a point in
+  ///        world space if exists.
+  /// \param[in] _position World position of point that intersected with a plane
+  /// \return maliput::api::RoadPositionResult associated with that position.
+  const maliput::api::RoadPositionResult GetRoadPositionResult(const ignition::math::Vector3d& _position);
+
   /// \brief Get the lane associated with an id.
   /// \param[in] _id Id of the lane.
   /// \return Lane associated with given id or nullptr if id is invalid.

@@ -565,13 +565,15 @@ ignition::gui::Plugin* MaliputViewerPlugin::FilterPluginsByTitle(const std::stri
 }
 
 bool MaliputViewerPlugin::eventFilter(QObject* _obj, QEvent* _event) {
-  if (_event->type() == QEvent::Type::MouseButtonPress) {
-    const QMouseEvent* mouseEvent = static_cast<QMouseEvent*>(_event);
-    if (mouseEvent && mouseEvent->button() == Qt::LeftButton) {
-      MouseClickHandler(mouseEvent);
-    }
+  if (_event->type() == ignition::gui::events::LeftClickToScene::kType) {
+    auto leftClickToScene = static_cast<ignition::gui::events::LeftClickToScene*>(_event);
+    MouseClickHandler(leftClickToScene->Point());
   }
   if (_event->type() == ignition::gui::events::Render::kType) {
+    if (roadPositionResultValue.IsDirty()) {
+      UpdateLaneSelectionOnLeftClick();
+      roadPositionResultValue.SetDirty(false);
+    }
     arrow->Update();
     trafficLightManager->Tick();
     if (renderMeshesOption.executeMeshRendering) {
@@ -587,26 +589,33 @@ bool MaliputViewerPlugin::eventFilter(QObject* _obj, QEvent* _event) {
   return QObject::eventFilter(_obj, _event);
 }
 
-void MaliputViewerPlugin::MouseClickHandler(const QMouseEvent* _mouseEvent) {
-  const auto rayQueryResult = ScreenToScene(_mouseEvent->x(), _mouseEvent->y());
-  if (rayQueryResult.distance >= 0) {
-    const maliput::api::Lane* lane = model->GetLaneFromWorldPosition(rayQueryResult.point);
-    if (lane) {
+void MaliputViewerPlugin::MouseClickHandler(const ignition::math::Vector3d& _sceneInertialPosition) {
+  const maliput::api::RoadPositionResult newRoadPositionResult = model->GetRoadPositionResult(_sceneInertialPosition);
+  // There is no intersection vs There is an intersection and should update the the properties of the lane, etc.
+  roadPositionResultValue = newRoadPositionResult.distance > 1e-6 ? RoadPositionResultValue()
+                                                                  : RoadPositionResultValue(newRoadPositionResult);
+  roadPositionResultValue.SetDirty(true);
+}
+
+void MaliputViewerPlugin::UpdateLaneSelectionOnLeftClick() {
+  if (roadPositionResultValue.Value().has_value()) {
+    if (roadPositionResultValue.Value()->road_position.lane) {
+      const maliput::api::Lane* lane = roadPositionResultValue.Value()->road_position.lane;
       const std::string lane_id = lane->id().string();
       ignmsg << "Clicked lane ID: " << lane_id << std::endl;
       selector->SelectLane(lane);
       // Update visualization to default if it is deselected
       UpdateLane(lane_id);
       UpdateRulesList(lane_id);
-      UpdateLaneInfoArea(rayQueryResult.point);
+      UpdateLaneInfoArea(roadPositionResultValue.Value().value());
 
       const std::string start_bp_id = lane->GetBranchPoint(maliput::api::LaneEnd::kStart)->id().string();
       const std::string end_bp_id = lane->GetBranchPoint(maliput::api::LaneEnd::kFinish)->id().string();
       UpdateBranchPoint(start_bp_id);
       UpdateBranchPoint(end_bp_id);
 
-      arrow->SelectAt(rayQueryResult.distance, rayQueryResult.point);
-      arrow->SetVisibility(true);
+      // arrow->SelectAt(rayQueryResult.distance, rayQueryResult.point);
+      // arrow->SetVisibility(true);
 
       // Update selected table's lane id.
       for (int i = 0; i < listLanes.length(); ++i) {
@@ -623,42 +632,35 @@ void MaliputViewerPlugin::MouseClickHandler(const QMouseEvent* _mouseEvent) {
   }
 }
 
-void MaliputViewerPlugin::UpdateLaneInfoArea(const ignition::math::Vector3d& _pos) {
-  const maliput::api::Lane* lane = model->GetLaneFromWorldPosition(_pos);
-  if (!lane) {
-    return;
-  }
-  const auto lane_pos = lane->ToLanePosition({_pos[0], _pos[1], _pos[2]});
+void MaliputViewerPlugin::UpdateLaneInfoArea(const maliput::api::RoadPositionResult& _roadPositionResult) {
+  const maliput::api::Lane* lane = _roadPositionResult.road_position.lane;
+  const maliput::api::LanePosition& lanePos = _roadPositionResult.road_position.pos;
+  const maliput::api::HBounds hBounds = lane->elevation_bounds(lanePos.s(), lanePos.r());
+  const maliput::api::RBounds startLaneBounds = lane->lane_bounds(0.);
+  const maliput::api::RBounds midLaneBounds = lane->lane_bounds(lane->length() / 2.);
+  const maliput::api::RBounds endLaneBounds = lane->lane_bounds(lane->length());
+  const maliput::api::RBounds laneBounds = lane->lane_bounds(lanePos.s());
   // Update message to be displayed in the info area.
   std::stringstream ss;
   ss << "----  LANE ID: " << lane->id() << "  -----";
   ss << "\nLength ------------> " << lane->length() << "m";
-  ss << "\nLanePosition ------> " << lane_pos.lane_position;
-  ss << "\nInertialPosition --> "
-     << "(x = " << _pos[0] << ", y = " << _pos[1] << ", z = " << _pos[2] << ")";
-  ss << "\nRBounds ------> "
-     << "(min: " << lane->lane_bounds(lane_pos.lane_position.s()).min()
-     << ", max: " << lane->lane_bounds(lane_pos.lane_position.s()).max() << ")";
-  ss << "\nHBounds ------> "
-     << "(min: " << lane->elevation_bounds(lane_pos.lane_position.s(), lane_pos.lane_position.r()).min()
-     << ", max: " << lane->elevation_bounds(lane_pos.lane_position.s(), lane_pos.lane_position.r()).max() << ")";
+  ss << "\nLanePosition ------> " << lanePos;
+  ss << "\nInertialPosition --> " << _roadPositionResult.nearest_position;
+  ss << "\nRBounds ------> (min: " << laneBounds.min() << ", max: " << laneBounds.max() << ")";
+  ss << "\nHBounds ------> (min: " << hBounds.min() << ", max: " << hBounds.max() << ")";
   ss << "\nSegmentId: ------------> " << lane->segment()->id().string();
   ss << "\nJunctionId: ------------> " << lane->segment()->junction()->id().string();
   ss << "\n----  LANE BOUNDARIES (INERTIAL FRAME)  ----";
   ss << "\n(s, r, h) ------> (x, y, z)";
   ss << "\n(0, 0, 0) ----------> " << lane->ToInertialPosition({0., 0., 0.});
-  ss << "\n(0, r_min, 0) ------> " << lane->ToInertialPosition({0., lane->lane_bounds(0.).min(), 0.});
-  ss << "\n(0, r_max, 0) ------> " << lane->ToInertialPosition({0., lane->lane_bounds(0.).max(), 0.});
+  ss << "\n(0, r_min, 0) ------> " << lane->ToInertialPosition({0., startLaneBounds.min(), 0.});
+  ss << "\n(0, r_max, 0) ------> " << lane->ToInertialPosition({0., startLaneBounds.max(), 0.});
   ss << "\n(s_max / 2, 0, 0) ----------> " << lane->ToInertialPosition({lane->length() / 2., 0., 0.});
-  ss << "\n(s_max / 2, r_min, 0) ------> "
-     << lane->ToInertialPosition({lane->length() / 2., lane->lane_bounds(lane->length() / 2.).min(), 0.});
-  ss << "\n(s_max / 2, r_max, 0) ------> "
-     << lane->ToInertialPosition({lane->length() / 2., lane->lane_bounds(lane->length() / 2.).max(), 0.});
+  ss << "\n(s_max / 2, r_min, 0) ------> " << lane->ToInertialPosition({lane->length() / 2., midLaneBounds.min(), 0.});
+  ss << "\n(s_max / 2, r_max, 0) ------> " << lane->ToInertialPosition({lane->length() / 2., midLaneBounds.max(), 0.});
   ss << "\n(s_max, 0, 0) ----------> " << lane->ToInertialPosition({lane->length(), 0., 0.});
-  ss << "\n(s_max, r_min, 0) ------> "
-     << lane->ToInertialPosition({lane->length(), lane->lane_bounds(lane->length()).min(), 0.});
-  ss << "\n(s_max, r_max, 0) ------> "
-     << lane->ToInertialPosition({lane->length(), lane->lane_bounds(lane->length()).max(), 0.});
+  ss << "\n(s_max, r_min, 0) ------> " << lane->ToInertialPosition({lane->length(), endLaneBounds.min(), 0.});
+  ss << "\n(s_max, r_max, 0) ------> " << lane->ToInertialPosition({lane->length(), endLaneBounds.max(), 0.});
 
   laneInfo = QString::fromStdString(ss.str());
   emit LaneInfoChanged();

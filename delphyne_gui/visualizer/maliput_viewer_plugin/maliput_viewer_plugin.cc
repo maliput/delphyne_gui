@@ -567,7 +567,9 @@ ignition::gui::Plugin* MaliputViewerPlugin::FilterPluginsByTitle(const std::stri
 bool MaliputViewerPlugin::eventFilter(QObject* _obj, QEvent* _event) {
   if (_event->type() == ignition::gui::events::LeftClickToScene::kType) {
     auto leftClickToScene = static_cast<ignition::gui::events::LeftClickToScene*>(_event);
-    MouseClickHandler(leftClickToScene->Point());
+    // TODO(https://github.com/ignitionrobotics/ign-gui/issues/209): use distance to camera once
+    //                                                               it is available.
+    MouseClickHandler(leftClickToScene->Point(), camera->WorldPosition().Distance(leftClickToScene->Point()));
   }
   if (_event->type() == ignition::gui::events::Render::kType) {
     if (roadPositionResultValue.IsDirty()) {
@@ -589,11 +591,12 @@ bool MaliputViewerPlugin::eventFilter(QObject* _obj, QEvent* _event) {
   return QObject::eventFilter(_obj, _event);
 }
 
-void MaliputViewerPlugin::MouseClickHandler(const ignition::math::Vector3d& _sceneInertialPosition) {
+void MaliputViewerPlugin::MouseClickHandler(const ignition::math::Vector3d& _sceneInertialPosition, double _distance) {
   const maliput::api::RoadPositionResult newRoadPositionResult = model->GetRoadPositionResult(_sceneInertialPosition);
   // There is no intersection vs There is an intersection and should update the the properties of the lane, etc.
-  roadPositionResultValue = newRoadPositionResult.distance > 1e-6 ? RoadPositionResultValue()
-                                                                  : RoadPositionResultValue(newRoadPositionResult);
+  roadPositionResultValue = newRoadPositionResult.distance > 1e-6
+                                ? RoadPositionResultValue()
+                                : RoadPositionResultValue(newRoadPositionResult, _distance);
   roadPositionResultValue.SetDirty(true);
 }
 
@@ -614,8 +617,11 @@ void MaliputViewerPlugin::UpdateLaneSelectionOnLeftClick() {
       UpdateBranchPoint(start_bp_id);
       UpdateBranchPoint(end_bp_id);
 
-      // arrow->SelectAt(rayQueryResult.distance, rayQueryResult.point);
-      // arrow->SetVisibility(true);
+      const ignition::math::Vector3d sceneClickPosition(roadPositionResultValue.Value()->nearest_position.x(),
+                                                        roadPositionResultValue.Value()->nearest_position.y(),
+                                                        roadPositionResultValue.Value()->nearest_position.z());
+      arrow->SelectAt(roadPositionResultValue.Distance(), sceneClickPosition);
+      arrow->SetVisibility(true);
 
       // Update selected table's lane id.
       for (int i = 0; i < listLanes.length(); ++i) {

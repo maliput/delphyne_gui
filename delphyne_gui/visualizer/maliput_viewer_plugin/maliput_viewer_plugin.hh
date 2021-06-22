@@ -201,7 +201,9 @@ class MaliputViewerPlugin : public ignition::gui::Plugin {
   /// @brief The rendering engine name.
   static constexpr char const* kEngineName = "ogre";
 
-  /// \brief Holds a maliput::api::RoadPositionResult.
+  /// \brief Holds a maliput::api::RoadPositionResult which results from the
+  ///        mapped scene click position into the Inertial frame and the
+  ///        distance to the camera.
   /// \details Note that this wrapper may hold a std::nullopt and the dirty flag
   ///          is true. It helps to change the selection state of the lanes.
   class RoadPositionResultValue {
@@ -210,13 +212,20 @@ class MaliputViewerPlugin : public ignition::gui::Plugin {
     RoadPositionResultValue() = default;
 
     /// \brief Constructs a RoadPositionResultValue from @p _other
-    ///        maliput::api::RoadPositionResult.
+    ///        maliput::api::RoadPositionResult and @p _distance to the camera
+    ///        position in the scene.
     /// \param _other A maliput::api::RoadPositionResult.
-    explicit RoadPositionResultValue(const maliput::api::RoadPositionResult& _other) : value(_other), dirty(true) {}
+    /// \param _distance The distance between the camera and the intersected
+    ///        point in the scene.
+    explicit RoadPositionResultValue(const maliput::api::RoadPositionResult& _other, double _distance)
+        : value(_other), distance(_distance), dirty(true) {}
 
     /// \brief Sets the dirty flag.
     /// \param _isDirty Whether the value is dirty or not.
     void SetDirty(bool _isDirty) { dirty = _isDirty; }
+
+    /// \return The distance between the clicked scene position and the camera.
+    double Distance() const { return distance; }
 
     /// \return True when the value is dirty.
     bool IsDirty() const { return dirty; }
@@ -226,6 +235,7 @@ class MaliputViewerPlugin : public ignition::gui::Plugin {
 
    private:
     std::optional<maliput::api::RoadPositionResult> value{std::nullopt};
+    double distance{0.};
     bool dirty{false};
   };
 
@@ -276,9 +286,10 @@ class MaliputViewerPlugin : public ignition::gui::Plugin {
   void Initialize();
 
   /// \brief Handles the left click mouse event and populates roadPositionResultValue.
-  /// @param[in] _sceneInertialPosition The scene (Inertial) frame position to
+  /// \param[in] _sceneInertialPosition The scene (Inertial) frame position to
   ///            map into the RoadGeometry.
-  void MouseClickHandler(const ignition::math::Vector3d& _sceneInertialPosition);
+  /// \param[in] _distance The distance between the camera and @p _sceneInertialPosition.
+  void MouseClickHandler(const ignition::math::Vector3d& _sceneInertialPosition, double _distance);
 
   /// \brief Handles the left click mouse event and populates roadPositionResultValue.
   void UpdateLaneSelectionOnLeftClick();

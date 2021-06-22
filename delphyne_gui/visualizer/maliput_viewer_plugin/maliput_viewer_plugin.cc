@@ -565,22 +565,24 @@ ignition::gui::Plugin* MaliputViewerPlugin::FilterPluginsByTitle(const std::stri
 }
 
 bool MaliputViewerPlugin::eventFilter(QObject* _obj, QEvent* _event) {
-  if (_event->type() == QEvent::Type::MouseButtonPress) {
-    const QMouseEvent* mouseEvent = static_cast<QMouseEvent*>(_event);
-    if (mouseEvent && mouseEvent->button() == Qt::LeftButton) {
-      MouseClickHandler(mouseEvent);
+  if (model->IsInitialized()) {
+    if (_event->type() == QEvent::Type::MouseButtonPress) {
+      const QMouseEvent* mouseEvent = static_cast<QMouseEvent*>(_event);
+      if (mouseEvent && mouseEvent->button() == Qt::LeftButton) {
+        MouseClickHandler(mouseEvent);
+      }
     }
-  }
-  if (_event->type() == ignition::gui::events::Render::kType) {
-    arrow->Update();
-    trafficLightManager->Tick();
-    if (renderMeshesOption.executeMeshRendering) {
-      RenderRoadMeshes(model->Meshes());
-      renderMeshesOption.executeMeshRendering = false;
-    }
-    if (renderMeshesOption.executeLabelRendering) {
-      RenderLabels(model->Labels());
-      renderMeshesOption.executeLabelRendering = false;
+    if (_event->type() == ignition::gui::events::Render::kType) {
+      arrow->Update();
+      trafficLightManager->Tick();
+      if (renderMeshesOption.executeMeshRendering) {
+        RenderRoadMeshes(model->Meshes());
+        renderMeshesOption.executeMeshRendering = false;
+      }
+      if (renderMeshesOption.executeLabelRendering) {
+        RenderLabels(model->Labels());
+        renderMeshesOption.executeLabelRendering = false;
+      }
     }
   }
   // Standard event processing

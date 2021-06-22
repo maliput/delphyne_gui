@@ -196,6 +196,9 @@ class MaliputViewerModel {
             const std::string& _trafficLightBook = std::string(),
             const std::string& _phaseRingFilePath = std::string());
 
+  /// \return True when any of roadGeometry and roadNetwork are not nullptr.
+  bool IsInitialized() const { return roadGeometry.get() != nullptr || roadNetwork.get() != nullptr; }
+
   /// \brief Getter of the map of meshes.
   /// \return The map of meshes.
   const std::map<std::string, std::unique_ptr<MaliputMesh>>& Meshes() const;

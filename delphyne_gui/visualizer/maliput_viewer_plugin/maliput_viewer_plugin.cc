@@ -565,26 +565,24 @@ ignition::gui::Plugin* MaliputViewerPlugin::FilterPluginsByTitle(const std::stri
 }
 
 bool MaliputViewerPlugin::eventFilter(QObject* _obj, QEvent* _event) {
-  if (_event->type() == ignition::gui::events::LeftClickToScene::kType) {
-    auto leftClickToScene = static_cast<ignition::gui::events::LeftClickToScene*>(_event);
-    // TODO(https://github.com/ignitionrobotics/ign-gui/issues/209): use distance to camera once
-    //                                                               it is available.
-    MouseClickHandler(leftClickToScene->Point(), camera->WorldPosition().Distance(leftClickToScene->Point()));
-  }
-  if (_event->type() == ignition::gui::events::Render::kType) {
-    if (roadPositionResultValue.IsDirty()) {
-      UpdateLaneSelectionOnLeftClick();
-      roadPositionResultValue.SetDirty(false);
+  if (model->IsInitialized()) {
+    if (_event->type() == ignition::gui::events::LeftClickToScene::kType) {
+      auto leftClickToScene = static_cast<ignition::gui::events::LeftClickToScene*>(_event);
+      // TODO(https://github.com/ignitionrobotics/ign-gui/issues/209): use distance to camera once
+      //                                                               it is available.
+      MouseClickHandler(leftClickToScene->Point(), camera->WorldPosition().Distance(leftClickToScene->Point()));
     }
-    arrow->Update();
-    trafficLightManager->Tick();
-    if (renderMeshesOption.executeMeshRendering) {
-      RenderRoadMeshes(model->Meshes());
-      renderMeshesOption.executeMeshRendering = false;
-    }
-    if (renderMeshesOption.executeLabelRendering) {
-      RenderLabels(model->Labels());
-      renderMeshesOption.executeLabelRendering = false;
+    if (_event->type() == ignition::gui::events::Render::kType) {
+      if (roadPositionResultValue.IsDirty()) {
+        UpdateLaneSelectionOnLeftClick();
+        roadPositionResultValue.SetDirty(false);
+      }
+      arrow->Update();
+      trafficLightManager->Tick();
+      if (renderMeshesOption.executeMeshRendering) {
+        RenderRoadMeshes(model->Meshes());
+        renderMeshesOption.executeMeshRendering = false;
+      }
     }
   }
   // Standard event processing

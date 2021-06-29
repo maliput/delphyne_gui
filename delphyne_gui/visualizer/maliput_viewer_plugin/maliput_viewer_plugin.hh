@@ -3,6 +3,7 @@
 
 #include <map>
 #include <memory>
+#include <optional>
 #include <string>
 #include <unordered_map>
 
@@ -200,6 +201,44 @@ class MaliputViewerPlugin : public ignition::gui::Plugin {
   /// @brief The rendering engine name.
   static constexpr char const* kEngineName = "ogre";
 
+  /// \brief Holds a maliput::api::RoadPositionResult which results from the
+  ///        mapped scene click position into the Inertial frame and the
+  ///        distance to the camera.
+  /// \details Note that this wrapper may hold a std::nullopt and the dirty flag
+  ///          is true. It helps to change the selection state of the lanes.
+  class RoadPositionResultValue {
+   public:
+    /// \brief Default constructor.
+    RoadPositionResultValue() = default;
+
+    /// \brief Constructs a RoadPositionResultValue from @p _other
+    ///        maliput::api::RoadPositionResult and @p _distance to the camera
+    ///        position in the scene.
+    /// \param _other A maliput::api::RoadPositionResult.
+    /// \param _distance The distance between the camera and the intersected
+    ///        point in the scene.
+    explicit RoadPositionResultValue(const maliput::api::RoadPositionResult& _other, double _distance)
+        : value(_other), distance(_distance), dirty(true) {}
+
+    /// \brief Sets the dirty flag.
+    /// \param _isDirty Whether the value is dirty or not.
+    void SetDirty(bool _isDirty) { dirty = _isDirty; }
+
+    /// \return The distance between the clicked scene position and the camera.
+    double Distance() const { return distance; }
+
+    /// \return True when the value is dirty.
+    bool IsDirty() const { return dirty; }
+
+    /// \return The stored optional with maliput::api::RoadPositionResult.
+    const std::optional<maliput::api::RoadPositionResult>& Value() const { return value; }
+
+   private:
+    std::optional<maliput::api::RoadPositionResult> value{std::nullopt};
+    double distance{0.};
+    bool dirty{false};
+  };
+
   /// \brief Fills a material for a lane label.
   /// \param[in] _material Material to be filled.
   static void CreateLaneLabelMaterial(ignition::rendering::MaterialPtr& _material);
@@ -246,9 +285,14 @@ class MaliputViewerPlugin : public ignition::gui::Plugin {
   ///          is expected to be titled as #kMainScene3dPlugin.
   void Initialize();
 
-  /// \brief Handles the left click mouse event.
-  /// @param[in] _mouseEvent QMouseEvent pointer.
-  void MouseClickHandler(const QMouseEvent* _mouseEvent);
+  /// \brief Handles the left click mouse event and populates roadPositionResultValue.
+  /// \param[in] _sceneInertialPosition The scene (Inertial) frame position to
+  ///            map into the RoadGeometry.
+  /// \param[in] _distance The distance between the camera and @p _sceneInertialPosition.
+  void MouseClickHandler(const ignition::math::Vector3d& _sceneInertialPosition, double _distance);
+
+  /// \brief Handles the left click mouse event and populates roadPositionResultValue.
+  void UpdateLaneSelectionOnLeftClick();
 
   /// \brief Performs a raycast on the screen.
   /// \param[in] screenX X screen's coordinate.
@@ -286,8 +330,8 @@ class MaliputViewerPlugin : public ignition::gui::Plugin {
   void UpdateRulesList(const std::string& _laneId);
 
   /// \brief Updates the text related to the clicked surface if any.
-  /// \param[in] _pos Coordinate in the Inertial Frame.
-  void UpdateLaneInfoArea(const ignition::math::Vector3d& _pos);
+  /// \param[in] _roadPositionResult Result of the mapped RoadPosition after a click in the scene.
+  void UpdateLaneInfoArea(const maliput::api::RoadPositionResult& _roadPositionResult);
 
   /// Keys used by the checkbox logic to visualize different layers and by
   /// the default map #objectVisualDefaults.
@@ -378,6 +422,9 @@ class MaliputViewerPlugin : public ignition::gui::Plugin {
 
   /// \brief Manager of traffic lights visualization.
   std::unique_ptr<TrafficLightManager> trafficLightManager;
+
+  /// \brief Holds the RoadPositionResult upon a left click in the scene.
+  RoadPositionResultValue roadPositionResultValue;
 };
 
 }  // namespace gui

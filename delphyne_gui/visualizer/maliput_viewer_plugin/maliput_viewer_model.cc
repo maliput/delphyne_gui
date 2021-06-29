@@ -601,6 +601,16 @@ const maliput::api::Lane* MaliputViewerModel::GetLaneFromWorldPosition(const ign
 }
 
 ///////////////////////////////////////////////////////
+const maliput::api::RoadPositionResult MaliputViewerModel::GetRoadPositionResult(
+    const ignition::math::Vector3d& _position) {
+  const maliput::api::RoadGeometry* rg =
+      this->roadGeometry ? this->roadGeometry.get() : this->roadNetwork->road_geometry();
+  DELPHYNE_DEMAND(rg != nullptr);
+  const maliput::api::InertialPosition inertial_pos(_position.X(), _position.Y(), _position.Z());
+  return rg->ToRoadPosition(inertial_pos);
+}
+
+///////////////////////////////////////////////////////
 const maliput::api::Lane* MaliputViewerModel::GetLaneFromId(const std::string& _id) {
   const maliput::api::RoadGeometry* rg =
       this->roadGeometry ? this->roadGeometry.get() : this->roadNetwork->road_geometry();

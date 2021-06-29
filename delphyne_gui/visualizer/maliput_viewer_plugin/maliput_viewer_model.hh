@@ -229,6 +229,7 @@ class MaliputViewerModel {
 
   /// \brief Get the maliput::api::RoadPositionResult associated with a point in
   ///        world space if exists.
+  /// \pre The RoadGeometry (in case of multilane) or the RoadNetwork must be initialized.
   /// \param[in] _position World position of point that intersected with a plane
   /// \return maliput::api::RoadPositionResult associated with that position.
   const maliput::api::RoadPositionResult GetRoadPositionResult(const ignition::math::Vector3d& _position);

@@ -583,6 +583,10 @@ bool MaliputViewerPlugin::eventFilter(QObject* _obj, QEvent* _event) {
         RenderRoadMeshes(model->Meshes());
         renderMeshesOption.executeMeshRendering = false;
       }
+      if (renderMeshesOption.executeLabelRendering) {
+        RenderLabels(model->Labels());
+        renderMeshesOption.executeLabelRendering = false;
+      }
     }
   }
   // Standard event processing

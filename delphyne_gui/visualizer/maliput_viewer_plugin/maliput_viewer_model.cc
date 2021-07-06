@@ -17,6 +17,7 @@
 #include <maliput_multilane/loader.h>
 
 #include "maliput_mesh_converter.hh"
+#include "visualizer/global_attributes.hh"
 
 using namespace delphyne;
 using namespace gui;
@@ -433,6 +434,18 @@ void MaliputViewerModel::LoadRoadGeometry(const std::string& _maliputFilePath, c
     throw std::runtime_error(_maliputFilePath + " doesn't exist or can't be opened.");
   }
   std::string line;
+
+  // TODO(#427): Loads parameters from the visualizer.
+  // @{
+  bool omit_nondrivable_lanes{true};
+  double linear_tolerance{5e-2};
+  if (GlobalAttributes::HasArgument("omit_nondrivable_lanes")) {
+    omit_nondrivable_lanes = GlobalAttributes::GetArgument("omit_nondrivable_lanes") == "true" ? true : false;
+  }
+  if (GlobalAttributes::HasArgument("linear_tolerance")) {
+    linear_tolerance = std::stod(GlobalAttributes::GetArgument("linear_tolerance"));
+  }
+  // @}
   while (!fileStream.eof()) {
     std::getline(fileStream, line);
     if (line.find("<OpenDRIVE>") != std::string::npos) {
@@ -443,7 +456,7 @@ void MaliputViewerModel::LoadRoadGeometry(const std::string& _maliputFilePath, c
       } else {
         this->roadNetwork = delphyne::roads::CreateMalidriveRoadNetworkFromXodr(
             _maliputFilePath.substr(_maliputFilePath.find_last_of("/") + 1), _maliputFilePath, _roadRulebookFilePath,
-            _trafficLightBookFilePath, _phaseRingFilePath);
+            _trafficLightBookFilePath, _phaseRingFilePath, omit_nondrivable_lanes, linear_tolerance);
       }
       return;
     } else if (line.find("maliput_multilane_builder:") != std::string::npos) {

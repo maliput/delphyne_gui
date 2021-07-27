@@ -35,10 +35,16 @@ GridLayout {
     width: parent.width
     Layout.preferredHeight: 100
     Layout.fillWidth: true
+    anchors.topMargin: header.implicitHeight
+    Text {
+        id: header
+        text: "Phase Ring"
+        font.family: "Helvetica"
+        font.pixelSize: 12
+    }
     TableViewColumn {
         // 'display' role is the default role when using QStandardItem::setText method.
         role: "display"
-        title: "Phase Ring"
     }
     itemDelegate: Item {
       Text {

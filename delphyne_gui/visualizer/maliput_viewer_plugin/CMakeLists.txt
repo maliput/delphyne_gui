@@ -18,7 +18,6 @@ set_target_properties(maliput_viewer_model
 
 ament_target_dependencies(maliput_viewer_model
   "maliput"
-  "maliput_multilane"
 )
 
 target_link_libraries(maliput_viewer_model

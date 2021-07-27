@@ -14,7 +14,6 @@
 #include <maliput/api/rules/traffic_light_book.h>
 #include <maliput/utilities/generate_obj.h>
 #include <maliput/utilities/mesh.h>
-#include <maliput_multilane/loader.h>
 
 #include "maliput_mesh_converter.hh"
 
@@ -447,7 +446,7 @@ void MaliputViewerModel::LoadRoadGeometry(const std::string& _maliputFilePath, c
       }
       return;
     } else if (line.find("maliput_multilane_builder:") != std::string::npos) {
-      this->roadGeometry = maliput::multilane::LoadFile(maliput::multilane::BuilderFactory(), _maliputFilePath);
+      this->roadGeometry = delphyne::roads::CreateMultilaneFromFile(_maliputFilePath);
       return;
     }
   }

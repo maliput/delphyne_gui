@@ -21,32 +21,6 @@ include (${project_cmake_dir}/Utils.cmake)
 
 set(BUILD_SHARED_LIBS true)
 
-##########
-# Package Creation:
-
-include (${project_cmake_dir}/cpack.cmake)
-set (CPACK_PACKAGE_VERSION "${PROJECT_VERSION_FULL}")
-set (CPACK_PACKAGE_VERSION_MAJOR "${PROJECT_MAJOR_VERSION}")
-set (CPACK_PACKAGE_VERSION_MINOR "${PROJECT_MINOR_VERSION}")
-set (CPACK_PACKAGE_VERSION_PATCH "${PROJECT_PATCH_VERSION}")
-
-if (CPACK_GENERATOR)
-  message(STATUS "Found CPack generators: ${CPACK_GENERATOR}")
-
-  configure_file("${project_cmake_dir}/cpack_options.cmake.in"
-    ${PROJECT_CPACK_CFG_FILE} @ONLY)
-
-  set(CPACK_PROJECT_CONFIG_FILE ${PROJECT_CPACK_CFG_FILE})
-  include (CPack)
-endif()
-
-# If we're configuring only to package source, stop here
-if (PACKAGE_SOURCE_ONLY)
-  message(WARNING "Configuration was done in PACKAGE_SOURCE_ONLY mode."
-  "You can build a tarball (make package_source), but nothing else.")
-  return()
-endif()
-
 enable_testing()
 
 # Use GNUInstallDirst to get canonical paths

@@ -5,13 +5,11 @@
 #include <mutex>
 #include <sstream>
 
+#include <delphyne/protobuf/agent_state_v.pb.h>
 #include <ignition/common/Console.hh>
 #include <ignition/common/PluginMacros.hh>
-#include <ignition/rendering/Text.hh>
-
 #include <ignition/gui/NumberWidget.hh>
-
-#include "delphyne/protobuf/agent_state_v.pb.h"
+#include <ignition/rendering/Text.hh>
 
 #include "agent_info_display0.hh"
 

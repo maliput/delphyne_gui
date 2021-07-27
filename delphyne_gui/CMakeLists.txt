@@ -84,34 +84,6 @@ set (build_warnings "" CACHE INTERNAL "build warnings" FORCE)
 include (${project_cmake_dir}/DissectVersion.cmake)
 
 #####################################
-MESSAGE(STATUS "Checking build type")
-# Set the default build type
-if (NOT CMAKE_BUILD_TYPE)
-    set (CMAKE_BUILD_TYPE "RelWithDebInfo" CACHE STRING
-        "Choose the type of build, options are: Debug Release RelWithDebInfo Profile Check" FORCE)
-endif (NOT CMAKE_BUILD_TYPE)
-# TODO: still convert to uppercase to keep backwards compatibility with
-# uppercase old supported and deprecated modes
-string(TOUPPER ${CMAKE_BUILD_TYPE} CMAKE_BUILD_TYPE_UPPERCASE)
-
-set (BUILD_TYPE_PROFILE FALSE)
-set (BUILD_TYPE_RELEASE FALSE)
-set (BUILD_TYPE_RELWITHDEBINFO FALSE)
-set (BUILD_TYPE_DEBUG FALSE)
-
-if ("${CMAKE_BUILD_TYPE_UPPERCASE}" STREQUAL "PROFILE")
-  set (BUILD_TYPE_PROFILE TRUE)
-elseif ("${CMAKE_BUILD_TYPE_UPPERCASE}" STREQUAL "RELEASE")
-  set (BUILD_TYPE_RELEASE TRUE)
-elseif ("${CMAKE_BUILD_TYPE_UPPERCASE}" STREQUAL "RELWITHDEBINFO")
-  set (BUILD_TYPE_RELWITHDEBINFO TRUE)
-elseif ("${CMAKE_BUILD_TYPE_UPPERCASE}" STREQUAL "DEBUG")
-  set (BUILD_TYPE_DEBUG TRUE)
-else()
-  build_error("CMAKE_BUILD_TYPE ${CMAKE_BUILD_TYPE} unknown. Valid options are: Debug Release RelWithDebInfo Profile Check")
-endif()
-
-#####################################
 # Handle CFlags
 unset (CMAKE_CXX_FLAGS CACHE)
 

@@ -78,8 +78,6 @@ set (BIN_INSTALL_DIR ${CMAKE_INSTALL_BINDIR})
 
 set (BUILD_DELPHYNE ON CACHE INTERNAL
   "Build Delphyne GUI" FORCE)
-set (build_errors "" CACHE INTERNAL "build errors" FORCE)
-set (build_warnings "" CACHE INTERNAL "build warnings" FORCE)
 
 include (${project_cmake_dir}/DissectVersion.cmake)
 
@@ -121,68 +119,46 @@ if(APPLE)
   delphyne_setup_apple()
 endif()
 
-#################################################
-# Print warnings and errors
-if ( build_warnings )
-  message(STATUS "BUILD WARNINGS")
-  foreach (msg ${build_warnings})
-    message(STATUS ${msg})
-  endforeach ()
-  message(STATUS "END BUILD WARNINGS\n")
-endif (build_warnings)
+########################################
+# Write the config.hh file
+configure_file (${project_cmake_dir}/config.hh.in
+  ${PROJECT_BINARY_DIR}/include/${PROJECT_NAME}/config.hh)
 
+include_directories(
+  ${PROJECT_BINARY_DIR}/include
+  ${PROJECT_BINARY_DIR}/visualizer
+)
+link_directories(${PROJECT_BINARY_DIR}/src)
 
-if (build_errors)
-  message(STATUS "BUILD ERRORS: These must be resolved before compiling.")
-  foreach (msg ${build_errors})
-    message(STATUS ${msg})
-  endforeach ()
-  message(STATUS "END BUILD ERRORS\n")
-  message (FATAL_ERROR "Errors encountered in build. "
-      "Please see the BUILD ERRORS above.")
-else (build_errors)
+if (DEFINED CMAKE_CXX_FLAGS)
+  message (STATUS "Custom CFlags:${CMAKE_CXX_FLAGS}")
+else()
+  message (STATUS "Use default CFlags")
+endif()
+message (STATUS "Build Type: ${CMAKE_BUILD_TYPE}")
+message (STATUS "Install path: ${CMAKE_INSTALL_PREFIX}")
 
-  ########################################
-  # Write the config.hh file
-  configure_file (${project_cmake_dir}/config.hh.in
-    ${PROJECT_BINARY_DIR}/include/${PROJECT_NAME}/config.hh)
+set(TEST_TYPE "UNIT")
+add_subdirectory(visualizer)
+if (BUILD_TESTING)
+  find_package(ament_cmake_clang_format REQUIRED)
+  find_package(ament_cmake_flake8 REQUIRED)
+  add_subdirectory(test)
+  ament_flake8("--config" ${CMAKE_CURRENT_SOURCE_DIR}/.flake8)
+  ament_clang_format(CONFIG_FILE ${CMAKE_CURRENT_SOURCE_DIR}/../.clang-format)
+endif()
 
-  include_directories(
-    ${PROJECT_BINARY_DIR}/include
-    ${PROJECT_BINARY_DIR}/visualizer
-  )
-  link_directories(${PROJECT_BINARY_DIR}/src)
+########################################
+# If present, load platform-specific build hooks.  This system is used,
+# for example, by the Ubuntu overlay, to arrange for installation of
+# Ubuntu-specific application-launching configuration.
+if (EXISTS ${PROJECT_SOURCE_DIR}/cmake/packager-hooks/CMakeLists.txt)
+  message(STATUS "Loading packager build hooks from cmake/packager-hooks")
+  add_subdirectory(cmake/packager-hooks)
+endif()
 
-  if (DEFINED CMAKE_CXX_FLAGS)
-    message (STATUS "Custom CFlags:${CMAKE_CXX_FLAGS}")
-  else()
-    message (STATUS "Use default CFlags")
-  endif()
-  message (STATUS "Build Type: ${CMAKE_BUILD_TYPE}")
-  message (STATUS "Install path: ${CMAKE_INSTALL_PREFIX}")
-
-  set(TEST_TYPE "UNIT")
-  add_subdirectory(visualizer)
-  if (BUILD_TESTING)
-    find_package(ament_cmake_clang_format REQUIRED)
-    find_package(ament_cmake_flake8 REQUIRED)
-    add_subdirectory(test)
-    ament_flake8("--config" ${CMAKE_CURRENT_SOURCE_DIR}/.flake8)
-    ament_clang_format(CONFIG_FILE ${CMAKE_CURRENT_SOURCE_DIR}/../.clang-format)
-  endif()
-
-  ########################################
-  # If present, load platform-specific build hooks.  This system is used,
-  # for example, by the Ubuntu overlay, to arrange for installation of
-  # Ubuntu-specific application-launching configuration.
-  if (EXISTS ${PROJECT_SOURCE_DIR}/cmake/packager-hooks/CMakeLists.txt)
-    message(STATUS "Loading packager build hooks from cmake/packager-hooks")
-    add_subdirectory(cmake/packager-hooks)
-  endif()
-
-  message(STATUS "Configuration successful. Type make to compile
-  ${PROJECT_NAME_LOWER}")
-endif(build_errors)
+message(STATUS "Configuration successful. Type make to compile
+${PROJECT_NAME_LOWER}")
 
 add_subdirectory(python)
 ament_environment_hooks(setup.sh.in)

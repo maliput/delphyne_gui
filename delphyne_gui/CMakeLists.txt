@@ -106,18 +106,6 @@ filter_valid_compiler_warnings(${WARN_LEVEL} -Wextra -Wno-long-long
   -Wmissing-include-dirs -pedantic -Wno-pragmas)
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}${WARNING_CXX_FLAGS} ${UNFILTERED_FLAGS}")
 
-#################################################
-# OS Specific initialization
-if (UNIX)
-  delphyne_setup_unix()
-else (WIN32)
-  delphyne_setup_windows()
-endif()
-
-if(APPLE)
-  delphyne_setup_apple()
-endif()
-
 ########################################
 # Write the config.hh file
 configure_file (${project_cmake_dir}/config.hh.in

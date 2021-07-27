@@ -122,10 +122,9 @@ if (DEFINED CMAKE_CXX_FLAGS)
 else()
   message (STATUS "Use default CFlags")
 endif()
-message (STATUS "Build Type: ${CMAKE_BUILD_TYPE}")
-message (STATUS "Install path: ${CMAKE_INSTALL_PREFIX}")
 
 add_subdirectory(visualizer)
+
 if (BUILD_TESTING)
   set(TEST_TYPE "UNIT")
   enable_testing()
@@ -135,18 +134,6 @@ if (BUILD_TESTING)
   ament_flake8("--config" ${CMAKE_CURRENT_SOURCE_DIR}/.flake8)
   ament_clang_format(CONFIG_FILE ${CMAKE_CURRENT_SOURCE_DIR}/../.clang-format)
 endif()
-
-########################################
-# If present, load platform-specific build hooks.  This system is used,
-# for example, by the Ubuntu overlay, to arrange for installation of
-# Ubuntu-specific application-launching configuration.
-if (EXISTS ${PROJECT_SOURCE_DIR}/cmake/packager-hooks/CMakeLists.txt)
-  message(STATUS "Loading packager build hooks from cmake/packager-hooks")
-  add_subdirectory(cmake/packager-hooks)
-endif()
-
-message(STATUS "Configuration successful. Type make to compile
-${PROJECT_NAME_LOWER}")
 
 add_subdirectory(python)
 ament_environment_hooks(setup.sh.in)

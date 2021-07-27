@@ -20,10 +20,6 @@ set_target_properties(PlaybackPlugin
     OUTPUT_NAME PlaybackPlugin
 )
 
-ament_target_dependencies(PlaybackPlugin
-  "maliput"
-)
-
 target_link_libraries(PlaybackPlugin
   PUBLIC
     ignition-common3::ignition-common3

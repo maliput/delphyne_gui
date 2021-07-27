@@ -38,7 +38,6 @@ message(STATUS "\n\n========= Project Configuration ========\n")
 
 set(BUILD_SHARED_LIBS true)
 
-enable_testing()
 
 ##############################################################################
 # Find 3rd Party Packages
@@ -138,9 +137,10 @@ endif()
 message (STATUS "Build Type: ${CMAKE_BUILD_TYPE}")
 message (STATUS "Install path: ${CMAKE_INSTALL_PREFIX}")
 
-set(TEST_TYPE "UNIT")
 add_subdirectory(visualizer)
 if (BUILD_TESTING)
+  set(TEST_TYPE "UNIT")
+  enable_testing()
   find_package(ament_cmake_clang_format REQUIRED)
   find_package(ament_cmake_flake8 REQUIRED)
   add_subdirectory(test)

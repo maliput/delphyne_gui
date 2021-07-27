@@ -119,5 +119,4 @@ endif()
 # Find Delphyne
 find_package(delphyne REQUIRED)
 find_package(maliput REQUIRED)
-find_package(maliput_malidrive REQUIRED)
 find_package(maliput_multilane REQUIRED)

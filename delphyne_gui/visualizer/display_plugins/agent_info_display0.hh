@@ -6,11 +6,10 @@
 #include <memory>
 #include <string>
 
+#include <delphyne/protobuf/agent_state_v.pb.h>
 #include <ignition/gui/DisplayPlugin.hh>
 #include <ignition/gui/qt.h>
 #include <ignition/transport.hh>
-
-#include "delphyne/protobuf/agent_state_v.pb.h"
 
 namespace delphyne {
 namespace gui {

@@ -4,12 +4,11 @@
 #include <memory>
 #include <string>
 
+#include <delphyne/protobuf/agent_state_v.pb.h>
 #include <ignition/gui/Plugin.hh>
 #include <ignition/gui/qt.h>
 #include <ignition/rendering/RenderTypes.hh>
 #include <ignition/transport.hh>
-
-#include "delphyne/protobuf/agent_state_v.pb.h"
 
 namespace delphyne {
 namespace gui {

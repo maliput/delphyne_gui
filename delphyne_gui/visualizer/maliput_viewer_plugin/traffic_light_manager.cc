@@ -1,7 +1,6 @@
 #include "traffic_light_manager.hh"
 
-#include "delphyne/macros.h"
-
+#include <delphyne/macros.h>
 #include <ignition/common/Console.hh>
 #include <ignition/common/MeshManager.hh>
 #include <ignition/common/SystemPaths.hh>

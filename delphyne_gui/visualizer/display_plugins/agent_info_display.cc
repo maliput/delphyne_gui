@@ -6,6 +6,7 @@
 #include <mutex>
 #include <sstream>
 
+#include <delphyne/protobuf/agent_state_v.pb.h>
 #include <ignition/common/Console.hh>
 #include <ignition/gui/Application.hh>
 #include <ignition/gui/GuiEvents.hh>
@@ -16,8 +17,6 @@
 #include <ignition/rendering/Scene.hh>
 #include <ignition/rendering/Text.hh>
 #include <ignition/rendering/Visual.hh>
-
-#include "delphyne/protobuf/agent_state_v.pb.h"
 
 namespace delphyne {
 namespace gui {

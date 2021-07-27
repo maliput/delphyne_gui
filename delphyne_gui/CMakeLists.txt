@@ -1,5 +1,8 @@
-cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
+##############################################################################
+# Project
+##############################################################################
 
+cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
 project (delphyne_gui)
 
 string (TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
@@ -14,17 +17,58 @@ set (PROJECT_VERSION_FULL ${PROJECT_MAJOR_VERSION}.${PROJECT_MINOR_VERSION}.${PR
 
 message (STATUS "${PROJECT_NAME} version ${PROJECT_VERSION_FULL}")
 
+##############################################################################
+# CMake Support
+##############################################################################
+
+# Useful string/list macros
+include (${PROJECT_SOURCE_DIR}/cmake/Utils.cmake)
+
+# Use GNUInstallDirst to get canonical paths
+include(GNUInstallDirs)
+
 set (project_cmake_dir ${PROJECT_SOURCE_DIR}/cmake
   CACHE PATH "Location of CMake scripts")
 
-include (${project_cmake_dir}/Utils.cmake)
+##############################################################################
+# Project Configuration
+##############################################################################
+
+message(STATUS "\n\n========= Project Configuration ========\n")
 
 set(BUILD_SHARED_LIBS true)
 
 enable_testing()
 
-# Use GNUInstallDirst to get canonical paths
-include(GNUInstallDirs)
+##############################################################################
+# Find 3rd Party Packages
+##############################################################################
+
+message(STATUS "\n\n====== Finding 3rd Party Packages ======\n")
+
+find_package(ament_cmake REQUIRED)
+
+# ignition
+find_package(ignition-common3 REQUIRED)
+find_package(ignition-math6 REQUIRED)
+find_package(ignition-msgs5 REQUIRED)
+find_package(ignition-gui0 0.1 REQUIRED)
+find_package(ignition-gui3 REQUIRED)
+find_package(ignition-rendering3 REQUIRED)
+find_package(ignition-transport8 REQUIRED)
+
+# Qt
+find_package(Qt5Widgets REQUIRED)
+find_package(Qt5Core REQUIRED)
+find_package(Qt5OpenGL REQUIRED)
+find_package(Qt5Quick REQUIRED)
+find_package(Qt5QuickControls2 REQUIRED)
+find_package(Qt5Test REQUIRED)
+
+# delphyne, drake and maliput
+find_package(drake_vendor REQUIRED)
+find_package(delphyne REQUIRED)
+find_package(maliput REQUIRED)
 
 # with -fPIC
 if(UNIX AND NOT WIN32)
@@ -85,11 +129,6 @@ set (build_errors "" CACHE INTERNAL "build errors" FORCE)
 set (build_warnings "" CACHE INTERNAL "build warnings" FORCE)
 
 include (${project_cmake_dir}/DissectVersion.cmake)
-
-message (STATUS "\n\n====== Finding 3rd Party Packages ======")
-include (${project_cmake_dir}/SearchForStuff.cmake)
-find_package(ament_cmake REQUIRED)
-message (STATUS "----------------------------------------\n")
 
 #####################################
 MESSAGE(STATUS "Checking build type")

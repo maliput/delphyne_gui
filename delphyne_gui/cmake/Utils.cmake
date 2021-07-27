@@ -121,7 +121,7 @@ macro (delphyne_build_tests)
 endmacro()
 
 if (ENABLE_TESTS_COMPILATION)
-  include (${project_cmake_dir}/TestUtils.cmake)
+  include (${PROJECT_SOURCE_DIR}/cmake/TestUtils.cmake)
 endif()
 
 #################################################

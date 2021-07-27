@@ -20,6 +20,8 @@
   <build_depend>ignition-gui0</build_depend>
   <build_depend>ignition-gui3</build_depend>
   <build_depend>delphyne</build_depend>
+
+  <depend>drake_vendor</depend>
   <depend>maliput</depend>
   <depend>maliput_multilane</depend>
 

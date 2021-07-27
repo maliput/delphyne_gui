@@ -41,9 +41,15 @@ GridLayout {
     Layout.preferredHeight: 100
     Layout.fillWidth: true
     selectionMode: 1 /* Single Selection */
+    anchors.topMargin: header.implicitHeight
+    Text {
+        id: header
+        text: "Lanes ID"
+        font.family: "Helvetica"
+        font.pixelSize: 12
+    }
     TableViewColumn {
         role: "lane_id"
-        title: "Lanes ID"
     }
     model: ListModel {
       id: tableModel

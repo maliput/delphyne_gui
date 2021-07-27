@@ -69,6 +69,17 @@ Rectangle {
       // This list will be updated dynamically when
       // new data is presented.
     }
+
+    itemDelegate: Item {
+      Text {
+          anchors.verticalCenter: parent.verticalCenter
+          color: styleData.textColor
+          elide: styleData.elideMode
+          font.family: "Helvetica"
+          font.pixelSize: 12
+          text: styleData.value
+      }
+    }
   }
 
   // When new data arrives the table is updated.

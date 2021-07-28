@@ -16,10 +16,6 @@ set_target_properties(maliput_viewer_model
     OUTPUT_NAME delphyne_gui_maliput_viewer_model
 )
 
-ament_target_dependencies(maliput_viewer_model
-  "maliput"
-)
-
 target_link_libraries(maliput_viewer_model
   ${drake_LIBRARIES}
   delphyne::public_headers
@@ -75,10 +71,6 @@ set_target_properties(selector
     OUTPUT_NAME delphyne_gui_selector
 )
 
-ament_target_dependencies(selector
-  "maliput"
-)
-
 target_link_libraries(selector
   delphyne::public_headers
   ignition-common3::ignition-common3
@@ -104,10 +96,6 @@ add_library(delphyne_gui::traffic_light_manager ALIAS traffic_light_manager)
 set_target_properties(traffic_light_manager
   PROPERTIES
     OUTPUT_NAME delphyne_gui_traffic_light_manager
-)
-
-ament_target_dependencies(traffic_light_manager
-  "maliput"
 )
 
 target_link_libraries(traffic_light_manager

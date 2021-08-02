@@ -1,4 +1,3 @@
-include (${project_cmake_dir}/Utils.cmake)
 include (${project_cmake_dir}/TestUtils.cmake)
 
 set (gtest_sources

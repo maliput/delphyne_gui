@@ -21,9 +21,6 @@ message (STATUS "${PROJECT_NAME} version ${PROJECT_VERSION_FULL}")
 # CMake Support
 ##############################################################################
 
-# Useful string/list macros
-include (${PROJECT_SOURCE_DIR}/cmake/Utils.cmake)
-
 # Use GNUInstallDirst to get canonical paths
 include(GNUInstallDirs)
 

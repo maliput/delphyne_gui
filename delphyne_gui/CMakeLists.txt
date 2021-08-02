@@ -74,10 +74,6 @@ find_package(maliput REQUIRED)
 
 set (CMAKE_INCLUDE_DIRECTORIES_PROJECT_BEFORE ON)
 
-set (INCLUDE_INSTALL_DIR "${CMAKE_INSTALL_INCLUDEDIR}")
-set (LIB_INSTALL_DIR ${CMAKE_INSTALL_LIBDIR})
-set (BIN_INSTALL_DIR ${CMAKE_INSTALL_BINDIR})
-
 set (BUILD_DELPHYNE ON CACHE INTERNAL
   "Build Delphyne GUI" FORCE)
 
@@ -111,7 +107,7 @@ ament_environment_hooks(setup.sh.in)
 #################################################
 # Installs maliput_viewer0.sh and maliput_viewer2.sh as a shortcut to run both
 # visualizers.
-install (PROGRAMS tools/maliput_viewer0.sh DESTINATION ${BIN_INSTALL_DIR})
-install (PROGRAMS tools/maliput_viewer2.sh DESTINATION ${BIN_INSTALL_DIR})
+install (PROGRAMS tools/maliput_viewer0.sh DESTINATION bin)
+install (PROGRAMS tools/maliput_viewer2.sh DESTINATION bin)
 
 ament_package()

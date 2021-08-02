@@ -193,7 +193,7 @@ target_link_libraries(visualizer0
 install(
   TARGETS visualizer0
   EXPORT ${PROJECT_NAME}-targets
-  DESTINATION ${BIN_INSTALL_DIR}
+  DESTINATION bin
 )
 
 # Visualizer with ign-gui3
@@ -213,7 +213,7 @@ target_link_libraries(visualizer
 install(
   TARGETS visualizer
   EXPORT ${PROJECT_NAME}-targets
-  DESTINATION ${BIN_INSTALL_DIR}
+  DESTINATION bin
 )
 
 # Install .config files.

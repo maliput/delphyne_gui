@@ -89,6 +89,9 @@ configure_file (${project_cmake_dir}/config.hh.in
   ${PROJECT_BINARY_DIR}/include/${PROJECT_NAME}/config.hh)
 
 include_directories(
+  # This include path is required to find the config.hh file. It won't be
+  # installed but it is required in the build space.
+  ${PROJECT_BINARY_DIR}/include
   ${PROJECT_BINARY_DIR}/visualizer
 )
 link_directories(${PROJECT_BINARY_DIR}/src)

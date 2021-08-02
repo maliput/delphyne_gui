@@ -1,5 +1,3 @@
-include (${project_cmake_dir}/Utils.cmake)
-
 include_directories(
   ${Qt5Core_INCLUDE_DIRS}
   ${CMAKE_SOURCE_DIR}

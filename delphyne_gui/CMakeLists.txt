@@ -83,14 +83,12 @@ set (BUILD_DELPHYNE ON CACHE INTERNAL
 
 include (${project_cmake_dir}/DissectVersion.cmake)
 
-
 ########################################
 # Write the config.hh file
 configure_file (${project_cmake_dir}/config.hh.in
   ${PROJECT_BINARY_DIR}/include/${PROJECT_NAME}/config.hh)
 
 include_directories(
-  ${PROJECT_BINARY_DIR}/include
   ${PROJECT_BINARY_DIR}/visualizer
 )
 link_directories(${PROJECT_BINARY_DIR}/src)

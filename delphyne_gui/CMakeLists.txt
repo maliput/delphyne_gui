@@ -97,6 +97,7 @@ include_directories(
 link_directories(${PROJECT_BINARY_DIR}/src)
 
 add_subdirectory(visualizer)
+add_subdirectory(python)
 
 if (BUILD_TESTING)
   set(TEST_TYPE "UNIT")
@@ -108,7 +109,6 @@ if (BUILD_TESTING)
   ament_clang_format(CONFIG_FILE ${CMAKE_CURRENT_SOURCE_DIR}/../.clang-format)
 endif()
 
-add_subdirectory(python)
 ament_environment_hooks(setup.sh.in)
 
 #################################################

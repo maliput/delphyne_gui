@@ -38,6 +38,9 @@ message(STATUS "\n\n========= Project Configuration ========\n")
 
 set(BUILD_SHARED_LIBS true)
 
+include(${project_cmake_dir}/DefaultCFlags.cmake)
+# Check whether sanitizers should be enabled or not.
+include(${project_cmake_dir}/SanitizersConfig.cmake)
 
 ##############################################################################
 # Find 3rd Party Packages
@@ -80,31 +83,6 @@ set (BUILD_DELPHYNE ON CACHE INTERNAL
 
 include (${project_cmake_dir}/DissectVersion.cmake)
 
-#####################################
-# Handle CFlags
-unset (CMAKE_CXX_FLAGS CACHE)
-
-include(${project_cmake_dir}/DefaultCFlags.cmake)
-
-# Check whether sanitizers should be enabled or not.
-include(${project_cmake_dir}/SanitizersConfig.cmake)
-
-# Check if warning options are avaliable for the compiler and return WARNING_CXX_FLAGS variable
-list(APPEND WARN_LEVEL -Waddress -Warray-bounds -Wcomment -Wformat -Wnonnull)
-list(APPEND WARN_LEVEL -Wparentheses -Wreorder -Wreturn-type)
-list(APPEND WARN_LEVEL -Wsequence-point -Wsign-compare -Wstrict-aliasing)
-list(APPEND WARN_LEVEL -Wstrict-overflow=1 -Wswitch -Wtrigraphs -Wuninitialized)
-list(APPEND WARN_LEVEL -Wunused-function -Wunused-label -Wunused-value)
-list(APPEND WARN_LEVEL -Wunused-variable -Wvolatile-register-var)
-
-  # Unable to be filtered flags (failing due to limitations in filter_valid_compiler_warnings)
-  set(UNFILTERED_FLAGS "-Wc++11-compat")
-
-filter_valid_compiler_warnings(${WARN_LEVEL} -Wextra -Wno-long-long
-  -Wno-unused-value -Wno-unused-value -Wno-unused-value -Wno-unused-value
-  -Wshadow -Winit-self -Wswitch-default
-  -Wmissing-include-dirs -pedantic -Wno-pragmas)
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}${WARNING_CXX_FLAGS} ${UNFILTERED_FLAGS}")
 
 ########################################
 # Write the config.hh file
@@ -116,12 +94,6 @@ include_directories(
   ${PROJECT_BINARY_DIR}/visualizer
 )
 link_directories(${PROJECT_BINARY_DIR}/src)
-
-if (DEFINED CMAKE_CXX_FLAGS)
-  message (STATUS "Custom CFlags:${CMAKE_CXX_FLAGS}")
-else()
-  message (STATUS "Use default CFlags")
-endif()
 
 add_subdirectory(visualizer)
 

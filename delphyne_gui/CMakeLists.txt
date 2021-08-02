@@ -72,6 +72,10 @@ find_package(drake_vendor REQUIRED)
 find_package(delphyne REQUIRED)
 find_package(maliput REQUIRED)
 
+# TODO(#443): Probably drake_vendor exposes its own ignition-math6 which
+#             collides with the ignition-exported one.
+find_package(ignition-math6 REQUIRED)
+
 set (CMAKE_INCLUDE_DIRECTORIES_PROJECT_BEFORE ON)
 
 set (BUILD_DELPHYNE ON CACHE INTERNAL

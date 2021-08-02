@@ -23,7 +23,6 @@
 
   <depend>drake_vendor</depend>
   <depend>maliput</depend>
-  <depend>maliput_multilane</depend>
 
   <build_export_depend>ignition-common3</build_export_depend>
   <build_export_depend>ignition-msgs5</build_export_depend>

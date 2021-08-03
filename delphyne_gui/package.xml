@@ -17,7 +17,6 @@
   <build_depend>ignition-msgs5</build_depend>
   <build_depend>ignition-transport8</build_depend>
   <build_depend>ignition-rendering3</build_depend>
-  <build_depend>ignition-gui0</build_depend>
   <build_depend>ignition-gui3</build_depend>
   <build_depend>delphyne</build_depend>
 
@@ -28,7 +27,6 @@
   <build_export_depend>ignition-msgs5</build_export_depend>
   <build_export_depend>ignition-transport8</build_export_depend>
   <build_export_depend>ignition-rendering3</build_export_depend>
-  <build_export_depend>ignition-gui0</build_export_depend>
   <build_export_depend>ignition-gui3</build_export_depend>
   <build_export_depend>delphyne</build_export_depend>
 

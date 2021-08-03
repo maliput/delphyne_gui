@@ -1,8 +1,5 @@
-include (${project_cmake_dir}/Utils.cmake)
-
 include_directories(
   ${Qt5Core_INCLUDE_DIRS}
-  ${CMAKE_BINARY_DIR}/include
   ${CMAKE_SOURCE_DIR}
 )
 
@@ -194,7 +191,7 @@ target_link_libraries(visualizer0
 install(
   TARGETS visualizer0
   EXPORT ${PROJECT_NAME}-targets
-  DESTINATION ${BIN_INSTALL_DIR}
+  DESTINATION bin
 )
 
 # Visualizer with ign-gui3
@@ -214,7 +211,7 @@ target_link_libraries(visualizer
 install(
   TARGETS visualizer
   EXPORT ${PROJECT_NAME}-targets
-  DESTINATION ${BIN_INSTALL_DIR}
+  DESTINATION bin
 )
 
 # Install .config files.

@@ -1,6 +1,5 @@
 include_directories(
   ${Qt5Core_INCLUDE_DIRS}
-  ${CMAKE_BINARY_DIR}/include
   ${CMAKE_SOURCE_DIR}
 )
 

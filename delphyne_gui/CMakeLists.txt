@@ -51,7 +51,6 @@ find_package(ament_cmake REQUIRED)
 find_package(ignition-common3 REQUIRED)
 find_package(ignition-math6 REQUIRED)
 find_package(ignition-msgs5 REQUIRED)
-find_package(ignition-gui0 0.1 REQUIRED)
 find_package(ignition-gui3 REQUIRED)
 find_package(ignition-rendering3 REQUIRED)
 find_package(ignition-transport8 REQUIRED)
@@ -110,9 +109,7 @@ add_subdirectory(python)
 ament_environment_hooks(setup.sh.in)
 
 #################################################
-# Installs maliput_viewer0.sh and maliput_viewer2.sh as a shortcut to run both
-# visualizers.
-install (PROGRAMS tools/maliput_viewer0.sh DESTINATION bin)
+# Installs maliput_viewer2.sh as a shortcut to run the visualizer.
 install (PROGRAMS tools/maliput_viewer2.sh DESTINATION bin)
 
 ament_package()

@@ -3,15 +3,15 @@
 #ifndef TRAFFIC_LIGHT_MANAGER_HH
 #define TRAFFIC_LIGHT_MANAGER_HH
 
+#include <unordered_map>
+#include <vector>
+
 #include <ignition/math/Vector3.hh>
 #include <ignition/rendering/Scene.hh>
 #include <maliput/api/lane.h>
 #include <maliput/api/lane_data.h>
 #include <maliput/api/rules/phase.h>
 #include <maliput/api/rules/traffic_lights.h>
-
-#include <unordered_map>
-#include <vector>
 
 namespace delphyne {
 namespace gui {

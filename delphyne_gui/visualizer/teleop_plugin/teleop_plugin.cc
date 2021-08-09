@@ -6,10 +6,9 @@
 #include <cstdint>
 #include <iostream>
 
+#include <delphyne/protobuf/automotive_driving_command.pb.h>
 #include <ignition/common/Console.hh>
 #include <ignition/plugin/Register.hh>
-
-#include <delphyne/protobuf/automotive_driving_command.pb.h>
 
 namespace delphyne {
 namespace gui {

@@ -1,13 +1,13 @@
 // Copyright 2017 Toyota Research Institute
 
+#include "global_attributes.hh"
+
 #include <regex>
 #include <stdexcept>
 #include <utility>
 #include <vector>
 
 #include <ignition/common/Console.hh>
-
-#include "global_attributes.hh"
 
 namespace delphyne {
 namespace gui {

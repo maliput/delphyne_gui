@@ -4,7 +4,6 @@
 #include <string>
 
 #include <delphyne/utility/package.h>
-
 #include <ignition/common/Console.hh>
 #include <ignition/common/Filesystem.hh>
 
@@ -15,7 +14,6 @@
 #endif
 
 #include "delphyne_gui/config.hh"
-
 #include "global_attributes.hh"
 
 namespace delphyne_gui {

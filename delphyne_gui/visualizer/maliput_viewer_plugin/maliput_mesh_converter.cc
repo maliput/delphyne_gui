@@ -4,6 +4,8 @@
 // https://github.com/RobotLocomotion/drake/blob/master/automotive/maliput/utility/generate_obj.cc
 // and this commit: 82bf3c8a02678f553c746bdbbe0f8e5a345841b7
 
+#include "maliput_mesh_converter.hh"
+
 #include <algorithm>
 #include <cmath>
 #include <cstddef>
@@ -15,7 +17,8 @@
 #include <vector>
 
 #include <delphyne/macros.h>
-
+#include <ignition/common/SubMesh.hh>
+#include <ignition/math/Vector3.hh>
 #include <maliput/api/branch_point.h>
 #include <maliput/api/junction.h>
 #include <maliput/api/lane.h>
@@ -23,11 +26,6 @@
 #include <maliput/api/road_geometry.h>
 #include <maliput/api/segment.h>
 #include <maliput/utilities/mesh.h>
-
-#include <ignition/common/SubMesh.hh>
-#include <ignition/math/Vector3.hh>
-
-#include "maliput_mesh_converter.hh"
 
 using namespace maliput::utility::mesh;
 

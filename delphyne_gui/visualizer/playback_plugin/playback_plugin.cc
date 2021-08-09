@@ -1,18 +1,17 @@
 // Copyright 2021 Toyota Research Institute
 
+#include "playback_plugin.hh"
+
 #include <chrono>
 #include <iostream>
 #include <string>
 
 #include <delphyne/macros.h>
 #include <delphyne/protobuf/playback_status.pb.h>
-#include <maliput/common/maliput_throw.h>
-
 #include <ignition/common/PluginMacros.hh>
 #include <ignition/msgs.hh>
 #include <ignition/plugin/Register.hh>
-
-#include "playback_plugin.hh"
+#include <maliput/common/maliput_throw.h>
 
 Q_DECLARE_METATYPE(ignition::msgs::PlaybackStatus)
 

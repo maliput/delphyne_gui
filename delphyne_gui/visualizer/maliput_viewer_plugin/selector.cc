@@ -3,7 +3,6 @@
 #include "selector.hh"
 
 #include <delphyne/macros.h>
-
 #include <ignition/common/Console.hh>
 #include <ignition/math/Helpers.hh>
 #include <ignition/math/Matrix4.hh>
@@ -11,7 +10,6 @@
 #include <ignition/rendering/Material.hh>
 #include <ignition/rendering/Mesh.hh>
 #include <ignition/rendering/Scene.hh>
-
 #include <maliput/api/lane.h>
 #include <maliput/api/lane_data.h>
 

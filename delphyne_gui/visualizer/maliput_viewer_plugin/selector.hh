@@ -3,12 +3,12 @@
 #ifndef DELPHYNE_GUI_SELECTOR_HH
 #define DELPHYNE_GUI_SELECTOR_HH
 
+#include <vector>
+
 #include <ignition/math/Vector3.hh>
 #include <ignition/rendering/Scene.hh>
 #include <maliput/api/lane.h>
 #include <maliput/api/road_geometry.h>
-
-#include <vector>
 
 namespace delphyne {
 namespace gui {

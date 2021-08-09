@@ -8,14 +8,12 @@
 #include <unordered_map>
 
 #include <QStandardItem>
-
-#include <maliput/api/road_geometry.h>
-
 #include <ignition/common/MouseEvent.hh>
 #include <ignition/gui/Plugin.hh>
 #include <ignition/rendering/RayQuery.hh>
 #include <ignition/rendering/RenderTypes.hh>
 #include <ignition/rendering/Scene.hh>
+#include <maliput/api/road_geometry.h>
 
 #include "arrow_mesh.hh"
 #include "maliput_viewer_model.hh"

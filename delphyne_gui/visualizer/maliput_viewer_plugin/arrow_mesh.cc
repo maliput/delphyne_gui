@@ -1,6 +1,7 @@
 // Copyright 2018 Toyota Research Institute
 
 #include "arrow_mesh.hh"
+
 #include <ignition/common/MeshManager.hh>
 #include <ignition/math/Helpers.hh>
 #include <ignition/rendering/Material.hh>

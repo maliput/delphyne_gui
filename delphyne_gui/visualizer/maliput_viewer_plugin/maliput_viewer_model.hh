@@ -10,8 +10,8 @@
 #include <string>
 
 #include <delphyne/macros.h>
+#include <ignition/common/Mesh.hh>
 #include <ignition/math/Vector3.hh>
-
 #include <maliput/api/lane.h>
 #include <maliput/api/regions.h>
 #include <maliput/api/road_geometry.h>
@@ -21,8 +21,6 @@
 #include <maliput/api/rules/traffic_lights.h>
 #include <maliput/utilities/generate_obj.h>
 #include <maliput/utilities/mesh.h>
-
-#include <ignition/common/Mesh.hh>
 
 // Code copied from malidrive's repository. You can find it in
 // src/applications/malidrive_query.cc.

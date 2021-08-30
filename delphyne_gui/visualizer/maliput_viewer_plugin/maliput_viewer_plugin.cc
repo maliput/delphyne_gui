@@ -117,9 +117,6 @@ MaliputViewerPlugin::MaliputViewerPlugin() : Plugin() {
   } else if (GlobalAttributes::HasArgument("yaml_file")) {
     model->Load(GlobalAttributes::GetArgument("yaml_file"));
   }
-  if (GlobalAttributes::HasArgument("malidrive_backend")) {
-    model->SetOpenDriveBackend(GlobalAttributes::GetArgument("malidrive_backend"));
-  }
 }
 
 QStringList MaliputViewerPlugin::ListLanes() const { return listLanes; }

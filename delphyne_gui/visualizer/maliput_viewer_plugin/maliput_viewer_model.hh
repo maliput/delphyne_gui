@@ -22,9 +22,6 @@
 #include <maliput/utilities/generate_obj.h>
 #include <maliput/utilities/mesh.h>
 
-// Code copied from malidrive's repository. You can find it in
-// src/applications/malidrive_query.cc.
-//
 // Returns a vector of all possible direction usage values. Item order
 // matches maliput::api::rules::DirectionUsageRule::Type enumeration.
 const std::vector<std::string> DirectionUsageRuleNames();
@@ -56,9 +53,6 @@ std::ostream& operator<<(std::ostream& out, const maliput::api::rules::RightOfWa
 namespace delphyne {
 namespace gui {
 
-/// Code copied from malidrive's repository. You can find it in
-/// src/applications/malidrive_query.cc.
-///
 /// Query and logs results to RoadGeometry or RoadRulebook minimizing the
 /// overhead of getting the right calls / asserting conditions.
 class RoadNetworkQuery {

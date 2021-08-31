@@ -426,6 +426,7 @@ void MaliputViewerModel::LoadRoadGeometry(const std::string& _maliputFilePath, c
       this->roadNetwork = delphyne::roads::CreateMalidriveRoadNetworkFromXodr(
           _maliputFilePath.substr(_maliputFilePath.find_last_of("/") + 1), _maliputFilePath, _roadRulebookFilePath,
           _trafficLightBookFilePath, _phaseRingFilePath);
+      return;
     } else if (line.find("maliput_multilane_builder:") != std::string::npos) {
       this->roadGeometry = delphyne::roads::CreateMultilaneFromFile(_maliputFilePath);
       return;

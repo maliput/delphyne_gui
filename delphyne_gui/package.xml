@@ -13,6 +13,7 @@
   <build_depend>libqwt-qt5-dev</build_depend>
   <build_depend>qtbase5-dev</build_depend>
 
+  <build_depend>ament_cmake_doxygen</build_depend>
   <build_depend>ignition-common3</build_depend>
   <build_depend>ignition-msgs5</build_depend>
   <build_depend>ignition-transport8</build_depend>

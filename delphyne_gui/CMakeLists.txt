@@ -92,6 +92,9 @@ include_directories(
 )
 link_directories(${PROJECT_BINARY_DIR}/src)
 
+##############################################################################
+# Tests
+##############################################################################
 
 if (BUILD_TESTING)
   set(TEST_TYPE "UNIT")
@@ -101,6 +104,22 @@ if (BUILD_TESTING)
   find_package(ament_cmake_gtest REQUIRED)
   ament_flake8("--config" ${CMAKE_CURRENT_SOURCE_DIR}/.flake8)
   ament_clang_format(CONFIG_FILE ${CMAKE_CURRENT_SOURCE_DIR}/../.clang-format)
+endif()
+
+##############################################################################
+# Docs
+##############################################################################
+
+if(NOT DEFINED BUILD_DOCS)
+  set(BUILD_DOCS 1)
+endif()
+
+if(BUILD_DOCS)
+  find_package(ament_cmake_doxygen REQUIRED)
+  ament_doxygen_generate(doxygen_maliput_malidrive
+    CONFIG_OVERLAY doc/Doxyfile.overlay.in
+    DEPENDENCIES delphyne maliput
+  )
 endif()
 
 add_subdirectory(visualizer)

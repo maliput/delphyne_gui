@@ -119,6 +119,7 @@ if(BUILD_DOCS)
   ament_doxygen_generate(doxygen_maliput_malidrive
     CONFIG_OVERLAY doc/Doxyfile.overlay.in
     DEPENDENCIES delphyne maliput
+    TEST_ON_WARNS
   )
 endif()
 

@@ -17,12 +17,12 @@ class GlobalAttributes {
   /// \brief Parses a list of CLI arguments and holds them as pairs key-value.
   /// \details Each element of @p argv must be "--{KEY}={VALUE}". The key will
   /// be KEY, and the value will be VALUE. Note that "--" and "=" are necessary.
-  /// Each element of @p argv should not have: white spaces, '\n', '\r', '\t'
+  /// Each element of @p argv should not have: white spaces, '\\n', '\\r', '\\t'
   /// characters and must be at least 5 characters long including "--" and "=".
   /// \param[in] argc The number of elements in @p argv.
   /// \param[in] argv A vector of string constants that hold the arguments.
   /// \throws std::runtime_error When any item of @p argv contains: white
-  /// spaces, '\n', '\r' or '\t' characters.
+  /// spaces, '\\n', '\\r' or '\\t' characters.
   /// \throws std::runtime_error When any item of @p argv does not start with
   /// "--".
   /// \throws std::runtime_error When any item of @p argv does not have "=" from

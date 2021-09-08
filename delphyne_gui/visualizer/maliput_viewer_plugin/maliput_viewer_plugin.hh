@@ -152,7 +152,7 @@ class MaliputViewerPlugin : public ignition::gui::Plugin {
   ///        the scene is not ready yet.
   void timerEvent(QTimerEvent* _event) override;
 
-  /// \brief Filters QMouseEvents from a Scene3D plugin whose title matches with <main_scene_plugin_title>.
+  /// \brief Filters QMouseEvents from a Scene3D plugin whose title matches with `<main_scene_plugin_title>`.
   ///        Filters ignition::gui::events::Render events to update the meshes and labels of the roads and the animation
   ///        of the arrow mesh.
   /// \details To make this method be called by Qt Event System, install the event filter in target object.

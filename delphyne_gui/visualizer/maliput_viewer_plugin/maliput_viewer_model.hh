@@ -249,6 +249,8 @@ class MaliputViewerModel {
   ContainerType GetAllLaneIds() const;
 
   /// \brief Get all the rules for a given lane.
+  /// \param[in] _phaseRingId Id of the desired phase ring to get the rules from.
+  /// \param[in] _phaseId Id of the desired phase to get the rules from.
   /// \param[in] _laneId Id of the desired lane to get the rules from.
   /// \tparam StringType A string class that must be constructible with a single const char* argument and
   /// must support concatenation via operator+.

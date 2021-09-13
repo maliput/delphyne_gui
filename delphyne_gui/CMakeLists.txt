@@ -130,6 +130,6 @@ ament_environment_hooks(setup.sh.in)
 
 #################################################
 # Installs maliput_viewer2.sh as a shortcut to run the visualizer.
-install (PROGRAMS tools/maliput_viewer2.sh DESTINATION bin)
+install (PROGRAMS tools/maliput_viewer.sh DESTINATION bin)
 
 ament_package()

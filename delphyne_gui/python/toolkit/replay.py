@@ -4,7 +4,19 @@
 #
 
 """
-The replay tool.
+Replays a simulation out of a log file previously obtained.
+The layout used for the window is `layout_for_playback` which
+posses a playback plugin for rewinding, pausing and stepping forward the
+simulation.
+
+-- How to use:
+1 - To use this application a log file is needed.
+    (e.g.: `delphyne_demos` package allows you to get a log file when running its demos)
+    "delphyne_gazoo -l -f <path/to/somewhere/my_awesome_log_file.log>"
+
+2 - Execute the application using the log as argument:
+    "delphyne_replay <path/to/somewhere/my_awesome_log_file.log>"
+
 """
 
 ##############################################################################
@@ -133,11 +145,8 @@ def main():
             if not args.bare:
                 delphyne_gui.utilities.launch_visualizer(
                     launch_manager, bundle_path=bundle_path,
-                    ign_visualizer="visualizer0",
-                    # Injects PlaybackWidget below RenderWidget
-                    # if the former is not present in the layout.
-                    plugin_injection="RenderWidget/delphyne_gui_playback_widget",
-                    plugin_name="PlaybackWidget"
+                    ign_visualizer="visualizer",
+                    layout_filename="layout_for_playback.config",
                 )
                 launch_manager.wait(float("Inf"))
         except RuntimeError as error_msg:

@@ -27,7 +27,7 @@ install(
 
 # Visualizer
 add_executable(visualizer
-  visualizer2.cc
+  visualizer.cc
 )
 
 target_link_libraries(visualizer
@@ -48,9 +48,9 @@ install(
 # Install .config files.
 install(
   FILES
-    layout2_for_playback.config
-    layout2_maliput_viewer.config
-    layout2_with_teleop.config
+    layout_for_playback.config
+    layout_maliput_viewer.config
+    layout_with_teleop.config
   DESTINATION
     ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/delphyne/layouts
 )

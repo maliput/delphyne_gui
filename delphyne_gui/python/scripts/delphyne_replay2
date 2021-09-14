@@ -1,9 +1,0 @@
-#!/usr/bin/env python3
-#
-# Copyright 2021 Toyota Research Institute
-#
-
-import delphyne_gui.toolkit.replay2
-
-if __name__ == "__main__":
-    delphyne_gui.toolkit.replay2.main()

@@ -9,7 +9,7 @@ Rectangle {
   height: panel.implicitHeight + 10
   color: "transparent"
   Layout.minimumWidth: 290
-  Layout.minimumHeight: 110
+  Layout.minimumHeight: 200
 
   Keys.onPressed: {
     if (TeleopPlugin.isDriving) {
@@ -42,20 +42,6 @@ Rectangle {
         // do nothing
         // this avoids the accel/brake values of not going down
         // to zero after release when steering at the same time
-      }
-    }
-  }
-
-  RowLayout {
-    id: hideButton
-    height: teleop.height
-    ToolButton {
-      id: hideToolButton
-      text: panel.state === "hide" ? "\u2039" : "\u203A"
-      Layout.alignment: Qt.AlignBottom
-      font.pixelSize: 20
-      onClicked: {
-        panel.state = panel.state === "hide" ? "show" : "hide"
       }
     }
   }

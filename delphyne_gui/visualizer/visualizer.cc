@@ -24,6 +24,9 @@ namespace {
 constexpr char kVersionStr[] = "Visualizer 0.2.0";
 constexpr char kDefaultLayout[] = "layout_with_teleop.config";
 
+/// Environment variable to look for user custom plugins.
+constexpr char kVisualizerPluginPath[] = "VISUALIZER_PLUGIN_PATH";
+
 /////////////////////////////////////////////////
 /// \brief Get the path of the default configuration file for Delphyne.
 /// \return The default configuration path.
@@ -70,12 +73,19 @@ int Main(int argc, char** argv) {
   // Set the default location for saving user settings.
   app.SetDefaultConfigPath(defaultConfigPath());
 
-  // Look for all plugins in the same place
-  app.SetPluginPathEnv("VISUALIZER_PLUGIN_PATH");
+  // Look for custom plugins.
+  app.SetPluginPathEnv(kVisualizerPluginPath);
 
   // Then look for plugins on compile-time defined path.
-  // Plugins installed by gazebo end up here
+  // Plugins installed by delphyne_gui end up here
   app.AddPluginPath(PLUGIN_INSTALL_PATH);
+  auto pl_list = app.PluginList();
+  for (const auto& p : pl_list) {
+    std::cout << p.first << " : " << std::endl;
+    for (const auto& p_ : p.second) {
+      std::cout << "\t" << p_ << std::endl;
+    }
+  }
 
   // Attempt to load window layout from parsed arguments.
   bool layout_loaded = delphyne::gui::GlobalAttributes::HasArgument("layout") &&

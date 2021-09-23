@@ -79,13 +79,6 @@ int Main(int argc, char** argv) {
   // Then look for plugins on compile-time defined path.
   // Plugins installed by delphyne_gui end up here
   app.AddPluginPath(PLUGIN_INSTALL_PATH);
-  auto pl_list = app.PluginList();
-  for (const auto& p : pl_list) {
-    std::cout << p.first << " : " << std::endl;
-    for (const auto& p_ : p.second) {
-      std::cout << "\t" << p_ << std::endl;
-    }
-  }
 
   // Attempt to load window layout from parsed arguments.
   bool layout_loaded = delphyne::gui::GlobalAttributes::HasArgument("layout") &&

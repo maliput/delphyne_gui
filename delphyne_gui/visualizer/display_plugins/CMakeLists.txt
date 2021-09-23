@@ -22,10 +22,10 @@ set_target_properties(AgentInfoDisplay
 target_link_libraries(AgentInfoDisplay
   PUBLIC
     delphyne::protobuf_messages
-    ignition-common3::ignition-common3
-    ignition-gui3::ignition-gui3
+    ignition-common4::ignition-common4
+    ignition-gui5::ignition-gui5
     ignition-math6::ignition-math6
-    ignition-rendering3::ignition-rendering3
+    ignition-rendering5::ignition-rendering5
     ${Qt5Core_LIBRARIES}
     ${Qt5Widgets_LIBRARIES}
   PRIVATE
@@ -58,10 +58,10 @@ set_target_properties(OriginDisplay
 
 target_link_libraries(OriginDisplay
   PUBLIC
-    ignition-common3::ignition-common3
-    ignition-gui3::ignition-gui3
+    ignition-common4::ignition-common4
+    ignition-gui5::ignition-gui5
     ignition-math6::ignition-math6
-    ignition-rendering3::ignition-rendering3
+    ignition-rendering5::ignition-rendering5
     ${Qt5Core_LIBRARIES}
     ${Qt5Widgets_LIBRARIES}
   PRIVATE

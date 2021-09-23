@@ -48,12 +48,12 @@ message(STATUS "\n\n====== Finding 3rd Party Packages ======\n")
 find_package(ament_cmake REQUIRED)
 
 # ignition
-find_package(ignition-common3 REQUIRED)
+find_package(ignition-common4 REQUIRED)
 find_package(ignition-math6 REQUIRED)
-find_package(ignition-msgs5 REQUIRED)
-find_package(ignition-gui3 REQUIRED)
-find_package(ignition-rendering3 REQUIRED)
-find_package(ignition-transport8 REQUIRED)
+find_package(ignition-msgs7 REQUIRED)
+find_package(ignition-gui5 REQUIRED)
+find_package(ignition-rendering5 REQUIRED)
+find_package(ignition-transport10 REQUIRED)
 
 # Qt
 find_package(Qt5Widgets REQUIRED)

@@ -21,10 +21,10 @@ set_target_properties(PlaybackPlugin
 
 target_link_libraries(PlaybackPlugin
   PUBLIC
-    ignition-common3::ignition-common3
-    ignition-gui3::ignition-gui3
-    ignition-msgs5::ignition-msgs5
-    ignition-transport8::ignition-transport8
+    ignition-common4::ignition-common4
+    ignition-gui5::ignition-gui5
+    ignition-msgs7::ignition-msgs7
+    ignition-transport10::ignition-transport10
     ${Qt5Core_LIBRARIES}
     ${Qt5Qml_LIBRARIES}
     ${Qt5Widgets_LIBRARIES}

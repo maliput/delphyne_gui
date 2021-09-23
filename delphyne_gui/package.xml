@@ -14,21 +14,21 @@
   <build_depend>qtbase5-dev</build_depend>
 
   <build_depend>ament_cmake_doxygen</build_depend>
-  <build_depend>ignition-common3</build_depend>
-  <build_depend>ignition-msgs5</build_depend>
-  <build_depend>ignition-transport8</build_depend>
-  <build_depend>ignition-rendering3</build_depend>
-  <build_depend>ignition-gui3</build_depend>
+  <build_depend>ignition-common4</build_depend>
+  <build_depend>ignition-msgs7</build_depend>
+  <build_depend>ignition-transport10</build_depend>
+  <build_depend>ignition-rendering5</build_depend>
+  <build_depend>ignition-gui5</build_depend>
   <build_depend>delphyne</build_depend>
 
   <depend>drake_vendor</depend>
   <depend>maliput</depend>
 
-  <build_export_depend>ignition-common3</build_export_depend>
-  <build_export_depend>ignition-msgs5</build_export_depend>
-  <build_export_depend>ignition-transport8</build_export_depend>
-  <build_export_depend>ignition-rendering3</build_export_depend>
-  <build_export_depend>ignition-gui3</build_export_depend>
+  <build_export_depend>ignition-common4</build_export_depend>
+  <build_export_depend>ignition-msgs7</build_export_depend>
+  <build_export_depend>ignition-transport10</build_export_depend>
+  <build_export_depend>ignition-rendering5</build_export_depend>
+  <build_export_depend>ignition-gui5</build_export_depend>
   <build_export_depend>delphyne</build_export_depend>
 
   <exec_depend>ament_cmake</exec_depend>

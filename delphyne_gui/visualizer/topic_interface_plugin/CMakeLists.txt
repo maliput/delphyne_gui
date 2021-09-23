@@ -22,10 +22,10 @@ set_target_properties(TopicInterfacePlugin
 
 target_link_libraries(TopicInterfacePlugin
   PUBLIC
-    ignition-common3::ignition-common3
-    ignition-gui3::ignition-gui3
+    ignition-common4::ignition-common4
+    ignition-gui5::ignition-gui5
     ignition-math6::ignition-math6
-    ignition-rendering3::ignition-rendering3
+    ignition-rendering5::ignition-rendering5
     ${Qt5Core_LIBRARIES}
     ${Qt5Widgets_LIBRARIES}
   PRIVATE

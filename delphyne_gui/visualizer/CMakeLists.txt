@@ -14,7 +14,7 @@ set_target_properties(global_attributes
 )
 
 target_link_libraries(global_attributes
-  ignition-common3::ignition-common3
+  ignition-common4::ignition-common4
 )
 
 install(
@@ -31,8 +31,8 @@ add_executable(visualizer
 )
 
 target_link_libraries(visualizer
-  ignition-common3::ignition-common3
-  ignition-gui3::ignition-gui3
+  ignition-common4::ignition-common4
+  ignition-gui5::ignition-gui5
   ${Qt5Core_LIBRARIES}
   ${Qt5Widgets_LIBRARIES}
   delphyne::utility

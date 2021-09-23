@@ -55,7 +55,7 @@ def launch_interactive_simulation(simulation_runner,
         launch_manager.kill()
 
 
-def launch_visualizer(launcher_manager, layout_filename=None,
+def launch_visualizer(launcher_manager, layout=None,
                       plugin_injection=None, plugin_name=None, bundle_path=None,
                       ign_visualizer=None):
     """
@@ -65,12 +65,9 @@ def launch_visualizer(launcher_manager, layout_filename=None,
     if ign_visualizer is None:
         ign_visualizer = "visualizer"
     ign_visualizer_args = []
-    if layout_filename:
+    if layout:
         layout_key = "--layout="
-        layout_path = get_delphyne_gui_resource(
-            os.path.join("layouts", layout_filename)
-        )
-        ign_visualizer_args.append(layout_key + layout_path)
+        ign_visualizer_args.append(layout_key + resolve_layout_path(layout))
     # Force line buffering for child process.
     ign_visualizer_args.append("--use-line-buffer=yes")
     if plugin_injection:
@@ -80,6 +77,20 @@ def launch_visualizer(launcher_manager, layout_filename=None,
     if bundle_path:
         ign_visualizer_args.append("--package=" + bundle_path)
     launcher_manager.launch([ign_visualizer] + ign_visualizer_args)
+
+
+def resolve_layout_path(layout):
+    layout_path = str()
+    if os.path.isabs(layout):
+        layout_path = layout
+    else:
+        layout_path = get_delphyne_gui_resource(
+            os.path.join("layouts", layout)
+        )
+        if layout_path == "":
+            # Then it could be relative to the execution folder.
+            layout_path = layout
+    return layout_path
 
 
 def get_delphyne_gui_resource_root():

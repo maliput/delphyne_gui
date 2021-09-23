@@ -54,8 +54,3 @@ add_if_not_in_var() {
 #   e.g. configuration files, protos, road geometries
 add_if_not_in_var DELPHYNE_GUI_RESOURCE_ROOT $COLCON_PREFIX_PATH/delphyne_gui/share/delphyne
 
-# Path to visualizer plugins
-add_if_not_in_var VISUALIZER_PLUGIN_PATH $COLCON_PREFIX_PATH/delphyne_gui/lib
-
-# Path to display plugins
-add_if_not_in_var IGN_GUI_DISPLAY_PLUGIN_PATH $COLCON_PREFIX_PATH/delphyne_gui/lib

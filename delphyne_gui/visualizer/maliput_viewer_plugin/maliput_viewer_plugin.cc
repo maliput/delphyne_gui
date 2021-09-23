@@ -554,7 +554,8 @@ void MaliputViewerPlugin::Initialize() {
 }
 
 ignition::gui::Plugin* MaliputViewerPlugin::FilterPluginsByTitle(const std::string& _pluginTitle) {
-  QList<ignition::gui::Plugin*> plugins = parent()->findChildren<ignition::gui::Plugin*>();
+  QList<ignition::gui::Plugin*> plugins =
+      ignition::gui::App()->findChild<ignition::gui::MainWindow*>()->findChildren<ignition::gui::Plugin*>();
   auto plugin = std::find_if(std::begin(plugins), std::end(plugins), [&_pluginTitle](ignition::gui::Plugin* _plugin) {
     return _plugin->Title() == _pluginTitle;
   });

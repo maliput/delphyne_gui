@@ -37,3 +37,11 @@ An automated script that looks for all C++ source files and calls `clang-format`
 
 This script must be run from the top-level of the repository in order to find all of the files.
 It is recommended to run this before opening any pull request.
+
+## Visualizer
+See [visualizer/README.md](delphyne_gui/visualizer/README.md)
+
+## Exported variables
+
+Exported variables can be found at [delphyne_gui/setup.sh.in](delphyne_gui/setup.sh.in):
+ - `DELPHYNE_GUI_RESOURCE_ROOT`: Contains the path of the installed delphyne_gui's resources.

@@ -10,7 +10,7 @@
 
 #define DELPHYNE_GUI_VERSION_HEADER "${PROJECT_NAME_LOWER}, version ${PROJECT_VERSION_FULL}\nCopyright (C) 2017 Open Source Robotics Foundation.\nReleased under the Apache 2.0 License.\n\n"
 
-#define PLUGIN_INSTALL_PATH "${CMAKE_INSTALL_PREFIX}/lib"
+#define PLUGIN_INSTALL_PATH "${CMAKE_INSTALL_PREFIX}/lib/gui_plugins"
 
 #define DELPHYNE_INITIAL_CONFIG_PATH "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/delphyne/layouts"
 

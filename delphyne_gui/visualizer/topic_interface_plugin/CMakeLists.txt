@@ -36,6 +36,6 @@ install(
   TARGETS TopicInterfacePlugin
   EXPORT ${PROJECT_NAME}-targets
   RUNTIME DESTINATION bin
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib/gui_plugins
+  ARCHIVE DESTINATION lib/gui_plugins
 )

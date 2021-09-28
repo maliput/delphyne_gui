@@ -146,7 +146,7 @@ def main():
                 delphyne_gui.utilities.launch_visualizer(
                     launch_manager, bundle_path=bundle_path,
                     ign_visualizer="visualizer",
-                    layout_filename="layout_for_playback.config",
+                    layout="layout_for_playback.config",
                 )
                 launch_manager.wait(float("Inf"))
         except RuntimeError as error_msg:

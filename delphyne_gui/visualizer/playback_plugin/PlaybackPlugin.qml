@@ -42,7 +42,6 @@ Rectangle {
     id: rewindButton
     x: 10
     y: 10
-    visible: showPlay
     text: rewindIcon
     checkable: true
     height: playButton.height * 0.8
@@ -60,7 +59,6 @@ Rectangle {
    */
   RoundButton {
     id: playButton
-    visible: showPlay
     text: isPlaying ? pauseIcon : playIcon
     checkable: true
     width: 60
@@ -87,7 +85,6 @@ Rectangle {
    */
   RoundButton {
     id: stepButton
-    visible: showPlay
     text: stepIcon
     checkable: true
     height: playButton.height * 0.8

@@ -21,9 +21,9 @@ set_target_properties(TopicsStats
 
 target_link_libraries(TopicsStats
   PUBLIC
-    ignition-gui3::ignition-gui3
-    ignition-common3::ignition-common3
-    ignition-transport8::ignition-transport8
+    ignition-gui6::ignition-gui6
+    ignition-common4::ignition-common4
+    ignition-transport11::ignition-transport11
     ${Qt5Core_LIBRARIES}
     ${Qt5Widgets_LIBRARIES}
     delphyne::protobuf_messages

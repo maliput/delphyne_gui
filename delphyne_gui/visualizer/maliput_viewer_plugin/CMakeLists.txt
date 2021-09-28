@@ -19,8 +19,8 @@ target_link_libraries(maliput_viewer_model
   ${drake_LIBRARIES}
   delphyne::public_headers
   delphyne::roads_utilities
-  ignition-common3::ignition-common3
-  ignition-rendering3::ignition-rendering3
+  ignition-common4::ignition-common4
+  ignition-rendering6::ignition-rendering6
   maliput::api
   maliput::utilities
 )
@@ -46,9 +46,9 @@ set_target_properties(arrow_mesh
 
 target_link_libraries(arrow_mesh
   ${drake_LIBRARIES}
-  ignition-common3::ignition-common3
+  ignition-common4::ignition-common4
   ignition-math6::ignition-math6
-  ignition-rendering3::ignition-rendering3
+  ignition-rendering6::ignition-rendering6
 )
 
 install(
@@ -72,9 +72,9 @@ set_target_properties(selector
 
 target_link_libraries(selector
   delphyne::public_headers
-  ignition-common3::ignition-common3
+  ignition-common4::ignition-common4
   ignition-math6::ignition-math6
-  ignition-rendering3::ignition-rendering3
+  ignition-rendering6::ignition-rendering6
   maliput::api
 )
 
@@ -99,9 +99,9 @@ set_target_properties(traffic_light_manager
 
 target_link_libraries(traffic_light_manager
   delphyne::public_headers
-  ignition-common3::ignition-common3
+  ignition-common4::ignition-common4
   ignition-math6::ignition-math6
-  ignition-rendering3::ignition-rendering3
+  ignition-rendering6::ignition-rendering6
   maliput::api
 )
 
@@ -135,10 +135,10 @@ target_link_libraries(MaliputViewerPlugin
     delphyne_gui::maliput_viewer_model
     delphyne_gui::selector
     delphyne_gui::traffic_light_manager
-    ignition-gui3::ignition-gui3
-    ignition-common3::ignition-common3
-    ignition-transport8::ignition-transport8
-    ignition-rendering3::ignition-rendering3
+    ignition-gui6::ignition-gui6
+    ignition-common4::ignition-common4
+    ignition-transport11::ignition-transport11
+    ignition-rendering6::ignition-rendering6
     ${Qt5Core_LIBRARIES}
     ${Qt5Widgets_LIBRARIES}
     ignition-plugin1::register

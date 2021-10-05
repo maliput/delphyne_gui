@@ -1,6 +1,7 @@
 // Copyright 2021 Toyota Research Institute
 #pragma once
 
+#include <atomic>
 #include <map>
 #include <memory>
 #include <optional>
@@ -11,6 +12,7 @@
 #include <ignition/common/MouseEvent.hh>
 #include <ignition/gui/Plugin.hh>
 #include <ignition/rendering/RayQuery.hh>
+#include <ignition/rendering/RenderEngine.hh>
 #include <ignition/rendering/RenderTypes.hh>
 #include <ignition/rendering/Scene.hh>
 #include <maliput/api/road_geometry.h>
@@ -77,12 +79,8 @@ class PhaseTreeModel : public QStandardItemModel {
 };
 
 /// \brief Loads a road geometry out of a xodr file or a yaml file.
-///        Meshes are created and displayed in the scene.
+///        Meshes are created and displayed in the scene provided by Scene3D plugin.
 ///
-/// ## Configuration
-///
-/// * \<main_scene_plugin_title\> : Title of the Scene3D plugin instance that manages the main scene.
-///                                 Defaults to '3D Scene'.
 class MaliputViewerPlugin : public ignition::gui::Plugin {
   Q_OBJECT
 
@@ -148,10 +146,6 @@ class MaliputViewerPlugin : public ignition::gui::Plugin {
   void tableLaneIdSelection(int _index);
 
  protected:
-  /// \brief Timer event callback which handles the logic to load the meshes when
-  ///        the scene is not ready yet.
-  void timerEvent(QTimerEvent* _event) override;
-
   /// \brief Filters QMouseEvents from a Scene3D plugin whose title matches with `<main_scene_plugin_title>`.
   ///        Filters ignition::gui::events::Render events to update the meshes and labels of the roads and the animation
   ///        of the arrow mesh.
@@ -187,9 +181,6 @@ class MaliputViewerPlugin : public ignition::gui::Plugin {
   void OnPhaseSelection(const QModelIndex& _index);
 
  private:
-  /// @brief The period in milliseconds of the timer to try to load the meshes.
-  static constexpr int kTimerPeriodInMs{500};
-
   /// @brief The scene name.
   static constexpr char const* kSceneName = "scene";
 
@@ -279,8 +270,6 @@ class MaliputViewerPlugin : public ignition::gui::Plugin {
   void Clear();
 
   /// \brief Configurate scene and install event filter for filtering QMouseEvents.
-  /// \details To install the event filter the Scene3D plugin hosting the scene
-  ///          is expected to be titled as #kMainScene3dPlugin.
   void Initialize();
 
   /// \brief Handles the left click mouse event and populates roadPositionResultValue.
@@ -365,9 +354,6 @@ class MaliputViewerPlugin : public ignition::gui::Plugin {
   /// \brief Holds the phase ring book file path.
   std::string phaseRingBookFile{""};
 
-  /// \brief Holds the title of the main Scene3D plugin.
-  std::string mainScene3dPluginTitle{"3D Scene"};
-
   /// \brief Holds the lanes id that are shown in the table.
   ///        The order in this collection will affect the order
   ///        that the lanes id are displayed in the table.
@@ -378,9 +364,6 @@ class MaliputViewerPlugin : public ignition::gui::Plugin {
 
   /// \brief Holds the info about the clicked surface that is displayed in the UI.
   QString laneInfo{};
-
-  /// \brief Triggers an event every `kTimerPeriodInMs` to try to get the scene.
-  QBasicTimer timer;
 
   /// \brief Holds the model of the tree view table where the phases are listed.
   PhaseTreeModel phaseTreeModel{this};
@@ -399,6 +382,12 @@ class MaliputViewerPlugin : public ignition::gui::Plugin {
 
   /// \brief A map that contains the default of the checkbox for meshes and labels.
   std::unordered_map<std::string, bool> objectVisualDefaults;
+
+  /// \brief Pointer to the render engine.
+  ignition::rendering::RenderEngine* engine{nullptr};
+
+  /// \brief Pointer to the QuickWindow instance.
+  QQuickWindow* quickWindow{nullptr};
 
   /// \brief Holds a pointer to the scene.
   ignition::rendering::ScenePtr scene{nullptr};
@@ -423,6 +412,12 @@ class MaliputViewerPlugin : public ignition::gui::Plugin {
 
   /// \brief Holds the RoadPositionResult upon a left click in the scene.
   RoadPositionResultValue roadPositionResultValue;
+
+  /// \brief Indicates a RoadNetwork is already loaded.
+  std::atomic<bool> isRoadNetworkLoaded{false};
+
+  /// \brief Indicates a new RoadNetwork has been loaded.
+  std::atomic<bool> newRoadNetwork{false};
 };
 
 }  // namespace gui

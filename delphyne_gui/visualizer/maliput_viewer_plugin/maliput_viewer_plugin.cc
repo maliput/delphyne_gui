@@ -164,8 +164,8 @@ void MaliputViewerPlugin::OnNewRoadNetwork(const QString& _mapFile, const QStrin
     }
   }
 
-  // Create traffic light manager.
-  trafficLightManager->CreateTrafficLights(model->GetTrafficLights());
+  isRoadNetworkLoaded = true;
+  newRoadNetwork = true;
 }
 
 void MaliputViewerPlugin::UpdateLaneList() {
@@ -284,25 +284,6 @@ void MaliputViewerPlugin::OnPhaseSelection(const QModelIndex& _index) {
   }
 }
 
-void MaliputViewerPlugin::timerEvent(QTimerEvent* _event) {
-  if (_event->timerId() != timer.timerId()) {
-    return;
-  }
-
-  // Get the render engine.
-  // Note: we don't support other engines than Ogre.
-  auto engine = ignition::rendering::engine(kEngineName);
-  scene = engine->SceneByName(kSceneName);
-  if (!scene) {
-    ignwarn << "Scene \"" << kSceneName << "\" not found yet. Trying again in "
-            << " Trying again in " << kTimerPeriodInMs << "ms" << std::endl;
-    return;
-  }
-  timer.stop();
-  Initialize();
-  renderMeshesOption.RenderAll();
-}
-
 void MaliputViewerPlugin::RenderRoadMeshes(const std::map<std::string, std::unique_ptr<MaliputMesh>>& _maliputMeshes) {
   for (const auto& id_mesh : _maliputMeshes) {
     // Checks if the mesh to be rendered already exists or not.
@@ -414,28 +395,31 @@ void MaliputViewerPlugin::RenderLabels(const std::map<std::string, MaliputLabel>
 }
 
 void MaliputViewerPlugin::Clear() {
-  selector->DeselectAll();
-  arrow->SetVisibility(false);
-  // Clears the text labels.
-  for (auto it : textLabels) {
-    this->rootVisual->RemoveChild(it.second);
+  if (isRoadNetworkLoaded) {
+    selector->DeselectAll();
+    arrow->SetVisibility(false);
+    // Clears the text labels.
+    for (auto it : textLabels) {
+      this->rootVisual->RemoveChild(it.second);
+    }
+    // Clears the meshes.
+    for (auto it : meshes) {
+      this->rootVisual->RemoveChild(it.second);
+    }
+    textLabels.clear();
+    meshes.clear();
+    // Reset phase table.
+    phaseTreeModel.Clear();
+    // Resert traffic light manager.
+    trafficLightManager->Clear();
+    isRoadNetworkLoaded = false;
   }
-  // Clears the meshes.
-  for (auto it : meshes) {
-    this->rootVisual->RemoveChild(it.second);
-  }
-  textLabels.clear();
-  meshes.clear();
+  newRoadNetwork = false;
   // Reset default values for meshes' visualization.
   for (const std::string& key : {kLane, kMarker, kBranchPoint, kBranchPointLabels, kLaneLabels}) {
     objectVisualDefaults[key] = true;
   }
-  // Reset phase table.
-  phaseTreeModel.Clear();
   currentPhase = {"" /* phaseId */, "", /* phaseRingId*/};
-
-  // Resert traffic light manager.
-  trafficLightManager->Clear();
 }
 
 void MaliputViewerPlugin::CreateLaneLabelMaterial(ignition::rendering::MaterialPtr& _material) {
@@ -480,77 +464,76 @@ void MaliputViewerPlugin::LoadConfig(const tinyxml2::XMLElement* _pluginElem) {
     return;
   }
 
-  if (auto elem = _pluginElem->FirstChildElement("main_scene_plugin_title")) {
-    mainScene3dPluginTitle = elem->GetText();
-  }
+  // Initialization process based on Grid3D plugin implementation.
+  // See https://github.com/ignitionrobotics/ign-gui/blob/ign-gui3/src/plugins/grid_3d/Grid3D.cc#L187.
+  this->connect(this->PluginItem(), &QQuickItem::windowChanged, [this](QQuickWindow* _window) {
+    if (!_window) {
+      igndbg << "Changed to null window" << std::endl;
+      return;
+    }
 
-  // Get the render engine.
-  // Note: we don't support other engines than Ogre.
-  auto engine = ignition::rendering::engine(kEngineName);
-  if (!engine) {
-    ignerr << "Engine \"" << kEngineName << "\" not supported, maliput viewer plugin won't work." << std::endl;
+    this->quickWindow = _window;
+
+    // Initialize after Scene3D plugins
+    this->connect(this->quickWindow, &QQuickWindow::beforeRendering, this, &MaliputViewerPlugin::Initialize,
+                  Qt::DirectConnection);
+  });
+}
+
+void MaliputViewerPlugin::Initialize() {
+  // Get engine.
+  auto loadedEngNames = ignition::rendering::loadedEngines();
+  if (loadedEngNames.empty()) {
+    // Keep trying until an engine is loaded
+    return;
+  }
+  if (this->engine == nullptr) this->engine = ignition::rendering::engine(this->kEngineName);
+
+  if (this->engine == nullptr) {
+    ignerr << "Failed to get engine [" + std::string(this->kEngineName) + "]" << std::endl;
+
+    this->disconnect(this->quickWindow, &QQuickWindow::beforeRendering, this, &MaliputViewerPlugin::Initialize);
+
+    return;
+  }
+  if (this->engine->SceneCount() == 0) {
+    // Scene may not be loaded yet, keep trying
     return;
   }
   // Get the scene.
   scene = engine->SceneByName(kSceneName);
   if (!scene) {
     ignwarn << "Scene \"" << kSceneName << "\" not found, meshes won't be loaded until the scene is created."
-            << " Trying again in " << kTimerPeriodInMs << "ms" << std::endl;
-    timer.start(kTimerPeriodInMs, this);
+            << std::endl;
+    // Scene may not be loaded yet, keep trying
     return;
   }
-  Initialize();
-  renderMeshesOption.RenderAll();
-}
 
-void MaliputViewerPlugin::Initialize() {
-  rayQuery = scene->CreateRayQuery();
+  // Get root visual.
   rootVisual = scene->RootVisual();
   if (!rootVisual) {
-    ignerr << "Failed to find the root visual" << std::endl;
+    ignwarn << "Failed to find the root visual, trying again" << std::endl;
     return;
   }
+  if (rootVisual->ChildCount() == 0) {
+    ignwarn << "Failed to find the camera, trying again" << std::endl;
+    return;
+  }
+  // Get camera.
   camera = std::dynamic_pointer_cast<ignition::rendering::Camera>(rootVisual->ChildByIndex(0));
   if (!camera) {
-    ignerr << "Failed to find the camera" << std::endl;
+    ignwarn << "Failed to find the camera, trying again" << std::endl;
     return;
   }
-  // Lights.
-  const double lightRed = 0.88;
-  const double lightGreen = 0.88;
-  const double lightBlue = 0.95;
-  scene->SetAmbientLight(lightRed, lightGreen, lightBlue);
-  auto directionalLight = scene->CreateDirectionalLight();
-  if (!directionalLight) {
-    ignerr << "Failed to create a directional light" << std::endl;
-    return;
-  }
-  directionalLight->SetDirection(-0.5, -0.5, -1);
-  directionalLight->SetDiffuseColor(lightRed, lightGreen, lightBlue);
-  directionalLight->SetSpecularColor(lightRed, lightGreen, lightBlue);
-  rootVisual->AddChild(directionalLight);
 
-  // Create arrow mesh and link it to the scene.
-  arrow = std::make_unique<ArrowMesh>(this->scene, 0.5);
-  // Create a Selector.
-  selector = std::make_unique<Selector>(this->scene, 0.3 /* scaleX */, 0.5 /* scaleY */, 0.1 /* scaleZ */,
-                                        50 /* poolSize */, 15 /* numLanes */, 0.6 /* minTolerance */);
-  trafficLightManager = std::make_unique<TrafficLightManager>(this->scene);
-  // Install event filter to get mouse event from the main scene.
-  const ignition::gui::Plugin* scene3D = FilterPluginsByTitle(mainScene3dPluginTitle);
-  if (!scene3D) {
-    const std::string msg{"Scene3D plugin titled '" + mainScene3dPluginTitle + "' wasn't found"};
-    ignerr << msg << std::endl;
-    MALIPUT_THROW_MESSAGE(msg);
-  }
-  auto renderWindowItem = scene3D->PluginItem()->findChild<QQuickItem*>();
-  if (!renderWindowItem) {
-    const std::string msg{"Scene3D's renderWindowItem child isn't found"};
-    ignerr << msg << std::endl;
-    MALIPUT_THROW_MESSAGE(msg);
-  }
-  renderWindowItem->installEventFilter(this);
+  // Install event filter.
   ignition::gui::App()->findChild<ignition::gui::MainWindow*>()->installEventFilter(this);
+
+  // Disconnect method.
+  this->disconnect(this->quickWindow, &QQuickWindow::beforeRendering, this, &MaliputViewerPlugin::Initialize);
+
+  setUpScene = true;
+  ignmsg << "MaliputViewerPlugin has been initialized." << std::endl;
 }
 
 ignition::gui::Plugin* MaliputViewerPlugin::FilterPluginsByTitle(const std::string& _pluginTitle) {
@@ -562,28 +545,79 @@ ignition::gui::Plugin* MaliputViewerPlugin::FilterPluginsByTitle(const std::stri
   return plugin == plugins.end() ? nullptr : *plugin;
 }
 
+void MaliputViewerPlugin::SetUpScene() {
+  // Adds Directional light to improve visualization.
+  const auto ambientLight = scene->AmbientLight();
+  auto directionalLight = scene->CreateDirectionalLight();
+  if (!directionalLight) {
+    ignerr << "Failed to create a directional light" << std::endl;
+  } else {
+    directionalLight->SetDirection(-0.5, -0.5, -1);
+    directionalLight->SetDiffuseColor(ambientLight);
+    directionalLight->SetSpecularColor(ambientLight);
+    rootVisual->AddChild(directionalLight);
+  }
+  // Create an ArrowMesh.
+  const double zArrowOffset{0.5};
+  arrow = std::make_unique<ArrowMesh>(this->scene, zArrowOffset);
+  // Create a Selector.
+  const double selScaleX{0.3};
+  const double selScaleY{0.5};
+  const double selScaleZ{0.1};
+  const double selMinTolerance{0.6};
+  const int selPoolSize{50};
+  const int selNumLanes{15};
+  selector = std::make_unique<Selector>(this->scene, selScaleX, selScaleY, selScaleZ, selPoolSize, selNumLanes,
+                                        selMinTolerance);
+  // Create traffic light manager.
+  trafficLightManager = std::make_unique<TrafficLightManager>(this->scene);
+}
+
 bool MaliputViewerPlugin::eventFilter(QObject* _obj, QEvent* _event) {
-  if (model->IsInitialized()) {
+  if (isRoadNetworkLoaded) {
     if (_event->type() == ignition::gui::events::LeftClickToScene::kType) {
       auto leftClickToScene = static_cast<ignition::gui::events::LeftClickToScene*>(_event);
       // TODO(https://github.com/ignitionrobotics/ign-gui/issues/209): use distance to camera once
       //                                                               it is available.
-      MouseClickHandler(leftClickToScene->Point(), camera->WorldPosition().Distance(leftClickToScene->Point()));
+      this->MouseClickHandler(leftClickToScene->Point(),
+                              this->camera->WorldPosition().Distance(leftClickToScene->Point()));
     }
+    // Hooking to the Render event to safely make rendering calls.
+    // See https://github.com/ignitionrobotics/ign-gui/blob/ign-gui3/include/ignition/gui/GuiEvents.hh#L36-L37
     if (_event->type() == ignition::gui::events::Render::kType) {
-      if (roadPositionResultValue.IsDirty()) {
-        UpdateLaneSelectionOnLeftClick();
-        roadPositionResultValue.SetDirty(false);
+      if (setUpScene) {
+        SetUpScene();
+        setUpScene = false;
       }
-      arrow->Update();
-      trafficLightManager->Tick();
-      if (renderMeshesOption.executeMeshRendering) {
-        RenderRoadMeshes(model->Meshes());
-        renderMeshesOption.executeMeshRendering = false;
-      }
-      if (renderMeshesOption.executeLabelRendering) {
-        RenderLabels(model->Labels());
-        renderMeshesOption.executeLabelRendering = false;
+      if (this->newRoadNetwork) {
+        // New road network loaded.
+        this->RenderRoadMeshes(model->Meshes());
+        this->RenderLabels(model->Labels());
+        this->trafficLightManager->CreateTrafficLights(model->GetTrafficLights());
+        this->renderMeshesOption.executeLabelRendering = false;
+        this->renderMeshesOption.executeMeshRendering = false;
+        this->newRoadNetwork = false;
+      } else {
+        // Update scene.
+        // Lane selection.
+        if (roadPositionResultValue.IsDirty()) {
+          this->UpdateLaneSelectionOnLeftClick();
+          roadPositionResultValue.SetDirty(false);
+        }
+        // Update arrow movement.
+        arrow->Update();
+        // Tick traffic light manager.
+        trafficLightManager->Tick();
+        // Update road meshes if necessary.
+        if (renderMeshesOption.executeMeshRendering) {
+          this->RenderRoadMeshes(model->Meshes());
+          renderMeshesOption.executeMeshRendering = false;
+        }
+        // Update label meshes if necessary.
+        if (renderMeshesOption.executeLabelRendering) {
+          this->RenderLabels(model->Labels());
+          renderMeshesOption.executeLabelRendering = false;
+        }
       }
     }
   }
@@ -714,19 +748,6 @@ void MaliputViewerPlugin::UpdateRulesList(const std::string& _laneId) {
   rulesList =
       model->GetRulesOfLane<QString>(currentPhase.second /* phaseRingId */, currentPhase.first /* phaseId */, _laneId);
   emit RulesListChanged();
-}
-
-ignition::rendering::RayQueryResult MaliputViewerPlugin::ScreenToScene(int _screenX, int _screenY) const {
-  // Normalize point on the image
-  const double width = camera->ImageWidth();
-  const double height = camera->ImageHeight();
-
-  const double nx = 2.0 * _screenX / width - 1.0;
-  const double ny = 1.0 - 2.0 * _screenY / height;
-
-  // Make a ray query
-  rayQuery->SetFromCamera(camera, {nx, ny});
-  return rayQuery->ClosestPoint();
 }
 
 }  // namespace gui

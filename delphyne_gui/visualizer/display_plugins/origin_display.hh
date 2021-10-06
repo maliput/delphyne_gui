@@ -2,6 +2,7 @@
 #pragma once
 
 #include <array>
+#include <atomic>
 #include <string>
 
 #include <ignition/gui/Plugin.hh>
@@ -39,20 +40,20 @@ class OriginDisplay : public ignition::gui::Plugin {
   /// @{ isVisible accessors.
   Q_INVOKABLE bool IsVisible() const { return isVisible; }
 
-  Q_INVOKABLE void SetIsVisible(bool _isVisible) {
-    isVisible = _isVisible;
-    IsVisibleChanged();
-    ChangeAxesVisibility();
-  }
+  Q_INVOKABLE void SetIsVisible(bool _isVisible);
   /// @}
 
  signals:
   void IsVisibleChanged();
 
  protected:
-  /// @brief Timer event callback which handles the logic to draw the axes when
-  ///        the scene is not ready yet.
+  /// @brief Timer event callback which handles the logic to get the scene.
   void timerEvent(QTimerEvent* _event) override;
+
+  /// \brief Filters ignition::gui::events::Render events to update the visualization of the axis if needed.
+  /// \details To make this method be called by Qt Event System, install the event filter in target object.
+  ///          \see QObject::installEventFilter() method.
+  bool eventFilter(QObject* _obj, QEvent* _event) override;
 
  private:
   /// @brief The period in milliseconds of the timer to try to draw the axes.
@@ -68,7 +69,7 @@ class OriginDisplay : public ignition::gui::Plugin {
   /// @brief Toggles the visibility of the axes.
   void ChangeAxesVisibility();
 
-  /// @brief Triggers an event every `kTimerPeriodInMs` to try to draw the axes.
+  /// @brief Triggers an event every `kTimerPeriodInMs` to try to get the scene.
   QBasicTimer timer;
 
   /// @brief The scene name.
@@ -79,6 +80,15 @@ class OriginDisplay : public ignition::gui::Plugin {
 
   /// @brief Pointers to the visual axes
   std::array<ignition::rendering::VisualPtr, 3> axes{nullptr, nullptr, nullptr};
+
+  /// @brief Indicates whether the axes are drawn.
+  std::atomic<bool> areAxesDrawn{false};
+
+  /// @brief Indicates whether the axes visibility should be updated.
+  std::atomic<bool> isDirty{true};
+
+  /// @brief Holds a pointer to the scene.
+  ignition::rendering::ScenePtr scene{nullptr};
 };
 
 }  // namespace gui

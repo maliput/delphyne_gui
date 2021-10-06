@@ -4,6 +4,9 @@
 #include <cmath>
 
 #include <ignition/common/Console.hh>
+#include <ignition/gui/Application.hh>
+#include <ignition/gui/GuiEvents.hh>
+#include <ignition/gui/MainWindow.hh>
 #include <ignition/math/Color.hh>
 #include <ignition/math/Pose3.hh>
 #include <ignition/plugin/Register.hh>
@@ -29,23 +32,30 @@ void OriginDisplay::LoadConfig(const tinyxml2::XMLElement* _pluginElem) {
       IsVisibleChanged();
     }
   }
+  // Install event filter.
+  ignition::gui::App()->findChild<ignition::gui::MainWindow*>()->installEventFilter(this);
 
-  // Get the render engine.
-  // Note: we don't support other engines than Ogre.
-  auto engine = ignition::rendering::engine(kEngineName);
-  if (!engine) {
-    ignerr << "Engine \"" << kEngineName << "\" not supported, origin display plugin won't work." << std::endl;
-    return;
+  // Set timer to get the scene.
+  timer.start(kTimerPeriodInMs, this);
+}
+
+bool OriginDisplay::eventFilter(QObject* _obj, QEvent* _event) {
+  // Hooking to the Render event to safely make rendering calls.
+  // See https://github.com/ignitionrobotics/ign-gui/blob/ign-gui3/include/ignition/gui/GuiEvents.hh#L36-L37
+  if (_event->type() == ignition::gui::events::Render::kType) {
+    if (scene != nullptr) {
+      if (!areAxesDrawn) {
+        this->DrawAxes(scene);
+        areAxesDrawn = true;
+      }
+      if (isDirty) {
+        ChangeAxesVisibility();
+        isDirty = false;
+      }
+    }
   }
-  // Get the scene.
-  auto scene = engine->SceneByName(sceneName);
-  if (!scene) {
-    ignwarn << "Scene \"" << sceneName << "\" not found, origin display plugin won't work until the scene is created."
-            << " Trying again in " << kTimerPeriodInMs << "ms" << std::endl;
-    timer.start(kTimerPeriodInMs, this);
-    return;
-  }
-  DrawAxes(scene);
+  // Standard event processing
+  return QObject::eventFilter(_obj, _event);
 }
 
 void OriginDisplay::timerEvent(QTimerEvent* _event) {
@@ -56,14 +66,19 @@ void OriginDisplay::timerEvent(QTimerEvent* _event) {
   // Get the render engine.
   // Note: we don't support other engines than Ogre.
   auto engine = ignition::rendering::engine(kEngineName);
-  auto scene = engine->SceneByName(sceneName);
+  scene = engine->SceneByName(sceneName);
   if (!scene) {
     ignwarn << "Scene \"" << sceneName << "\" not found yet. Trying again in "
             << " Trying again in " << kTimerPeriodInMs << "ms" << std::endl;
     return;
   }
   timer.stop();
-  DrawAxes(scene);
+}
+
+void OriginDisplay::SetIsVisible(bool _isVisible) {
+  isVisible = _isVisible;
+  IsVisibleChanged();
+  isDirty = true;
 }
 
 void OriginDisplay::DrawAxes(ignition::rendering::ScenePtr scene) {

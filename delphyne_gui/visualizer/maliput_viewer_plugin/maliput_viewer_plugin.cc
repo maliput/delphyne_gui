@@ -395,30 +395,31 @@ void MaliputViewerPlugin::RenderLabels(const std::map<std::string, MaliputLabel>
 }
 
 void MaliputViewerPlugin::Clear() {
+  if (isRoadNetworkLoaded) {
+    selector->DeselectAll();
+    arrow->SetVisibility(false);
+    // Clears the text labels.
+    for (auto it : textLabels) {
+      this->rootVisual->RemoveChild(it.second);
+    }
+    // Clears the meshes.
+    for (auto it : meshes) {
+      this->rootVisual->RemoveChild(it.second);
+    }
+    textLabels.clear();
+    meshes.clear();
+    // Reset phase table.
+    phaseTreeModel.Clear();
+    // Resert traffic light manager.
+    trafficLightManager->Clear();
+  }
   isRoadNetworkLoaded = false;
   newRoadNetwork = false;
-  selector->DeselectAll();
-  arrow->SetVisibility(false);
-  // Clears the text labels.
-  for (auto it : textLabels) {
-    this->rootVisual->RemoveChild(it.second);
-  }
-  // Clears the meshes.
-  for (auto it : meshes) {
-    this->rootVisual->RemoveChild(it.second);
-  }
-  textLabels.clear();
-  meshes.clear();
   // Reset default values for meshes' visualization.
   for (const std::string& key : {kLane, kMarker, kBranchPoint, kBranchPointLabels, kLaneLabels}) {
     objectVisualDefaults[key] = true;
   }
-  // Reset phase table.
-  phaseTreeModel.Clear();
   currentPhase = {"" /* phaseId */, "", /* phaseRingId*/};
-
-  // Resert traffic light manager.
-  trafficLightManager->Clear();
 }
 
 void MaliputViewerPlugin::CreateLaneLabelMaterial(ignition::rendering::MaterialPtr& _material) {
@@ -525,38 +526,13 @@ void MaliputViewerPlugin::Initialize() {
     return;
   }
 
-  // Finally, initialize.
-
-  // Lights.
-  const double lightRed = 0.88;
-  const double lightGreen = 0.88;
-  const double lightBlue = 0.95;
-  scene->SetAmbientLight(lightRed, lightGreen, lightBlue);
-  auto directionalLight = scene->CreateDirectionalLight();
-  if (!directionalLight) {
-    ignerr << "Failed to create a directional light" << std::endl;
-    return;
-  }
-  directionalLight->SetDirection(-0.5, -0.5, -1);
-  directionalLight->SetDiffuseColor(lightRed, lightGreen, lightBlue);
-  directionalLight->SetSpecularColor(lightRed, lightGreen, lightBlue);
-  rootVisual->AddChild(directionalLight);
-
-  // Create arrow mesh and link it to the scene.
-  arrow = std::make_unique<ArrowMesh>(this->scene, 0.5);
-  // Create a Selector.
-  selector = std::make_unique<Selector>(this->scene, 0.3 /* scaleX */, 0.5 /* scaleY */, 0.1 /* scaleZ */,
-                                        50 /* poolSize */, 15 /* numLanes */, 0.6 /* minTolerance */);
-
-  // Create traffic light manager.
-  trafficLightManager = std::make_unique<TrafficLightManager>(this->scene);
-
   // Install event filter.
   ignition::gui::App()->findChild<ignition::gui::MainWindow*>()->installEventFilter(this);
 
   // Disconnect method.
   this->disconnect(this->quickWindow, &QQuickWindow::beforeRendering, this, &MaliputViewerPlugin::Initialize);
 
+  setUpScene = true;
   ignmsg << "MaliputViewerPlugin has been initialized." << std::endl;
 }
 
@@ -581,6 +557,32 @@ bool MaliputViewerPlugin::eventFilter(QObject* _obj, QEvent* _event) {
     // Hooking to the Render event to safely make rendering calls.
     // See https://github.com/ignitionrobotics/ign-gui/blob/ign-gui3/include/ignition/gui/GuiEvents.hh#L36-L37
     if (_event->type() == ignition::gui::events::Render::kType) {
+      if (setUpScene) {
+        // Lights.
+        const double lightRed = 0.88;
+        const double lightGreen = 0.88;
+        const double lightBlue = 0.95;
+        scene->SetAmbientLight(lightRed, lightGreen, lightBlue);
+        auto directionalLight = scene->CreateDirectionalLight();
+        if (!directionalLight) {
+          ignerr << "Failed to create a directional light" << std::endl;
+        } else {
+          directionalLight->SetDirection(-0.5, -0.5, -1);
+          directionalLight->SetDiffuseColor(lightRed, lightGreen, lightBlue);
+          directionalLight->SetSpecularColor(lightRed, lightGreen, lightBlue);
+          rootVisual->AddChild(directionalLight);
+        }
+
+        // Create arrow mesh and link it to the scene.
+        arrow = std::make_unique<ArrowMesh>(this->scene, 0.5);
+        // Create a Selector.
+        selector = std::make_unique<Selector>(this->scene, 0.3 /* scaleX */, 0.5 /* scaleY */, 0.1 /* scaleZ */,
+                                              50 /* poolSize */, 15 /* numLanes */, 0.6 /* minTolerance */);
+
+        // Create traffic light manager.
+        trafficLightManager = std::make_unique<TrafficLightManager>(this->scene);
+        setUpScene = false;
+      }
       if (this->newRoadNetwork) {
         // New road network loaded.
         this->RenderRoadMeshes(model->Meshes());

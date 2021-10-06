@@ -418,6 +418,9 @@ class MaliputViewerPlugin : public ignition::gui::Plugin {
 
   /// \brief Indicates a new RoadNetwork has been loaded.
   std::atomic<bool> newRoadNetwork{false};
+
+  /// \brief Indicates the scene needs to be set-up.
+  bool setUpScene = false;
 };
 
 }  // namespace gui

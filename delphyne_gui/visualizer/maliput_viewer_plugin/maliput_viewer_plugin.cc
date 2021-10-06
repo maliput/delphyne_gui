@@ -412,8 +412,8 @@ void MaliputViewerPlugin::Clear() {
     phaseTreeModel.Clear();
     // Resert traffic light manager.
     trafficLightManager->Clear();
+    isRoadNetworkLoaded = false;
   }
-  isRoadNetworkLoaded = false;
   newRoadNetwork = false;
   // Reset default values for meshes' visualization.
   for (const std::string& key : {kLane, kMarker, kBranchPoint, kBranchPointLabels, kLaneLabels}) {
@@ -487,9 +487,9 @@ void MaliputViewerPlugin::Initialize() {
     // Keep trying until an engine is loaded
     return;
   }
-  if (nullptr == this->engine) this->engine = ignition::rendering::engine(this->kEngineName);
+  if (this->engine == nullptr) this->engine = ignition::rendering::engine(this->kEngineName);
 
-  if (nullptr == this->engine) {
+  if (this->engine == nullptr) {
     ignerr << "Failed to get engine [" + std::string(this->kEngineName) + "]" << std::endl;
 
     this->disconnect(this->quickWindow, &QQuickWindow::beforeRendering, this, &MaliputViewerPlugin::Initialize);
@@ -545,6 +545,34 @@ ignition::gui::Plugin* MaliputViewerPlugin::FilterPluginsByTitle(const std::stri
   return plugin == plugins.end() ? nullptr : *plugin;
 }
 
+void MaliputViewerPlugin::SetUpScene() {
+  // Adds Directional light to improve visualization.
+  const auto ambientLight = scene->AmbientLight();
+  auto directionalLight = scene->CreateDirectionalLight();
+  if (!directionalLight) {
+    ignerr << "Failed to create a directional light" << std::endl;
+  } else {
+    directionalLight->SetDirection(-0.5, -0.5, -1);
+    directionalLight->SetDiffuseColor(ambientLight);
+    directionalLight->SetSpecularColor(ambientLight);
+    rootVisual->AddChild(directionalLight);
+  }
+  // Create an ArrowMesh.
+  const double zArrowOffset{0.5};
+  arrow = std::make_unique<ArrowMesh>(this->scene, zArrowOffset);
+  // Create a Selector.
+  const double selScaleX{0.3};
+  const double selScaleY{0.5};
+  const double selScaleZ{0.1};
+  const double selMinTolerance{0.6};
+  const int selPoolSize{50};
+  const int selNumLanes{15};
+  selector = std::make_unique<Selector>(this->scene, selScaleX, selScaleY, selScaleZ, selPoolSize, selNumLanes,
+                                        selMinTolerance);
+  // Create traffic light manager.
+  trafficLightManager = std::make_unique<TrafficLightManager>(this->scene);
+}
+
 bool MaliputViewerPlugin::eventFilter(QObject* _obj, QEvent* _event) {
   if (isRoadNetworkLoaded) {
     if (_event->type() == ignition::gui::events::LeftClickToScene::kType) {
@@ -558,29 +586,7 @@ bool MaliputViewerPlugin::eventFilter(QObject* _obj, QEvent* _event) {
     // See https://github.com/ignitionrobotics/ign-gui/blob/ign-gui3/include/ignition/gui/GuiEvents.hh#L36-L37
     if (_event->type() == ignition::gui::events::Render::kType) {
       if (setUpScene) {
-        // Lights.
-        const double lightRed = 0.88;
-        const double lightGreen = 0.88;
-        const double lightBlue = 0.95;
-        scene->SetAmbientLight(lightRed, lightGreen, lightBlue);
-        auto directionalLight = scene->CreateDirectionalLight();
-        if (!directionalLight) {
-          ignerr << "Failed to create a directional light" << std::endl;
-        } else {
-          directionalLight->SetDirection(-0.5, -0.5, -1);
-          directionalLight->SetDiffuseColor(lightRed, lightGreen, lightBlue);
-          directionalLight->SetSpecularColor(lightRed, lightGreen, lightBlue);
-          rootVisual->AddChild(directionalLight);
-        }
-
-        // Create arrow mesh and link it to the scene.
-        arrow = std::make_unique<ArrowMesh>(this->scene, 0.5);
-        // Create a Selector.
-        selector = std::make_unique<Selector>(this->scene, 0.3 /* scaleX */, 0.5 /* scaleY */, 0.1 /* scaleZ */,
-                                              50 /* poolSize */, 15 /* numLanes */, 0.6 /* minTolerance */);
-
-        // Create traffic light manager.
-        trafficLightManager = std::make_unique<TrafficLightManager>(this->scene);
+        SetUpScene();
         setUpScene = false;
       }
       if (this->newRoadNetwork) {
@@ -588,9 +594,9 @@ bool MaliputViewerPlugin::eventFilter(QObject* _obj, QEvent* _event) {
         this->RenderRoadMeshes(model->Meshes());
         this->RenderLabels(model->Labels());
         this->trafficLightManager->CreateTrafficLights(model->GetTrafficLights());
-        this->newRoadNetwork = false;
         this->renderMeshesOption.executeLabelRendering = false;
         this->renderMeshesOption.executeMeshRendering = false;
+        this->newRoadNetwork = false;
       } else {
         // Update scene.
         // Lane selection.

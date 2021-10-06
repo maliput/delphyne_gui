@@ -272,7 +272,7 @@ class MaliputViewerPlugin : public ignition::gui::Plugin {
   /// \brief Get properties from the scene and install event filter for filtering QMouseEvents.
   void Initialize();
 
-  /// \brief Set up the scene modifying the light and instanciating the ArrowMesh, Selector and TrafficLightManager.
+  /// \brief Set up the scene modifying the light and instantiating the ArrowMesh, Selector and TrafficLightManager.
   void SetUpScene();
 
   /// \brief Handles the left click mouse event and populates roadPositionResultValue.
@@ -423,7 +423,7 @@ class MaliputViewerPlugin : public ignition::gui::Plugin {
   std::atomic<bool> newRoadNetwork{false};
 
   /// \brief Indicates the scene needs to be set-up.
-  std::atomic<bool> setUpScene = false;
+  std::atomic<bool> setUpScene{false};
 };
 
 }  // namespace gui

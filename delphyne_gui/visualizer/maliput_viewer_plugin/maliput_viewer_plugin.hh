@@ -152,6 +152,8 @@ class MaliputViewerPlugin : public ignition::gui::Plugin {
   /// \details To make this method be called by Qt Event System, install the event filter in target object.
   ///          \see QObject::installEventFilter() method.
   bool eventFilter(QObject* _obj, QEvent* _event) override;
+
+  /// @brief Timer event callback which handles the logic to get the scene.
   void timerEvent(QTimerEvent* _event) override;
 
  protected slots:

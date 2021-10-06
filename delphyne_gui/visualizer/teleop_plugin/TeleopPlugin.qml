@@ -5,7 +5,7 @@ import QtQuick.Layouts 1.3
 
 Rectangle {
   id: teleop
-  width: panel.implicitWidth + hideToolButton.width + 20
+  width: panel.implicitWidth + 20
   height: panel.implicitHeight + 10
   color: "transparent"
   Layout.minimumWidth: 290

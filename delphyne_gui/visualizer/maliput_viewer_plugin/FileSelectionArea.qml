@@ -41,7 +41,7 @@ GridLayout {
   Text {
     id: titleText
     Layout.columnSpan: 2
-    anchors.horizontalCenter: parent.horizontalCenter
+    Layout.alignment: Qt.AlignHCenter
     font.pixelSize: 14
     text: "FILES SELECTION"
   }

@@ -24,7 +24,6 @@ GridLayout {
   Text {
     id: titleText
     Layout.columnSpan: 1
-    anchors.horizontalCenter: parent.horizontalCenter
     Layout.alignment: Qt.AlignVTop | Qt.AlignHCenter
     font.family: "Helvetica"
     font.pixelSize: 14
@@ -35,8 +34,7 @@ GridLayout {
   TableView {
 
     id: tableView
-    anchors.top: titleText.bottom
-    anchors.left: parent.left
+    Layout.alignment: Qt.AlignVTop | Qt.AlignHLeft
     width: parent.width
     Layout.preferredHeight: 100
     Layout.fillWidth: true

@@ -24,7 +24,6 @@ GridLayout {
   Text {
     id: titleText
     Layout.columnSpan: 3
-    anchors.horizontalCenter: parent.horizontalCenter
     Layout.alignment: Qt.AlignVTop | Qt.AlignHCenter
     font.pixelSize: 14
     text: "MESH LAYERS"

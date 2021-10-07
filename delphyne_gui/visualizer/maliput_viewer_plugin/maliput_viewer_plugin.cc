@@ -464,51 +464,27 @@ void MaliputViewerPlugin::LoadConfig(const tinyxml2::XMLElement* _pluginElem) {
     return;
   }
 
-  // Initialization process based on Grid3D plugin implementation.
-  // See https://github.com/ignitionrobotics/ign-gui/blob/ign-gui3/src/plugins/grid_3d/Grid3D.cc#L187.
-  this->connect(this->PluginItem(), &QQuickItem::windowChanged, [this](QQuickWindow* _window) {
-    if (!_window) {
-      igndbg << "Changed to null window" << std::endl;
-      return;
-    }
+  // Install event filter.
+  ignition::gui::App()->findChild<ignition::gui::MainWindow*>()->installEventFilter(this);
 
-    this->quickWindow = _window;
-
-    // Initialize after Scene3D plugins
-    this->connect(this->quickWindow, &QQuickWindow::beforeRendering, this, &MaliputViewerPlugin::Initialize,
-                  Qt::DirectConnection);
-  });
+  // Set timer to get the scene.
+  timer.start(kTimerPeriodInMs, this);
 }
 
-void MaliputViewerPlugin::Initialize() {
-  // Get engine.
-  auto loadedEngNames = ignition::rendering::loadedEngines();
-  if (loadedEngNames.empty()) {
-    // Keep trying until an engine is loaded
+void MaliputViewerPlugin::timerEvent(QTimerEvent* _event) {
+  if (_event->timerId() != timer.timerId()) {
     return;
   }
-  if (this->engine == nullptr) this->engine = ignition::rendering::engine(this->kEngineName);
 
-  if (this->engine == nullptr) {
-    ignerr << "Failed to get engine [" + std::string(this->kEngineName) + "]" << std::endl;
-
-    this->disconnect(this->quickWindow, &QQuickWindow::beforeRendering, this, &MaliputViewerPlugin::Initialize);
-
-    return;
-  }
-  if (this->engine->SceneCount() == 0) {
-    // Scene may not be loaded yet, keep trying
-    return;
-  }
-  // Get the scene.
+  // Get the render engine.
+  // Note: we don't support other engines than Ogre.
+  auto engine = ignition::rendering::engine(kEngineName);
   scene = engine->SceneByName(kSceneName);
   if (!scene) {
-    ignwarn << "Scene \"" << kSceneName << "\" not found, meshes won't be loaded until the scene is created."
-            << std::endl;
-    // Scene may not be loaded yet, keep trying
+    ignwarn << "Scene \"" << kSceneName << "\" not found yet. Trying again in "
+            << " Trying again in " << kTimerPeriodInMs << "ms" << std::endl;
     return;
   }
-
   // Get root visual.
   rootVisual = scene->RootVisual();
   if (!rootVisual) {
@@ -525,15 +501,9 @@ void MaliputViewerPlugin::Initialize() {
     ignwarn << "Failed to find the camera, trying again" << std::endl;
     return;
   }
-
-  // Install event filter.
-  ignition::gui::App()->findChild<ignition::gui::MainWindow*>()->installEventFilter(this);
-
-  // Disconnect method.
-  this->disconnect(this->quickWindow, &QQuickWindow::beforeRendering, this, &MaliputViewerPlugin::Initialize);
-
   setUpScene = true;
   ignmsg << "MaliputViewerPlugin has been initialized." << std::endl;
+  timer.stop();
 }
 
 ignition::gui::Plugin* MaliputViewerPlugin::FilterPluginsByTitle(const std::string& _pluginTitle) {
@@ -574,7 +544,7 @@ void MaliputViewerPlugin::SetUpScene() {
 }
 
 bool MaliputViewerPlugin::eventFilter(QObject* _obj, QEvent* _event) {
-  if (isRoadNetworkLoaded) {
+  if (this->scene != nullptr && isRoadNetworkLoaded) {
     if (_event->type() == ignition::gui::events::LeftClickToScene::kType) {
       auto leftClickToScene = static_cast<ignition::gui::events::LeftClickToScene*>(_event);
       // TODO(https://github.com/ignitionrobotics/ign-gui/issues/209): use distance to camera once

@@ -146,12 +146,15 @@ class MaliputViewerPlugin : public ignition::gui::Plugin {
   void tableLaneIdSelection(int _index);
 
  protected:
-  /// \brief Filters QMouseEvents from a Scene3D plugin whose title matches with `<main_scene_plugin_title>`.
+  /// \brief Filters ignition::gui::events::LeftClickToScene to get the clicks events.
   ///        Filters ignition::gui::events::Render events to update the meshes and labels of the roads and the animation
   ///        of the arrow mesh.
   /// \details To make this method be called by Qt Event System, install the event filter in target object.
   ///          \see QObject::installEventFilter() method.
   bool eventFilter(QObject* _obj, QEvent* _event) override;
+
+  /// @brief Timer event callback which handles the logic to get the scene.
+  void timerEvent(QTimerEvent* _event) override;
 
  protected slots:
   /// \brief Clears the visualizer, loads a RoadNetwork and update the GUI with meshes and labels.
@@ -184,11 +187,11 @@ class MaliputViewerPlugin : public ignition::gui::Plugin {
   /// @brief The scene name.
   static constexpr char const* kSceneName = "scene";
 
-  /// @brief The Scene3D instance holding the main scene.
-  static constexpr char const* kMainScene3dPlugin = "Main3DScene";
-
   /// @brief The rendering engine name.
   static constexpr char const* kEngineName = "ogre";
+
+  /// @brief The period in milliseconds of the timer to try to get the scene.
+  static constexpr int kTimerPeriodInMs{500};
 
   /// \brief Holds a maliput::api::RoadPositionResult which results from the
   ///        mapped scene click position into the Inertial frame and the
@@ -269,9 +272,6 @@ class MaliputViewerPlugin : public ignition::gui::Plugin {
   /// \brief Clears all the references to text labels, meshes and the scene.
   void Clear();
 
-  /// \brief Get properties from the scene and install event filter for filtering QMouseEvents.
-  void Initialize();
-
   /// \brief Set up the scene modifying the light and instantiating the ArrowMesh, Selector and TrafficLightManager.
   void SetUpScene();
 
@@ -283,12 +283,6 @@ class MaliputViewerPlugin : public ignition::gui::Plugin {
 
   /// \brief Handles the left click mouse event and populates roadPositionResultValue.
   void UpdateLaneSelectionOnLeftClick();
-
-  /// \brief Performs a raycast on the screen.
-  /// \param[in] screenX X screen's coordinate.
-  /// \param[in] screenY Y screen's coordinate.
-  /// \return A ignition::rendering::RayQueryResult.
-  ignition::rendering::RayQueryResult ScreenToScene(int _screenX, int _screenY) const;
 
   /// \brief Filters by title all the children of the parent plugin.
   /// \param _pluginTitle Title of the ignition::gui::plugin.
@@ -368,6 +362,9 @@ class MaliputViewerPlugin : public ignition::gui::Plugin {
   /// \brief Holds the info about the clicked surface that is displayed in the UI.
   QString laneInfo{};
 
+  /// @brief Triggers an event every `kTimerPeriodInMs` to try to get the scene.
+  QBasicTimer timer;
+
   /// \brief Holds the model of the tree view table where the phases are listed.
   PhaseTreeModel phaseTreeModel{this};
 
@@ -386,17 +383,8 @@ class MaliputViewerPlugin : public ignition::gui::Plugin {
   /// \brief A map that contains the default of the checkbox for meshes and labels.
   std::unordered_map<std::string, bool> objectVisualDefaults;
 
-  /// \brief Pointer to the render engine.
-  ignition::rendering::RenderEngine* engine{nullptr};
-
-  /// \brief Pointer to the QuickWindow instance.
-  QQuickWindow* quickWindow{nullptr};
-
   /// \brief Holds a pointer to the scene.
   ignition::rendering::ScenePtr scene{nullptr};
-
-  /// \brief Holds a pointer to a ray query.
-  ignition::rendering::RayQueryPtr rayQuery{nullptr};
 
   /// \brief Holds a pointer to the camera.
   ignition::rendering::CameraPtr camera{};

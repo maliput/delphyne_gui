@@ -22,15 +22,12 @@ Rectangle {
       Image {
         id: searchImg
         source: "icons/search.svg"
-        anchors.left: parent.left
         anchors.leftMargin: 5
       }
 
       TextField {
           id: searchText
-          anchors.left: searchImg.right
           anchors.leftMargin: 5
-          anchors.right: parent.right
           anchors.rightMargin: 5
           Layout.fillWidth: true
 

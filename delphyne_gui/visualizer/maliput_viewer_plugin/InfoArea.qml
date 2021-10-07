@@ -19,7 +19,6 @@ GridLayout {
   Text {
     id: titleText
     Layout.columnSpan: 1
-    anchors.horizontalCenter: parent.horizontalCenter
     Layout.alignment: Qt.AlignVTop | Qt.AlignHCenter
     font.family: "Helvetica"
     font.pixelSize: 14
@@ -29,9 +28,8 @@ GridLayout {
   // Text are used to show rules of lanes.
   TextArea {
     id: laneInfo
-    anchors.top: titleText.bottom
-    anchors.left: parent.left
     width: parent.width
+    Layout.alignment: Qt.AlignVTop | Qt.AlignHLeft
     Layout.minimumHeight: 100
     Layout.preferredHeight: 140
     Layout.maximumHeight: 150

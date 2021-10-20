@@ -381,7 +381,7 @@ bool MaliputViewerModel::Load(const std::string& _maliputFilePath, const std::st
 
   ignmsg << "About to load [" << _maliputFilePath << "] maliput file." << std::endl;
   LoadRoadGeometry(_maliputFilePath, _roadRulebookFilePath, _trafficLightBookFilePath, _phaseRingFilePath);
-  const maliput::api::RoadGeometry* rg = roadGeometry == nullptr ? roadNetwork->road_geometry() : roadGeometry.get();
+  const maliput::api::RoadGeometry* rg = roadNetwork->road_geometry();
   ignmsg << "Loaded [" << _maliputFilePath << "] maliput file." << std::endl;
   ignmsg << "Loading RoadGeometry meshes of " << rg->id().string() << std::endl;
   maliput::utility::ObjFeatures features;
@@ -397,7 +397,6 @@ bool MaliputViewerModel::Load(const std::string& _maliputFilePath, const std::st
 
 ///////////////////////////////////////////////////////
 void MaliputViewerModel::Clear() {
-  this->roadGeometry.reset();
   this->roadNetwork.reset();
   this->labels.clear();
   this->maliputMeshes.clear();
@@ -428,7 +427,7 @@ void MaliputViewerModel::LoadRoadGeometry(const std::string& _maliputFilePath, c
           _trafficLightBookFilePath, _phaseRingFilePath);
       return;
     } else if (line.find("maliput_multilane_builder:") != std::string::npos) {
-      this->roadGeometry = delphyne::roads::CreateMultilaneFromFile(_maliputFilePath);
+      this->roadNetwork = delphyne::roads::CreateMultilaneFromFile(_maliputFilePath);
       return;
     }
   }
@@ -527,7 +526,7 @@ MaliputLabel LabelFor(const maliput::api::Lane& lane) {
 ///////////////////////////////////////////////////////
 void MaliputViewerModel::GenerateLabels() {
   // Traverses branch points to generate labels for them.
-  const maliput::api::RoadGeometry* rg = roadGeometry == nullptr ? roadNetwork->road_geometry() : roadGeometry.get();
+  const maliput::api::RoadGeometry* rg = roadNetwork->road_geometry();
   for (int i = 0; i < rg->num_branch_points(); ++i) {
     const maliput::api::BranchPoint* bp = rg->branch_point(i);
     this->labels["branch_point_" + bp->id().string()] = LabelFor(*bp);
@@ -574,8 +573,7 @@ void MaliputViewerModel::SetTextLabelState(const std::string& _key, bool _isVisi
 
 ///////////////////////////////////////////////////////
 const maliput::api::Lane* MaliputViewerModel::GetLaneFromWorldPosition(const ignition::math::Vector3d& _position) {
-  const maliput::api::RoadGeometry* rg =
-      this->roadGeometry ? this->roadGeometry.get() : this->roadNetwork->road_geometry();
+  const maliput::api::RoadGeometry* rg = this->roadNetwork->road_geometry();
   DELPHYNE_DEMAND(rg != nullptr);
   const maliput::api::InertialPosition inertial_pos(_position.X(), _position.Y(), _position.Z());
   return rg->ToRoadPosition(inertial_pos).road_position.lane;
@@ -584,8 +582,7 @@ const maliput::api::Lane* MaliputViewerModel::GetLaneFromWorldPosition(const ign
 ///////////////////////////////////////////////////////
 const maliput::api::RoadPositionResult MaliputViewerModel::GetRoadPositionResult(
     const ignition::math::Vector3d& _position) {
-  const maliput::api::RoadGeometry* rg =
-      this->roadGeometry ? this->roadGeometry.get() : this->roadNetwork->road_geometry();
+  const maliput::api::RoadGeometry* rg = this->roadNetwork->road_geometry();
   DELPHYNE_DEMAND(rg != nullptr);
   const maliput::api::InertialPosition inertial_pos(_position.X(), _position.Y(), _position.Z());
   return rg->ToRoadPosition(inertial_pos);
@@ -593,8 +590,7 @@ const maliput::api::RoadPositionResult MaliputViewerModel::GetRoadPositionResult
 
 ///////////////////////////////////////////////////////
 const maliput::api::Lane* MaliputViewerModel::GetLaneFromId(const std::string& _id) {
-  const maliput::api::RoadGeometry* rg =
-      this->roadGeometry ? this->roadGeometry.get() : this->roadNetwork->road_geometry();
+  const maliput::api::RoadGeometry* rg = this->roadNetwork->road_geometry();
   DELPHYNE_DEMAND(rg != nullptr);
   return rg->ById().GetLane(maliput::api::LaneId(_id));
 }

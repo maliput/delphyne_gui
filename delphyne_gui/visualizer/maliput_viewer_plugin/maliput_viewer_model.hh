@@ -183,8 +183,8 @@ class MaliputViewerModel {
             const std::string& _trafficLightBook = std::string(),
             const std::string& _phaseRingFilePath = std::string());
 
-  /// \return True when any of roadGeometry and roadNetwork are not nullptr.
-  bool IsInitialized() const { return roadGeometry.get() != nullptr || roadNetwork.get() != nullptr; }
+  /// \return True when any of roadNetwork are not nullptr.
+  bool IsInitialized() const { return roadNetwork.get() != nullptr; }
 
   /// \brief Getter of the map of meshes.
   /// \return The map of meshes.
@@ -348,9 +348,6 @@ class MaliputViewerModel {
   // To support both malidrive and multilane files, we have both. roadNetwork
   // has a pointer to a RoadGeometry.
 
-  /// \brief Maliput RoadGeometry pointer.
-  std::unique_ptr<const maliput::api::RoadGeometry> roadGeometry;
-
   /// \brief Maliput RoadNetwork pointer.
   std::unique_ptr<maliput::api::RoadNetwork> roadNetwork;
 
@@ -363,8 +360,7 @@ class MaliputViewerModel {
 
 template <typename ContainerType>
 ContainerType MaliputViewerModel::GetNLanes(size_t _n) const {
-  const maliput::api::RoadGeometry* rg =
-      this->roadGeometry ? this->roadGeometry.get() : this->roadNetwork->road_geometry();
+  const maliput::api::RoadGeometry* rg = this->roadNetwork->road_geometry();
   const std::unordered_map<maliput::api::LaneId, const maliput::api::Lane*>& all_lanes = rg->ById().GetLanes();
   ContainerType lanes;
   lanes.reserve(_n);
@@ -379,8 +375,7 @@ ContainerType MaliputViewerModel::GetNLanes(size_t _n) const {
 
 template <typename ContainerType>
 ContainerType MaliputViewerModel::GetAllLaneIds() const {
-  const maliput::api::RoadGeometry* rg =
-      this->roadGeometry ? this->roadGeometry.get() : this->roadNetwork->road_geometry();
+  const maliput::api::RoadGeometry* rg = this->roadNetwork->road_geometry();
   const std::unordered_map<maliput::api::LaneId, const maliput::api::Lane*>& all_lanes = rg->ById().GetLanes();
   ContainerType lanes;
   lanes.reserve(all_lanes.size());

@@ -533,14 +533,9 @@ void MaliputViewerModel::GenerateLabels() {
   }
 
   // Traverses lanes to generate labels for them.
-  for (int i = 0; i < rg->num_junctions(); ++i) {
-    const maliput::api::Junction* junction = rg->junction(i);
-    for (int j = 0; j < junction->num_segments(); ++j) {
-      const maliput::api::Segment* segment = junction->segment(j);
-      for (int k = 0; k < segment->num_lanes(); ++k) {
-        this->labels["lane_" + segment->lane(k)->id().string()] = LabelFor(*segment->lane(k));
-      }
-    }
+  const auto lanes = rg->ById().GetLanes();
+  for (const auto& lane : lanes) {
+    this->labels["lane_" + lane.first.string()] = LabelFor(*lane.second);
   }
 }
 

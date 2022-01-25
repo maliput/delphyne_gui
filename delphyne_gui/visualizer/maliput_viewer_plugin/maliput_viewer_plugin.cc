@@ -650,12 +650,14 @@ void MaliputViewerPlugin::UpdateLaneInfoArea(const maliput::api::RoadPositionRes
   const maliput::api::RBounds midLaneBounds = lane->lane_bounds(lane->length() / 2.);
   const maliput::api::RBounds endLaneBounds = lane->lane_bounds(lane->length());
   const maliput::api::RBounds laneBounds = lane->lane_bounds(lanePos.s());
+  const maliput::api::Rotation rotation = lane->GetOrientation(lanePos);
   // Update message to be displayed in the info area.
   std::stringstream ss;
   ss << "----  LANE ID: " << lane->id() << "  -----";
   ss << "\nLength ------------> " << lane->length() << "m";
   ss << "\nLanePosition ------> " << lanePos;
   ss << "\nInertialPosition --> " << _roadPositionResult.nearest_position;
+  ss << "\nRotation --> " << rotation;
   ss << "\nRBounds ------> (min: " << laneBounds.min() << ", max: " << laneBounds.max() << ")";
   ss << "\nHBounds ------> (min: " << hBounds.min() << ", max: " << hBounds.max() << ")";
   ss << "\nSegmentId: ------------> " << lane->segment()->id().string();

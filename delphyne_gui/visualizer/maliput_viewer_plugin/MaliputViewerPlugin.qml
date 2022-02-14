@@ -10,7 +10,7 @@ Rectangle {
   id: maliputViewerPlugin
   Layout.minimumWidth: 400
   Layout.preferredWidth: 450
-  Layout.minimumHeight: 1150
+  Layout.minimumHeight: 1250
   anchors.fill: parent
 
   // Files Selection Panel

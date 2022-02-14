@@ -159,11 +159,14 @@ class MaliputViewerPlugin : public ignition::gui::Plugin {
  protected slots:
   /// \brief Clears the visualizer, loads a RoadNetwork and update the GUI with meshes and labels.
   /// \param[in] _mapFile The path to the map file to load and visualize.
+  /// \param[in] _ruleRegistryFile The path to the rule registry file.
   /// \param[in] _roadRulebookFile The path to the road rulebook file.
   /// \param[in] _trafficLightBookFile The path to the traffic light book file.
   /// \param[in] _phaseRingBookFile The path to the phase ring book file.
-  void OnNewRoadNetwork(const QString& _mapFile, const QString& _roadRulebookFile, const QString& _trafficLightBookFile,
-                        const QString& _phaseRingBookFile);
+  /// \param[in] _intersectionBookFile The path to the phase ring book file.
+  void OnNewRoadNetwork(const QString& _mapFile, const QString& _ruleRegistryFile, const QString& _roadRulebookFile,
+                        const QString& _trafficLightBookFile, const QString& _phaseRingBookFile,
+                        const QString& _intersectionBookFile);
 
   /// \brief Change the visibility of the layers.
   /// \param[in] _layer The layer to change its visibility.
@@ -342,6 +345,9 @@ class MaliputViewerPlugin : public ignition::gui::Plugin {
   /// \brief Holds the map file path.
   std::string mapFile{""};
 
+  /// \brief Holds the rule registry file path.
+  std::string ruleRegistryFile{""};
+
   /// \brief Holds the road rulebook file path.
   std::string roadRulebookFile{""};
 
@@ -350,6 +356,9 @@ class MaliputViewerPlugin : public ignition::gui::Plugin {
 
   /// \brief Holds the phase ring book file path.
   std::string phaseRingBookFile{""};
+
+  /// \brief Holds the phase intersection book file path.
+  std::string intersectionBookFile{""};
 
   /// \brief Holds the lanes id that are shown in the table.
   ///        The order in this collection will affect the order

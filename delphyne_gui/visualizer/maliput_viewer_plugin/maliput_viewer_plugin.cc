@@ -138,18 +138,22 @@ QList<bool> MaliputViewerPlugin::LabelCheckboxes() const {
   return {true /* lane */, true /* branch_point */};
 }
 
-void MaliputViewerPlugin::OnNewRoadNetwork(const QString& _mapFile, const QString& _roadRulebookFile,
-                                           const QString& _trafficLightBookFile, const QString& _phaseRingBookFile) {
+void MaliputViewerPlugin::OnNewRoadNetwork(const QString& _mapFile, const QString& _ruleRegistryFile,
+                                           const QString& _roadRulebookFile, const QString& _trafficLightBookFile,
+                                           const QString& _phaseRingBookFile, const QString& _intersectionBookFile) {
   if (_mapFile.isEmpty()) {
     ignerr << "Select the map file before clicking the LOAD button." << std::endl;
     return;
   }
   Clear();
   mapFile = GetPathFromFileUrl(_mapFile.toStdString());
+  ruleRegistryFile = GetPathFromFileUrl(_ruleRegistryFile.toStdString());
   roadRulebookFile = GetPathFromFileUrl(_roadRulebookFile.toStdString());
   trafficLightBookFile = GetPathFromFileUrl(_trafficLightBookFile.toStdString());
   phaseRingBookFile = GetPathFromFileUrl(_phaseRingBookFile.toStdString());
-  model->Load(mapFile, roadRulebookFile, trafficLightBookFile, phaseRingBookFile);
+  intersectionBookFile = GetPathFromFileUrl(_intersectionBookFile.toStdString());
+  model->Load(mapFile, ruleRegistryFile, roadRulebookFile, trafficLightBookFile, phaseRingBookFile,
+              intersectionBookFile);
   UpdateLaneList();
   emit LayerCheckboxesChanged();
   emit LabelCheckboxesChanged();

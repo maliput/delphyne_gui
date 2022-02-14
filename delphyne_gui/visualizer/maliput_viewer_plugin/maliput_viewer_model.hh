@@ -179,9 +179,10 @@ class MaliputViewerModel {
   /// Gets the file path from GlobalAttributes and loads the RoadGeometry into
   /// memory. Then, converts it into a map of meshes, loading each mesh material
   /// information. Meshes that are not available, are set to kDisabled.
-  bool Load(const std::string& _maliputFilePath, const std::string& _roadRulebookFilePath = std::string(),
-            const std::string& _trafficLightBook = std::string(),
-            const std::string& _phaseRingFilePath = std::string());
+  bool Load(const std::string& _maliputFilePath, const std::string& _ruleRegistryFilePath = std::string(),
+            const std::string& _roadRulebookFilePath = std::string(),
+            const std::string& _trafficLightBook = std::string(), const std::string& _phaseRingFilePath = std::string(),
+            const std::string& _intersectionBookFilePath = std::string());
 
   /// \return True when any of roadNetwork are not nullptr.
   bool IsInitialized() const { return roadNetwork.get() != nullptr; }
@@ -277,8 +278,9 @@ class MaliputViewerModel {
   /// If the key doesn't exist in the file, it's not valid.
   /// Otherwise the correct loader will be called to parse the file.
   /// \param _maliputFilePath The YAML file path to parse.
-  void LoadRoadGeometry(const std::string& _maliputFilePath, const std::string& _roadRulebookFilePath,
-                        const std::string& _trafficLightBookFilePath, const std::string& _phaseRingFilePath);
+  void LoadRoadGeometry(const std::string& _maliputFilePath, const std::string& _ruleRegistryFilePath,
+                        const std::string& _roadRulebookFilePath, const std::string& _trafficLightBookFilePath,
+                        const std::string& _phaseRingFilePath, const std::string& _intersectionBookFilePath);
 
   /// \brief Converts @p _geoMeshes into a
   ///        std::map<std::string, std::unique_ptr<ignition::common::Mesh>>

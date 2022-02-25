@@ -8,14 +8,7 @@ This is the repository for Delphyne GUI, a front-end visualizer for `delphyne`.
 
 1. Setup a development workspace as described [here](https://github.com/ToyotaResearchInstitute/maliput_documentation/blob/main/docs/installation_quickstart.rst).
 
-2. Bring up your development workspace:
-
-```sh
-cd path/to/my/workspace
-source ./bringup
-```
-
-3. Build Delphyne packages and their dependencies:
+2. Build Delphyne packages and their dependencies:
 
   - If not building drake from source:
 
@@ -27,6 +20,11 @@ source ./bringup
 
    ```sh
    colcon build --cmake-args -DWITH_PYTHON_VERSION=3 --packages-up-to delphyne_gui
+   ```
+
+   **Note**: To build documentation a `-BUILD_DOCS` cmake flag is required:
+   ```sh
+   colcon build --packages-up-to delphyne_gui --cmake-args " -DBUILD_DOCS=On"
    ```
 
 ## Tools

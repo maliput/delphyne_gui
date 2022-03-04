@@ -9,6 +9,7 @@ import QtQuick.Layouts 1.3
 
 // Panel that contains four buttons for selecting:
 // - Map file.
+// - RuleRegistry file.
 // - RoadRulebook file.
 // - TrafficLightBook file.
 // - PhaseRingBook file.
@@ -23,6 +24,9 @@ GridLayout {
   anchors.topMargin: 10
   Layout.fillWidth: true
 
+  // Path to the RuleRegistry file.
+  property string ruleRegistryPath: ""
+
   // Path to the RoadRulebook file.
   property string roadRulebookPath: ""
 
@@ -31,6 +35,9 @@ GridLayout {
 
   // Path to the PhaseRingBook file.
   property string phaseRingBookPath: ""
+
+  // Path to the IntersectionBook file.
+  property string intersectionBookPath: ""
 
   // Path to the map file.
   property string mapFilePath: ""
@@ -44,6 +51,57 @@ GridLayout {
     Layout.alignment: Qt.AlignHCenter
     font.pixelSize: 14
     text: "FILES SELECTION"
+  }
+
+  /**
+  * RuleRegistry selecting button
+  */
+  FileDialog {
+    id: ruleRegistryDialog
+    title: "Please choose a RuleRegistry"
+    nameFilters: [ "YAML files (*.yaml)", "All files (*)" ]
+    selectExisting : true
+    selectFolder : false
+    selectMultiple : false
+    sidebarVisible : true
+    onAccepted: {
+      console.log("RuleRegistry selection: You chose: " + ruleRegistryDialog.fileUrl)
+      ruleRegistryPath = ruleRegistryDialog.fileUrl
+    }
+    onRejected: {
+      console.log("RuleRegistry selection: Canceled")
+    }
+    visible: false
+  }
+  TextField {
+    id: ruleRegistryPathTextField
+    Layout.fillWidth: true
+    readOnly: true
+    text: ruleRegistryPath
+    placeholderText: qsTr("Optional: Select a RuleRegistry file...")
+    font.pixelSize: 12
+    font.family: "Helvetica"
+  }
+  Button {
+    id: ruleRegistryButton
+    text: "RuleRegistry"
+    checkable: false
+    Layout.preferredWidth: parent.width * 0.3
+    onClicked: {
+      ruleRegistryDialog.visible = true
+    }
+    Material.background: Material.primary
+    style: ButtonStyle {
+      label: Text {
+        renderType: Text.NativeRendering
+        verticalAlignment: Text.AlignVCenter
+        horizontalAlignment: Text.AlignHCenter
+        font.family: "Helvetica"
+        font.pointSize: 10
+        color: "black"
+        text: ruleRegistryButton.text
+      }
+    }
   }
 
   /**
@@ -200,6 +258,57 @@ GridLayout {
   }
 
   /**
+  * Intersection book selecting button
+  */
+  FileDialog {
+    id: intersectionBookDialog
+    title: "Please choose a IntersectionBook"
+    nameFilters: [ "YAML files (*.yaml)", "All files (*)" ]
+    selectExisting : true
+    selectFolder : false
+    selectMultiple : false
+    sidebarVisible : true
+    onAccepted: {
+      console.log("IntersectionBook selection: You chose: " + intersectionBookDialog.fileUrl)
+      intersectionBookPath = intersectionBookDialog.fileUrl
+    }
+    onRejected: {
+      console.log("IntersectionBook selection: Canceled")
+    }
+    visible: false
+  }
+  TextField {
+    id: intersectionBookPathTextField
+    Layout.fillWidth: true
+    readOnly: true
+    text: intersectionBookPath
+    placeholderText: qsTr("Optional: Select a IntersectionBook file...")
+    font.pixelSize: 12
+    font.family: "Helvetica"
+  }
+  Button {
+    id: intersectionBookButton
+    text: "IntersectionBook"
+    checkable: false
+    Layout.preferredWidth: parent.width * 0.3
+    onClicked: {
+      intersectionBookDialog.visible = true
+    }
+    Material.background: Material.primary
+    style: ButtonStyle {
+      label: Text {
+        renderType: Text.NativeRendering
+        verticalAlignment: Text.AlignVCenter
+        horizontalAlignment: Text.AlignHCenter
+        font.family: "Helvetica"
+        font.pointSize: 10
+        color: "black"
+        text: intersectionBookButton.text
+      }
+    }
+  }
+
+  /**
   * Mapfile selecting button
   */
   FileDialog {
@@ -261,7 +370,7 @@ GridLayout {
     Layout.columnSpan: 2
     Layout.fillWidth: true
     onClicked: {
-      MaliputViewerPlugin.OnNewRoadNetwork(mapFilePath, roadRulebookPath, trafficLightBookPath, phaseRingBookPath)
+      MaliputViewerPlugin.OnNewRoadNetwork(mapFilePath, ruleRegistryPath, roadRulebookPath, trafficLightBookPath, phaseRingBookPath, intersectionBookPath)
     }
     Material.background: Material.primary
     style: ButtonStyle {

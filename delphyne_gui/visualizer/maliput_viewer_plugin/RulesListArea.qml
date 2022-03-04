@@ -31,8 +31,8 @@ GridLayout {
     Layout.alignment: Qt.AlignVTop | Qt.AlignHLeft
     width: parent.width
     Layout.minimumHeight: 100
-    Layout.preferredHeight: 125
-    Layout.maximumHeight: 125
+    Layout.preferredHeight: 175
+    Layout.maximumHeight: 175
     Layout.fillWidth: true
     font.pixelSize: 12
     font.family: "Helvetica"

@@ -200,7 +200,7 @@ void RoadNetworkQuery::GetDiscreteValue(const maliput::api::LaneId& lane_id) {
   const int n_rules = static_cast<int>(query_result.discrete_value_rules.size());
   if (n_rules > 0) {
     for (const auto& discrete_value_rule : query_result.discrete_value_rules) {
-      const auto& values = discrete_value_rule.second.values();
+      const auto& values = discrete_value_rule.second.states();
       for (const auto& value : values) {
         const std::string val = value.value;
         (*out_) << "              : Result: Rule (id: " << discrete_value_rule.first.string();
@@ -223,7 +223,7 @@ void RoadNetworkQuery::GetRangeValue(const maliput::api::LaneId& lane_id) {
   const int n_rules = static_cast<int>(query_result.range_value_rules.size());
   if (n_rules > 0) {
     for (const auto& range_value_rule : query_result.range_value_rules) {
-      const auto& ranges = range_value_rule.second.ranges();
+      const auto& ranges = range_value_rule.second.states();
       for (const auto& range : ranges) {
         const std::string description = range.description;
         const double min = range.min;

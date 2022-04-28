@@ -25,7 +25,7 @@
 #include <maliput/api/lane_data.h>
 #include <maliput/api/road_geometry.h>
 #include <maliput/api/segment.h>
-#include <maliput/utilities/mesh.h>
+#include <maliput/utility/mesh.h>
 
 using namespace maliput::utility::mesh;
 

@@ -19,8 +19,8 @@
 #include <maliput/api/rules/phase.h>
 #include <maliput/api/rules/right_of_way_rule.h>
 #include <maliput/api/rules/traffic_lights.h>
-#include <maliput/utilities/generate_obj.h>
-#include <maliput/utilities/mesh.h>
+#include <maliput/utility/generate_obj.h>
+#include <maliput/utility/mesh.h>
 
 // Returns a vector of all possible direction usage values. Item order
 // matches maliput::api::rules::DirectionUsageRule::Type enumeration.

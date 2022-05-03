@@ -22,7 +22,7 @@ target_link_libraries(maliput_viewer_model
   ignition-common3::ignition-common3
   ignition-rendering3::ignition-rendering3
   maliput::api
-  maliput::utilities
+  maliput::utility
 )
 
 install(

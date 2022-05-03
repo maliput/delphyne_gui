@@ -12,8 +12,8 @@
 #include <maliput/api/lane_data.h>
 #include <maliput/api/rules/phase.h>
 #include <maliput/api/rules/traffic_light_book.h>
-#include <maliput/utilities/generate_obj.h>
-#include <maliput/utilities/mesh.h>
+#include <maliput/utility/generate_obj.h>
+#include <maliput/utility/mesh.h>
 
 #include "maliput_mesh_converter.hh"
 

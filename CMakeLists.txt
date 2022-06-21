@@ -103,7 +103,7 @@ if (BUILD_TESTING)
   find_package(ament_cmake_flake8 REQUIRED)
   find_package(ament_cmake_gtest REQUIRED)
   ament_flake8("--config" ${CMAKE_CURRENT_SOURCE_DIR}/.flake8)
-  ament_clang_format(CONFIG_FILE ${CMAKE_CURRENT_SOURCE_DIR}/../.clang-format)
+  ament_clang_format(CONFIG_FILE ${CMAKE_CURRENT_SOURCE_DIR}/.clang-format)
 endif()
 
 ##############################################################################

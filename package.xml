@@ -5,7 +5,7 @@
   <version>1.0.0</version>
   <description>Delphyne GUI</description>
   <maintainer email="daniel.stonier@tri.global">Daniel Stonier</maintainer>
-  <license file="../LICENSE">BSD 3-Clause</license>
+  <license file="LICENSE">BSD 3-Clause</license>
 
   <build_depend>libqt5-multimedia</build_depend>
   <build_depend>libogre-dev</build_depend>

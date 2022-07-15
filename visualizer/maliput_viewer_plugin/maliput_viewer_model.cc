@@ -454,15 +454,12 @@ void MaliputViewerModel::LoadRoadGeometry(const std::string& _maliputFilePath, c
   while (!fileStream.eof()) {
     std::getline(fileStream, line);
     if (line.find("<OpenDRIVE>") != std::string::npos) {
-      this->roadNetwork = std::unique_ptr<maliput::api::RoadNetwork>(
-          delphyne::roads::CreateMalidriveRoadNetworkFromXodr(
-              _maliputFilePath.substr(_maliputFilePath.find_last_of("/") + 1), _maliputFilePath, _ruleRegistryFilePath,
-              _roadRulebookFilePath, _trafficLightBookFilePath, _phaseRingFilePath, _intersectionBookFilePath)
-              ->release());
+      this->roadNetwork = delphyne::roads::CreateMalidriveRoadNetworkFromXodr(
+          _maliputFilePath.substr(_maliputFilePath.find_last_of("/") + 1), _maliputFilePath, _ruleRegistryFilePath,
+          _roadRulebookFilePath, _trafficLightBookFilePath, _phaseRingFilePath, _intersectionBookFilePath);
       return;
     } else if (line.find("maliput_multilane_builder:") != std::string::npos) {
-      this->roadNetwork = std::unique_ptr<maliput::api::RoadNetwork>(
-          delphyne::roads::CreateMultilaneFromFile(_maliputFilePath)->release());
+      this->roadNetwork = delphyne::roads::CreateMultilaneFromFile(_maliputFilePath);
       return;
     }
   }

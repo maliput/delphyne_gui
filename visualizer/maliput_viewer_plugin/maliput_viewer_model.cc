@@ -165,17 +165,17 @@ void RoadNetworkQuery::ToInertialPosition(const maliput::api::LaneId& lane_id,
 }
 
 /////////////////////////////////////////////////
-void RoadNetworkQuery::ToLanePosition(const maliput::api::LaneId& lane_id,
-                                      const maliput::api::InertialPosition& inertial_position) {
+void RoadNetworkQuery::ToSegmentPosition(const maliput::api::LaneId& lane_id,
+                                         const maliput::api::InertialPosition& inertial_position) {
   const maliput::api::Lane* lane = rn_->road_geometry()->ById().GetLane(lane_id);
   if (lane == nullptr) {
     (*out_) << "              : Result: Could not find lane. " << std::endl;
     return;
   }
 
-  const maliput::api::LanePositionResult result = lane->ToLanePosition(inertial_position);
+  const maliput::api::LanePositionResult result = lane->ToSegmentPosition(inertial_position);
 
-  (*out_) << "(" << lane_id.string() << ")->ToLanePosition(inertial_position: " << inertial_position << ")"
+  (*out_) << "(" << lane_id.string() << ")->ToSegmentPosition(inertial_position: " << inertial_position << ")"
           << std::endl;
   (*out_) << "              : Result: lane_pos:" << result.lane_position << ", nearest_pos: " << result.nearest_position
           << ", with distance: " << result.distance << std::endl;

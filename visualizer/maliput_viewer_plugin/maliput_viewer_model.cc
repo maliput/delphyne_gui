@@ -453,6 +453,8 @@ void MaliputViewerModel::LoadRoadGeometry(const std::string& _maliputFilePath, c
   std::string line;
   while (!fileStream.eof()) {
     std::getline(fileStream, line);
+    // TODO(#427): When the viewer is able to receive a dictionary of string for the configuration,
+    //             this should change to use directly #maliput::plugin::CreateRoadNetwork("<maliput_backend>", config);
     if (line.find("<OpenDRIVE>") != std::string::npos) {
       this->roadNetwork = delphyne::roads::CreateMalidriveRoadNetworkFromXodr(
           _maliputFilePath.substr(_maliputFilePath.find_last_of("/") + 1), _maliputFilePath, _ruleRegistryFilePath,
@@ -460,6 +462,12 @@ void MaliputViewerModel::LoadRoadGeometry(const std::string& _maliputFilePath, c
       return;
     } else if (line.find("maliput_multilane_builder:") != std::string::npos) {
       this->roadNetwork = delphyne::roads::CreateMultilaneFromFile(_maliputFilePath);
+      return;
+    } else if (line.find("<osm version=") != std::string::npos) {
+      this->roadNetwork = delphyne::roads::CreateMaliputOSMRoadNetwork(
+          _maliputFilePath.substr(_maliputFilePath.find_last_of("/") + 1), _maliputFilePath, {} /* origin */,
+          _ruleRegistryFilePath, _roadRulebookFilePath, _trafficLightBookFilePath, _phaseRingFilePath,
+          _intersectionBookFilePath);
       return;
     }
   }

@@ -342,7 +342,7 @@ GridLayout {
   FileDialog {
     id: mapFileDialog
     title: "Please choose a map to load"
-    nameFilters: [ "XODR files (*.xodr)", "YAML files (*.yaml)", "All files (*)" ]
+    nameFilters: [ "XODR files (*.xodr)", "OSM files (*.osm)", "YAML files (*.yaml)", "All files (*)" ]
     selectExisting : true
     selectFolder : false
     selectMultiple : false
@@ -362,7 +362,7 @@ GridLayout {
     Layout.fillWidth: true
     readOnly: true
     text: mapFilePath
-    placeholderText: qsTr("Select an XODR or YAML map file...")
+    placeholderText: qsTr("Select an XODR, OSM, or YAML map file...")
     font.pixelSize: 12
     font.family: "Helvetica"
   }

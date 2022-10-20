@@ -319,6 +319,8 @@ void RoadNetworkQuery::GetDirectionUsage(const maliput::api::LaneId& lane_id) {
 }
 
 /////////////////////////////////////////////////
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 void RoadNetworkQuery::GetRightOfWay(const maliput::api::LaneSRange& lane_s_range) {
   const maliput::api::rules::RoadRulebook::QueryResults results = rn_->rulebook()->FindRules({lane_s_range}, 0.);
   maliput::api::rules::RightOfWayRuleStateProvider* right_of_way_rule_state_provider =
@@ -345,6 +347,7 @@ void RoadNetworkQuery::GetRightOfWay(const maliput::api::LaneSRange& lane_s_rang
     (*out_) << ", static: " << (rule.second.is_static() ? "yes" : "no") << ")" << std::endl << std::endl;
   }
 }
+#pragma GCC diagnostic pop
 
 /////////////////////////////////////////////////
 void RoadNetworkQuery::GetPhaseRightOfWay(const maliput::api::rules::PhaseRing::Id& phase_ring_id,
@@ -373,7 +376,8 @@ void RoadNetworkQuery::GetPhaseRightOfWay(const maliput::api::rules::PhaseRing::
             << std::endl;
     return;
   }
-
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
   const maliput::api::rules::Phase& phase = it->second;
   (*out_) << "Right of way for " << phase_id.string() << ":" << std::endl;
   for (const auto& rule_id_to_rule_state_id : phase.rule_states()) {
@@ -386,6 +390,7 @@ void RoadNetworkQuery::GetPhaseRightOfWay(const maliput::api::rules::PhaseRing::
             << std::endl;
   }
 }
+#pragma GCC diagnostic pop
 
 /////////////////////////////////////////////////
 maliput::api::rules::RoadRulebook::QueryResults RoadNetworkQuery::FindRulesFor(const maliput::api::LaneId& lane_id) {

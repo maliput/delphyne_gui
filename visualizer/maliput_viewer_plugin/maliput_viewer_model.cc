@@ -407,17 +407,10 @@ maliput::api::rules::RoadRulebook::QueryResults RoadNetworkQuery::FindRulesFor(c
   return rn_->rulebook()->FindRules(lane_s_ranges, 0.);
 }
 
-/////////////////////////////////////////////////
-bool MaliputViewerModel::Load(const std::string& _maliputFilePath, const std::string& _ruleRegistryFilePath,
-                              const std::string& _roadRulebookFilePath, const std::string& _trafficLightBookFilePath,
-                              const std::string& _phaseRingFilePath, const std::string& _intersectionBookFilePath) {
-  this->Clear();
-
-  ignmsg << "About to load [" << _maliputFilePath << "] maliput file." << std::endl;
-  LoadRoadGeometry(_maliputFilePath, _ruleRegistryFilePath, _roadRulebookFilePath, _trafficLightBookFilePath,
-                   _phaseRingFilePath, _intersectionBookFilePath);
+MaliputViewerModel::MaliputViewerModel(std::unique_ptr<maliput::api::RoadNetwork> _roadNetwork)
+    : roadNetwork(std::move(_roadNetwork)) {
+  MALIPUT_THROW_UNLESS(roadNetwork != nullptr);
   const maliput::api::RoadGeometry* rg = roadNetwork->road_geometry();
-  ignmsg << "Loaded [" << _maliputFilePath << "] maliput file." << std::endl;
   ignmsg << "Loading RoadGeometry meshes of " << rg->id().string() << std::endl;
   maliput::utility::ObjFeatures features;
   features.off_grid_mesh_generation = true;
@@ -427,14 +420,6 @@ bool MaliputViewerModel::Load(const std::string& _maliputFilePath, const std::st
   ignmsg << "Meshes converted to ignition type." << std::endl;
   this->GenerateLabels();
   ignmsg << "Labels generated." << std::endl;
-  return true;
-}
-
-///////////////////////////////////////////////////////
-void MaliputViewerModel::Clear() {
-  this->roadNetwork.reset();
-  this->labels.clear();
-  this->maliputMeshes.clear();
 }
 
 /////////////////////////////////////////////////

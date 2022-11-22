@@ -46,7 +46,7 @@
 #include <maliput/api/road_geometry.h>
 
 #include "arrow_mesh.hh"
-#include "maliput_viewer_model.hh"
+#include "maliput_backend_selection.hh"
 #include "selector.hh"
 #include "traffic_light_manager.hh"
 
@@ -185,16 +185,8 @@ class MaliputViewerPlugin : public ignition::gui::Plugin {
   void timerEvent(QTimerEvent* _event) override;
 
  protected slots:
-  /// \brief Clears the visualizer, loads a RoadNetwork and update the GUI with meshes and labels.
-  /// \param[in] _mapFile The path to the map file to load and visualize.
-  /// \param[in] _ruleRegistryFile The path to the rule registry file.
-  /// \param[in] _roadRulebookFile The path to the road rulebook file.
-  /// \param[in] _trafficLightBookFile The path to the traffic light book file.
-  /// \param[in] _phaseRingBookFile The path to the phase ring book file.
-  /// \param[in] _intersectionBookFile The path to the phase ring book file.
-  void OnNewRoadNetwork(const QString& _mapFile, const QString& _ruleRegistryFile, const QString& _roadRulebookFile,
-                        const QString& _trafficLightBookFile, const QString& _phaseRingBookFile,
-                        const QString& _intersectionBookFile);
+  /// \brief Clears the visualizer and updates the GUI with meshes and labels using the new RoadNetwork.
+  void OnNewRoadNetwork();
 
   /// \brief Change the visibility of the layers.
   /// \param[in] _layer The layer to change its visibility.
@@ -426,8 +418,8 @@ class MaliputViewerPlugin : public ignition::gui::Plugin {
   /// \brief Holds a pointer to the camera.
   ignition::rendering::CameraPtr camera{};
 
-  /// \brief Model that holds the meshes and the visualization status.
-  std::unique_ptr<MaliputViewerModel> model{};
+  /// \brief Manages the backend selection and road network loading.
+  MaliputBackendSelection maliputBackendSelection{this};
 
   /// \brief Arrow that points the location clicked in the visualizer.
   std::unique_ptr<ArrowMesh> arrow;

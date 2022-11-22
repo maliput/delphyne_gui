@@ -55,15 +55,6 @@ bool FoundKeyword(const std::string& word, const std::string& keyword) {
   return word.find(keyword) != std::string::npos;
 }
 
-// \brief Returns the absolute path from @p fileUrl.
-// \details `fileUrl` is expected to be conformed as:
-//          "file://" + "absolute path"
-//          If `fileUrl` is empty returns an empty string.
-std::string GetPathFromFileUrl(const std::string& fileUrl) {
-  static constexpr char const* kFileUrlLabel = "file://";
-  return fileUrl.empty() ? fileUrl : fileUrl.substr(fileUrl.find(kFileUrlLabel) + strlen(kFileUrlLabel));
-}
-
 // \brief Obtains the id of a branchpoint or lane from the string used as it's
 //        key value in the mesh map.
 //        e.g: If @p keyword is "lane_1_0_1", it returns "1_0_1";
@@ -135,16 +126,10 @@ void PhaseTreeModel::AddPhaseToPhaseRing(const std::string& _phaseName, const st
 }
 
 MaliputViewerPlugin::MaliputViewerPlugin() : Plugin() {
-  model = std::make_unique<MaliputViewerModel>();
   ignition::gui::App()->Engine()->rootContext()->setContextProperty(QString::fromStdString("PhaseTreeModel"),
                                                                     &phaseTreeModel);
-
-  // Loads the maliput file path if any and parses it.
-  if (GlobalAttributes::HasArgument("xodr_file")) {
-    model->Load(GlobalAttributes::GetArgument("xodr_file"));
-  } else if (GlobalAttributes::HasArgument("yaml_file")) {
-    model->Load(GlobalAttributes::GetArgument("yaml_file"));
-  }
+  ignition::gui::App()->Engine()->rootContext()->setContextProperty(QString::fromStdString("MaliputBackendSelection"),
+                                                                    &maliputBackendSelection);
 }
 
 QStringList MaliputViewerPlugin::ListLanes() const { return listLanes; }
@@ -166,29 +151,15 @@ QList<bool> MaliputViewerPlugin::LabelCheckboxes() const {
   return {true /* lane */, true /* branch_point */};
 }
 
-void MaliputViewerPlugin::OnNewRoadNetwork(const QString& _mapFile, const QString& _ruleRegistryFile,
-                                           const QString& _roadRulebookFile, const QString& _trafficLightBookFile,
-                                           const QString& _phaseRingBookFile, const QString& _intersectionBookFile) {
-  if (_mapFile.isEmpty()) {
-    ignerr << "Select the map file before clicking the LOAD button." << std::endl;
-    return;
-  }
+void MaliputViewerPlugin::OnNewRoadNetwork() {
   Clear();
-  mapFile = GetPathFromFileUrl(_mapFile.toStdString());
-  ruleRegistryFile = GetPathFromFileUrl(_ruleRegistryFile.toStdString());
-  roadRulebookFile = GetPathFromFileUrl(_roadRulebookFile.toStdString());
-  trafficLightBookFile = GetPathFromFileUrl(_trafficLightBookFile.toStdString());
-  phaseRingBookFile = GetPathFromFileUrl(_phaseRingBookFile.toStdString());
-  intersectionBookFile = GetPathFromFileUrl(_intersectionBookFile.toStdString());
-  model->Load(mapFile, ruleRegistryFile, roadRulebookFile, trafficLightBookFile, phaseRingBookFile,
-              intersectionBookFile);
   UpdateLaneList();
   emit LayerCheckboxesChanged();
   emit LabelCheckboxesChanged();
   renderMeshesOption.RenderAll();
 
   // Get phases and update the list.
-  const auto phaseRings = model->GetPhaseRings<std::string>();
+  const auto phaseRings = maliputBackendSelection.GetMaliputModel()->GetPhaseRings<std::string>();
   for (const auto& phaseRing : phaseRings) {
     phaseTreeModel.AddPhaseRing(phaseRing.first);
     for (const auto& phase : phaseRing.second) {
@@ -201,7 +172,8 @@ void MaliputViewerPlugin::OnNewRoadNetwork(const QString& _mapFile, const QStrin
 }
 
 void MaliputViewerPlugin::UpdateLaneList() {
-  std::vector<std::string> laneIds = model->GetAllLaneIds<std::vector<std::string>>();
+  std::vector<std::string> laneIds =
+      maliputBackendSelection.GetMaliputModel()->GetAllLaneIds<std::vector<std::string>>();
   std::sort(laneIds.begin(), laneIds.end());
   listLanes.clear();
   std::for_each(laneIds.cbegin(), laneIds.cend(),
@@ -231,18 +203,18 @@ void MaliputViewerPlugin::OnNewMeshLayerSelection(const QString& _layer, bool _s
   if (FoundKeyword(layer, kAll)) {
     const std::string keyword = layer.substr(0, all_keyword);
     UpdateObjectVisualDefaults(layer, _state);
-    for (auto const& it : model->Meshes()) {
+    for (auto const& it : maliputBackendSelection.GetMaliputModel()->Meshes()) {
       if (FoundKeyword(it.first, keyword)) {
         const std::string id = GetID(it.first);
         // If the region is not selected, update with the default setting
         if (!selector->IsSelected(id)) {
           // Updates the model.
-          model->SetLayerState(it.first, _state);
+          maliputBackendSelection.GetMaliputModel()->SetLayerState(it.first, _state);
         }
       }
     }
   } else {
-    model->SetLayerState(layer, _state);
+    maliputBackendSelection.GetMaliputModel()->SetLayerState(layer, _state);
     // If the asphalt is turned off, deselect all lanes.
     if (FoundKeyword(layer, kAsphalt) && !_state) {
       selector->DeselectAll();
@@ -257,15 +229,15 @@ void MaliputViewerPlugin::OnNewTextLabelSelection(const QString& _label, bool _s
   if (label == kLaneLabels || label == kBranchPointLabels) {
     UpdateObjectVisualDefaults(label, _state);
     const std::string keyword = label.substr(0, label.find(kLabels));
-    for (auto const& it : model->Labels()) {
+    for (auto const& it : maliputBackendSelection.GetMaliputModel()->Labels()) {
       if (FoundKeyword(it.first, keyword)) {
         if (!selector->IsSelected(it.second.text)) {
-          model->SetTextLabelState(it.first, _state);
+          maliputBackendSelection.GetMaliputModel()->SetTextLabelState(it.first, _state);
         }
       }
     }
   } else {
-    model->SetTextLabelState(label, _state);
+    maliputBackendSelection.GetMaliputModel()->SetTextLabelState(label, _state);
   }
 
   renderMeshesOption.executeLabelRendering = true;
@@ -274,7 +246,7 @@ void MaliputViewerPlugin::OnTableLaneIdSelection(int _index) {
   // Because the table is filled in the same order that the table's index increases,
   // we can easily get the lane id out of the index of the table.
   const QString& laneId = listLanes[_index];
-  const maliput::api::Lane* lane = model->GetLaneFromId(laneId.toStdString());
+  const maliput::api::Lane* lane = maliputBackendSelection.GetMaliputModel()->GetLaneFromId(laneId.toStdString());
   if (!lane) {
     ignerr << "There is no loaded lane that matches with this id: " << laneId.toStdString() << std::endl;
     return;
@@ -311,8 +283,8 @@ void MaliputViewerPlugin::OnPhaseSelection(const QModelIndex& _index) {
     }
     currentPhase.first = item->text().toStdString();
     currentPhase.second = phaseRingItem->text().toStdString();
-    trafficLightManager->SetBulbStates(
-        model->GetBulbStates(currentPhase.second /* phaseRingId */, currentPhase.first /* phaseId */));
+    trafficLightManager->SetBulbStates(maliputBackendSelection.GetMaliputModel()->GetBulbStates(
+        currentPhase.second /* phaseRingId */, currentPhase.first /* phaseId */));
   }
 }
 
@@ -593,9 +565,9 @@ bool MaliputViewerPlugin::eventFilter(QObject* _obj, QEvent* _event) {
       }
       if (this->newRoadNetwork) {
         // New road network loaded.
-        this->RenderRoadMeshes(model->Meshes());
-        this->RenderLabels(model->Labels());
-        this->trafficLightManager->CreateTrafficLights(model->GetTrafficLights());
+        this->RenderRoadMeshes(maliputBackendSelection.GetMaliputModel()->Meshes());
+        this->RenderLabels(maliputBackendSelection.GetMaliputModel()->Labels());
+        this->trafficLightManager->CreateTrafficLights(maliputBackendSelection.GetMaliputModel()->GetTrafficLights());
         this->renderMeshesOption.executeLabelRendering = false;
         this->renderMeshesOption.executeMeshRendering = false;
         this->newRoadNetwork = false;
@@ -612,12 +584,12 @@ bool MaliputViewerPlugin::eventFilter(QObject* _obj, QEvent* _event) {
         trafficLightManager->Tick();
         // Update road meshes if necessary.
         if (renderMeshesOption.executeMeshRendering) {
-          this->RenderRoadMeshes(model->Meshes());
+          this->RenderRoadMeshes(maliputBackendSelection.GetMaliputModel()->Meshes());
           renderMeshesOption.executeMeshRendering = false;
         }
         // Update label meshes if necessary.
         if (renderMeshesOption.executeLabelRendering) {
-          this->RenderLabels(model->Labels());
+          this->RenderLabels(maliputBackendSelection.GetMaliputModel()->Labels());
           renderMeshesOption.executeLabelRendering = false;
         }
       }
@@ -628,7 +600,8 @@ bool MaliputViewerPlugin::eventFilter(QObject* _obj, QEvent* _event) {
 }
 
 void MaliputViewerPlugin::MouseClickHandler(const ignition::math::Vector3d& _sceneInertialPosition, double _distance) {
-  const maliput::api::RoadPositionResult newRoadPositionResult = model->GetRoadPositionResult(_sceneInertialPosition);
+  const maliput::api::RoadPositionResult newRoadPositionResult =
+      maliputBackendSelection.GetMaliputModel()->GetRoadPositionResult(_sceneInertialPosition);
   // There is no intersection vs There is an intersection and should update the the properties of the lane, etc.
   roadPositionResultValue = newRoadPositionResult.distance > 1e-6
                                 ? RoadPositionResultValue()
@@ -736,21 +709,25 @@ void MaliputViewerPlugin::UpdateSelectedLanesWithDefault() {
   const std::vector<std::string> selectedLanes = selector->GetSelectedLanes();
   const std::vector<std::string> selectedBranchPoints = selector->GetSelectedBranchPoints();
   for (const auto& id : selectedLanes) {
-    model->SetLayerState(FromIdToMapKey(kLane, id), objectVisualDefaults[kLane]);
-    model->SetLayerState(FromIdToMapKey(kMarker, id), objectVisualDefaults[kMarker]);
-    model->SetTextLabelState(FromIdToMapKey(kLane, id), objectVisualDefaults[kLaneLabels]);
+    maliputBackendSelection.GetMaliputModel()->SetLayerState(FromIdToMapKey(kLane, id), objectVisualDefaults[kLane]);
+    maliputBackendSelection.GetMaliputModel()->SetLayerState(FromIdToMapKey(kMarker, id),
+                                                             objectVisualDefaults[kMarker]);
+    maliputBackendSelection.GetMaliputModel()->SetTextLabelState(FromIdToMapKey(kLane, id),
+                                                                 objectVisualDefaults[kLaneLabels]);
   }
   for (const auto& id : selectedBranchPoints) {
-    model->SetLayerState(FromIdToMapKey(kBranchPoint, id), objectVisualDefaults[kBranchPoint]);
-    model->SetTextLabelState(FromIdToMapKey(kBranchPoint, id), objectVisualDefaults[kBranchPointLabels]);
+    maliputBackendSelection.GetMaliputModel()->SetLayerState(FromIdToMapKey(kBranchPoint, id),
+                                                             objectVisualDefaults[kBranchPoint]);
+    maliputBackendSelection.GetMaliputModel()->SetTextLabelState(FromIdToMapKey(kBranchPoint, id),
+                                                                 objectVisualDefaults[kBranchPointLabels]);
   }
 
   renderMeshesOption.RenderAll();
 }
 
 void MaliputViewerPlugin::UpdateRulesList(const std::string& _laneId) {
-  rulesList =
-      model->GetRulesOfLane<QString>(currentPhase.second /* phaseRingId */, currentPhase.first /* phaseId */, _laneId);
+  rulesList = maliputBackendSelection.GetMaliputModel()->GetRulesOfLane<QString>(
+      currentPhase.second /* phaseRingId */, currentPhase.first /* phaseId */, _laneId);
   emit RulesListChanged();
 }
 

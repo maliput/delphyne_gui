@@ -197,23 +197,11 @@ MaliputLabelType FromString(const std::string& _type);
 class MaliputViewerModel {
  public:
   /// \brief Constructor.
-  MaliputViewerModel() = default;
+  /// @param _roadNetwork A maliput::api::RoadNetwork.
+  MaliputViewerModel(std::unique_ptr<maliput::api::RoadNetwork> _roadNetwork);
 
   /// \brief Destructor.
   ~MaliputViewerModel() = default;
-
-  /// \brief Loads the meshes from a yaml file.
-  ///
-  /// Gets the file path from GlobalAttributes and loads the RoadGeometry into
-  /// memory. Then, converts it into a map of meshes, loading each mesh material
-  /// information. Meshes that are not available, are set to kDisabled.
-  bool Load(const std::string& _maliputFilePath, const std::string& _ruleRegistryFilePath = std::string(),
-            const std::string& _roadRulebookFilePath = std::string(),
-            const std::string& _trafficLightBook = std::string(), const std::string& _phaseRingFilePath = std::string(),
-            const std::string& _intersectionBookFilePath = std::string());
-
-  /// \return True when any of roadNetwork are not nullptr.
-  bool IsInitialized() const { return roadNetwork.get() != nullptr; }
 
   /// \brief Getter of the map of meshes.
   /// \return The map of meshes.
@@ -326,9 +314,6 @@ class MaliputViewerModel {
   /// \brief Populates this->labels map with this->roadGeometry lane and branch
   ///        point IDs.
   void GenerateLabels();
-
-  /// \brief Frees and clears the roadGeometry, maliputMeshes and labels.
-  void Clear();
 
   /// \brief Get the right of way rules for a given LaneSRange.
   /// \param[in] _laneSRange Object that contains a lane id and a range in the s

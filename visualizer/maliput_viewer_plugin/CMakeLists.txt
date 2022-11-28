@@ -114,12 +114,47 @@ install(
 )
 
 #-------------------------------------------------------------------------------
+# maliput_backend_selection (Qt Object)
+
+QT5_WRAP_CPP(maliput_backend_selection_headers_MOC maliput_backend_selection.hh)
+
+add_library(maliput_backend_selection
+  ${CMAKE_CURRENT_SOURCE_DIR}/maliput_backend_selection.cc
+  ${maliput_backend_selection_headers_MOC}
+  ${maliput_backend_selection_RCC}
+)
+add_library(delphyne_gui::maliput_backend_selection ALIAS maliput_backend_selection)
+set_target_properties(maliput_backend_selection
+  PROPERTIES
+    OUTPUT_NAME maliput_backend_selection
+)
+target_link_libraries(maliput_backend_selection
+    delphyne_gui::maliput_viewer_model
+    maliput::plugin
+    ignition-gui3::ignition-gui3
+    ignition-common3::ignition-common3
+    ignition-transport8::ignition-transport8
+    ignition-rendering3::ignition-rendering3
+    ${Qt5Core_LIBRARIES}
+    ${Qt5Widgets_LIBRARIES}
+)
+
+install(
+  TARGETS maliput_backend_selection
+  EXPORT ${PROJECT_NAME}-targets
+  RUNTIME DESTINATION bin
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib
+)
+
+#-------------------------------------------------------------------------------
 # MaliputViewerPlugin (ign-gui 3)
 QT5_WRAP_CPP(MaliputViewerPlugin_headers_MOC maliput_viewer_plugin.hh)
 QT5_ADD_RESOURCES(MaliputViewerPlugin_RCC maliput_viewer_plugin.qrc)
 
 add_library(MaliputViewerPlugin
   ${CMAKE_CURRENT_SOURCE_DIR}/maliput_viewer_plugin.cc
+  ${maliput_backend_selection_headers_MOC}
   ${MaliputViewerPlugin_headers_MOC}
   ${MaliputViewerPlugin_RCC}
 )
@@ -132,6 +167,7 @@ set_target_properties(MaliputViewerPlugin
 target_link_libraries(MaliputViewerPlugin
     delphyne_gui::arrow_mesh
     delphyne_gui::global_attributes
+    delphyne_gui::maliput_backend_selection
     delphyne_gui::maliput_viewer_model
     delphyne_gui::selector
     delphyne_gui::traffic_light_manager

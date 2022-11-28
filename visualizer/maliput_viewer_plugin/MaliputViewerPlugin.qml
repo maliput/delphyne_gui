@@ -36,21 +36,21 @@ import QtQuick.Layouts 1.3
 
 Rectangle {
   id: maliputViewerPlugin
-  Layout.minimumWidth: 400
-  Layout.preferredWidth: 450
+  Layout.minimumWidth: 450
+  Layout.preferredWidth: 500
   Layout.minimumHeight: 1250
   anchors.fill: parent
 
   // Files Selection Panel
   Loader {
-    id: filesLoader
+    id: maliputLoader
     width: parent.width
-    source: "FileSelectionArea.qml"
+    source: "MaliputBackendConfigurationArea.qml"
   }
   ToolSeparator {
     id: fileSectionSeparator
     orientation: Qt.Horizontal
-    anchors.top: filesLoader.bottom
+    anchors.top: maliputLoader.bottom
     anchors.topMargin: 15
     anchors.left: parent.left
     anchors.leftMargin: 10

@@ -140,15 +140,15 @@ MaliputBackendSelection::MaliputBackendSelection(QObject* parent) : QObject(pare
   backendListModel->setStringList(backend_list);
 }
 
-void MaliputBackendSelection::OnBackendSelected(const QString& backend_name) {
-  std::cout << "backend selected: " << backend_name.toStdString() << std::endl;
+void MaliputBackendSelection::OnBackendSelected(const QString& _backendName) {
+  std::cout << "backend selected: " << _backendName.toStdString() << std::endl;
   // Clears the table model.
   parameterTableModel->ClearParameters();
 
   // Obtains the RoadNetworkLoader for the selected backend.
-  roadNetworkLoader = CreateRoadNetworkLoader(backend_name.toStdString(), maliputManager.get());
+  roadNetworkLoader = CreateRoadNetworkLoader(_backendName.toStdString(), maliputManager.get());
   if (!roadNetworkLoader) {
-    ignerr << "Failed to create road network loader for backend: " << backend_name.toStdString() << std::endl;
+    ignerr << "Failed to create road network loader for backend: " << _backendName.toStdString() << std::endl;
     return;
   }
 

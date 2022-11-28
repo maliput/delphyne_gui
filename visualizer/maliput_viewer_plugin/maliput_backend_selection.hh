@@ -112,7 +112,7 @@ class MaliputBackendSelection : public QObject {
 
   /// Called when the user selects a backend.
   /// @param _backendName Name of the backend.
-  void OnBackendSelected(const QString& backend_name);
+  void OnBackendSelected(const QString& _backendName);
 
  private:
   std::unique_ptr<ParameterTableModel> parameterTableModel;

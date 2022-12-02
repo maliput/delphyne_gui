@@ -49,7 +49,6 @@ install(
 install(
   FILES
     layout_for_playback.config
-    layout_maliput_viewer.config
     layout_with_teleop.config
   DESTINATION
     ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/delphyne/layouts

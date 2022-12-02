@@ -76,7 +76,6 @@ install(
 )
 
 add_subdirectory(display_plugins)
-add_subdirectory(maliput_viewer_plugin)
 add_subdirectory(playback_plugin)
 add_subdirectory(teleop_plugin)
 add_subdirectory(topic_interface_plugin)

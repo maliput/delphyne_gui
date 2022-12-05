@@ -49,7 +49,6 @@ install(
 install(
   FILES
     layout_for_playback.config
-    layout_maliput_viewer.config
     layout_with_teleop.config
   DESTINATION
     ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/delphyne/layouts
@@ -67,16 +66,7 @@ install(
     ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/delphyne/roads
 )
 
-install(
-  FILES
-    resources/arrow_bulb.obj
-    resources/arrow_bulb.mtl
-  DESTINATION
-    ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/delphyne/resources
-)
-
 add_subdirectory(display_plugins)
-add_subdirectory(maliput_viewer_plugin)
 add_subdirectory(playback_plugin)
 add_subdirectory(teleop_plugin)
 add_subdirectory(topic_interface_plugin)

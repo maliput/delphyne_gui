@@ -15,30 +15,6 @@ Refer to [Delphyne GUI's Online API Documentation](https://maliput.readthedocs.i
 
 See [visualizer page](visualizer/README.md).
 
-## Maliput Viewer
-
-An application based on the [visualizer](visualizer/README.md) is provided for visualizing a given Maliput's road network.
-
-### Features
-
- - Supports maliput_multilane and maliput_malidrive backends.
-   - A XODR or YAML file could be selected to be visualized
- - Supports loading a Traffic Light Book.
- - Supports loading a RuleRegistry Book.
- - Supports loading a Rule Book.
- - Supports loading a Phase Ring Book.
-   - Phases can be switched via the interface.
- - Supports loading a Intersection Book.
- - Road examination.
-
-### Open the Maliput Viewer
-
-After installing `delphyne_gui`, run:
-
-```sh
-  maliput_viewer.sh
-```
-
 ## Examples
 
 [delphyne_demos](https://github.com/maliput/delphyne_demos) provides demos that rely on `delphyne_gui` for the visualization.
